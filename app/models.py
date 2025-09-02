@@ -169,12 +169,11 @@ class PasswordReset(db.Model):
     
     @classmethod
     def generate_code(cls) -> str:
-        """Генерирует 8-символьный код восстановления"""
-        import string
+        """Генерирует 8-значный код восстановления"""
         import logging
         logger = logging.getLogger(__name__)
         
-        code = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        code = ''.join(secrets.choice('0123456789') for _ in range(8))
         logger.info(f"Generated password reset code: '{code}' (type: {type(code)}, length: {len(code)})")
         return code
     

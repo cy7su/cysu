@@ -122,12 +122,9 @@
         /* Стили для navbar */
         .navbar-nav .nav-link {
             color: var(--text-secondary) !important;
-            transition: color 0.3s ease;
         }
         
-        .navbar-nav .nav-link:hover {
-            color: var(--primary-color) !important;
-        }
+        /* Hover эффекты отключены */
         
         .btn-primary {
             background-color: var(--primary-color) !important;
@@ -967,14 +964,9 @@
                 border-radius: 8px;
                 background: rgba(255, 255, 255, 0.05);
                 border: 1px solid rgba(255, 255, 255, 0.1);
-                transition: all 0.2s ease;
             }
             
-            .navbar-nav .nav-item.d-lg-none .nav-link:hover {
-                background: rgba(255, 255, 255, 0.1);
-                border-color: rgba(255, 255, 255, 0.2);
-                transform: translateX(5px);
-            }
+            /* Hover эффекты отключены */
             
             /* Добавляем разделитель перед мобильным меню админки */
             .navbar-nav .nav-item.d-lg-none:first-of-type::before {
@@ -1002,12 +994,12 @@
                 background: rgba(255, 255, 255, 0.1);
                 margin-bottom: 0.25rem;
                 border-radius: 8px;
-                transition: background-color 0.2s ease;
+                /* Переходы отключены */
             }
             
+            /* Hover эффект для мобильного dropdown-menu */
             .dropdown-menu .dropdown-item:hover {
-                background: rgba(255, 255, 255, 0.2) !important;
-                color: #ffffff !important;
+                color: #B595FF !important;
             }
             
             .dropdown-menu .dropdown-divider {
@@ -1037,20 +1029,18 @@
                 padding: 0.5rem 1rem;
                 color: #ffffff !important;
                 font-size: 0.9rem;
-                transition: all 0.2s ease;
                 border-radius: 0;
                 margin: 0;
             }
             
+            /* Hover эффект для dropdown-menu элементов */
             .dropdown-menu .dropdown-item:hover {
-                background: rgba(255, 255, 255, 0.1) !important;
-                color: #ffffff !important;
-                transform: translateX(3px);
+                color: #B595FF !important;
             }
             
             .dropdown-menu .dropdown-item:active {
-                background: rgba(255, 255, 255, 0.15) !important;
-                color: #ffffff !important;
+                background: transparent !important;
+                color: #B595FF !important;
             }
             
             .dropdown-menu .dropdown-divider {
@@ -1245,23 +1235,35 @@
                         
                         <!-- Dropdown меню админки только для десктопных устройств -->
                         <li class="nav-item dropdown d-none d-lg-block">
-                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-cog me-2"></i>Админка
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('admin.admin_users') }}">
-                                    <i class="fas fa-users"></i>Пользователи
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('admin.admin_groups') }}">
-                                    <i class="fas fa-layer-group"></i>Группы
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('admin.admin_subject_groups') }}">
-                                    <i class="fas fa-link"></i>Предметы по группам
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ url_for('admin.admin_settings') }}">
-                                    <i class="fas fa-cogs"></i>Настройки
-                                </a></li>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown" style="min-width: 200px;">
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin.admin_users') }}">
+                                        <i class="fas fa-users me-3"></i>
+                                        <span>Пользователи</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin.admin_groups') }}">
+                                        <i class="fas fa-layer-group me-3"></i>
+                                        <span>Группы</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin.admin_subject_groups') }}">
+                                        <i class="fas fa-link me-3"></i>
+                                        <span>Предметы по группам</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-2"></li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin.admin_settings') }}">
+                                        <i class="fas fa-cogs me-3"></i>
+                                        <span>Настройки</span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     {% endif %}
@@ -1904,7 +1906,7 @@ function createTicket() {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
     submitBtn.disabled = true;
     
-    fetch('/api/create_ticket', {
+    fetch('/api/ticket/create', {
         method: 'POST',
         body: formData,
         headers: {

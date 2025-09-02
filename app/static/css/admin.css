@@ -330,6 +330,24 @@
     display: contents;
 }
 
+.subject-groups .bg-primary {
+    background-color: var(--dp-08) !important;
+}
+
+.bg-primary {
+    background-color: var(--dp-02);
+}
+
+.admin-groups .badge {
+    background-color: var(--dp-02) !important;
+}
+
+.bg-info {
+    background-color: var(--dp-02) !important;
+}
+
+
+
 /* Стили для select элементов удалены - функционал коротких ссылок убран */
 
 /* Стили для предварительного просмотра SVG паттернов */
