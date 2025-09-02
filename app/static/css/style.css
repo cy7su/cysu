@@ -595,6 +595,8 @@ a:hover {
 /* Пропорции для карточек предметов */
 .subject-card {
     min-height: 220px;
+    min-width: 400px;
+    margin-right: 40px;
 }
 
 /* SVG изображение занимает 67% высоты карточки */
