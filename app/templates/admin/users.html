@@ -12,11 +12,11 @@
 
   <div class="row g-4">
     <!-- Создание пользователя -->
-    <div class="col-lg-4">
-      <div class="card shadow-sm border-0">
+    <div class="col-lg-3">
+      <div class="card shadow-sm border-0" style="background: var(--dp-02); height: fit-content;">
         <div class="card-body">
           <h5 class="card-title mb-3">
-            <i class="fas fa-user-plus me-2"></i>Создать пользователя
+            <i class="fas fa-user-plus me-2 text-primary"></i>Создать пользователя
           </h5>
           <form method="post">
             {{ form.hidden_tag() }}
@@ -75,6 +75,24 @@
                 </div>
               {% endif %}
             </div>
+            
+            <!-- Роли пользователя -->
+            <div class="mb-3">
+              <label class="form-label">Роли</label>
+              <div class="form-check">
+                {{ form.is_admin(class_='form-check-input') }}
+                <label class="form-check-label" for="{{ form.is_admin.id }}">
+                  Администратор
+                </label>
+              </div>
+              <div class="form-check">
+                {{ form.is_moderator(class_='form-check-input') }}
+                <label class="form-check-label" for="{{ form.is_moderator.id }}">
+                  Модератор
+                </label>
+              </div>
+            </div>
+            
             <button type="submit" name="submit" value="Зарегистрироваться" class="btn btn-primary w-100">
               <i class="fas fa-plus me-2"></i>Создать пользователя
             </button>
@@ -84,25 +102,25 @@
     </div>
 
     <!-- Список пользователей -->
-    <div class="col-lg-8">
-      <div class="card shadow-sm border-0">
+    <div class="col-lg-9">
+      <div class="card shadow-sm border-0" style="background: var(--dp-02);">
         <div class="card-body p-0">
-                      <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead>
+          <div class="table-responsive" style="border-radius: 14px;">
+            <table class="table mb-0" style="background: var(--dp-02); color: var(--text-primary); font-size: 0.9em;">
+              <thead style="background: var(--dp-03);">
                 <tr>
-                  <th class="border-0">ID</th>
-                  <th class="border-0">Пользователь</th>
-                  <th class="border-0">Email</th>
-                  <th class="border-0">Группа</th>
-                  <th class="border-0">Статус</th>
-                  <th class="border-0">Подписка</th>
-                  <th class="border-0">Действия</th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">ID</th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Пользователь</th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Email</th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Группа</th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Статус</th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Подписка</th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Действия</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody style="background: var(--dp-02);">
                 {% for user in users %}
-                <tr>
+                <tr style="border-color: var(--border-secondary); background: var(--dp-02); color: var(--text-primary);">
                   <td><span class="badge bg-secondary">{{ user.id }}</span></td>
                   <td>
                     <strong>{{ user.username }}</strong>
@@ -133,24 +151,49 @@
                   <td>
                     {% if user.is_admin %}
                       <span class="badge bg-danger">Админ</span>
+                      {% if user.admin_mode_enabled %}
+                        <span class="badge bg-success ms-1">Админ режим</span>
+                      {% else %}
+                        <span class="badge bg-secondary ms-1">Пользователь режим</span>
+                      {% endif %}
+                    {% elif user.is_moderator %}
+                      <span class="badge bg-warning">Модератор</span>
                     {% else %}
                       <span class="badge bg-secondary">Пользователь</span>
                     {% endif %}
+                    
+                    <!-- Кнопка редактирования статуса -->
+                    {% if user.id != current_user.id %}
+                      <button type="button" class="btn btn-sm btn-outline-primary ms-1" 
+                              data-bs-toggle="modal" 
+                              data-bs-target="#changeStatusModal{{ user.id }}">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                    {% endif %}
                   </td>
                   <td>
-                    {% if user.is_subscribed %}
-                      {% if user.subscription_expires %}
+                    {% if user.has_active_subscription() %}
+                      {% if user.is_trial_subscription %}
+                        {% if user.trial_subscription_expires %}
+                          <span class="badge bg-info">
+                            <i class="fas fa-clock me-1"></i>
+                            Пробная до {{ user.trial_subscription_expires.strftime('%d.%m.%Y') }}
+                          </span>
+                        {% else %}
+                          <span class="badge bg-info">Пробная активна</span>
+                        {% endif %}
+                      {% elif user.subscription_expires %}
                         <span class="badge bg-success">
                           <i class="fas fa-check me-1"></i>
                           До {{ user.subscription_expires.strftime('%d.%m.%Y') }}
                         </span>
                       {% else %}
                         <span class="badge bg-success">Активна</span>
+                      {% endif %}
+                    {% else %}
+                      <span class="badge bg-warning text-dark">Нет подписки</span>
                     {% endif %}
-                  {% else %}
-                    <span class="badge bg-warning text-dark">Нет подписки</span>
-                  {% endif %}
-                </td>
+                  </td>
                 <td>
                     <div class="d-grid">
                       <!-- Показать новый пароль -->
@@ -189,9 +232,9 @@
                       <form method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="toggle_subscription_id" value="{{ user.id }}">
-                        <button type="submit" class="btn {% if user.is_subscribed %}btn-warning{% else %}btn-success{% endif %}" 
+                        <button type="submit" class="btn {% if user.has_active_subscription() %}btn-warning{% else %}btn-success{% endif %}" 
                                 data-bs-toggle="tooltip" 
-                                title="{% if user.is_subscribed %}Отозвать подписку{% else %}Выдать подписку{% endif %}">
+                                title="{% if user.has_active_subscription() %}Отозвать подписку{% else %}Выдать подписку{% endif %}">
                           <i class="fas fa-crown"></i>
                         </button>
                       </form>
@@ -210,12 +253,12 @@
                   </td>
                 </tr>
                 {% else %}
-                                  <tr>
-                  <td colspan="7" class="text-center text-muted py-4">
-                    <i class="fas fa-users fa-2x mb-3"></i>
-                    <p>Нет пользователей</p>
-                  </td>
-                </tr>
+                  <tr style="background: var(--dp-02); color: var(--text-primary);">
+                    <td colspan="7" class="text-center text-muted py-4" style="color: var(--text-primary);">
+                      <i class="fas fa-users fa-2x mb-3"></i>
+                      <p>Нет пользователей</p>
+                    </td>
+                  </tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -225,45 +268,7 @@
     </div>
   </div>
 
-  <!-- Статистика -->
-  <div class="row g-4 mt-4">
-    <div class="col-md-3">
-      <div class="card shadow-sm border-0 text-center">
-        <div class="card-body">
-          <i class="fas fa-users fa-2x text-primary mb-2"></i>
-          <h4 class="text-primary">{{ users|length }}</h4>
-          <small class="text-muted">Всего пользователей</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card shadow-sm border-0 text-center">
-        <div class="card-body">
-          <i class="fas fa-crown fa-2x text-success mb-2"></i>
-          <h4 class="text-success">{{ users|selectattr('is_subscribed')|list|length }}</h4>
-          <small class="text-muted">С подпиской</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card shadow-sm border-0 text-center">
-        <div class="card-body">
-          <i class="fas fa-user-shield fa-2x text-danger mb-2"></i>
-          <h4 class="text-danger">{{ users|selectattr('is_admin')|list|length }}</h4>
-          <small class="text-muted">Администраторов</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card shadow-sm border-0 text-center">
-        <div class="card-body">
-          <i class="fas fa-user-times fa-2x text-warning mb-2"></i>
-          <h4 class="text-warning">{{ users|rejectattr('is_subscribed')|list|length }}</h4>
-          <small class="text-muted">Без подписки</small>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
 <!-- Блок управления короткими ссылками удален -->
 
@@ -438,5 +443,94 @@ function showCopyNotification(message, type = 'success') {
     </div>
   </div>
 </div>
+
+<!-- Модальное окно для изменения статуса пользователя -->
+<div class="modal fade" id="changeStatusModal{{ user.id }}" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Изменить статус пользователя {{ user.username }}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post">
+        <div class="modal-body">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="change_status_user_id" value="{{ user.id }}">
+          
+          <div class="mb-3">
+            <label class="form-label">Выберите роль</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="new_role" value="user" id="role_user_{{ user.id }}"
+                     {% if not user.is_admin and not user.is_moderator %}checked{% endif %}>
+              <label class="form-check-label" for="role_user_{{ user.id }}">
+                <span class="badge bg-secondary">Пользователь</span>
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="new_role" value="moderator" id="role_moderator_{{ user.id }}"
+                     {% if user.is_moderator %}checked{% endif %}>
+              <label class="form-check-label" for="role_moderator_{{ user.id }}">
+                <span class="badge bg-warning">Модератор</span>
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="new_role" value="admin" id="role_admin_{{ user.id }}"
+                     {% if user.is_admin %}checked{% endif %}>
+              <label class="form-check-label" for="role_admin_{{ user.id }}">
+                <span class="badge bg-danger">Администратор</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Дополнительные настройки для Админа -->
+          <div id="admin_settings_{{ user.id }}" style="display: none;">
+            <div class="mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="admin_mode_enabled" id="admin_mode_{{ user.id }}"
+                       {% if user.admin_mode_enabled %}checked{% endif %}>
+                <label class="form-check-label" for="admin_mode_{{ user.id }}">
+                  Включить админ режим
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endfor %}
+
+<script>
+// Показываем/скрываем настройки Админа в зависимости от выбранной роли
+document.addEventListener('DOMContentLoaded', function() {
+  {% for user in users %}
+  const adminRadio{{ user.id }} = document.getElementById('role_admin_{{ user.id }}');
+  const adminSettings{{ user.id }} = document.getElementById('admin_settings_{{ user.id }}');
+  
+  function toggleAdminSettings{{ user.id }}() {
+    if (adminRadio{{ user.id }}.checked) {
+      adminSettings{{ user.id }}.style.display = 'block';
+    } else {
+      adminSettings{{ user.id }}.style.display = 'none';
+    }
+  }
+  
+  // Инициализация
+  toggleAdminSettings{{ user.id }}();
+  
+  // Обработчик изменения
+  adminRadio{{ user.id }}.addEventListener('change', toggleAdminSettings{{ user.id }});
+  
+  // Обработчики для других ролей
+  document.getElementById('role_user_{{ user.id }}').addEventListener('change', toggleAdminSettings{{ user.id }});
+  document.getElementById('role_moderator_{{ user.id }}').addEventListener('change', toggleAdminSettings{{ user.id }});
+  {% endfor %}
+});
+</script>
+
 {% endblock %} 

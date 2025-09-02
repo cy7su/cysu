@@ -79,7 +79,7 @@ def inject_subscription_status() -> Dict[str, Any]:
     Context processor для передачи актуального статуса подписки в шаблоны.
     """
     is_subscribed = False
-    trial_info = None
+    subscription_info = None
     
     if current_user.is_authenticated:
         try:
@@ -90,21 +90,18 @@ def inject_subscription_status() -> Dict[str, Any]:
             payment_service = YooKassaService()
             is_subscribed = payment_service.check_user_subscription(current_user)
             
-            # Получаем информацию о пробной подписке
-            if current_user.is_trial_subscription:
-                trial_info = payment_service.get_trial_subscription_info(current_user)
-                current_app.logger.info(f"Получена информация о пробной подписке: {trial_info}")
-            else:
-                current_app.logger.info("Пользователь не имеет пробной подписки")
+            # Получаем полную информацию о подписке
+            subscription_info = payment_service.get_subscription_info(current_user)
+            current_app.logger.info(f"Получена информация о подписке: {subscription_info}")
                 
         except Exception as e:
             current_app.logger.error(f"Error in inject_subscription_status: {e}")
             is_subscribed = False
-            trial_info = None
+            subscription_info = None
     else:
         current_app.logger.info("Пользователь не авторизован")
             
-    return dict(is_subscribed=is_subscribed, trial_info=trial_info)
+    return dict(is_subscribed=is_subscribed, subscription_info=subscription_info)
 
 
 def inject_maintenance_mode() -> Dict[str, Any]:

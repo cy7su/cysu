@@ -13,7 +13,7 @@ from typing import Union, Dict, Any
 
 from ..models import (
     User, Material, Subject, Payment, ChatMessage, EmailVerification, 
-    Ticket, TicketFile, TicketMessage, Notification, 
+    Ticket, TicketFile, TicketMessage, Notification, Submission,
     Group, SubjectGroup, SiteSettings
 )
 from ..forms import (
@@ -31,7 +31,7 @@ admin_bp = Blueprint("admin", __name__)
 @login_required
 def admin_users() -> Union[str, Response]:
     """Админка для управления пользователями"""
-    if not current_user.is_admin:
+    if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
 
@@ -101,7 +101,8 @@ def admin_users() -> Union[str, Response]:
                         username=form.username.data,
                         email=form.email.data,
                         password=generate_password_hash(form.password.data),
-                        is_admin=False,
+                        is_admin=form.is_admin.data,
+                        is_moderator=form.is_moderator.data,
                         is_subscribed=False,
                         group_id=form.group_id.data if form.group_id.data else None,
                     )
@@ -210,10 +211,10 @@ def admin_users() -> Union[str, Response]:
                         current_app.logger.info(f"Удалено платежей: {payments_count}")
 
                         # Удаляем решения
-                        submissions_count = db.session.query(db.Submission).filter_by(
+                        submissions_count = db.session.query(Submission).filter_by(
                             user_id=user.id
                         ).count()
-                        db.session.query(db.Submission).filter_by(user_id=user.id).delete()
+                        db.session.query(Submission).filter_by(user_id=user.id).delete()
                         current_app.logger.info(f"Удалено решений: {submissions_count}")
 
                         # Удаляем сообщения чата
@@ -326,6 +327,40 @@ def admin_users() -> Union[str, Response]:
             current_app.logger.error(f"Ошибка изменения группы пользователя: {str(e)}")
             db.session.rollback()
             flash("Ошибка при изменении группы пользователя", "error")
+    
+    # Обработка изменения статуса пользователя
+    if request.method == "POST" and request.form.get("change_status_user_id"):
+        try:
+            user_id = int(request.form.get("change_status_user_id"))
+            new_role = request.form.get("new_role")
+            admin_mode_enabled = request.form.get("admin_mode_enabled") == "on"
+            user = User.query.get(user_id)
+            
+            if user:
+                # Сбрасываем все роли
+                user.is_admin = False
+                user.is_moderator = False
+                user.admin_mode_enabled = False
+                
+                # Устанавливаем новую роль
+                if new_role == "admin":
+                    user.is_admin = True
+                    user.admin_mode_enabled = admin_mode_enabled
+                    mode = "админ" if admin_mode_enabled else "пользователь"
+                    flash(f"Пользователь {user.username} назначен администратором в режиме {mode}")
+                elif new_role == "moderator":
+                    user.is_moderator = True
+                    flash(f"Пользователь {user.username} назначен модератором")
+                else:  # user
+                    flash(f"Пользователь {user.username} назначен обычным пользователем")
+                
+                db.session.commit()
+            else:
+                flash("Пользователь не найден", "error")
+        except Exception as e:
+            current_app.logger.error(f"Ошибка изменения статуса пользователя: {str(e)}")
+            db.session.rollback()
+            flash("Ошибка при изменении статуса пользователя", "error")
 
     # Выдача/отзыв подписки
     if request.method == "POST" and request.form.get("toggle_subscription_id"):
@@ -402,7 +437,7 @@ def admin_users() -> Union[str, Response]:
 @login_required
 def admin_groups() -> Union[str, Response]:
     """Админка для управления группами"""
-    if not current_user.is_admin:
+    if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
 
@@ -567,7 +602,7 @@ def admin_groups() -> Union[str, Response]:
 @login_required
 def admin_subject_groups() -> Union[str, Response]:
     """Админка для управления предметами по группам"""
-    if not current_user.is_admin:
+    if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
 
@@ -671,7 +706,7 @@ def admin_subject_groups() -> Union[str, Response]:
 @login_required
 def admin_settings() -> Union[str, Response]:
     """Админка для управления настройками сайта"""
-    if not current_user.is_admin:
+    if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
 

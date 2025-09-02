@@ -510,6 +510,100 @@ class YooKassaService:
 
         return True
 
+    def get_subscription_info(self, user: User) -> dict:
+        """
+        Получает полную информацию о подписке пользователя (включая пробную)
+        
+        Параметры:
+            user (User): Пользователь
+            
+        Возвращает:
+            dict: Информация о подписке
+        """
+        now = datetime.utcnow()
+        
+        # Проверяем пробную подписку
+        if user.is_trial_subscription:
+            if not user.trial_subscription_expires:
+                return {
+                    'is_subscribed': True,
+                    'is_trial': True,
+                    'expires_at': None,
+                    'days_left': None,
+                    'type': 'trial'
+                }
+            
+            if user.trial_subscription_expires < now:
+                # Пробная подписка истекла
+                user.is_trial_subscription = False
+                user.trial_subscription_expires = None
+                db.session.commit()
+                return {
+                    'is_subscribed': False,
+                    'is_trial': False,
+                    'expires_at': None,
+                    'days_left': 0,
+                    'type': 'none'
+                }
+            
+            time_left = user.trial_subscription_expires - now
+            days_left = time_left.days
+            
+            return {
+                'is_subscribed': True,
+                'is_trial': True,
+                'expires_at': user.trial_subscription_expires,
+                'days_left': days_left,
+                'type': 'trial'
+            }
+        
+        # Проверяем обычную подписку
+        if not user.is_subscribed:
+            return {
+                'is_subscribed': False,
+                'is_trial': False,
+                'expires_at': None,
+                'days_left': 0,
+                'type': 'none'
+            }
+        
+        # Если подписка выдана вручную администратором
+        if user.is_manual_subscription:
+            if user.subscription_expires and user.subscription_expires < now:
+                # Подписка истекла
+                user.is_subscribed = False
+                user.is_manual_subscription = False
+                db.session.commit()
+                return {
+                    'is_subscribed': False,
+                    'is_trial': False,
+                    'expires_at': None,
+                    'days_left': 0,
+                    'type': 'none'
+                }
+            
+            time_left = user.subscription_expires - now if user.subscription_expires else None
+            days_left = time_left.days if time_left else None
+            
+            return {
+                'is_subscribed': True,
+                'is_trial': False,
+                'expires_at': user.subscription_expires,
+                'days_left': days_left,
+                'type': 'manual'
+            }
+        
+        # Проверяем платежи
+        # ... (остальная логика проверки платежей)
+        
+        return {
+            'is_subscribed': False,
+            'is_trial': False,
+            'expires_at': None,
+            'days_left': 0,
+            'type': 'none'
+        }
+
     def get_trial_subscription_info(self, user: User) -> dict:
         """
         Получает информацию о пробной подписке пользователя

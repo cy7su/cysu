@@ -46,6 +46,141 @@
 }
 
 /* ========================================
+   ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ
+   ======================================== */
+
+.mode-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 16px;
+}
+
+.mode-toggle {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.mode-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.mode-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--dp-04);
+    border: 1px solid var(--border-secondary);
+    border-radius: 26px;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.mode-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--text-primary);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--dp-00);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.mode-toggle input:checked + .mode-slider {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.mode-toggle input:checked + .mode-slider:before {
+    transform: translateX(22px);
+}
+
+.mode-slider:before {
+    content: "П";
+    font-size: 10px;
+    font-weight: bold;
+    color: var(--dp-00);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mode-toggle input:checked + .mode-slider:before {
+    content: "А";
+}
+
+.mode-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* ========================================
+   ПЛЕЙСХОЛДЕРЫ
+   ======================================== */
+
+/* Стили для плейсхолдеров в input полях */
+.form-control::placeholder,
+.form-select::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-secondary) !important;
+    opacity: 0.8 !important;
+}
+
+/* Для WebKit браузеров (Chrome, Safari) */
+.form-control::-webkit-input-placeholder,
+.form-select::-webkit-input-placeholder,
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    color: var(--text-secondary) !important;
+    opacity: 0.8 !important;
+}
+
+/* Для Mozilla Firefox */
+.form-control::-moz-placeholder,
+.form-select::-moz-placeholder,
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+    color: var(--text-secondary) !important;
+    opacity: 0.8 !important;
+}
+
+/* Для старых версий Firefox */
+.form-control:-moz-placeholder,
+.form-select:-moz-placeholder,
+input:-moz-placeholder,
+textarea:-moz-placeholder {
+    color: var(--text-secondary) !important;
+    opacity: 0.8 !important;
+}
+
+/* Для Internet Explorer */
+.form-control:-ms-input-placeholder,
+.form-select:-ms-input-placeholder,
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+    color: var(--text-secondary) !important;
+    opacity: 0.8 !important;
+}
+
+/* ========================================
    БАЗОВЫЕ СТИЛИ
    ======================================== */
 
@@ -181,7 +316,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 500;
     padding: 0.75rem 1.5rem;
     transition: all 0.3s ease;
-    border: 1px solid var(--border-secondary);
+    border: 0px solid var(--border-secondary);
     text-decoration: none;
 }
 
@@ -284,7 +419,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .table th {
-    background-color: var(--dp-00);
+    background-color: var(--dp-02);
     border-color: var(--border-primary);
     color: var(--text-primary);
 }
@@ -611,7 +746,7 @@ a:hover {
 /* Пропорции для карточек предметов */
 .subject-card {
     min-height: 220px;
-    min-width: 400px;
+    min-width: 420px;
     margin-right: 40px;
 }
 
@@ -645,13 +780,14 @@ a:hover {
 .pattern-preview {
     width: 100%;
     height: 120px;
-    border-radius: 10px;
+    border-radius: 16px 16px 0 0;
     border: 1px solid var(--border-secondary);
     overflow: hidden;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
+    min-height: 120px;
 }
 
 .pattern-preview::before {
@@ -858,10 +994,6 @@ a:hover {
         width: 32px;
         height: 32px;
         padding: 0;
-        min-width: 32px;
-        min-height: 32px;
-        max-width: 32px;
-        max-height: 32px;
         background-color: var(--primary-color);
         border-color: var(--primary-color);
         color: white;
@@ -953,10 +1085,6 @@ a:hover {
         width: 28px;
         height: 28px;
         padding: 0;
-        min-width: 28px;
-        min-height: 28px;
-        max-width: 28px;
-        max-height: 28px;
         background-color: var(--primary-color);
         border-color: var(--primary-color);
         color: white;

@@ -10,64 +10,63 @@
   </div>
 
   <div class="row g-4">
-    <!-- Назначение предмета группам -->
-    <div class="col-lg-4">
-      <div class="card shadow-sm border-0" style="background: var(--dp-02); height: fit-content;">
-        <div class="card-body">
-          <h5 class="card-title mb-3">
-            <i class="fas fa-link me-2 text-primary"></i>Назначить предмет группам
-          </h5>
-          <form method="post">
-            {{ form.hidden_tag() }}
-            <div class="mb-3">
-              <label for="{{ form.subject_id.id }}" class="form-label">Предмет</label>
-              {{ form.subject_id(class_='form-control', style='background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px;') }}
-              {% if form.subject_id.errors %}
-                <div class="text-danger small">
-                  {% for error in form.subject_id.errors %}
-                    {{ error }}
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-            <div class="mb-3">
-              <label for="{{ form.group_ids.id }}" class="form-label">Группы</label>
-              {{ form.group_ids(class_='form-control custom-scrollbar', size=6, style='background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px; min-height: 120px;') }}
-              <small class="text-muted">Используйте Ctrl+клик для выбора нескольких групп</small>
-              {% if form.group_ids.errors %}
-                <div class="text-danger small">
-                  {% for error in form.group_ids.errors %}
-                    {{ error }}
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-            <button type="submit" name="submit" value="Сохранить" class="btn btn-primary text-white w-100" style="color: #fff !important; border-radius: 20px;">
-              <i class="fas fa-save me-2"></i>Назначить группам
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-
     <!-- Список предметов с их группами -->
-    <div class="col-lg-8">
-      <div class="card shadow-sm border-0" style="background: var(--dp-02);">
+    <div class="col-12">
+      <div class="card shadow-sm border-0" style="background: none;">
         <div class="card-body p-0">
+          <!-- Массовые операции -->
+          <div class="d-flex justify-content-between align-items-center mb-3 p-3" style="background: var(--dp-01); border-radius: 8px;">
+            <div class="d-flex align-items-center gap-3">
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllSubjects()">
+                <i class="fas fa-check-square me-1"></i>Выбрать все
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAllSubjects()">
+                <i class="fas fa-square me-1"></i>Снять выбор
+              </button>
+              <span class="text-muted" id="selected-count">Выбрано: 0</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-success" onclick="showMassAssignModal()" disabled id="mass-assign-btn">
+                <i class="fas fa-link me-1"></i>Назначить группам
+              </button>
+              <button type="button" class="btn btn-sm btn-warning" onclick="removeAllFromGroups()" disabled id="mass-remove-btn">
+                <i class="fas fa-unlink me-1"></i>Убрать из групп
+              </button>
+            </div>
+          </div>
+
           <div class="table-responsive" style="border-radius: 14px;">
-            <table class="table mb-0" style="background: var(--dp-02); color: var(--text-primary);">
+            <table class="table mb-0" style="background: var(--dp-02); color: var(--text-primary); font-size: 0.9em;">
               <thead style="background: var(--dp-03);">
                 <tr>
-                  <th class="border-0" style="color: var(--text-primary);">Предмет</th>
-                  <th class="border-0" style="color: var(--text-primary);">Группы</th>
-                  <th class="border-0" style="color: var(--text-primary);">Материалов</th>
-                  <th class="border-0" style="color: var(--text-primary);">Действия</th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem; width: 40px;">
+                    <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()">
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">
+                    <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('title')" style="color: var(--text-primary);">
+                      Предмет <i class="fas fa-sort ms-1"></i>
+                    </button>
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">
+                    <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('groups')" style="color: var(--text-primary);">
+                      Группы <i class="fas fa-sort ms-1"></i>
+                    </button>
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">
+                    <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('materials')" style="color: var(--text-primary);">
+                      Материалов <i class="fas fa-sort ms-1"></i>
+                    </button>
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Действия</th>
                 </tr>
               </thead>
-              <tbody style="background: var(--dp-02);">
+              <tbody style="background: var(--dp-02);" id="subjects-table-body">
                 {% if subjects %}
                   {% for subject in subjects %}
-                  <tr style="border-color: var(--border-secondary); background: var(--dp-02); color: var(--text-primary);">
+                  <tr style="border-color: var(--border-secondary); background: var(--dp-02); color: var(--text-primary);" data-subject-id="{{ subject.id }}">
+                    <td style="color: var(--text-primary);">
+                      <input type="checkbox" class="subject-checkbox" value="{{ subject.id }}" onchange="updateSelectedCount()">
+                    </td>
                     <td style="color: var(--text-primary);">
                       <strong>{{ subject.title }}</strong>
                       {% if subject.description %}
@@ -103,12 +102,10 @@
                       </div>
                     </td>
                   </tr>
-                  
-
                   {% endfor %}
                 {% else %}
                   <tr style="background: var(--dp-02); color: var(--text-primary);">
-                    <td colspan="4" class="text-center text-muted py-4" style="color: var(--text-primary);">
+                    <td colspan="5" class="text-center text-muted py-4" style="color: var(--text-primary);">
                       <i class="fas fa-book fa-2x mb-3"></i>
                       <p>Нет предметов</p>
                     </td>
@@ -122,10 +119,52 @@
     </div>
   </div>
 </div>
+
+<!-- Модальное окно для массового назначения -->
+<div class="modal fade" id="massAssignModal" tabindex="-1" aria-labelledby="massAssignModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="massAssignModalLabel">Назначить предметы группам</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" id="mass-assign-form">
+        <div class="modal-body">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="mass_assign">
+          <div id="selected-subjects-inputs"></div>
+          
+          <div class="mb-3">
+            <label class="form-label">Выберите группы</label>
+            <select name="group_ids" class="form-control" multiple size="6" required style="background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px; min-height: 120px;">
+              {% for group in groups %}
+                <option value="{{ group.id }}">{{ group.name }}</option>
+              {% endfor %}
+            </select>
+            <small class="text-muted">Используйте Ctrl+клик для выбора нескольких групп</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Назначить группам</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block head %}
+<style>
+/* Стили для input элементов на странице subject-groups */
+.admin-subject-groups input {
+    margin-left: 15px;
+}
+</style>
 <script>
+let currentSortColumn = null;
+let currentSortDirection = 'asc';
+
 document.addEventListener('DOMContentLoaded', function() {
     // Улучшение работы с select элементами
     const multiSelects = document.querySelectorAll('select[multiple]');
@@ -224,5 +263,185 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Функции для массовых операций
+function selectAllSubjects() {
+    const checkboxes = document.querySelectorAll('.subject-checkbox');
+    checkboxes.forEach(checkbox => checkbox.checked = true);
+    updateSelectedCount();
+}
+
+function deselectAllSubjects() {
+    const checkboxes = document.querySelectorAll('.subject-checkbox');
+    checkboxes.forEach(checkbox => checkbox.checked = false);
+    updateSelectedCount();
+}
+
+function toggleSelectAll() {
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    const checkboxes = document.querySelectorAll('.subject-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('.subject-checkbox:checked');
+    const count = checkboxes.length;
+    const countElement = document.getElementById('selected-count');
+    const massAssignBtn = document.getElementById('mass-assign-btn');
+    const massRemoveBtn = document.getElementById('mass-remove-btn');
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    
+    countElement.textContent = `Выбрано: ${count}`;
+    
+    // Включаем/выключаем кнопки массовых операций
+    massAssignBtn.disabled = count === 0;
+    massRemoveBtn.disabled = count === 0;
+    
+    // Обновляем состояние главного чекбокса
+    const allCheckboxes = document.querySelectorAll('.subject-checkbox');
+    if (count === 0) {
+        selectAllCheckbox.indeterminate = false;
+        selectAllCheckbox.checked = false;
+    } else if (count === allCheckboxes.length) {
+        selectAllCheckbox.indeterminate = false;
+        selectAllCheckbox.checked = true;
+    } else {
+        selectAllCheckbox.indeterminate = true;
+    }
+}
+
+function showMassAssignModal() {
+    const selectedCheckboxes = document.querySelectorAll('.subject-checkbox:checked');
+    if (selectedCheckboxes.length === 0) {
+        alert('Выберите предметы для назначения группам');
+        return;
+    }
+    
+    // Заполняем скрытые поля с выбранными предметами
+    const inputsContainer = document.getElementById('selected-subjects-inputs');
+    inputsContainer.innerHTML = '';
+    
+    selectedCheckboxes.forEach(checkbox => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'subject_ids';
+        input.value = checkbox.value;
+        inputsContainer.appendChild(input);
+    });
+    
+    // Показываем модальное окно
+    const modal = new bootstrap.Modal(document.getElementById('massAssignModal'));
+    modal.show();
+}
+
+function removeAllFromGroups() {
+    const selectedCheckboxes = document.querySelectorAll('.subject-checkbox:checked');
+    if (selectedCheckboxes.length === 0) {
+        alert('Выберите предметы для удаления из групп');
+        return;
+    }
+    
+    if (!confirm(`Убрать ${selectedCheckboxes.length} предметов из всех групп?`)) {
+        return;
+    }
+    
+    // Создаем форму для массового удаления
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.style.display = 'none';
+    
+    // Добавляем CSRF токен
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = document.querySelector('input[name="csrf_token"]').value;
+    form.appendChild(csrfInput);
+    
+    // Добавляем действие
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = 'action';
+    actionInput.value = 'mass_remove';
+    form.appendChild(actionInput);
+    
+    // Добавляем выбранные предметы
+    selectedCheckboxes.forEach(checkbox => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'subject_ids';
+        input.value = checkbox.value;
+        form.appendChild(input);
+    });
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Функции сортировки
+function sortTable(column) {
+    const tbody = document.getElementById('subjects-table-body');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Определяем направление сортировки
+    if (currentSortColumn === column) {
+        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSortDirection = 'asc';
+        currentSortColumn = column;
+    }
+    
+    // Сортируем строки
+    rows.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch (column) {
+            case 'title':
+                aValue = a.querySelector('td:nth-child(2) strong').textContent.toLowerCase();
+                bValue = b.querySelector('td:nth-child(2) strong').textContent.toLowerCase();
+                break;
+            case 'groups':
+                const aGroups = a.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                const bGroups = b.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                aValue = aGroups.includes('не назначен') ? 'zzz' : aGroups;
+                bValue = bGroups.includes('не назначен') ? 'zzz' : bGroups;
+                break;
+            case 'materials':
+                aValue = parseInt(a.querySelector('td:nth-child(4) .badge').textContent);
+                bValue = parseInt(b.querySelector('td:nth-child(4) .badge').textContent);
+                break;
+            default:
+                return 0;
+        }
+        
+        if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    // Очищаем tbody и добавляем отсортированные строки
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+    
+    // Обновляем иконки сортировки
+    updateSortIcons(column);
+}
+
+function updateSortIcons(activeColumn) {
+    // Сбрасываем все иконки
+    document.querySelectorAll('th button i').forEach(icon => {
+        icon.className = 'fas fa-sort ms-1';
+    });
+    
+    // Устанавливаем иконку для активной колонки
+    const activeButton = document.querySelector(`button[onclick="sortTable('${activeColumn}')"]`);
+    if (activeButton) {
+        const icon = activeButton.querySelector('i');
+        icon.className = currentSortDirection === 'asc' ? 'fas fa-sort-up ms-1' : 'fas fa-sort-down ms-1';
+    }
+}
 </script>
 {% endblock %}

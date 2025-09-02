@@ -4,9 +4,11 @@
 
 from flask import Blueprint, request, current_app, jsonify
 from flask_login import login_required, current_user
+from flask_wtf.csrf import validate_csrf
+from wtforms import ValidationError
 from typing import Dict, Any
 
-from ..models import Notification
+from ..models import Notification, Subject
 
 api_bp = Blueprint("api", __name__)
 
@@ -56,6 +58,52 @@ def mark_notification_read(notification_id: int) -> Dict[str, Any]:
     db.session.commit()
 
     return jsonify({"success": True})
+
+
+@api_bp.route("/api/subject/<int:subject_id>/pattern", methods=["POST"])
+@login_required
+def update_subject_pattern(subject_id: int) -> Dict[str, Any]:
+    """API для обновления паттерна предмета"""
+    from .. import db
+    
+    # Проверяем CSRF токен
+    try:
+        csrf_token = request.headers.get('X-CSRFToken')
+        if not csrf_token:
+            return jsonify({"success": False, "error": "Отсутствует CSRF токен"}), 400
+        
+        validate_csrf(csrf_token)
+    except ValidationError:
+        return jsonify({"success": False, "error": "Неверный CSRF токен"}), 400
+    
+    # Проверяем, что пользователь - админ
+    if not current_user.is_effective_admin():
+        return jsonify({"success": False, "error": "Доступ запрещен"})
+    
+    # Получаем предмет
+    subject = Subject.query.get_or_404(subject_id)
+    
+    # Получаем данные из запроса
+    data = request.get_json()
+    if not data or 'pattern_svg' not in data:
+        return jsonify({"success": False, "error": "Отсутствуют данные паттерна"})
+    
+    try:
+        # Обновляем паттерн в базе данных
+        subject.pattern_svg = data['pattern_svg']
+        subject.pattern_type = data.get('pattern_type', 'random')
+        
+        db.session.commit()
+        
+        return jsonify({
+            "success": True, 
+            "message": "Паттерн успешно обновлен"
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Ошибка обновления паттерна: {e}")
+        db.session.rollback()
+        return jsonify({"success": False, "error": "Ошибка сохранения паттерна"}), 500
 
 
 @api_bp.errorhandler(400)

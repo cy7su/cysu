@@ -129,20 +129,22 @@ def index() -> Union[str, Response]:
                     db.session.rollback()
 
     try:
-        if current_user.is_authenticated and not current_user.is_admin:
-            # Для обычных пользователей показываем только предметы их группы
-            if current_user.group:
-                subjects = Subject.query.options(
-                    joinedload(Subject.materials),
-                    joinedload(Subject.groups)
-                ).join(SubjectGroup).filter(
-                    SubjectGroup.group_id == current_user.group.id
-                ).all()
-            else:
-                subjects = []
+        if current_user.is_authenticated:
+            # Используем новый метод для получения доступных предметов
+            subjects = current_user.get_accessible_subjects()
+            # Добавляем связанные данные
+            subjects = Subject.query.options(
+                joinedload(Subject.materials),
+                joinedload(Subject.groups)
+            ).filter(Subject.id.in_([s.id for s in subjects])).all()
+            
+            # Показываем предупреждение если нет доступных предметов
+            if not subjects and current_user.group_id:
+                flash("У вашей группы нет назначенных предметов. Обратитесь к администратору.", "warning")
+            elif not subjects and not current_user.group_id:
                 flash("У вас не назначена группа. Обратитесь к администратору.", "warning")
         else:
-            # Для админов и неавторизованных пользователей показываем все предметы
+            # Для неавторизованных пользователей показываем все предметы
             subjects = Subject.query.options(
                 joinedload(Subject.materials),
                 joinedload(Subject.groups)
@@ -185,6 +187,13 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         current_app.logger.error(f"Error loading subject {subject_id}: {e}")
         flash("Ошибка загрузки предмета.", "error")
         return redirect(url_for("main.index"))
+    
+    # Проверяем доступ к предмету
+    if current_user.is_authenticated:
+        accessible_subjects = current_user.get_accessible_subjects()
+        if subject not in accessible_subjects:
+            flash("У вас нет доступа к этому предмету.", "error")
+            return redirect(url_for("main.index"))
 
     # Проверяем подписку для аутентифицированных пользователей
     if current_user.is_authenticated:
@@ -197,7 +206,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                 return redirect(url_for("payment.subscription"))
             
             # Проверяем доступ к предмету по группе (если пользователь не админ)
-            if not current_user.is_admin:
+            if not current_user.is_effective_admin():
                 # Проверяем, есть ли у пользователя группа
                 if current_user.group:
                     # Проверяем, доступен ли предмет для группы пользователя
@@ -242,7 +251,9 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
             current_app.logger.error(f"Error loading user submissions: {e}")
             user_submissions = {}
     
-    if current_user.is_authenticated and current_user.is_admin:
+    # Создаем форму только если пользователь может добавлять материалы
+    form = None
+    if current_user.is_authenticated and current_user.can_add_materials_to_subject(subject):
         form = MaterialForm()
         form.subject_id.choices = [(subject.id, subject.title)]
         form.subject_id.data = subject.id
@@ -252,7 +263,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         current_app.logger.info(f"Данные формы: {request.form}")
         current_app.logger.info(f"Файлы: {request.files}")
         
-        if form.validate_on_submit():
+        if form and form.validate_on_submit():
             current_app.logger.info("Форма валидна, начинаем обработку")
             filename = None
             solution_filename = None
@@ -316,13 +327,22 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                 for error in errors:
                     current_app.logger.warning(f"Ошибка в поле {field}: {error}")
     
+    # Проверяем, может ли пользователь добавлять материалы
+    can_add_materials = False
+    can_manage_materials = False
+    if current_user.is_authenticated:
+        can_add_materials = current_user.can_add_materials_to_subject(subject)
+        can_manage_materials = current_user.can_manage_subject_materials(subject)
+    
     return render_template(
         "subjects/subject_detail.html",
         subject=subject,
         lectures=lectures,
         assignments=assignments,
-        form=form,
+        form=form if can_add_materials else None,
         user_submissions=user_submissions,
+        can_add_materials=can_add_materials,
+        can_manage_materials=can_manage_materials,
     )
 
 
@@ -330,7 +350,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
 @login_required
 def delete_subject(subject_id: int) -> Response:
     """Удаление предмета"""
-    if not current_user.is_admin:
+    if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
     
@@ -377,11 +397,18 @@ def material_detail(material_id: int) -> Union[str, Response]:
 @login_required
 def add_solution_file(material_id: int) -> Response:
     """Добавление файла решения к материалу"""
-    if not current_user.is_admin:
+    if not current_user.can_manage_materials():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
     
     material = Material.query.get_or_404(material_id)
+    
+    # Проверяем доступ к предмету для модераторов
+    if current_user.is_moderator:
+        accessible_subjects = current_user.get_accessible_subjects()
+        if material.subject not in accessible_subjects:
+            flash("У вас нет доступа к этому предмету.", "error")
+            return redirect(url_for("main.index"))
     file = request.files.get("solution_file")
     if file:
         # Получаем информацию о предмете
@@ -449,16 +476,40 @@ def submit_solution(material_id: int) -> Response:
     return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
 
 
+@main_bp.route("/toggle-admin-mode", methods=["POST"])
+@login_required
+def toggle_admin_mode() -> Response:
+    """Переключение режима админа"""
+    if not current_user.is_admin:
+        flash("Доступ запрещён")
+        return redirect(url_for("main.index"))
+    
+    current_user.admin_mode_enabled = not current_user.admin_mode_enabled
+    db.session.commit()
+    
+    mode = "админ" if current_user.admin_mode_enabled else "пользователь"
+    flash(f"Переключен в режим {mode}")
+    
+    return redirect(request.referrer or url_for("main.index"))
+
+
 @main_bp.route("/material/<int:material_id>/delete", methods=["POST"])
 @login_required
 def delete_material(material_id: int) -> Response:
     """Удаление материала"""
-    if not current_user.is_admin:
+    if not current_user.can_manage_materials():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
     
     material = Material.query.get_or_404(material_id)
     subject_id = material.subject_id
+    
+    # Проверяем доступ к предмету для модераторов
+    if current_user.is_moderator:
+        accessible_subjects = current_user.get_accessible_subjects()
+        if material.subject not in accessible_subjects:
+            flash("У вас нет доступа к этому предмету.", "error")
+            return redirect(url_for("main.index"))
     
     # Удаляем файл материала, если он существует
     if material.file:
