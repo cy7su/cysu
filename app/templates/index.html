@@ -70,7 +70,7 @@
     </button>
   {% endif %}
 </div>
-<div class="row g-4" style="gap: 83px;">
+<div class="row g-4" style="column-gap: 80px;">
     {% for subject in subjects %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
         <div class="card shadow-sm subject-card" data-subject-id="{{ subject.id }}" data-url="{{ url_for('main.subject_detail', subject_id=subject.id) }}" onclick="window.location.href=this.getAttribute('data-url')">
