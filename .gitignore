@@ -6,6 +6,7 @@
 .env.production
 .env.staging
 .env.development
+.env.test
 secrets.json
 config_secret.py
 secrets.py
@@ -14,6 +15,10 @@ config.py
 *.pem
 *.p12
 *.crt
+*.pfx
+*.jks
+credentials.json
+service-account.json
 
 # ========================================
 # БАЗА ДАННЫХ
@@ -36,6 +41,10 @@ debug.log
 access.log
 error.log
 *.log.*
+app.log
+flask.log
+gunicorn.log
+nginx.log
 
 # ========================================
 # КЭШ PYTHON
@@ -118,6 +127,9 @@ app/static/ticket_files/
 app/static/user_files/
 app/static/materials/
 app/static/attachments/
+app/static/avatars/
+app/static/documents/
+app/static/cache/
 
 # ========================================
 # КОНФИГУРАЦИОННЫЕ ФАЙЛЫ
@@ -178,3 +190,62 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+
+# ========================================
+# DOCKER И КОНТЕЙНЕРЫ
+# ========================================
+.dockerignore
+docker-compose.override.yml
+.docker/
+docker-data/
+
+# ========================================
+# CI/CD И АВТОМАТИЗАЦИЯ
+# ========================================
+.github/workflows/secrets/
+.gitlab-ci-local/
+.circleci/
+.travis.yml
+Jenkinsfile
+azure-pipelines.yml
+
+# ========================================
+# МОНИТОРИНГ И МЕТРИКИ
+# ========================================
+.prometheus/
+.grafana/
+monitoring/
+metrics/
+*.metrics
+
+# ========================================
+# ТЕСТИРОВАНИЕ
+# ========================================
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+test-results/
+coverage.xml
+junit.xml
+
+# ========================================
+# ДОКУМЕНТАЦИЯ
+# ========================================
+docs/_build/
+site/
+_site/
+.jekyll-cache/
+.jekyll-metadata
+
+# ========================================
+# РАЗВЕРТЫВАНИЕ
+# ========================================
+deploy/
+deployment/
+production/
+staging/
+*.tar.gz
+*.zip
+*.rar

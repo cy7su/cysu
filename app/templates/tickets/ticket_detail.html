@@ -29,7 +29,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    {% if current_user.is_admin %}
+                    {% if current_user.is_admin and current_user.admin_mode_enabled %}
                     <div class="col-md-6">
                         <h6 class="text-white mb-2">Информация о пользователе</h6>
                         <p class="mb-1"><strong class="text-white">Имя:</strong> <span class="text-muted">{{ ticket.user.username }}</span></p>
@@ -157,7 +157,7 @@
         {% endif %}
 
         <!-- Админские действия -->
-        {% if current_user.is_admin and ticket.status != 'closed' %}
+        {% if current_user.is_admin and current_user.admin_mode_enabled and ticket.status != 'closed' %}
         <div class="card mt-4">
             <div class="card-header">
                 <h6 class="mb-0">

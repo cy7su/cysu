@@ -38,6 +38,8 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(256), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    is_moderator = db.Column(db.Boolean, default=False)
+    admin_mode_enabled = db.Column(db.Boolean, default=False)  # Для админов переключения
     is_subscribed = db.Column(db.Boolean, default=False)
     subscription_expires = db.Column(db.DateTime)
     is_manual_subscription = db.Column(db.Boolean, default=False)  # Подписка выдана вручную администратором
@@ -49,6 +51,69 @@ class User(UserMixin, db.Model):
     payments = db.relationship('Payment', backref='user', lazy=True, cascade='all, delete-orphan')
     tickets = db.relationship('Ticket', foreign_keys='Ticket.user_id', backref='user', lazy=True, cascade='all, delete-orphan')
     notifications = db.relationship('Notification', backref='user', lazy=True, cascade='all, delete-orphan')
+    
+    def is_effective_admin(self):
+        """Проверяет, является ли пользователь эффективным админом (админ в админ режиме)"""
+        return self.is_admin and self.admin_mode_enabled
+    
+    def can_manage_materials(self):
+        """Проверяет, может ли пользователь управлять материалами (админ в админ режиме или модератор)"""
+        return (self.is_admin and self.admin_mode_enabled) or self.is_moderator
+    
+    def can_see_all_subjects(self):
+        """Проверяет, может ли пользователь видеть все предметы (только админ в админ режиме)"""
+        return self.is_admin and self.admin_mode_enabled
+    
+    def get_accessible_subjects(self):
+        """Возвращает предметы, доступные пользователю"""
+        from .models import Subject, SubjectGroup
+        
+        if self.can_see_all_subjects():
+            # Админ в админ режиме видит все предметы
+            return Subject.query.all()
+        elif self.group_id:
+            # Модератор или админ в пользователь режиме видит только предметы своей группы
+            return Subject.query.join(SubjectGroup).filter(
+                SubjectGroup.group_id == self.group_id
+            ).all()
+        else:
+            # Пользователь без группы не видит предметов
+            return []
+    
+    def can_add_materials_to_subject(self, subject):
+        """Проверяет, может ли пользователь добавлять материалы к предмету"""
+        if self.is_admin and self.admin_mode_enabled:
+            # Админ в админ режиме может добавлять материалы ко всем предметам
+            return True
+        elif self.is_moderator and self.group_id:
+            # Модератор может добавлять материалы только к предметам своей группы
+            from .models import SubjectGroup
+            return SubjectGroup.query.filter_by(
+                subject_id=subject.id,
+                group_id=self.group_id
+            ).first() is not None
+        else:
+            # Обычные пользователи не могут добавлять материалы
+            return False
+
+    def can_manage_subject_materials(self, subject):
+        """Проверяет, может ли пользователь управлять материалами предмета (добавлять/удалять)"""
+        return self.can_add_materials_to_subject(subject)
+
+    def has_active_subscription(self):
+        """Проверяет, есть ли у пользователя активная подписка (включая пробную)"""
+        from .utils.payment_service import YooKassaService
+        payment_service = YooKassaService()
+        return payment_service.check_user_subscription(self)
+
+    def get_role_display(self):
+        """Возвращает отображаемое название роли"""
+        if self.is_admin:
+            return "Администратор" + (" (Админ режим)" if self.admin_mode_enabled else " (Пользователь режим)")
+        elif self.is_moderator:
+            return "Модератор"
+        else:
+            return "Пользователь"
 
 class EmailVerification(db.Model):
     """Модель для хранения кодов подтверждения email"""

@@ -411,3 +411,55 @@ def ticket_response() -> Dict[str, Any]:
     except Exception as e:
         current_app.logger.error(f"Ошибка отправки ответа: {str(e)}")
         return jsonify({"success": False, "error": "Ошибка отправки ответа"})
+
+
+@tickets_bp.route("/api/delete_all_closed_tickets", methods=["POST"])
+@login_required
+def delete_all_closed_tickets():
+    """API для удаления всех закрытых и отклоненных тикетов (только для админов)"""
+    try:
+        # Проверяем права администратора
+        if not current_user.is_admin or not current_user.admin_mode_enabled:
+            return jsonify({"success": False, "error": "Недостаточно прав"})
+        
+        # Находим все закрытые и отклоненные тикеты
+        closed_tickets = Ticket.query.filter(
+            Ticket.status.in_(['closed', 'rejected'])
+        ).all()
+        
+        deleted_count = 0
+        
+        for ticket in closed_tickets:
+            # Удаляем связанные файлы
+            for ticket_file in ticket.files:
+                try:
+                    file_storage = FileStorageManager()
+                    file_storage.delete_file(ticket_file.file_path)
+                except Exception as e:
+                    current_app.logger.warning(f"Не удалось удалить файл {ticket_file.file_path}: {str(e)}")
+            
+            # Удаляем связанные сообщения
+            TicketMessage.query.filter_by(ticket_id=ticket.id).delete()
+            
+            # Удаляем связанные уведомления (через link)
+            ticket_link = url_for("tickets.ticket_detail", ticket_id=ticket.id)
+            Notification.query.filter_by(link=ticket_link).delete()
+            
+            # Удаляем сам тикет
+            db.session.delete(ticket)
+            deleted_count += 1
+        
+        db.session.commit()
+        
+        current_app.logger.info(f"Администратор {current_user.username} удалил {deleted_count} закрытых тикетов")
+        
+        return jsonify({
+            "success": True, 
+            "deleted_count": deleted_count,
+            "message": f"Удалено {deleted_count} тикетов"
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Ошибка удаления тикетов: {str(e)}")
+        return jsonify({"success": False, "error": "Ошибка при удалении тикетов"})

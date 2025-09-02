@@ -31,6 +31,8 @@ class AdminUserForm(FlaskForm):
     password = PasswordField('Пароль', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Подтвердите пароль', validators=[DataRequired(), EqualTo('password')])
     group_id = SelectField('Группа', validators=[Optional()])  # Группа необязательна в админке
+    is_admin = BooleanField('Администратор')
+    is_moderator = BooleanField('Модератор')
     submit = SubmitField('Зарегистрироваться')
 
     def __init__(self, *args, **kwargs):
@@ -85,7 +87,7 @@ class PasswordResetForm(FlaskForm):
 
 class MaterialForm(FlaskForm):
     title = StringField('Название', validators=[DataRequired()])
-    description = TextAreaField('Описание')
+    description = TextAreaField('Описание', validators=[Length(max=100, message='Описание не должно превышать 100 символов')])
     type = SelectField('Тип', choices=[('lecture', 'Лекция'), ('assignment', 'Задание')])
     subject_id = SelectField('Предмет', coerce=int, validators=[DataRequired()])
     file = FileField('Файл')
@@ -166,30 +168,6 @@ class SubjectGroupForm(FlaskForm):
         self.group_ids.choices = [
             (group.id, group.name) for group in groups
         ]
-
-class ShortenForm(FlaskForm):
-    """Форма сокращения ссылки"""
-    url = StringField('Ссылка', validators=[DataRequired(message='Введите ссылку'), URL(require_tld=True, message='Введите корректный URL с протоколом http(s)')])
-    ttl = SelectField(
-        'Срок действия',
-        choices=[
-            ('', 'Без ограничения времени'),
-            ('3h', '3 часа'),
-            ('6h', '6 часов'),
-        ],
-        default='',
-    )
-    max_clicks = SelectField(
-        'Лимит переходов',
-        choices=[
-            ('', 'Без лимита'),
-            ('1', '1 переход'),
-            ('3', '3 перехода'),
-            ('5', '5 переходов'),
-        ],
-        default='',
-    )
-    submit = SubmitField('Сократить')
 
 
 class SiteSettingsForm(FlaskForm):

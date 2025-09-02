@@ -5,8 +5,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, Response
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
+from ..utils.transliteration import get_safe_filename
 from sqlalchemy.orm import joinedload
 from typing import Union, Dict, Any
+import os
+import shutil
 
 from ..models import User, Material, Subject, SubjectGroup
 from ..forms import MaterialForm
@@ -108,6 +111,16 @@ def index() -> Union[str, Response]:
                     )
                     db.session.add(subject)
                     db.session.commit()
+                    
+                    # Создаем папку для предмета
+                    try:
+                        upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+                        subject_path = os.path.join(upload_base, str(subject.id))
+                        os.makedirs(subject_path, exist_ok=True)
+                        current_app.logger.info(f"Создана папка для предмета {subject.id}: {subject_path}")
+                    except Exception as folder_error:
+                        current_app.logger.error(f"Ошибка создания папки для предмета {subject.id}: {folder_error}")
+                    
                     flash("Предмет добавлен")
                     return redirect(url_for("main.index"))
                 except Exception as e:
@@ -116,20 +129,22 @@ def index() -> Union[str, Response]:
                     db.session.rollback()
 
     try:
-        if current_user.is_authenticated and not current_user.is_admin:
-            # Для обычных пользователей показываем только предметы их группы
-            if current_user.group:
-                subjects = Subject.query.options(
-                    joinedload(Subject.materials),
-                    joinedload(Subject.groups)
-                ).join(SubjectGroup).filter(
-                    SubjectGroup.group_id == current_user.group.id
-                ).all()
-            else:
-                subjects = []
+        if current_user.is_authenticated:
+            # Используем новый метод для получения доступных предметов
+            subjects = current_user.get_accessible_subjects()
+            # Добавляем связанные данные
+            subjects = Subject.query.options(
+                joinedload(Subject.materials),
+                joinedload(Subject.groups)
+            ).filter(Subject.id.in_([s.id for s in subjects])).all()
+            
+            # Показываем предупреждение если нет доступных предметов
+            if not subjects and current_user.group_id:
+                flash("У вашей группы нет назначенных предметов. Обратитесь к администратору.", "warning")
+            elif not subjects and not current_user.group_id:
                 flash("У вас не назначена группа. Обратитесь к администратору.", "warning")
         else:
-            # Для админов и неавторизованных пользователей показываем все предметы
+            # Для неавторизованных пользователей показываем все предметы
             subjects = Subject.query.options(
                 joinedload(Subject.materials),
                 joinedload(Subject.groups)
@@ -172,6 +187,13 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         current_app.logger.error(f"Error loading subject {subject_id}: {e}")
         flash("Ошибка загрузки предмета.", "error")
         return redirect(url_for("main.index"))
+    
+    # Проверяем доступ к предмету
+    if current_user.is_authenticated:
+        accessible_subjects = current_user.get_accessible_subjects()
+        if subject not in accessible_subjects:
+            flash("У вас нет доступа к этому предмету.", "error")
+            return redirect(url_for("main.index"))
 
     # Проверяем подписку для аутентифицированных пользователей
     if current_user.is_authenticated:
@@ -184,7 +206,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                 return redirect(url_for("payment.subscription"))
             
             # Проверяем доступ к предмету по группе (если пользователь не админ)
-            if not current_user.is_admin:
+            if not current_user.is_effective_admin():
                 # Проверяем, есть ли у пользователя группа
                 if current_user.group:
                     # Проверяем, доступен ли предмет для группы пользователя
@@ -229,11 +251,20 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
             current_app.logger.error(f"Error loading user submissions: {e}")
             user_submissions = {}
     
-    if current_user.is_authenticated and current_user.is_admin:
+    # Создаем форму только если пользователь может добавлять материалы
+    form = None
+    if current_user.is_authenticated and current_user.can_add_materials_to_subject(subject):
         form = MaterialForm()
         form.subject_id.choices = [(subject.id, subject.title)]
         form.subject_id.data = subject.id
-        if form.validate_on_submit():
+        
+        current_app.logger.info(f"Обработка формы материала для предмета {subject.id}")
+        current_app.logger.info(f"Метод запроса: {request.method}")
+        current_app.logger.info(f"Данные формы: {request.form}")
+        current_app.logger.info(f"Файлы: {request.files}")
+        
+        if form and form.validate_on_submit():
+            current_app.logger.info("Форма валидна, начинаем обработку")
             filename = None
             solution_filename = None
 
@@ -242,20 +273,28 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
 
             if form.file.data:
                 file = form.file.data
-                original_filename = secure_filename(file.filename)
+                original_filename = get_safe_filename(file.filename)
+                
+                current_app.logger.info(f"Загрузка файла материала: {file.filename} -> {original_filename}")
 
                 # Создаем путь для файла материала
                 full_path, relative_path = FileStorageManager.get_material_upload_path(
                     subject.id, original_filename
                 )
+                
+                current_app.logger.info(f"Путь для сохранения: {full_path}")
+                current_app.logger.info(f"Относительный путь: {relative_path}")
 
                 # Сохраняем файл
                 if FileStorageManager.save_file(file, full_path):
                     filename = relative_path
+                    current_app.logger.info(f"Файл материала сохранен: {filename}")
+                else:
+                    current_app.logger.error(f"Ошибка сохранения файла материала: {original_filename}")
 
             if form.type.data == "assignment" and form.solution_file.data:
                 solution_file = form.solution_file.data
-                original_solution_filename = secure_filename(solution_file.filename)
+                original_solution_filename = get_safe_filename(solution_file.filename)
 
                 # Создаем путь для файла решения
                 full_solution_path, relative_solution_path = (
@@ -282,14 +321,28 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
             db.session.commit()
             flash("Материал добавлен")
             return redirect(url_for("main.subject_detail", subject_id=subject.id))
+        else:
+            current_app.logger.warning(f"Форма не валидна: {form.errors}")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    current_app.logger.warning(f"Ошибка в поле {field}: {error}")
+    
+    # Проверяем, может ли пользователь добавлять материалы
+    can_add_materials = False
+    can_manage_materials = False
+    if current_user.is_authenticated:
+        can_add_materials = current_user.can_add_materials_to_subject(subject)
+        can_manage_materials = current_user.can_manage_subject_materials(subject)
     
     return render_template(
         "subjects/subject_detail.html",
         subject=subject,
         lectures=lectures,
         assignments=assignments,
-        form=form,
+        form=form if can_add_materials else None,
         user_submissions=user_submissions,
+        can_add_materials=can_add_materials,
+        can_manage_materials=can_manage_materials,
     )
 
 
@@ -297,11 +350,24 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
 @login_required
 def delete_subject(subject_id: int) -> Response:
     """Удаление предмета"""
-    if not current_user.is_admin:
+    if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
     
     subject = Subject.query.get_or_404(subject_id)
+    
+    # Удаляем папку предмета с файлами
+    try:
+        upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+        subject_path = os.path.join(upload_base, str(subject.id))
+        if os.path.exists(subject_path):
+            shutil.rmtree(subject_path)
+            current_app.logger.info(f"Удалена папка предмета {subject.id}: {subject_path}")
+        else:
+            current_app.logger.info(f"Папка предмета {subject.id} не существует: {subject_path}")
+    except Exception as folder_error:
+        current_app.logger.error(f"Ошибка удаления папки предмета {subject.id}: {folder_error}")
+    
     # Удаляем все материалы этого предмета
     for material in subject.materials:
         db.session.delete(material)
@@ -331,16 +397,23 @@ def material_detail(material_id: int) -> Union[str, Response]:
 @login_required
 def add_solution_file(material_id: int) -> Response:
     """Добавление файла решения к материалу"""
-    if not current_user.is_admin:
+    if not current_user.can_manage_materials():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
     
     material = Material.query.get_or_404(material_id)
+    
+    # Проверяем доступ к предмету для модераторов
+    if current_user.is_moderator:
+        accessible_subjects = current_user.get_accessible_subjects()
+        if material.subject not in accessible_subjects:
+            flash("У вас нет доступа к этому предмету.", "error")
+            return redirect(url_for("main.index"))
     file = request.files.get("solution_file")
     if file:
         # Получаем информацию о предмете
         subject = material.subject
-        original_filename = secure_filename(file.filename)
+        original_filename = get_safe_filename(file.filename)
 
         # Создаем путь для файла решения
         full_path, relative_path = FileStorageManager.get_material_upload_path(
@@ -376,7 +449,7 @@ def submit_solution(material_id: int) -> Response:
     if file:
         # Получаем информацию о предмете
         subject = material.subject
-        original_filename = secure_filename(file.filename)
+        original_filename = get_safe_filename(file.filename)
 
         # Создаем путь для файла решения пользователя
         full_path, relative_path = FileStorageManager.get_subject_upload_path(
@@ -403,16 +476,63 @@ def submit_solution(material_id: int) -> Response:
     return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
 
 
+@main_bp.route("/toggle-admin-mode", methods=["POST"])
+@login_required
+def toggle_admin_mode() -> Response:
+    """Переключение режима админа"""
+    if not current_user.is_admin:
+        flash("Доступ запрещён")
+        return redirect(url_for("main.index"))
+    
+    current_user.admin_mode_enabled = not current_user.admin_mode_enabled
+    db.session.commit()
+    
+    mode = "админ" if current_user.admin_mode_enabled else "пользователь"
+    flash(f"Переключен в режим {mode}")
+    
+    return redirect(request.referrer or url_for("main.index"))
+
+
 @main_bp.route("/material/<int:material_id>/delete", methods=["POST"])
 @login_required
 def delete_material(material_id: int) -> Response:
     """Удаление материала"""
-    if not current_user.is_admin:
+    if not current_user.can_manage_materials():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
     
     material = Material.query.get_or_404(material_id)
     subject_id = material.subject_id
+    
+    # Проверяем доступ к предмету для модераторов
+    if current_user.is_moderator:
+        accessible_subjects = current_user.get_accessible_subjects()
+        if material.subject not in accessible_subjects:
+            flash("У вас нет доступа к этому предмету.", "error")
+            return redirect(url_for("main.index"))
+    
+    # Удаляем файл материала, если он существует
+    if material.file:
+        try:
+            upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+            file_path = os.path.join(upload_base, material.file)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                current_app.logger.info(f"Удален файл материала: {file_path}")
+        except Exception as file_error:
+            current_app.logger.error(f"Ошибка удаления файла материала {material.file}: {file_error}")
+    
+    # Удаляем файл решения, если он существует
+    if material.solution_file:
+        try:
+            upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+            solution_path = os.path.join(upload_base, material.solution_file)
+            if os.path.exists(solution_path):
+                os.remove(solution_path)
+                current_app.logger.info(f"Удален файл решения: {solution_path}")
+        except Exception as solution_error:
+            current_app.logger.error(f"Ошибка удаления файла решения {material.solution_file}: {solution_error}")
+    
     db.session.delete(material)
     db.session.commit()
     flash("Материал удалён")

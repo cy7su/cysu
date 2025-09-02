@@ -7,6 +7,8 @@ import shutil
 from datetime import datetime
 from typing import Tuple, List
 from flask import current_app
+from werkzeug.utils import secure_filename
+from .transliteration import get_safe_filename
 
 
 class FileStorageManager:
@@ -43,18 +45,23 @@ class FileStorageManager:
         Returns:
             Tuple[str, str]: (полный путь к файлу, относительный путь для БД)
         """
-        # Создаем структуру папок: uploads/id_предмета/id_пользователя/
+        # Транслитерируем и очищаем имя файла
+        safe_filename = get_safe_filename(filename)
+        
+        # Создаем структуру папок: uploads/id_предмета/users/id_пользователя/
         upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
-        subject_path = os.path.join(upload_base, str(subject_id), str(user_id))
+        subject_path = os.path.join(upload_base, str(subject_id))
+        users_path = os.path.join(subject_path, "users")
+        user_path = os.path.join(users_path, str(user_id))
 
         # Создаем папки если их нет
-        os.makedirs(subject_path, exist_ok=True)
+        os.makedirs(user_path, exist_ok=True)
 
         # Полный путь к файлу
-        full_path = os.path.join(subject_path, filename)
+        full_path = os.path.join(user_path, safe_filename)
 
-        # Относительный путь для БД: id_предмета/id_пользователя/файл
-        relative_path = os.path.join(str(subject_id), str(user_id), filename)
+        # Относительный путь для БД: id_предмета/users/id_пользователя/файл
+        relative_path = os.path.join(str(subject_id), "users", str(user_id), safe_filename)
 
         return full_path, relative_path
 
@@ -70,6 +77,9 @@ class FileStorageManager:
         Returns:
             Tuple[str, str]: (полный путь к файлу, относительный путь для БД)
         """
+        # Транслитерируем и очищаем имя файла
+        safe_filename = get_safe_filename(filename)
+        
         # Создаем структуру папок: uploads/id_предмета/
         upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
         subject_path = os.path.join(upload_base, str(subject_id))
@@ -78,10 +88,10 @@ class FileStorageManager:
         os.makedirs(subject_path, exist_ok=True)
 
         # Полный путь к файлу
-        full_path = os.path.join(subject_path, filename)
+        full_path = os.path.join(subject_path, safe_filename)
 
         # Относительный путь для БД: id_предмета/файл
-        relative_path = os.path.join(str(subject_id), filename)
+        relative_path = os.path.join(str(subject_id), safe_filename)
 
         return full_path, relative_path
 
@@ -106,7 +116,8 @@ class FileStorageManager:
 
         # Генерируем уникальное имя файла с timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
-        name, ext = os.path.splitext(filename)
+        safe_filename = get_safe_filename(filename)
+        name, ext = os.path.splitext(safe_filename)
         unique_filename = f"{timestamp}_{name}{ext}"
 
         # Полный путь к файлу
@@ -140,7 +151,8 @@ class FileStorageManager:
 
         # Генерируем уникальное имя файла с timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
-        name, ext = os.path.splitext(filename)
+        safe_filename = get_safe_filename(filename)
+        name, ext = os.path.splitext(safe_filename)
         unique_filename = f"{timestamp}_{name}{ext}"
 
         # Полный путь к файлу
@@ -164,10 +176,19 @@ class FileStorageManager:
             bool: True если файл сохранен успешно
         """
         try:
+            current_app.logger.info(f"Попытка сохранения файла: {full_path}")
+            current_app.logger.info(f"Папка существует: {os.path.exists(os.path.dirname(full_path))}")
+            
             file.save(full_path)
+            
+            current_app.logger.info(f"Файл успешно сохранен: {full_path}")
+            current_app.logger.info(f"Файл существует после сохранения: {os.path.exists(full_path)}")
+            
             return True
         except Exception as e:
             current_app.logger.error(f"Ошибка сохранения файла {full_path}: {str(e)}")
+            import traceback
+            current_app.logger.error(f"Traceback: {traceback.format_exc()}")
             return False
 
     @staticmethod
@@ -241,13 +262,17 @@ class FileStorageManager:
             if os.path.exists(chat_path):
                 shutil.rmtree(chat_path)
 
-            # Удаляем файлы материалов
+            # Удаляем файлы материалов (решения пользователей)
             upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
             if os.path.exists(upload_base):
                 for subject_folder in os.listdir(upload_base):
-                    user_path = os.path.join(upload_base, subject_folder, str(user_id))
-                    if os.path.exists(user_path):
-                        shutil.rmtree(user_path)
+                    subject_path = os.path.join(upload_base, subject_folder)
+                    if os.path.isdir(subject_path):
+                        users_path = os.path.join(subject_path, "users")
+                        if os.path.exists(users_path):
+                            user_path = os.path.join(users_path, str(user_id))
+                            if os.path.exists(user_path):
+                                shutil.rmtree(user_path)
 
             return True
         except Exception as e:
