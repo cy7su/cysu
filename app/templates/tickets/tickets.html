@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Тикеты поддержки{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-headset me-2"></i>Тикеты поддержки
+                </h1>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTicketModal">
+                    <i class="fas fa-plus me-2"></i>Создать тикет
+                </button>
+            </div>
+
+            {% if tickets %}
+                <div class="row g-3">
+                    {% for ticket in tickets %}
+                        <div class="col-12">
+                            <div class="card" style="background: var(--dp-02); border: 1px solid var(--border-primary); border-radius: 20px;">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="mb-1 text-primary">{{ ticket.subject }}</h6>
+                                                <span class="badge 
+                                                    {% if ticket.status == 'open' %}bg-warning
+                                                    {% elif ticket.status == 'accepted' %}bg-info
+                                                    {% elif ticket.status == 'closed' %}bg-success
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {% if ticket.status == 'open' %}Открыт
+                                                    {% elif ticket.status == 'accepted' %}Принят
+                                                    {% elif ticket.status == 'closed' %}Закрыт
+                                                    {% else %}{{ ticket.status }}{% endif %}
+                                                </span>
+                                            </div>
+                                            <p class="text-muted small mb-2">{{ ticket.message[:100] }}{% if ticket.message|length > 100 %}...{% endif %}</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user me-1"></i>
+                                                    {% if current_user.is_admin %}
+                                                        {{ ticket.user.username if ticket.user else 'Неизвестный пользователь' }}
+                                                    {% endif %}
+                                                </small>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    {{ ticket.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-md-end">
+                                            <a href="{{ url_for('tickets.ticket_detail', ticket_id=ticket.id) }}" 
+                                               class="btn btn-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i>Просмотр
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Тикеты не найдены</h5>
+                    <p class="text-muted">У вас пока нет тикетов поддержки</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно создания тикета -->
+<div class="modal fade" id="createTicketModal" tabindex="-1" aria-labelledby="createTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createTicketModalLabel">
+                    <i class="fas fa-plus me-2"></i>Создать тикет
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="ticketForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="ticketSubject" class="form-label">Тема</label>
+                        <input type="text" class="form-control" id="ticketSubject" name="subject" required 
+                               placeholder="Введите тему тикета">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ticketMessage" class="form-label">Сообщение</label>
+                        <textarea class="form-control" id="ticketMessage" name="message" rows="4" required 
+                                  placeholder="Опишите вашу проблему или вопрос"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ticketFiles" class="form-label">Прикрепить файлы (до 10 МБ каждый)</label>
+                        <input type="file" class="form-control" id="ticketFiles" name="files" multiple 
+                               accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar">
+                        <div class="form-text text-muted">Поддерживаемые форматы: изображения, PDF, документы, архивы</div>
+                    </div>
+                    <div id="fileList" class="mb-3">
+                        <!-- Здесь будут отображаться выбранные файлы -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="ticketSubmitBtn" onclick="createTicket()">
+                        <i class="fas fa-paper-plane me-1"></i>Отправить тикет
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Обработчик изменения файлов
+document.getElementById('ticketFiles').addEventListener('change', function(e) {
+    const fileList = document.getElementById('fileList');
+    fileList.innerHTML = '';
+    
+    Array.from(e.target.files).forEach(file => {
+        const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+        const fileItem = document.createElement('div');
+        fileItem.className = 'd-flex align-items-center justify-content-between p-2 bg-light rounded mb-2';
+        fileItem.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas fa-file me-2 text-primary"></i>
+                <span>${file.name}</span>
+            </div>
+            <span class="text-muted small">${fileSize} МБ</span>
+        `;
+        fileList.appendChild(fileItem);
+    });
+});
+
+function createTicket() {
+    const subject = document.getElementById('ticketSubject').value.trim();
+    const message = document.getElementById('ticketMessage').value.trim();
+    const files = document.getElementById('ticketFiles').files;
+    
+    if (!subject || !message) {
+        alert('Пожалуйста, заполните все обязательные поля');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('subject', subject);
+    formData.append('message', message);
+    
+    for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+    }
+    
+    // Отправляем запрос
+    fetch('/api/ticket/create', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Тикет успешно создан!');
+            location.reload();
+        } else {
+            alert('Ошибка при создании тикета: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при создании тикета');
+    });
+}
+</script>
+{% endblock %}

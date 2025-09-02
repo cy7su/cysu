@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Оформление подписки{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Основная карточка -->
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h4 mb-0"><i class="fas fa-credit-card me-2"></i>Оформление подписки</h1>
+                </div>
+                <div class="card-body">
+                    <!-- Описание -->
+                    <div class="mb-3">
+                        <p class="text-muted mb-0">Получите полный доступ ко всем учебным материалам, лекциям и практическим заданиям на платформе cysu.</p>
+                    </div>
+
+                    <!-- Выбор периода подписки -->
+                    <section class="mb-4">
+                        <h2 class="h5 mb-3">Выберите период подписки</h2>
+                        <div class="row g-2">
+                            <div class="col-md-3 col-6">
+                                <div class="p-2 subscription-card" onclick="selectPeriod('1')" id="period-1">
+                                    <h6 class="mb-1">1 месяц</h6>
+                                    <div class="text-primary fw-bold mb-1">89₽</div>
+                                    <small class="text-muted">89₽/мес</small>
+                                    <div class="mt-1">
+                                        <span class="badge bg-secondary">Экономия - нет</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="p-2 subscription-card" onclick="selectPeriod('3')" id="period-3">
+                                    <h6 class="mb-1">3 месяца</h6>
+                                    <div class="text-primary fw-bold mb-1">199₽</div>
+                                    <small class="text-muted">66₽/мес</small>
+                                    <div class="mt-1">
+                                        <span class="badge bg-secondary">Экономия 68₽</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="p-2 subscription-card" onclick="selectPeriod('6')" id="period-6">
+                                    <h6 class="mb-1">6 месяцев</h6>
+                                    <div class="text-primary fw-bold mb-1">349₽</div>
+                                    <small class="text-muted">58₽/мес</small>
+                                    <div class="mt-1">
+                                        <span class="badge bg-secondary">Экономия 185₽</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="p-2 subscription-card" onclick="selectPeriod('12')" id="period-12">
+                                    <h6 class="mb-1">1 год</h6>
+                                    <div class="text-primary fw-bold mb-1">469₽</div>
+                                    <small class="text-muted">39₽/мес</small>
+                                    <div class="mt-1">
+                                        <span class="badge bg-secondary">Экономия 599₽</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Что включено -->
+                    <section class="mb-4">
+                        <h2 class="h5 mb-3">Что включено в подписку</h2>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="p-4 text-center feature-card" style="height: 180px; display: flex; flex-direction: column; justify-content: center;">
+                                    <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                                    <h6 class="text-primary mb-2">Учебные материалы</h6>
+                                    <p class="text-muted small mb-0">Полный доступ ко всем учебным материалам и лекциям.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-4 text-center feature-card" style="height: 180px; display: flex; flex-direction: column; justify-content: center;">
+                                    <i class="fas fa-upload fa-3x text-primary mb-3"></i>
+                                    <h6 class="text-primary mb-2">Загрузка решений</h6>
+                                    <p class="text-muted small mb-0">Возможность загружать решения заданий.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-4 text-center feature-card" style="height: 180px; display: flex; flex-direction: column; justify-content: center;">
+                                    <i class="fas fa-headset fa-3x text-primary mb-3"></i>
+                                    <h6 class="text-primary mb-2">Поддержка</h6>
+                                    <p class="text-muted small mb-0">Персональная поддержка по всем вопросам.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Кнопка оплаты -->
+                    <section class="text-center">
+                        <button onclick="createPayment()" class="btn btn-primary" id="payment-btn" type="button">
+                            <i class="fas fa-credit-card me-2"></i>
+                            <span>Оплатить</span>
+                            <span id="price-text" class="ms-2">89₽</span>
+                        </button>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.subscription-card {
+    background: var(--dp-02);
+    border: 1px solid var(--border-primary);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Hover эффекты отключены */
+
+.subscription-card.selected {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border-color: var(--primary-color);
+    color: white;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(181, 149, 255, 0.4);
+}
+
+.subscription-card.selected h6,
+.subscription-card.selected .text-primary,
+.subscription-card.selected .text-muted {
+    color: white !important;
+}
+
+.subscription-card.selected .badge {
+    background: rgba(255,255,255,0.2) !important;
+    color: white !important;
+}
+
+.feature-card {
+    background: var(--dp-02);
+    border: 1px solid var(--border-primary);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Hover эффекты отключены */
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border: none;
+    color: white;
+    border-radius: 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(181, 149, 255, 0.3);
+}
+
+/* Hover эффекты отключены */
+
+.badge {
+    background-color: var(--dp-04);
+    color: var(--text-primary);
+    border-radius: 12px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge.bg-secondary {
+    background-color: var(--dp-08) !important;
+    color: var(--text-secondary) !important;
+}
+
+.card {
+    background-color: var(--dp-02);
+    color: var(--text-primary);
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    background-color: var(--dp-00);
+    border-bottom: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    padding: 1.5rem;
+    font-weight: 600;
+}
+
+.card-body {
+    background-color: var(--dp-02);
+    color: var(--text-primary);
+    padding: 1.5rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.text-muted {
+    color: var(--text-secondary);
+}
+
+body {
+    background-color: var(--dp-00);
+    color: var(--text-primary);
+}
+</style>
+
+<script>
+let selectedPeriod = '1';
+
+function selectPeriod(period) {
+    // Убираем выделение со всех карточек
+    document.querySelectorAll('.subscription-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Выделяем выбранную карточку
+    document.getElementById(`period-${period}`).classList.add('selected');
+    
+    // Обновляем выбранный период
+    selectedPeriod = period;
+    
+    // Обновляем цену
+    updatePrice(period);
+}
+
+function updatePrice(period) {
+    const prices = {
+        '1': '89₽',
+        '3': '199₽',
+        '6': '349₽',
+        '12': '469₽'
+    };
+    
+    document.getElementById('price-text').textContent = prices[period];
+}
+
+function createPayment() {
+    // Получаем цену для выбранного периода
+    const prices = {
+        '1': '89',
+        '3': '199',
+        '6': '349',
+        '12': '469'
+    };
+    
+    const selectedPrice = prices[selectedPeriod];
+    
+    // Перенаправляем на страницу подписки с параметрами для создания платежа
+    const url = new URL(window.location.href);
+    url.searchParams.set('period', selectedPeriod);
+    url.searchParams.set('amount', selectedPrice);
+    
+    window.location.href = url.toString();
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+    selectPeriod('1');
+});
+</script>
+{% endblock %} 

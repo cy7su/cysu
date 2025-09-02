@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Тикет #{{ ticket.id }} - cysu{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Заголовок тикета -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="fas fa-ticket-alt text-primary me-2"></i>
+                        Тикет #{{ ticket.id }}: {{ ticket.subject }}
+                    </h5>
+                    <small class="text-muted">Создан {{ ticket.created_at.strftime('%d.%m.%Y в %H:%M') }}</small>
+                </div>
+                <div class="d-flex gap-2">
+                    {% if ticket.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">Ожидает обработки</span>
+                    {% elif ticket.status == 'accepted' %}
+                        <span class="badge bg-success">Принят</span>
+                    {% elif ticket.status == 'rejected' %}
+                        <span class="badge bg-danger">Отклонен</span>
+                    {% elif ticket.status == 'closed' %}
+                        <span class="badge bg-secondary">Закрыт</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if current_user.is_admin %}
+                    <div class="col-md-6">
+                        <h6 class="text-white mb-2">Информация о пользователе</h6>
+                        <p class="mb-1"><strong class="text-white">Имя:</strong> <span class="text-muted">{{ ticket.user.username }}</span></p>
+                        <p class="mb-1"><strong class="text-white">Email:</strong> <span class="text-muted">{{ ticket.user.email }}</span></p>
+                        <p class="mb-0"><strong class="text-white">ID пользователя:</strong> <span class="text-muted">{{ ticket.user.id }}</span></p>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-6">
+                        <h6 class="text-white mb-2">Детали тикета</h6>
+                        <p class="mb-1"><strong class="text-white">Статус:</strong> 
+                            {% if ticket.status == 'pending' %}
+                                <span class="text-warning">Ожидает</span>
+                            {% elif ticket.status == 'accepted' %}
+                                <span class="text-success">Принят</span>
+                            {% elif ticket.status == 'rejected' %}
+                                <span class="text-danger">Отклонен</span>
+                            {% elif ticket.status == 'closed' %}
+                                <span class="text-secondary">Закрыт</span>
+                            {% endif %}
+                        </p>
+                        <p class="mb-1"><strong class="text-white">Создан:</strong> <span class="text-muted">{{ ticket.created_at.strftime('%d.%m.%Y в %H:%M') }}</span></p>
+                        {% if ticket.updated_at != ticket.created_at %}
+                        <p class="mb-0"><strong class="text-white">Обновлен:</strong> <span class="text-muted">{{ ticket.updated_at.strftime('%d.%m.%Y в %H:%M') }}</span></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщения тикета -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-comments text-primary me-2"></i>
+                    Переписка
+                </h6>
+            </div>
+            <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                <!-- Исходное сообщение -->
+                <div class="message mb-3">
+                    <div class="d-flex align-items-start">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="bg-light rounded p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <strong class="text-dark">{{ ticket.user.username }}</strong>
+                                    <small class="text-muted">{{ ticket.created_at.strftime('%d.%m.%Y в %H:%M') }}</small>
+                                </div>
+                                <p class="mb-0 text-dark">{{ ticket.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сообщения переписки -->
+                {% for message in ticket.messages %}
+                <div class="message mb-3">
+                    <div class="d-flex align-items-start">
+                        <div class="flex-shrink-0">
+                            {% if message.is_admin %}
+                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user-shield text-white"></i>
+                                </div>
+                            {% else %}
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="{% if message.is_admin %}bg-success{% else %}bg-light{% endif %} rounded p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <strong class="{% if message.is_admin %}text-white{% else %}text-dark{% endif %}">
+                                        {% if message.is_admin %}Администратор{% else %}{{ message.user.username }}{% endif %}
+                                    </strong>
+                                    <small class="{% if message.is_admin %}text-white-50{% else %}text-muted{% endif %}">
+                                        {{ message.created_at.strftime('%d.%m.%Y в %H:%M') }}
+                                    </small>
+                                </div>
+                                <p class="mb-0 {% if message.is_admin %}text-white{% else %}text-dark{% endif %}">{{ message.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Форма ответа -->
+        {% if ticket.status != 'closed' %}
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-reply text-primary me-2"></i>
+                    Ответить
+                </h6>
+            </div>
+            <div class="card-body">
+                <form id="responseForm" enctype="multipart/form-data">
+                    <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Сообщение</label>
+                        <textarea class="form-control" id="message" name="message" rows="4" required placeholder="Введите ваш ответ..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="files" class="form-label">Прикрепить файлы (необязательно)</label>
+                        <input type="file" class="form-control" id="files" name="files" multiple accept=".png,.jpg,.jpeg,.gif,.pdf,.doc,.docx,.txt,.zip,.rar">
+                        <div class="form-text">Максимальный размер файла: 10MB</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('tickets.tickets') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Назад к списку
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Отправить ответ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Админские действия -->
+        {% if current_user.is_admin and ticket.status != 'closed' %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-cogs text-warning me-2"></i>
+                    Действия администратора
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex gap-2 flex-wrap">
+                    {% if ticket.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('tickets.accept_ticket', ticket_id=ticket.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check me-2"></i>Принять
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('tickets.reject_ticket', ticket_id=ticket.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-times me-2"></i>Отклонить
+                            </button>
+                        </form>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('tickets.close_ticket', ticket_id=ticket.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-lock me-2"></i>Закрыть
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.getElementById('responseForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Отправка...';
+    submitBtn.disabled = true;
+    
+    fetch('{{ url_for("tickets.ticket_response") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Ошибка: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Произошла ошибка при отправке ответа');
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+});
+</script>
+{% endblock %}

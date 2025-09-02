@@ -1,0 +1,180 @@
+# ========================================
+# КОНФИДЕНЦИАЛЬНЫЕ ФАЙЛЫ
+# ========================================
+.env
+.env.local
+.env.production
+.env.staging
+.env.development
+secrets.json
+config_secret.py
+secrets.py
+config.py
+*.key
+*.pem
+*.p12
+*.crt
+
+# ========================================
+# БАЗА ДАННЫХ
+# ========================================
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+instance/
+migrations/
+alembic.ini
+
+# ========================================
+# ЛОГИ И ОТЛАДКА
+# ========================================
+*.log
+logs/
+err.log
+debug.log
+access.log
+error.log
+*.log.*
+
+# ========================================
+# КЭШ PYTHON
+# ========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# ========================================
+# ВИРТУАЛЬНОЕ ОКРУЖЕНИЕ
+# ========================================
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+env.bak/
+venv.bak/
+
+# ========================================
+# IDE И РЕДАКТОРЫ
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ========================================
+# ВРЕМЕННЫЕ ФАЙЛЫ
+# ========================================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ========================================
+# ЗАГРУЖЕННЫЕ ФАЙЛЫ
+# ========================================
+app/static/uploads/
+app/static/ticket_files/
+app/static/user_files/
+app/static/materials/
+app/static/attachments/
+
+# ========================================
+# КОНФИГУРАЦИОННЫЕ ФАЙЛЫ
+# ========================================
+local_settings.py
+local_config.py
+settings_local.py
+config_local.py
+*.json
+!package.json
+!package-lock.json
+!yarn.lock
+
+# ========================================
+# СИСТЕМНЫЕ ФАЙЛЫ
+# ========================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# ========================================
+# CURSOR И РАЗРАБОТКА
+# ========================================
+.cursor-server/
+.cursor/
+.cursorrules
+.cursorignore
+
+# ========================================
+# УСТАРЕВШИЕ ФАЙЛЫ
+# ========================================
+app/views.py
+app/static/css/style_old.css
+app/services/shortlink_service.py
+app/templates/chat/
+app/templates/tickets/user_ticket_detail.html
+scrpt/
+main_backup.py
+backup/
+old/
+archive/
+
+# ========================================
+# ДОПОЛНИТЕЛЬНЫЕ ИСКЛЮЧЕНИЯ
+# ========================================
+*.pid
+*.seed
+*.pid.lock
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
