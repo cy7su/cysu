@@ -5,8 +5,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, Response
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
+from ..utils.transliteration import get_safe_filename
 from sqlalchemy.orm import joinedload
 from typing import Union, Dict, Any
+import os
+import shutil
 
 from ..models import User, Material, Subject, SubjectGroup
 from ..forms import MaterialForm
@@ -108,6 +111,16 @@ def index() -> Union[str, Response]:
                     )
                     db.session.add(subject)
                     db.session.commit()
+                    
+                    # Создаем папку для предмета
+                    try:
+                        upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+                        subject_path = os.path.join(upload_base, str(subject.id))
+                        os.makedirs(subject_path, exist_ok=True)
+                        current_app.logger.info(f"Создана папка для предмета {subject.id}: {subject_path}")
+                    except Exception as folder_error:
+                        current_app.logger.error(f"Ошибка создания папки для предмета {subject.id}: {folder_error}")
+                    
                     flash("Предмет добавлен")
                     return redirect(url_for("main.index"))
                 except Exception as e:
@@ -233,7 +246,14 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         form = MaterialForm()
         form.subject_id.choices = [(subject.id, subject.title)]
         form.subject_id.data = subject.id
+        
+        current_app.logger.info(f"Обработка формы материала для предмета {subject.id}")
+        current_app.logger.info(f"Метод запроса: {request.method}")
+        current_app.logger.info(f"Данные формы: {request.form}")
+        current_app.logger.info(f"Файлы: {request.files}")
+        
         if form.validate_on_submit():
+            current_app.logger.info("Форма валидна, начинаем обработку")
             filename = None
             solution_filename = None
 
@@ -242,20 +262,28 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
 
             if form.file.data:
                 file = form.file.data
-                original_filename = secure_filename(file.filename)
+                original_filename = get_safe_filename(file.filename)
+                
+                current_app.logger.info(f"Загрузка файла материала: {file.filename} -> {original_filename}")
 
                 # Создаем путь для файла материала
                 full_path, relative_path = FileStorageManager.get_material_upload_path(
                     subject.id, original_filename
                 )
+                
+                current_app.logger.info(f"Путь для сохранения: {full_path}")
+                current_app.logger.info(f"Относительный путь: {relative_path}")
 
                 # Сохраняем файл
                 if FileStorageManager.save_file(file, full_path):
                     filename = relative_path
+                    current_app.logger.info(f"Файл материала сохранен: {filename}")
+                else:
+                    current_app.logger.error(f"Ошибка сохранения файла материала: {original_filename}")
 
             if form.type.data == "assignment" and form.solution_file.data:
                 solution_file = form.solution_file.data
-                original_solution_filename = secure_filename(solution_file.filename)
+                original_solution_filename = get_safe_filename(solution_file.filename)
 
                 # Создаем путь для файла решения
                 full_solution_path, relative_solution_path = (
@@ -282,6 +310,11 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
             db.session.commit()
             flash("Материал добавлен")
             return redirect(url_for("main.subject_detail", subject_id=subject.id))
+        else:
+            current_app.logger.warning(f"Форма не валидна: {form.errors}")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    current_app.logger.warning(f"Ошибка в поле {field}: {error}")
     
     return render_template(
         "subjects/subject_detail.html",
@@ -302,6 +335,19 @@ def delete_subject(subject_id: int) -> Response:
         return redirect(url_for("main.index"))
     
     subject = Subject.query.get_or_404(subject_id)
+    
+    # Удаляем папку предмета с файлами
+    try:
+        upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+        subject_path = os.path.join(upload_base, str(subject.id))
+        if os.path.exists(subject_path):
+            shutil.rmtree(subject_path)
+            current_app.logger.info(f"Удалена папка предмета {subject.id}: {subject_path}")
+        else:
+            current_app.logger.info(f"Папка предмета {subject.id} не существует: {subject_path}")
+    except Exception as folder_error:
+        current_app.logger.error(f"Ошибка удаления папки предмета {subject.id}: {folder_error}")
+    
     # Удаляем все материалы этого предмета
     for material in subject.materials:
         db.session.delete(material)
@@ -340,7 +386,7 @@ def add_solution_file(material_id: int) -> Response:
     if file:
         # Получаем информацию о предмете
         subject = material.subject
-        original_filename = secure_filename(file.filename)
+        original_filename = get_safe_filename(file.filename)
 
         # Создаем путь для файла решения
         full_path, relative_path = FileStorageManager.get_material_upload_path(
@@ -376,7 +422,7 @@ def submit_solution(material_id: int) -> Response:
     if file:
         # Получаем информацию о предмете
         subject = material.subject
-        original_filename = secure_filename(file.filename)
+        original_filename = get_safe_filename(file.filename)
 
         # Создаем путь для файла решения пользователя
         full_path, relative_path = FileStorageManager.get_subject_upload_path(
@@ -413,6 +459,29 @@ def delete_material(material_id: int) -> Response:
     
     material = Material.query.get_or_404(material_id)
     subject_id = material.subject_id
+    
+    # Удаляем файл материала, если он существует
+    if material.file:
+        try:
+            upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+            file_path = os.path.join(upload_base, material.file)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                current_app.logger.info(f"Удален файл материала: {file_path}")
+        except Exception as file_error:
+            current_app.logger.error(f"Ошибка удаления файла материала {material.file}: {file_error}")
+    
+    # Удаляем файл решения, если он существует
+    if material.solution_file:
+        try:
+            upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+            solution_path = os.path.join(upload_base, material.solution_file)
+            if os.path.exists(solution_path):
+                os.remove(solution_path)
+                current_app.logger.info(f"Удален файл решения: {solution_path}")
+        except Exception as solution_error:
+            current_app.logger.error(f"Ошибка удаления файла решения {material.solution_file}: {solution_error}")
+    
     db.session.delete(material)
     db.session.commit()
     flash("Материал удалён")

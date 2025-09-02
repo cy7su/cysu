@@ -401,6 +401,17 @@ a:hover {
     color: var(--primary-hover);
 }
 
+/* Ссылки в описании материалов */
+.text-muted a {
+    color: #B595FF !important;
+    text-decoration: none;
+}
+
+.text-muted a:hover {
+    color: #9A7FE6 !important;
+    text-decoration: underline;
+}
+
 .text-muted {
     color: var(--text-secondary);
 }

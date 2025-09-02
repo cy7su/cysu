@@ -12,7 +12,7 @@
                 </div>
                 <div class="card-body">
                     {% if material.description %}
-                        <p class="card-text">{{ material.description }}</p>
+                        <div class="card-text">{{ material.description | format_description }}</div>
                     {% endif %}
                     
                         {% if material.file %}

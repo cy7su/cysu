@@ -18,10 +18,14 @@ mail = Mail()
 csrf = CSRFProtect()
 
 def create_app():
+    # Определяем правильный путь к статическим файлам
+    app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # /root
+    static_folder_path = os.path.join(app_root, 'app', 'static')  # /root/app/static
+    
     app = Flask(__name__, 
                 instance_path=None, 
                 instance_relative_config=False,
-                static_folder='static',
+                static_folder=static_folder_path,
                 static_url_path='/static')
     
     # Конфигурация из переменных окружения
@@ -39,13 +43,22 @@ def create_app():
 
     
     # Конфигурация загрузки файлов
-    app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', 'app/static/uploads')
-    app.config['CHAT_FILES_FOLDER'] = os.getenv('CHAT_FILES_FOLDER', 'app/static/chat_files')
-    app.config['TICKET_FILES_FOLDER'] = os.getenv('TICKET_FILES_FOLDER', 'app/static/ticket_files')
+    # Создаем абсолютные пути относительно корня приложения
+    app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Поднимаемся на уровень выше от app/
+    upload_folder = os.getenv('UPLOAD_FOLDER', os.path.join(app_root, 'app', 'static', 'uploads'))
+    ticket_folder = os.getenv('TICKET_FILES_FOLDER', os.path.join(app_root, 'app', 'static', 'ticket_files'))
+    
+    app.config['UPLOAD_FOLDER'] = upload_folder
+    app.config['TICKET_FILES_FOLDER'] = ticket_folder
+    
+    # Логируем пути для отладки
+    app.logger.info(f"STATIC_FOLDER: {static_folder_path}")
+    app.logger.info(f"UPLOAD_FOLDER: {upload_folder}")
+    app.logger.info(f"TICKET_FILES_FOLDER: {ticket_folder}")
     app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH', 20 * 1024 * 1024))
     
     # Создаем необходимые директории для загрузки файлов
-    for folder in [app.config['UPLOAD_FOLDER'], app.config['CHAT_FILES_FOLDER'], app.config['TICKET_FILES_FOLDER']]:
+    for folder in [app.config['UPLOAD_FOLDER']]:
         if not os.path.exists(folder):
             os.makedirs(folder, exist_ok=True)
     
@@ -156,6 +169,12 @@ def create_app():
     app.register_blueprint(tickets_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(api_bp)
+    
+    # Регистрируем фильтры шаблонов
+    from .utils.template_filters import make_links_clickable, format_description, smart_truncate
+    app.jinja_env.filters['make_links_clickable'] = make_links_clickable
+    app.jinja_env.filters['format_description'] = format_description
+    app.jinja_env.filters['smart_truncate'] = smart_truncate
     
     # Context processor для проверки технических работ
     @app.context_processor

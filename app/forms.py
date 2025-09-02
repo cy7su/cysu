@@ -85,7 +85,7 @@ class PasswordResetForm(FlaskForm):
 
 class MaterialForm(FlaskForm):
     title = StringField('Название', validators=[DataRequired()])
-    description = TextAreaField('Описание')
+    description = TextAreaField('Описание', validators=[Length(max=100, message='Описание не должно превышать 100 символов')])
     type = SelectField('Тип', choices=[('lecture', 'Лекция'), ('assignment', 'Задание')])
     subject_id = SelectField('Предмет', coerce=int, validators=[DataRequired()])
     file = FileField('Файл')

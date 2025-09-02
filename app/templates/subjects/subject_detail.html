@@ -48,7 +48,10 @@
           </div>
           <div class="mb-3">
             <label class="form-label">{{ form.description.label }}</label>
-            {{ form.description(class_='form-control', style='min-height: 60px; resize: vertical;') }}
+            {{ form.description(class_='form-control', style='min-height: 60px; resize: vertical;', maxlength='100', id='description-field') }}
+            <div class="form-text">
+              <span id="char-count">0</span>/100 символов
+            </div>
           </div>
           <div class="mb-3">
             <label class="form-label">{{ form.file.label }}</label>
@@ -83,6 +86,31 @@
     }
     $('#type-select').on('change', toggleSolutionFile);
     toggleSolutionFile();
+    
+    // Подсчет символов в поле описания
+    function updateCharCount() {
+      const textarea = $('#description-field');
+      const charCount = $('#char-count');
+      const currentLength = textarea.val().length;
+      const maxLength = 100;
+      
+      charCount.text(currentLength);
+      
+      // Меняем цвет в зависимости от количества символов
+      if (currentLength > maxLength * 0.9) {
+        charCount.css('color', '#dc3545'); // Красный
+      } else if (currentLength > maxLength * 0.7) {
+        charCount.css('color', '#ffc107'); // Желтый
+      } else {
+        charCount.css('color', '#6c757d'); // Серый
+      }
+    }
+    
+    // Обновляем счетчик при вводе
+    $('#description-field').on('input', updateCharCount);
+    
+    // Инициализируем счетчик
+    updateCharCount();
   });
 </script>
 {% endif %}
@@ -103,7 +131,7 @@
                     <a href="{{ url_for('main.material_detail', material_id=material.id) }}" class="text-decoration-none text-white fw-medium" style="font-size: 0.95rem;">{{ material.title }}</a>
                   </div>
                   {% if material.description %}
-                    <div class="text-muted" style="font-size: 0.85rem; line-height: 1.3;">{{ material.description[:60] }}{% if material.description|length > 60 %}...{% endif %}</div>
+                    <div class="text-muted" style="font-size: 0.85rem; line-height: 1.3;">{{ material.description | make_links_clickable }}</div>
                   {% endif %}
                 </div>
                 <div class="d-flex align-items-center gap-1" style="flex-shrink: 0;">
@@ -151,7 +179,7 @@
                     <a href="{{ url_for('main.material_detail', material_id=material.id) }}" class="text-decoration-none text-white fw-medium" style="font-size: 0.95rem;">{{ material.title }}</a>
                   </div>
                   {% if material.description %}
-                    <div class="text-muted" style="font-size: 0.85rem; line-height: 1.3;">{{ material.description[:60] }}{% if material.description|length > 60 %}...{% endif %}</div>
+                    <div class="text-muted" style="font-size: 0.85rem; line-height: 1.3;">{{ material.description | make_links_clickable }}</div>
                   {% endif %}
                 </div>
                 <div class="d-flex align-items-center gap-1" style="flex-shrink: 0;">
