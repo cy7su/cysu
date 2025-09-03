@@ -11,7 +11,7 @@ from typing import Union, Dict, Any
 import os
 import shutil
 
-from ..models import User, Material, Subject, SubjectGroup
+from ..models import User, Material, Subject, SubjectGroup, SiteSettings
 from ..forms import MaterialForm
 from ..utils.payment_service import YooKassaService
 from ..utils.file_storage import FileStorageManager
@@ -154,8 +154,14 @@ def index() -> Union[str, Response]:
         subjects = []
         flash("Ошибка загрузки предметов. Попробуйте обновить страницу.", "error")
     
+    # Получаем настройку генерации паттернов
+    pattern_generation_enabled = SiteSettings.get_setting('pattern_generation_enabled', True)
+    
     return render_template(
-        "index.html", subjects=subjects, is_subscribed=is_subscribed
+        "index.html", 
+        subjects=subjects, 
+        is_subscribed=is_subscribed,
+        pattern_generation_enabled=pattern_generation_enabled
     )
 
 

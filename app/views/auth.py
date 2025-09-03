@@ -139,8 +139,9 @@ def email_verification() -> Union[str, Response]:
                 hashed_password = generate_password_hash(
                     pending_registration["password"]
                 )
-                # Проверяем настройку пробной подписки
+                # Проверяем настройки пробной подписки
                 trial_enabled = SiteSettings.get_setting('trial_subscription_enabled', True)
+                trial_days = SiteSettings.get_setting('trial_subscription_days', 14)
                 
                 user = User(
                     username=pending_registration["username"],
@@ -149,7 +150,7 @@ def email_verification() -> Union[str, Response]:
                     is_verified=True,  # Пользователь подтвержден
                     group_id=pending_registration.get("group_id") if pending_registration.get("group_id") else None,
                     is_trial_subscription=trial_enabled,  # Активируем пробную подписку только если включено
-                    trial_subscription_expires=datetime.utcnow() + timedelta(days=14) if trial_enabled else None,  # 14 дней пробной подписки
+                    trial_subscription_expires=datetime.utcnow() + timedelta(days=trial_days) if trial_enabled else None,  # Используем настройку количества дней
                 )
                 db.session.add(user)
                 db.session.commit()

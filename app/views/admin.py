@@ -386,16 +386,17 @@ def admin_users() -> Union[str, Response]:
                     )
                     status = "отозвана"
                 else:
-                    # Выдаем подписку на 30 дней
+                    # Выдаем подписку на количество дней из настроек
+                    trial_days = SiteSettings.get_setting('trial_subscription_days', 14)
                     current_app.logger.info(
-                        f"Выдаем подписку пользователю {user.username} на 30 дней"
+                        f"Выдаем подписку пользователю {user.username} на {trial_days} дней"
                     )
                     user.is_subscribed = True
-                    user.subscription_expires = datetime.utcnow() + timedelta(days=30)
+                    user.subscription_expires = datetime.utcnow() + timedelta(days=trial_days)
                     user.is_manual_subscription = (
                         True  # Устанавливаем флаг ручной подписки
                     )
-                    status = "выдана на 30 дней"
+                    status = f"выдана на {trial_days} дней"
 
                 db.session.commit()
                 current_app.logger.info(
@@ -716,12 +717,16 @@ def admin_settings() -> Union[str, Response]:
     if request.method == "GET":
         form.maintenance_mode.data = SiteSettings.get_setting('maintenance_mode', False)
         form.trial_subscription_enabled.data = SiteSettings.get_setting('trial_subscription_enabled', True)
+        form.trial_subscription_days.data = SiteSettings.get_setting('trial_subscription_days', 14)
+        form.pattern_generation_enabled.data = SiteSettings.get_setting('pattern_generation_enabled', True)
     
     if request.method == "POST" and form.validate_on_submit():
         try:
             # Сохраняем настройки
             SiteSettings.set_setting('maintenance_mode', form.maintenance_mode.data, 'Включить/выключить режим технических работ')
             SiteSettings.set_setting('trial_subscription_enabled', form.trial_subscription_enabled.data, 'Включить/выключить пробную подписку для новых аккаунтов')
+            SiteSettings.set_setting('trial_subscription_days', form.trial_subscription_days.data, 'Количество дней пробной подписки')
+            SiteSettings.set_setting('pattern_generation_enabled', form.pattern_generation_enabled.data, 'Включить/выключить кнопку генерации паттернов')
             
             flash('Настройки успешно сохранены', 'success')
             return redirect(url_for('admin.admin_settings'))

@@ -27,7 +27,7 @@
         <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest', v='3') }}">
             <meta name="msapplication-TileImage" content="{{ url_for('static', filename='icons/android-chrome-192x192.png', v=timestamp) }}">
     
-    <title>{% block title %}cysu - Code Your Skills Upgrade{% endblock %}</title>
+    <title>{% block title %}cysu{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=timestamp) }}" type="text/css">
@@ -116,7 +116,7 @@
         
         /* Переопределение основных цветов */
         .text-primary {
-            color: var(--primary-color) !important;
+            color: var(--text-primary) !important;
         }
         
         /* Стили для navbar */
@@ -372,37 +372,7 @@
             background: #4a4a4a;
         }
         
-        /* Стили для анимации печатающегося текста */
-        .typing-container {
-            min-width: 200px;
-            position: relative;
-        }
-        
-        #typing-text {
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-        }
-        
 
-        
-        /* Адаптивность для мобильных устройств */
-        @media (max-width: 768px) {
-            .typing-container {
-                min-width: 150px;
-            }
-            #typing-text {
-                font-size: 0.8rem;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .typing-container {
-                min-width: 120px;
-            }
-            #typing-text {
-                font-size: 0.7rem;
-            }
-        }
         
         .notification.auth-notification .notification-title {
             color: #28a745;
@@ -753,11 +723,7 @@
         /* Принудительное выравнивание размеров всех кнопок в футере */
         .footer .d-flex.gap-2 button,
         .footer .d-flex.gap-2 a {
-            width: 32px !important;
-            height: 32px !important;
             min-width: 32px !important;
-            min-height: 32px !important;
-            max-width: 32px !important;
             max-height: 32px !important;
             display: flex !important;
             align-items: center !important;
@@ -862,11 +828,7 @@
         .footer .d-flex.gap-2 button[onclick="openTicketModal()"],
         .footer .d-flex.gap-2 a[href*="vk.com"],
         .footer .d-flex.gap-2 a[href*="t.me"] {
-            width: 32px !important;
-            height: 32px !important;
             min-width: 32px !important;
-            min-height: 32px !important;
-            max-width: 32px !important;
             max-height: 32px !important;
             box-sizing: border-box !important;
             padding: 0 !important;
@@ -1178,11 +1140,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark mb-2">
     <div class="container">
         <div class="navbar-brand d-flex align-items-center">
-            <a href="{{ url_for('main.index') }}" class="text-decoration-none text-white fw-bold me-1" style="transition: color 0.3s ease;" onmouseover="this.style.color='var(--primary-color) !important'" onmouseout="this.style.color='white'">cysu</a>
-            <span class="text-primary fw-bold">•</span>
-            <div class="typing-container ms-2 d-flex align-items-center">
-                <span id="typing-text" class="text-muted fw-normal"></span>
-            </div>
+            <img src="{{ url_for('static', filename='icons/favicon-48x48.png', v=timestamp) }}" alt="cysu" class="me-2" style="width: 32px;height: 32px;margin-right: 0rem !important;">
+            <a href="{{ url_for('main.index') }}" class="text-decoration-none text-white fw-bold" style="transition: color 0.3s;margin-bottom: 0.16rem;" onmouseover="this.style.color='var(--primary-color) !important'" onmouseout="this.style.color='white'">cysu</a>
         </div>
         
         <!-- Кнопка мобильного меню -->
@@ -1392,57 +1351,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
-    
-    // Простая анимация текста
-    function initTypingAnimation() {
-        const typingText = document.getElementById('typing-text');
-        if (!typingText) return;
-        
-        const texts = ['can you shut up?', 't.me/cy7su'];
-        const savedState = localStorage.getItem('typingState');
-        
-        if (savedState) {
-            const state = JSON.parse(savedState);
-            if (state.completed) {
-                typingText.textContent = texts[1];
-                return;
-            }
-        }
-        
-        let textIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        
-        function animate() {
-            const currentText = texts[textIndex];
-            
-            if (isDeleting) {
-                typingText.textContent = currentText.substring(0, charIndex--);
-                if (charIndex < 0) {
-                    isDeleting = false;
-                    textIndex++;
-                    if (textIndex >= texts.length) {
-                        localStorage.setItem('typingState', JSON.stringify({completed: true}));
-                        return;
-                    }
-                }
-            } else {
-                typingText.textContent = currentText.substring(0, charIndex++);
-                if (charIndex > currentText.length) {
-                    isDeleting = true;
-                    setTimeout(animate, 2000);
-                    return;
-                }
-            }
-            
-            setTimeout(animate, isDeleting ? 50 : 100);
-        }
-        
-        setTimeout(animate, 1000);
-    }
-    
-    initTypingAnimation();
-    document.addEventListener('DOMContentLoaded', initTypingAnimation);
+
 });
 </script>
 

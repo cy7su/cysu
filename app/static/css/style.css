@@ -538,7 +538,6 @@ a:hover {
 
 /* Ссылки в описании материалов */
 .text-muted a {
-    color: #B595FF !important;
     text-decoration: none;
     word-break: break-all;
     font-size: 0.8rem;
@@ -547,7 +546,7 @@ a:hover {
 }
 
 .text-muted a:hover {
-    color: #9A7FE6 !important;
+    color: #B595FF !important;
     text-decoration: underline;
     opacity: 1;
 }

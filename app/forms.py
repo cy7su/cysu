@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField, SelectField, BooleanField, SelectMultipleField
-from wtforms.validators import DataRequired, Email, Length, EqualTo, URL, Optional
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField, SelectField, BooleanField, SelectMultipleField, IntegerField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, URL, Optional, NumberRange
 from .models import User, Group
 
 class LoginForm(FlaskForm):
@@ -174,4 +174,8 @@ class SiteSettingsForm(FlaskForm):
     """Форма для управления настройками сайта"""
     maintenance_mode = BooleanField('Технические работы')
     trial_subscription_enabled = BooleanField('Включить пробную подписку для новых аккаунтов')
+    trial_subscription_days = IntegerField('Количество дней пробной подписки', validators=[
+        NumberRange(min=1, max=365, message='Количество дней должно быть от 1 до 365')
+    ])
+    pattern_generation_enabled = BooleanField('Включить кнопку генерации паттернов')
     submit = SubmitField('Сохранить настройки')
