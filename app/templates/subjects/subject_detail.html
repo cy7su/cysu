@@ -30,12 +30,17 @@
         {% endif %}
       </div>
       {% if current_user.is_authenticated and current_user.is_admin and current_user.admin_mode_enabled %}
-        <form method="post" action="{{ url_for('main.delete_subject', subject_id=subject.id) }}" style="margin:0;">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить предмет?')">
-            <i class="fas fa-trash me-1"></i>Удалить
+        <div class="d-flex gap-2">
+          <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editSubjectModal">
+            <i class="fas fa-edit me-1"></i>Редактировать
           </button>
-        </form>
+          <form method="post" action="{{ url_for('main.delete_subject', subject_id=subject.id) }}" style="margin:0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить предмет?')">
+              <i class="fas fa-trash me-1"></i>Удалить
+            </button>
+          </form>
+        </div>
       {% endif %}
     </div>
   </div>
@@ -63,7 +68,7 @@
             </div>
             <div class="mb-3">
               <label class="form-label">{{ form.description.label }}</label>
-              {{ form.description(class_='form-control', style='min-height: 60px; resize: vertical;', maxlength='100', id='description-field') }}
+              {{ form.description(class_='form-control', style='min-height: 85px; resize: vertical;', maxlength='100', id='description-field') }}
               <div class="form-text">
                 <span id="char-count">0</span>/100 символов
               </div>
@@ -127,9 +132,69 @@
     
     // Инициализируем счетчик
     updateCharCount();
+    
+    // Подсчет символов для поля редактирования описания
+    function updateEditCharCount() {
+      const textarea = $('textarea[name="description"]');
+      const charCount = $('#edit-char-count');
+      const currentLength = textarea.val().length;
+      const maxLength = 500;
+      
+      charCount.text(currentLength);
+      
+      // Меняем цвет в зависимости от количества символов
+      if (currentLength > maxLength * 0.9) {
+        charCount.css('color', '#dc3545'); // Красный
+      } else if (currentLength > maxLength * 0.7) {
+        charCount.css('color', '#ffc107'); // Желтый
+      } else {
+        charCount.css('color', '#6c757d'); // Серый
+      }
+    }
+    
+    // Обновляем счетчик при вводе в поле редактирования
+    $('textarea[name="description"]').on('input', updateEditCharCount);
+    
+    // Инициализируем счетчик для поля редактирования
+    updateEditCharCount();
   });
 </script>
 {% endif %}
+
+<!-- Модальное окно для редактирования предмета -->
+{% if current_user.is_authenticated and current_user.is_admin and current_user.admin_mode_enabled %}
+<div class="modal fade" id="editSubjectModal" tabindex="-1" aria-labelledby="editSubjectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editSubjectModalLabel">Редактировать предмет</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{{ url_for('main.edit_subject', subject_id=subject.id) }}">
+        <div class="modal-body">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label">Название предмета</label>
+            <input type="text" name="title" class="form-control" value="{{ subject.title }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Описание</label>
+            <textarea name="description" class="form-control" rows="3" maxlength="500">{{ subject.description or '' }}</textarea>
+            <div class="form-text">
+              <span id="edit-char-count">0</span>/500 символов
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <div class="row">
   <div class="col-md-6">
     <div class="card">

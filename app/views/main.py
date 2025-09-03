@@ -346,6 +346,50 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
     )
 
 
+@main_bp.route("/subject/<int:subject_id>/edit", methods=["POST"])
+@login_required
+def edit_subject(subject_id: int) -> Response:
+    """Редактирование предмета"""
+    if not current_user.is_effective_admin():
+        flash("Доступ запрещён")
+        return redirect(url_for("main.index"))
+    
+    subject = Subject.query.get_or_404(subject_id)
+    
+    try:
+        # Получаем данные из формы
+        new_title = request.form.get("title", "").strip()
+        new_description = request.form.get("description", "").strip()
+        
+        # Валидация
+        if not new_title:
+            flash("Название предмета не может быть пустым", "error")
+            return redirect(url_for("main.subject_detail", subject_id=subject_id))
+        
+        if len(new_title) > 255:
+            flash("Название предмета слишком длинное (максимум 255 символов)", "error")
+            return redirect(url_for("main.subject_detail", subject_id=subject_id))
+        
+        if len(new_description) > 500:
+            flash("Описание слишком длинное (максимум 500 символов)", "error")
+            return redirect(url_for("main.subject_detail", subject_id=subject_id))
+        
+        # Обновляем данные
+        subject.title = new_title
+        subject.description = new_description if new_description else None
+        
+        db.session.commit()
+        flash("Предмет успешно обновлён")
+        current_app.logger.info(f"Предмет {subject.id} обновлён пользователем {current_user.id}")
+        
+    except Exception as e:
+        current_app.logger.error(f"Ошибка редактирования предмета {subject_id}: {e}")
+        flash("Ошибка при обновлении предмета", "error")
+        db.session.rollback()
+    
+    return redirect(url_for("main.subject_detail", subject_id=subject_id))
+
+
 @main_bp.route("/subject/<int:subject_id>/delete", methods=["POST"])
 @login_required
 def delete_subject(subject_id: int) -> Response:
