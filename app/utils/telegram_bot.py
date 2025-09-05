@@ -31,8 +31,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Конфигурация
-BOT_TOKEN = "8102415932:AAHpFAwjYMho9M7STS6AEk0MaQlZuau5htU"
-ADMIN_TELEGRAM_ID = 7194570395
+BOT_TOKEN = os.getenv('TG_TOKEN')
+ADMIN_TELEGRAM_ID = int(os.getenv('TG_ID', 0))
 USERS_PER_PAGE = 5
 
 class TelegramBotManager:
@@ -612,6 +612,15 @@ class TelegramBotManager:
 
     def run_bot(self):
         """Запуск бота"""
+        # Проверяем наличие токена
+        if not BOT_TOKEN:
+            logger.error("TG_TOKEN не найден в переменных окружения")
+            return
+        
+        if not ADMIN_TELEGRAM_ID:
+            logger.error("TG_ID не найден в переменных окружения")
+            return
+        
         # Создаем приложение
         application = Application.builder().token(BOT_TOKEN).build()
         
