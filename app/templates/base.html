@@ -30,6 +30,7 @@
     <title>{% block title %}cysu{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css?v={{ timestamp }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=timestamp) }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css', v=timestamp) }}" type="text/css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -636,10 +637,49 @@
             padding: 1rem !important;
             border-bottom: 1px solid var(--border-primary);
             font-size: 1rem;
+            background: none !important;
+            margin: 0.25rem 0 !important;
+            border-radius: 8px !important;
+            border: 0px solid var(--border-secondary) !important;
+            transition: all 0.2s ease !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .mobile-device .navbar-nav .nav-link:hover {
+            background: var(--dp-03) !important;
+            border-color: var(--primary-color) !important;
+            color: var(--primary-color) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .mobile-device .navbar-nav .nav-link:active {
+            background: var(--dp-04) !important;
+            transform: translateY(0) !important;
         }
         
         .mobile-device .navbar-nav .nav-link:last-child {
-            border-bottom: none;
+            border-bottom: 0px solid var(--border-secondary) !important;
+        }
+        
+        /* Стили для админских элементов мобильного меню */
+        .mobile-device .navbar-nav .nav-item.d-lg-none .nav-link {
+            background: none !important;
+            border: 0px solid var(--border-primary) !important;
+            font-weight: 500 !important;
+        }
+        
+        .mobile-device .navbar-nav .nav-item.d-lg-none .nav-link:hover {
+            background: var(--dp-04) !important;
+            border-color: var(--primary-color) !important;
+            color: var(--primary-color) !important;
+        }
+        
+        /* Стили для иконок в мобильном меню */
+        .mobile-device .navbar-nav .nav-link i {
+            width: 20px !important;
+            text-align: center !important;
+            margin-right: 0.75rem !important;
         }
         
         .mobile-device .card {
@@ -662,6 +702,255 @@
         .mobile-device .modal-dialog {
             margin: 1rem;
             max-width: calc(100% - 2rem);
+        }
+        
+        /* Стили для мобильного меню в стиле сайдбара */
+        .mobile-device .navbar-collapse {
+            border-radius: 12px !important;
+            margin-top: 1rem !important;
+            padding: 1rem !important;
+            background: var(--dp-00);
+        }
+        
+        .mobile-device .navbar-nav {
+            gap: 0.5rem !important;
+        }
+        
+        .mobile-device .navbar-nav .nav-item {
+            margin: 0 !important;
+        }
+        
+        /* Стили для кнопки "Выйти" */
+        .mobile-device .navbar-nav .nav-link[href*="logout"] {
+            background: none !important;
+            border-color: var(--error) !important;
+            color: var(--error) !important;
+        }
+        
+        .mobile-device .navbar-nav .nav-link[href*="logout"]:hover {
+            background: var(--error) !important;
+            color: white !important;
+            border-color: var(--error) !important;
+        }
+        
+        /* Стили для кнопки подписки */
+        .mobile-device .navbar-nav .nav-link.text-warning {
+            background: var(--dp-04) !important;
+            border-color: var(--warning) !important;
+            color: var(--warning) !important;
+        }
+        
+        .mobile-device .navbar-nav .nav-link.text-warning:hover {
+            background: var(--warning) !important;
+            color: white !important;
+            border-color: var(--warning) !important;
+        }
+        
+        /* Мобильные стили для админских страниц */
+        .mobile-device .admin-users .container-fluid,
+        .mobile-device .admin-subject-groups .container-fluid {
+            padding: 0.5rem !important;
+        }
+        
+        .mobile-device .admin-users .row,
+        .mobile-device .admin-subject-groups .row {
+            margin: 0 !important;
+        }
+        
+        .mobile-device .admin-users .col-lg-3,
+        .mobile-device .admin-subject-groups .col-lg-3 {
+            margin-bottom: 1rem !important;
+        }
+        
+        .mobile-device .admin-users .col-lg-9,
+        .mobile-device .admin-subject-groups .col-12 {
+            padding: 0 !important;
+        }
+        
+        /* Мобильные стили для таблиц */
+        .mobile-device .table-responsive {
+            border-radius: 8px !important;
+            overflow-x: auto !important;
+        }
+        
+        .mobile-device .table {
+            font-size: 0.8rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .mobile-device .table th,
+        .mobile-device .table td {
+            padding: 0.5rem 0.25rem !important;
+            white-space: nowrap !important;
+        }
+        
+        .mobile-device .table th:first-child,
+        .mobile-device .table td:first-child {
+            position: sticky !important;
+            left: 0 !important;
+            background: var(--dp-03) !important;
+            z-index: 10 !important;
+        }
+        
+        /* Мобильные стили для карточек */
+        .mobile-device .card {
+            margin-bottom: 1rem !important;
+            border-radius: 8px !important;
+        }
+        
+        .mobile-device .card-body {
+            padding: 1rem !important;
+        }
+        
+        /* Мобильные стили для кнопок */
+        .mobile-device .btn-group-vertical .btn {
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .mobile-device .btn-sm {
+            padding: 0.375rem 0.75rem !important;
+            font-size: 0.8rem !important;
+        }
+        
+        /* Мобильные стили для форм */
+        .mobile-device .form-control,
+        .mobile-device .form-select {
+            font-size: 16px !important;
+            padding: 0.75rem !important;
+        }
+        
+        .mobile-device .form-label {
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Мобильные стили для модальных окон */
+        .mobile-device .modal-dialog {
+            margin: 0.5rem !important;
+            max-width: calc(100% - 1rem) !important;
+        }
+        
+        .mobile-device .modal-content {
+            border-radius: 8px !important;
+        }
+        
+        .mobile-device .modal-body {
+            padding: 1rem !important;
+        }
+        
+        /* Мобильные стили для бейджей */
+        .mobile-device .badge {
+            font-size: 0.75rem !important;
+            padding: 0.375rem 0.75rem !important;
+        }
+        
+        /* Мобильные стили для заголовков */
+        .mobile-device h2 {
+            font-size: 1.5rem !important;
+        }
+        
+        .mobile-device h5 {
+            font-size: 1.1rem !important;
+        }
+        
+        /* Мобильные стили для массовых операций */
+        .mobile-device .d-flex.gap-3 {
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .mobile-device .d-flex.gap-2 {
+            flex-wrap: wrap !important;
+            gap: 0.25rem !important;
+        }
+        
+        /* Мобильные стили для заголовков страниц */
+        .mobile-device .d-flex.justify-content-between.align-items-center {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.5rem !important;
+        }
+        
+        .mobile-device .d-flex.justify-content-between.align-items-center .badge {
+            align-self: flex-end !important;
+        }
+        
+        /* Мобильные стили для таблиц пользователей */
+        .mobile-device .admin-users .table th:nth-child(2),
+        .mobile-device .admin-users .table td:nth-child(2) {
+            min-width: 120px !important;
+        }
+        
+        .mobile-device .admin-users .table th:nth-child(3),
+        .mobile-device .admin-users .table td:nth-child(3) {
+            min-width: 100px !important;
+        }
+        
+        .mobile-device .admin-users .table th:nth-child(4),
+        .mobile-device .admin-users .table td:nth-child(4) {
+            min-width: 80px !important;
+        }
+        
+        /* Мобильные стили для кнопок действий */
+        .mobile-device .btn-group-vertical {
+            width: 100% !important;
+        }
+        
+        .mobile-device .btn-group-vertical .btn {
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        /* Мобильные стили для модальных окон редактирования */
+        .mobile-device .modal-lg {
+            max-width: 95% !important;
+        }
+        
+        .mobile-device .modal-xl {
+            max-width: 98% !important;
+        }
+        
+        /* Мобильные стили для чекбоксов */
+        .mobile-device .form-check-input {
+            width: 1.2rem !important;
+            height: 1.2rem !important;
+        }
+        
+        .mobile-device .form-check-label {
+            font-size: 0.9rem !important;
+        }
+        
+        /* Мобильные стили для алертов */
+        .mobile-device .alert {
+            font-size: 0.9rem !important;
+            padding: 0.75rem !important;
+        }
+        
+        /* Мобильные стили для пагинации */
+        .mobile-device .pagination {
+            font-size: 0.8rem !important;
+        }
+        
+        .mobile-device .page-link {
+            padding: 0.375rem 0.5rem !important;
+        }
+        
+        /* Мобильные стили для поиска */
+        .mobile-device .input-group {
+            margin-bottom: 1rem !important;
+        }
+        
+        .mobile-device .input-group .form-control {
+            font-size: 16px !important;
+        }
+        
+        /* Мобильные стили для карточек статистики */
+        .mobile-device .card .card-body .row {
+            margin: 0 !important;
+        }
+        
+        .mobile-device .card .card-body .col-6 {
+            padding: 0.25rem !important;
         }
         
         /* Адаптивные стили для кнопок в футере */
@@ -1440,21 +1729,9 @@ function isAndroid() {
 function generateNewPattern(cardId) {
     // Проверяем, есть ли локальная функция на странице
     if (typeof window.generateNewPatternForCard === 'function') {
-        const success = window.generateNewPatternForCard(cardId);
-        if (success) {
-            showSuccess('Новый паттерн сгенерирован!', 2000);
-        } else {
-            showError('Ошибка генерации паттерна', 3000);
-        }
+        window.generateNewPatternForCard(cardId);
     } else if (typeof generateNewPatternForCard === 'function') {
-        const success = generateNewPatternForCard(cardId);
-        if (success) {
-            showSuccess('Новый паттерн сгенерирован!', 2000);
-        } else {
-            showError('Ошибка генерации паттерна', 3000);
-        }
-    } else {
-        showError('Генератор паттернов не загружен', 3000);
+        generateNewPatternForCard(cardId);
     }
 }
 
@@ -1469,10 +1746,143 @@ document.addEventListener('DOMContentLoaded', function() {
     if (isAndroid()) {
         document.body.classList.add('android-device');
     }
-    if (!window.matchMedia('(hover: hover)').matches) {
-        document.body.classList.add('touch-device');
+            if (!window.matchMedia('(hover: hover)').matches) {
+            document.body.classList.add('touch-device');
+        }
+        
+        // Заменяем названия языков программирования на иконки Devicon
+        replaceLanguageNamesWithIcons();
+        
+        // Дополнительный вызов с задержкой для гарантии загрузки DOM
+        setTimeout(() => {
+            replaceLanguageNamesWithIcons();
+        }, 1000);
+    });
+    
+    // Функция для замены названий языков программирования на иконки
+    function replaceLanguageNamesWithIcons() {
+        console.log('🔄 Запуск функции замены языков на иконки...');
+        
+        // 45 языков программирования + HTML/CSS (только доступные в Devicon)
+        const languageIcons = {
+            'python': 'devicon-python-plain colored',
+            'javascript': 'devicon-javascript-plain colored',
+            'java': 'devicon-java-plain colored',
+            'c++': 'devicon-cplusplus-plain colored',
+            'c#': 'devicon-csharp-plain colored',
+            'php': 'devicon-php-plain colored',
+            'ruby': 'devicon-ruby-plain colored',
+            'go': 'devicon-go-plain colored',
+            'rust': 'devicon-rust-plain colored',
+            'swift': 'devicon-swift-plain colored',
+            'kotlin': 'devicon-kotlin-plain colored',
+            'typescript': 'devicon-typescript-plain colored',
+            'html': 'devicon-html5-plain colored',
+            'css': 'devicon-css3-plain colored',
+            'c': 'devicon-c-plain colored',
+            'cpp': 'devicon-cplusplus-plain colored',
+            'csharp': 'devicon-csharp-plain colored',
+            'r': 'devicon-r-plain colored',
+            'scala': 'devicon-scala-plain colored',
+            'perl': 'devicon-perl-plain colored',
+            'haskell': 'devicon-haskell-plain colored',
+            'clojure': 'devicon-clojure-plain colored',
+            'erlang': 'devicon-erlang-plain colored',
+            'elixir': 'devicon-elixir-plain colored',
+            'fsharp': 'devicon-fsharp-plain colored',
+            'ocaml': 'devicon-ocaml-plain colored',
+            'lua': 'devicon-lua-plain colored',
+            'dart': 'devicon-dart-plain colored',
+            'crystal': 'devicon-crystal-plain colored',
+            'nim': 'devicon-nim-plain colored',
+            'zig': 'devicon-zig-plain colored',
+            'v': 'devicon-v-plain colored',
+            'julia': 'devicon-julia-plain colored',
+            'matlab': 'devicon-matlab-plain colored',
+            'octave': 'devicon-octave-plain colored',
+            'fortran': 'devicon-fortran-plain colored',
+            'cobol': 'devicon-cobol-plain colored',
+            'pascal': 'devicon-pascal-plain colored',
+            'ada': 'devicon-ada-plain colored',
+            'prolog': 'devicon-prolog-plain colored',
+            'lisp': 'devicon-lisp-plain colored',
+            'scheme': 'devicon-scheme-plain colored',
+            'smalltalk': 'devicon-smalltalk-plain colored',
+            'forth': 'devicon-forth-plain colored',
+            'assembly': 'devicon-wasm-plain colored',
+            // Дополнительные иконки для предметов (Font Awesome)
+            'english': 'fas fa-language',
+            'database': 'fas fa-database',
+            'security': 'fas fa-shield-alt',
+            'testing': 'fas fa-bug',
+            'quality': 'fas fa-check-circle',
+            'math': 'fas fa-calculator',
+            'language': 'fas fa-globe',
+            'db': 'fas fa-server',
+            'safety': 'fas fa-lock',
+            'test': 'fas fa-vial',
+            'qa': 'fas fa-clipboard-check',
+            'numerical': 'fas fa-chart-line'
+        };
+        
+        // Находим все элементы с классами text-muted mb-1 и text-muted mb-0
+        let cardTextElements = document.querySelectorAll('.card-text.text-muted.mb-1, .text-muted.mb-0');
+        console.log(`📋 Найдено элементов для обработки: ${cardTextElements.length}`);
+        
+        // Если не найдены, пробуем альтернативные селекторы
+        if (cardTextElements.length === 0) {
+            cardTextElements = document.querySelectorAll('.card-text, .text-muted');
+            console.log(`📋 Альтернативный поиск - найдено элементов: ${cardTextElements.length}`);
+        }
+        
+        if (cardTextElements.length === 0) {
+            cardTextElements = document.querySelectorAll('[class*="card-text"], [class*="text-muted"]');
+            console.log(`📋 Поиск по частичному совпадению - найдено элементов: ${cardTextElements.length}`);
+        }
+        
+        cardTextElements.forEach((element, index) => {
+            let text = element.innerHTML;
+            let hasReplacement = false;
+            const originalText = text;
+            
+            console.log(`🔍 Обрабатываем элемент ${index + 1}:`, text);
+            
+            // Заменяем :название: на иконки
+            Object.keys(languageIcons).forEach(language => {
+                try {
+                    // Экранируем специальные символы для регулярного выражения
+                    const escapedLanguage = language.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`:${escapedLanguage}:`, 'gi');
+                                    if (regex.test(text)) {
+                    // Определяем стиль в зависимости от типа иконки
+                    const iconClass = languageIcons[language];
+                    const isFontAwesome = iconClass.startsWith('fas ') || iconClass.startsWith('far ') || iconClass.startsWith('fab ');
+                    const iconStyle = isFontAwesome ? 'font-size: 1.2em; margin: 0 2px; color: var(--primary-color);' : 'font-size: 1.2em; margin: 0 2px;';
+                    
+                    const iconHtml = `<i class="${iconClass}" title="${language}" style="${iconStyle}"></i>`;
+                    text = text.replace(regex, iconHtml);
+                    hasReplacement = true;
+                    console.log(`✅ Заменен :${language}: на иконку (${isFontAwesome ? 'Font Awesome' : 'Devicon'})`);
+                }
+                } catch (error) {
+                    console.error(`❌ Ошибка при обработке языка "${language}":`, error);
+                }
+            });
+            
+            // Если были замены, обновляем содержимое элемента
+            if (hasReplacement) {
+                element.innerHTML = text;
+                console.log(`🎨 Элемент ${index + 1} обновлен:`, originalText, '→', text);
+            } else {
+                console.log(`⏭️ Элемент ${index + 1} не требует замены`);
+            }
+        });
+        
+        console.log('✅ Функция замены языков завершена');
     }
-});
+    
+    // Глобальная функция для ручного вызова (для отладки)
+    window.replaceLanguageIcons = replaceLanguageNamesWithIcons;
 </script>
 
 <!-- Система всплывающих уведомлений -->
@@ -1788,8 +2198,8 @@ document.addEventListener('DOMContentLoaded', function() {
     {% if current_user.is_authenticated and subscription_info and subscription_info.is_trial %}
         {% if request.endpoint == 'main.index' %}
         setTimeout(function() {
-            notificationManager.show('Пробная подписка активна!', 'info', 2000); // 2 секунды
-        }, 1000); // Показываем через 1 секунду после загрузки страницы
+            notificationManager.show('Пробная подписка активна!', 'info', 1000); // 2 секунды
+        }, 100); // Показываем через 1 секунду после загрузки страницы
         {% endif %}
     {% endif %}
     
@@ -2190,7 +2600,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                   placeholder="Подробно опишите вашу проблему или вопрос" minlength="10"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="ticketFiles" class="form-label text-white">Прикрепить файлы (до 10 МБ каждый)</label>
+                        <label for="ticketFiles" class="form-label text-white">Прикрепить файлы (до 200 МБ каждый)</label>
                         <input type="file" class="form-control" id="ticketFiles" name="files" multiple 
                                accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar">
                         <div class="form-text text-muted">Поддерживаемые форматы: изображения, PDF, документы, архивы</div>

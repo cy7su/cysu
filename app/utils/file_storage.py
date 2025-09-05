@@ -27,8 +27,8 @@ class FileStorageManager:
     )
 
     # Максимальные размеры файлов (в байтах)
-    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-    MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB для изображений
+    MAX_FILE_SIZE = 200 * 1024 * 1024  # 50MB
+    MAX_IMAGE_SIZE = 50 * 1024 * 1024  # 50MB для изображений
 
     @staticmethod
     def get_subject_upload_path(
@@ -176,13 +176,38 @@ class FileStorageManager:
             bool: True если файл сохранен успешно
         """
         try:
+            # Логируем подробную информацию о файле
+            file_size = getattr(file, 'content_length', None)
+            file_name = getattr(file, 'filename', 'unknown')
+            
             current_app.logger.info(f"Попытка сохранения файла: {full_path}")
+            current_app.logger.info(f"Исходное имя файла: {file_name}")
+            current_app.logger.info(f"Размер файла: {file_size} байт ({file_size / (1024*1024):.2f} MB)" if file_size else "Размер файла: неизвестен")
+            current_app.logger.info(f"Папка назначения: {os.path.dirname(full_path)}")
             current_app.logger.info(f"Папка существует: {os.path.exists(os.path.dirname(full_path))}")
+            
+            # Проверяем доступное место на диске
+            try:
+                statvfs = os.statvfs(os.path.dirname(full_path))
+                free_space = statvfs.f_frsize * statvfs.f_bavail
+                current_app.logger.info(f"Свободное место на диске: {free_space} байт ({free_space / (1024*1024):.2f} MB)")
+            except Exception as e:
+                current_app.logger.warning(f"Не удалось получить информацию о свободном месте: {e}")
             
             file.save(full_path)
             
-            current_app.logger.info(f"Файл успешно сохранен: {full_path}")
-            current_app.logger.info(f"Файл существует после сохранения: {os.path.exists(full_path)}")
+            # Проверяем размер сохраненного файла
+            if os.path.exists(full_path):
+                saved_size = os.path.getsize(full_path)
+                current_app.logger.info(f"Файл успешно сохранен: {full_path}")
+                current_app.logger.info(f"Размер сохраненного файла: {saved_size} байт ({saved_size / (1024*1024):.2f} MB)")
+                
+                # Сравниваем размеры
+                if file_size and saved_size != file_size:
+                    current_app.logger.warning(f"Размеры не совпадают! Ожидалось: {file_size}, получено: {saved_size}")
+            else:
+                current_app.logger.error(f"Файл не найден после сохранения: {full_path}")
+                return False
             
             return True
         except Exception as e:

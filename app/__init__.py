@@ -26,10 +26,51 @@ def create_app():
                 instance_path=None, 
                 instance_relative_config=False,
                 static_folder=static_folder_path,
-                static_url_path='/static')
+                static_url_path='/static',
+                subdomain_matching=True)
+    
+    
+    # Middleware для замены URL на поддомене
+    @app.after_request
+    def replace_urls_for_subdomain(response):
+        """Заменяет все URL на поддомен в HTML ответе"""
+        try:
+            if (hasattr(request, 'host') and request.host and '.' in request.host and 
+                not request.host.startswith('www.') and request.host != 'cysu.ru'):
+                
+                subdomain = request.host.split('.')[0]
+                if subdomain != 'cysu':  # Не основной домен
+                    # Проверяем, что это HTML ответ
+                    if response.content_type and 'text/html' in response.content_type:
+                        # Получаем HTML контент
+                        html = response.get_data(as_text=True)
+                        
+                        # Заменяем все ссылки на основной домен на поддомен
+                        html = html.replace('https://cysu.ru', f'https://{request.host}')
+                        html = html.replace('http://cysu.ru', f'https://{request.host}')
+                        
+                        # Заменяем относительные ссылки на абсолютные с поддоменом
+                        import re
+                        # Паттерн для href и src с относительными путями (исключаем уже обработанные)
+                        html = re.sub(r'href="(/[^"]*)"', rf'href="https://{request.host}\1"', html)
+                        html = re.sub(r'src="(/[^"]*)"', rf'src="https://{request.host}\1"', html)
+                        html = re.sub(r'action="(/[^"]*)"', rf'action="https://{request.host}\1"', html)
+                        # Заменяем data-url атрибуты
+                        html = re.sub(r'data-url="(/[^"]*)"', rf'data-url="https://{request.host}\1"', html)
+                        
+                        # Устанавливаем новый контент
+                        response.set_data(html)
+        except Exception as e:
+            # В случае ошибки просто пропускаем
+            pass
+        
+        return response
+    
     
     # Конфигурация из переменных окружения
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key-change-in-production')
+    # Настройка для работы с поддоменами
+    app.config['SERVER_NAME'] = os.getenv('SERVER_NAME', 'cysu.ru')
     # Конфигурация базы данных - создаем в корне проекта
     db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'app.db'))
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
@@ -44,9 +85,14 @@ def create_app():
     
     # Конфигурация загрузки файлов
     # Создаем абсолютные пути относительно корня приложения
-    app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Поднимаемся на уровень выше от app/
+    # __file__ = /root/cysu/app/__init__.py, поэтому app_root должен быть /root/cysu
+    app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # /root/cysu
+    # Создаем абсолютные пути
     upload_folder = os.getenv('UPLOAD_FOLDER', os.path.join(app_root, 'app', 'static', 'uploads'))
     ticket_folder = os.getenv('TICKET_FILES_FOLDER', os.path.join(app_root, 'app', 'static', 'ticket_files'))
+    # Убеждаемся что пути абсолютные
+    upload_folder = os.path.abspath(upload_folder)
+    ticket_folder = os.path.abspath(ticket_folder)
     
     app.config['UPLOAD_FOLDER'] = upload_folder
     app.config['TICKET_FILES_FOLDER'] = ticket_folder
@@ -55,7 +101,9 @@ def create_app():
     app.logger.info(f"STATIC_FOLDER: {static_folder_path}")
     app.logger.info(f"UPLOAD_FOLDER: {upload_folder}")
     app.logger.info(f"TICKET_FILES_FOLDER: {ticket_folder}")
-    app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH', 20 * 1024 * 1024))
+    max_content_length = int(os.getenv('MAX_CONTENT_LENGTH', 200 * 1024 * 1024))
+    app.config['MAX_CONTENT_LENGTH'] = max_content_length
+    app.logger.info(f"MAX_CONTENT_LENGTH установлен: {max_content_length} байт ({max_content_length / (1024*1024):.1f} MB)")
     
     # Создаем необходимые директории для загрузки файлов
     for folder in [app.config['UPLOAD_FOLDER']]:
@@ -154,6 +202,10 @@ def create_app():
     mail.init_app(app)
     csrf.init_app(app)
     
+    # Отключаем CSRF для Telegram авторизации
+    from .views.telegram_auth import telegram_login
+    csrf.exempt(telegram_login)
+    
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Пожалуйста, войдите в систему для доступа к этой странице.'
     
@@ -162,6 +214,8 @@ def create_app():
         main_bp, auth_bp, payment_bp, 
         tickets_bp, admin_bp, api_bp
     )
+    from .views.subdomain import subdomain_bp
+    from .views.telegram_auth import telegram_auth_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
@@ -169,12 +223,18 @@ def create_app():
     app.register_blueprint(tickets_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(telegram_auth_bp)
+    
+    # Регистрируем blueprint для поддомена q
+    app.register_blueprint(subdomain_bp, subdomain='q')
     
     # Регистрируем фильтры шаблонов
-    from .utils.template_filters import make_links_clickable, format_description, smart_truncate
+    from .utils.template_filters import make_links_clickable, format_description, smart_truncate, format_user_contact, get_telegram_link
     app.jinja_env.filters['make_links_clickable'] = make_links_clickable
     app.jinja_env.filters['format_description'] = format_description
     app.jinja_env.filters['smart_truncate'] = smart_truncate
+    app.jinja_env.filters['format_user_contact'] = format_user_contact
+    app.jinja_env.filters['get_telegram_link'] = get_telegram_link
     
     # Context processor для проверки технических работ
     @app.context_processor
@@ -195,6 +255,16 @@ def create_app():
         # Пропускаем только статические файлы
         if request.endpoint == 'static':
             return
+
+            # Логируем информацию о файлах
+            for key, file in request.files.items():
+                if file and file.filename:
+                    app.logger.info(f"Файл {key}: {file.filename}")
+                    file_size = getattr(file, 'content_length', None)
+                    if file_size:
+                        app.logger.info(f"Размер файла {key}: {file_size} байт ({file_size / (1024*1024):.2f} MB)")
+                    else:
+                        app.logger.info(f"Размер файла {key}: неизвестен")
         
         try:
             # Импортируем здесь, чтобы избежать циклических импортов

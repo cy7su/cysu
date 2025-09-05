@@ -98,15 +98,10 @@ class SubjectForm(FlaskForm):
     title = StringField('Название предмета', validators=[DataRequired()])
     description = TextAreaField('Описание')
     pattern_type = SelectField('Фон предмета', choices=[
-        ('dots', 'Точки'),
-        ('lines', 'Линии'),
-        ('grid', 'Сетка'),
         ('circles', 'Круги'),
-        ('hexagons', 'Шестигранники'),
-        ('waves', 'Волны'),
-        ('stars', 'Звезды'),
-        ('triangles', 'Треугольники')
-    ], default='dots')
+        ('quilt', 'Лоскутное одеяло'),
+        ('waves', 'Волны')
+    ], default='circles')
     submit = SubmitField('Сохранить')
 
 class SubmissionForm(FlaskForm):

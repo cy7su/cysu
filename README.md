@@ -60,7 +60,7 @@ SUBSCRIPTION_PRICE_12=469.00
 # ЗАГРУЗКА ФАЙЛОВ
 UPLOAD_FOLDER=app/static/uploads
 TICKET_FILES_FOLDER=app/static/ticket_files
-MAX_CONTENT_LENGTH=20971520  # 20MB
+MAX_CONTENT_LENGTH=209715200  # 200MB
 
 # ЛОГИРОВАНИЕ
 LOG_FILE=logs/app.log

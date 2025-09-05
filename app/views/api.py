@@ -96,8 +96,7 @@ def update_subject_pattern(subject_id: int) -> Dict[str, Any]:
         db.session.commit()
         
         return jsonify({
-            "success": True, 
-            "message": "Паттерн успешно обновлен"
+            "success": True
         })
         
     except Exception as e:

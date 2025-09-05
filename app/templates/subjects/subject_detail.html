@@ -74,8 +74,15 @@
               </div>
             </div>
             <div class="mb-3">
-              <label class="form-label">{{ form.file.label }}</label>
-              {{ form.file(class_='form-control') }}
+              <label class="form-label">{{ form.file.label }} <small class="text-muted">(необязательно)</small></label>
+              {{ form.file(class_='form-control', id='materialFile', onchange='handleFileUpload()') }}
+              <div class="form-text text-muted">Максимальный размер файла: 200 МБ</div>
+              <div id="fileUploadProgress" class="mt-2" style="display: none;">
+                <div class="progress">
+                  <div class="progress-bar" role="progressbar" style="width: 0%" id="uploadProgressBar"></div>
+                </div>
+                <small class="text-muted" id="uploadStatus">Загрузка файла...</small>
+              </div>
             </div>
             <div class="mb-3">
               <label class="form-label">{{ form.type.label }}</label>
@@ -90,7 +97,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-          <button type="submit" class="btn btn-primary">Сохранить</button>
+          <button type="submit" class="btn btn-primary" id="saveMaterialBtn">Сохранить</button>
         </div>
       </form>
     </div>
@@ -217,7 +224,7 @@
                 </div>
                 <div class="d-flex align-items-center gap-1" style="flex-shrink: 0;">
                   {% if material.file %}
-                  <a href="{{ url_for('static', filename='uploads/' + material.file) }}" class="btn btn-sm btn-outline-primary" target="_blank" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 6px;">
+                  <a href="{{ url_for("static", filename='uploads/' + material.file) }}" class="btn btn-sm btn-outline-primary" target="_blank" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 6px;">
                     <i class="fas fa-download me-1"></i>Файл
                   </a>
                   {% endif %}
@@ -265,14 +272,14 @@
                 </div>
                 <div class="d-flex align-items-center gap-1" style="flex-shrink: 0;">
                   {% if material.file %}
-                  <a href="{{ url_for('static', filename='uploads/' + material.file) }}" class="btn btn-sm btn-outline-primary" target="_blank" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 6px;">
+                  <a href="{{ url_for("static", filename='uploads/' + material.file) }}" class="btn btn-sm btn-outline-primary" target="_blank" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 6px;">
                     <i class="fas fa-download me-1"></i>Файл
                   </a>
                   {% endif %}
                   {% if current_user.is_authenticated %}
                     {% set my_submission = user_submissions.get(material.id) %}
                     {% if my_submission and my_submission.file %}
-                      <a href="{{ url_for('static', filename='uploads/' + my_submission.file) }}" class="btn btn-sm btn-success" target="_blank" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 6px; text-decoration: none; color: white;">
+                      <a href="{{ url_for("static", filename='uploads/' + my_submission.file) }}" class="btn btn-sm btn-success" target="_blank" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 6px; text-decoration: none; color: white;">
                         <i class="fas fa-check me-1"></i>Моё решение
                       </a>
                     {% else %}
@@ -321,13 +328,19 @@
             <div class="modal-body">
               <div class="mb-3">
                 <label class="form-label">Выберите файл решения</label>
-                <input type="file" name="solution_file" class="form-control" required>
+                <input type="file" name="solution_file" class="form-control solution-file-input" required onchange="handleSolutionFileUpload(this)">
+                <div class="solution-upload-progress mt-2" style="display: none;">
+                  <div class="progress">
+                    <div class="progress-bar solution-progress-bar" role="progressbar" style="width: 0%"></div>
+                  </div>
+                  <small class="text-muted solution-upload-status">Загрузка файла...</small>
+                </div>
               </div>
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-              <button type="submit" class="btn btn-primary">Загрузить</button>
+              <button type="submit" class="btn btn-primary solution-submit-btn" disabled>Загрузить</button>
             </div>
           </form>
         </div>
@@ -348,6 +361,165 @@ document.addEventListener('DOMContentLoaded', function() {
             var backdrop = document.querySelector('.modal-backdrop');
             if (backdrop) {
                 backdrop.style.zIndex = '1040';
+            }
+        });
+    });
+    
+    // Заменяем языки программирования на иконки на странице детального просмотра
+    if (typeof replaceLanguageIcons === 'function') {
+        replaceLanguageIcons();
+    }
+});
+
+// Переменные для отслеживания статуса загрузки файлов
+let isFileUploading = false;
+let isSolutionUploading = false;
+
+// Функция для обработки загрузки файла
+function handleFileUpload() {
+    const fileInput = document.getElementById('materialFile');
+    const progressDiv = document.getElementById('fileUploadProgress');
+    const progressBar = document.getElementById('uploadProgressBar');
+    const statusText = document.getElementById('uploadStatus');
+    const saveBtn = document.getElementById('saveMaterialBtn');
+    
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const maxSize = 200 * 1024 * 1024; // 200MB
+        
+        // Проверяем размер файла
+        if (file.size > maxSize) {
+            alert('Файл слишком большой. Максимальный размер: 200 МБ');
+            fileInput.value = '';
+            progressDiv.style.display = 'none';
+            saveBtn.disabled = true;
+            return;
+        }
+        
+        // Показываем прогресс загрузки
+        progressDiv.style.display = 'block';
+        progressBar.style.width = '0%';
+        statusText.textContent = 'Подготовка к загрузке...';
+        saveBtn.disabled = true;
+        isFileUploading = true;
+        
+        // Симулируем загрузку файла (в реальном приложении здесь был бы XMLHttpRequest с отслеживанием прогресса)
+        simulateFileUpload(file, progressBar, statusText, saveBtn);
+    } else {
+        progressDiv.style.display = 'none';
+        saveBtn.disabled = false;
+        isFileUploading = false;
+    }
+}
+
+// Функция для симуляции загрузки файла
+function simulateFileUpload(file, progressBar, statusText, saveBtn) {
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
+        
+        progressBar.style.width = progress + '%';
+        
+        if (progress < 30) {
+            statusText.textContent = 'Загрузка файла...';
+        } else if (progress < 70) {
+            statusText.textContent = 'Обработка файла...';
+        } else if (progress < 100) {
+            statusText.textContent = 'Завершение загрузки...';
+        } else {
+            statusText.textContent = 'Файл готов к сохранению';
+            progressBar.classList.add('bg-success');
+            saveBtn.disabled = false;
+            isFileUploading = false;
+            clearInterval(interval);
+        }
+    }, 200);
+}
+
+// Функция для обработки загрузки файла решения
+function handleSolutionFileUpload(input) {
+    const progressDiv = input.parentElement.querySelector('.solution-upload-progress');
+    const progressBar = progressDiv.querySelector('.solution-progress-bar');
+    const statusText = progressDiv.querySelector('.solution-upload-status');
+    const submitBtn = input.closest('form').querySelector('.solution-submit-btn');
+    
+    if (input.files.length > 0) {
+        const file = input.files[0];
+        const maxSize = 200 * 1024 * 1024; // 200MB
+        
+        // Проверяем размер файла
+        if (file.size > maxSize) {
+            alert('Файл слишком большой. Максимальный размер: 200 МБ');
+            input.value = '';
+            progressDiv.style.display = 'none';
+            submitBtn.disabled = true;
+            return;
+        }
+        
+        // Показываем прогресс загрузки
+        progressDiv.style.display = 'block';
+        progressBar.style.width = '0%';
+        statusText.textContent = 'Подготовка к загрузке...';
+        submitBtn.disabled = true;
+        isSolutionUploading = true;
+        
+        // Симулируем загрузку файла
+        simulateSolutionFileUpload(file, progressBar, statusText, submitBtn);
+    } else {
+        progressDiv.style.display = 'none';
+        submitBtn.disabled = false;
+        isSolutionUploading = false;
+    }
+}
+
+// Функция для симуляции загрузки файла решения
+function simulateSolutionFileUpload(file, progressBar, statusText, submitBtn) {
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
+        
+        progressBar.style.width = progress + '%';
+        
+        if (progress < 30) {
+            statusText.textContent = 'Загрузка файла...';
+        } else if (progress < 70) {
+            statusText.textContent = 'Обработка файла...';
+        } else if (progress < 100) {
+            statusText.textContent = 'Завершение загрузки...';
+        } else {
+            statusText.textContent = 'Файл готов к загрузке';
+            progressBar.classList.add('bg-success');
+            submitBtn.disabled = false;
+            isSolutionUploading = false;
+            clearInterval(interval);
+        }
+    }, 200);
+}
+
+// Перехватываем отправку формы для проверки статуса загрузки
+document.addEventListener('DOMContentLoaded', function() {
+    // Проверка для формы добавления материалов
+    const materialForm = document.querySelector('#addMaterialModal form');
+    if (materialForm) {
+        materialForm.addEventListener('submit', function(e) {
+            if (isFileUploading) {
+                e.preventDefault();
+                alert('Пожалуйста, дождитесь завершения загрузки файла');
+                return false;
+            }
+        });
+    }
+    
+    // Проверка для форм загрузки решений
+    const solutionForms = document.querySelectorAll('form[action*="submit_solution"]');
+    solutionForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (isSolutionUploading) {
+                e.preventDefault();
+                alert('Пожалуйста, дождитесь завершения загрузки файла');
+                return false;
             }
         });
     });

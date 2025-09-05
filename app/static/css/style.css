@@ -250,8 +250,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    transform: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .card-header {
@@ -739,7 +739,7 @@ a:hover {
 
 .subject-card:hover {
     background-color: var(--dp-04);
-    transform: translateY(-2px);
+    transform: none;
     border-color: var(--primary-color);
     border-width: 2px;
 }
@@ -1727,4 +1727,96 @@ body.modal-open {
     min-height: 120px;
     position: relative;
     overflow: hidden;
+}
+
+/* ========================================
+   СТИЛИ ДЛЯ ССЫЛОК
+   ======================================== */
+
+/* Стили для внешних ссылок */
+.external-link {
+    display: inline-block;
+    background-color: transparent;
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.external-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.external-link:hover {
+    color: var(--primary-color);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.external-link:hover::before {
+    width: 100%;
+    left: 0;
+    transform: translateX(0);
+}
+
+.external-link::after {
+    content: "↗";
+    margin-left: 4px;
+    font-size: 0.8rem;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.external-link:hover::after {
+    opacity: 1;
+}
+
+/* Специальные стили для GitHub Gist ссылок */
+.gist-link {
+    color: var(--primary-color);
+}
+
+.gist-link::before {
+    background-color: var(--primary-color);
+}
+
+.gist-link:hover {
+    color: var(--primary-hover);
+}
+
+.gist-link:hover::before {
+    background-color: var(--primary-hover);
+}
+
+/* Адаптивные стили для ссылок */
+@media (max-width: 768px) {
+    .external-link {
+        max-width: 150px;
+        font-size: 0.8rem;
+        padding: 3px 6px;
+    }
+}
+
+@media (max-width: 576px) {
+    .external-link {
+        max-width: 120px;
+        font-size: 0.75rem;
+        padding: 2px 4px;
+    }
 }

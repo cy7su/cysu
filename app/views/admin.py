@@ -11,6 +11,8 @@ import random
 import string
 from typing import Union, Dict, Any
 
+from ..utils.subdomain_url import get_subdomain_redirect
+
 from ..models import (
     User, Material, Subject, Payment, ChatMessage, EmailVerification, 
     Ticket, TicketFile, TicketMessage, Notification, Submission,
@@ -33,7 +35,7 @@ def admin_users() -> Union[str, Response]:
     """Админка для управления пользователями"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
-        return redirect(url_for("main.index"))
+        return get_subdomain_redirect("main.index")
 
     form = AdminUserForm()
     password_map = {}
@@ -264,7 +266,7 @@ def admin_users() -> Union[str, Response]:
                         current_app.logger.error(f"Traceback: {traceback.format_exc()}")
                         db.session.rollback()
                         flash(f"Ошибка при удалении пользователя {username}", "error")
-                        return redirect(url_for("admin.admin_users"))
+                        return get_subdomain_redirect("admin.admin_users")
             else:
                 flash("Пользователь не найден", "error")
         except Exception as e:
@@ -315,7 +317,7 @@ def admin_users() -> Union[str, Response]:
                         flash(f"Пользователь {user.username} перемещен в группу '{group.name}'")
                     else:
                         flash("Группа не найдена", "error")
-                        return redirect(url_for("admin.admin_users"))
+                        return get_subdomain_redirect("admin.admin_users")
                 else:
                     user.group_id = None
                     flash(f"Пользователь {user.username} убран из группы")
@@ -387,7 +389,7 @@ def admin_users() -> Union[str, Response]:
                     status = "отозвана"
                 else:
                     # Выдаем подписку на количество дней из настроек
-                    trial_days = SiteSettings.get_setting('trial_subscription_days', 14)
+                    trial_days = int(SiteSettings.get_setting('trial_subscription_days', 14))
                     current_app.logger.info(
                         f"Выдаем подписку пользователю {user.username} на {trial_days} дней"
                     )
@@ -440,7 +442,7 @@ def admin_groups() -> Union[str, Response]:
     """Админка для управления группами"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
-        return redirect(url_for("main.index"))
+        return get_subdomain_redirect("main.index")
 
     # Проверяем CSRF токен для POST запросов
     if request.method == "POST":
@@ -451,7 +453,7 @@ def admin_groups() -> Union[str, Response]:
         if not request.form.get('csrf_token'):
             current_app.logger.error("CSRF токен отсутствует в запросе")
             flash("Ошибка безопасности: отсутствует CSRF токен", "error")
-            return redirect(url_for("admin.admin_groups"))
+            return get_subdomain_redirect("admin.admin_groups")
 
     form = GroupForm()
     message = ""
@@ -605,7 +607,7 @@ def admin_subject_groups() -> Union[str, Response]:
     """Админка для управления предметами по группам"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
-        return redirect(url_for("main.index"))
+        return get_subdomain_redirect("main.index")
 
     # Получаем все предметы с их группами
     try:
@@ -678,7 +680,61 @@ def admin_subject_groups() -> Union[str, Response]:
                 db.session.rollback()
                 flash("Ошибка при обновлении групп предмета", "error")
 
-        # Удаление всех связей предмета с группами
+        # Массовое назначение предметов группам
+        elif request.form.get("action") == "mass_assign":
+            try:
+                subject_ids = request.form.getlist("subject_ids")
+                group_ids = request.form.getlist("group_ids")
+                
+                if not subject_ids or not group_ids:
+                    flash("Выберите предметы и группы", "error")
+                else:
+                    # Обрабатываем каждый предмет
+                    for subject_id in subject_ids:
+                        subject_id = int(subject_id)
+                        
+                        # Удаляем существующие связи для этого предмета
+                        SubjectGroup.query.filter_by(subject_id=subject_id).delete()
+                        
+                        # Создаем новые связи
+                        for group_id in group_ids:
+                            if group_id:  # Проверяем, что group_id не пустой
+                                subject_group = SubjectGroup(
+                                    subject_id=subject_id,
+                                    group_id=int(group_id)
+                                )
+                                db.session.add(subject_group)
+                    
+                    db.session.commit()
+                    flash(f"Успешно назначено {len(subject_ids)} предметов группам")
+                    
+            except Exception as e:
+                current_app.logger.error(f"Ошибка массового назначения предметов группам: {str(e)}")
+                db.session.rollback()
+                flash("Ошибка при массовом назначении предметов группам", "error")
+
+        # Массовое удаление предметов из всех групп
+        elif request.form.get("action") == "mass_remove":
+            try:
+                subject_ids = request.form.getlist("subject_ids")
+                
+                if not subject_ids:
+                    flash("Выберите предметы для удаления из групп", "error")
+                else:
+                    # Удаляем все связи для выбранных предметов
+                    for subject_id in subject_ids:
+                        subject_id = int(subject_id)
+                        SubjectGroup.query.filter_by(subject_id=subject_id).delete()
+                    
+                    db.session.commit()
+                    flash(f"Успешно убрано {len(subject_ids)} предметов из всех групп")
+                    
+            except Exception as e:
+                current_app.logger.error(f"Ошибка массового удаления предметов из групп: {str(e)}")
+                db.session.rollback()
+                flash("Ошибка при массовом удалении предметов из групп", "error")
+
+        # Удаление всех связей предмета с группами (одиночное)
         elif request.form.get("remove_all_groups"):
             try:
                 subject_id = int(request.form.get("remove_all_groups"))
@@ -709,7 +765,7 @@ def admin_settings() -> Union[str, Response]:
     """Админка для управления настройками сайта"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
-        return redirect(url_for("main.index"))
+        return get_subdomain_redirect("main.index")
 
     form = SiteSettingsForm()
     
@@ -729,7 +785,7 @@ def admin_settings() -> Union[str, Response]:
             SiteSettings.set_setting('pattern_generation_enabled', form.pattern_generation_enabled.data, 'Включить/выключить кнопку генерации паттернов')
             
             flash('Настройки успешно сохранены', 'success')
-            return redirect(url_for('admin.admin_settings'))
+            return get_subdomain_redirect('admin.admin_settings')
         except Exception as e:
             current_app.logger.error(f"Ошибка сохранения настроек: {str(e)}")
             flash('Ошибка при сохранении настроек', 'error')

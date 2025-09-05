@@ -9,6 +9,7 @@ from typing import Union, Dict, Any
 
 from ..models import Ticket, TicketFile, TicketMessage, Notification, User
 from ..utils.file_storage import FileStorageManager
+from ..utils.subdomain_url import get_subdomain_redirect
 from .. import db
 
 tickets_bp = Blueprint("tickets", __name__)
@@ -45,7 +46,7 @@ def ticket_detail(ticket_id: int) -> Union[str, Response]:
     # Проверяем права доступа
     if not current_user.is_admin and ticket.user_id != current_user.id:
         flash("Доступ запрещен", "error")
-        return redirect(url_for("main.index"))
+        return get_subdomain_redirect("main.index")
 
     return render_template("tickets/ticket_detail.html", ticket=ticket)
 
@@ -65,7 +66,7 @@ def accept_ticket(ticket_id: int) -> Union[Response, Dict[str, Any]]:
     db.session.commit()
 
     flash("Тикет принят", "success")
-    return redirect(url_for("tickets.ticket_detail", ticket_id=ticket_id))
+    return get_subdomain_redirect("tickets.ticket_detail", ticket_id=ticket_id)
 
 
 @tickets_bp.route("/tickets/<int:ticket_id>/reject", methods=["POST"])
@@ -83,7 +84,7 @@ def reject_ticket(ticket_id: int) -> Union[Response, Dict[str, Any]]:
     db.session.commit()
 
     flash("Тикет отклонен", "success")
-    return redirect(url_for("tickets.tickets"))
+    return get_subdomain_redirect("tickets.tickets")
 
 
 @tickets_bp.route("/tickets/<int:ticket_id>/close", methods=["POST"])
@@ -101,7 +102,7 @@ def close_ticket(ticket_id: int) -> Union[Response, Dict[str, Any]]:
     db.session.commit()
 
     flash("Тикет закрыт", "success")
-    return redirect(url_for("tickets.tickets"))
+    return get_subdomain_redirect("tickets.tickets")
 
 
 @tickets_bp.route("/api/ticket/create", methods=["POST"])
@@ -171,7 +172,7 @@ def upload_ticket_file(ticket_id: int) -> Dict[str, Any]:
         # Проверяем размер файла
         if not FileStorageManager.validate_file_size(file):
             return jsonify(
-                {"success": False, "error": "Файл слишком большой (максимум 10MB)"}
+                {"success": False, "error": "Файл слишком большой (максимум 200MB)"}
             )
 
         # Проверяем тип файла
@@ -367,12 +368,12 @@ def ticket_response() -> Dict[str, Any]:
         if files:
             for file in files:
                 if file and file.filename and file.filename.strip():
-                    # Проверяем размер файла (максимум 10MB)
+                    # Проверяем размер файла (максимум 200MB)
                     file.seek(0, 2)
                     file_size = file.tell()
                     file.seek(0)
 
-                    if file_size > 10 * 1024 * 1024:  # 10MB
+                    if file_size > 200 * 1024 * 1024:  # 200MB
                         continue
 
                     # Проверяем расширение файла

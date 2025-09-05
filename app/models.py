@@ -47,6 +47,7 @@ class User(UserMixin, db.Model):
     trial_subscription_expires = db.Column(db.DateTime)  # Дата окончания пробной подписки
     is_verified = db.Column(db.Boolean, default=False)  # Подтверждение email
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)  # Новая связь с группой
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Дата создания аккаунта
     submissions = db.relationship('Submission', backref='user', lazy=True, cascade='all, delete-orphan')
     payments = db.relationship('Payment', backref='user', lazy=True, cascade='all, delete-orphan')
     tickets = db.relationship('Ticket', foreign_keys='Ticket.user_id', backref='user', lazy=True, cascade='all, delete-orphan')
@@ -406,3 +407,48 @@ class SiteSettings(db.Model):
             db.session.add(setting)
         db.session.commit()
         return setting
+
+class TelegramUser(db.Model):
+    """Модель для хранения Telegram пользователей"""
+    id = db.Column(db.Integer, primary_key=True)
+    telegram_id = db.Column(db.BigInteger, unique=True, nullable=False)
+    username = db.Column(db.String(100), nullable=True)
+    first_name = db.Column(db.String(100), nullable=True)
+    last_name = db.Column(db.String(100), nullable=True)
+    is_bot = db.Column(db.Boolean, default=False)
+    language_code = db.Column(db.String(10), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Связь с пользователем сайта
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_activity = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Связи
+    user = db.relationship('User', backref='telegram_account', uselist=False)
+    
+    def __repr__(self) -> str:
+        return f'<TelegramUser {self.telegram_id}: {self.username or self.first_name}>'
+    
+    @classmethod
+    def get_or_create(cls, telegram_id, username=None, first_name=None, last_name=None, is_bot=False, language_code=None):
+        """Получить или создать Telegram пользователя"""
+        tg_user = cls.query.filter_by(telegram_id=telegram_id).first()
+        if not tg_user:
+            tg_user = cls(
+                telegram_id=telegram_id,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                is_bot=is_bot,
+                language_code=language_code
+            )
+            db.session.add(tg_user)
+            db.session.commit()
+        else:
+            # Обновляем данные
+            tg_user.username = username
+            tg_user.first_name = first_name
+            tg_user.last_name = last_name
+            tg_user.is_bot = is_bot
+            tg_user.language_code = language_code
+            tg_user.last_activity = datetime.utcnow()
+            db.session.commit()
+        return tg_user

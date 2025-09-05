@@ -10,6 +10,7 @@ from typing import Union, Tuple
 from ..models import User, Payment
 from ..forms import PaymentStatusForm
 from ..utils.payment_service import YooKassaService
+from ..utils.subdomain_url import get_subdomain_redirect
 from .. import db
 
 payment_bp = Blueprint("payment", __name__)
@@ -212,7 +213,7 @@ def payment_success() -> Union[str, Response]:
             # Если платеж отменен, перенаправляем на страницу отмены
             if payment_status.get("status") == "canceled":
                 current_app.logger.info("Платеж отменен - перенаправляем на страницу отмены")
-                return redirect(url_for("payment.payment_cancel", payment_id=payment_id))
+                return get_subdomain_redirect("payment.payment_cancel", payment_id=payment_id)
             
             # Если платеж в обработке, показываем страницу ожидания
             elif payment_status.get("status") == "pending":
@@ -223,7 +224,7 @@ def payment_success() -> Union[str, Response]:
     # Проверяем, не была ли отмена платежа через параметр cancel
     if request.args.get("cancel") == "true":
         current_app.logger.info("Обнаружена отмена платежа через параметр cancel")
-        return redirect(url_for("payment.payment_cancel", payment_id=payment_id))
+        return get_subdomain_redirect("payment.payment_cancel", payment_id=payment_id)
 
     # Если payment_id не передан, ищем последний платеж пользователя
     if not payment_id:
@@ -245,11 +246,11 @@ def payment_success() -> Union[str, Response]:
                 # Попробуем найти платеж по email пользователя в ЮKassa
                 current_app.logger.info("Попытка найти платеж по email пользователя")
                 flash("Платеж не найден. Попробуйте оформить подписку снова.", "warning")
-                return redirect(url_for("payment.subscription"))
+                return get_subdomain_redirect("payment.subscription")
         except Exception as e:
             current_app.logger.error(f"Error searching for user payments: {e}")
             flash("Ошибка поиска платежей. Попробуйте оформить подписку снова.", "error")
-            return redirect(url_for("payment.subscription"))
+            return get_subdomain_redirect("payment.subscription")
 
     # Создаем сервис платежей
     payment_service = YooKassaService()
@@ -273,15 +274,15 @@ def payment_success() -> Union[str, Response]:
                     f"Платеж найден, но принадлежит другому пользователю: {payment_record.user_id}"
                 )
                 flash("Платеж не принадлежит вам.", "error")
-                return redirect(url_for("main.index"))
+                return get_subdomain_redirect("main.index")
             else:
                 current_app.logger.error(f"Платеж {payment_id} не найден в базе данных")
                 flash("Платеж не найден. Попробуйте оформить подписку снова.", "warning")
-                return redirect(url_for("payment.subscription"))
+                return get_subdomain_redirect("payment.subscription")
     except Exception as e:
         current_app.logger.error(f"Error searching for payment {payment_id}: {e}")
         flash("Ошибка поиска платежа. Попробуйте позже.", "error")
-        return redirect(url_for("main.index"))
+        return get_subdomain_redirect("main.index")
 
     current_app.logger.info(f"Платеж найден: {payment_record.status}")
 
@@ -336,7 +337,7 @@ def payment_success() -> Union[str, Response]:
         )
     elif payment_status.get("status") == "canceled":
         current_app.logger.info("Платеж отменен - перенаправляем на страницу отмены")
-        return redirect(url_for("payment.payment_cancel", payment_id=payment_id))
+        return get_subdomain_redirect("payment.payment_cancel", payment_id=payment_id)
     elif payment_status.get("status") == "waiting_for_capture":
         current_app.logger.info("Платеж ожидает подтверждения")
         flash(

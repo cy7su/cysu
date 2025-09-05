@@ -103,7 +103,7 @@
             <!-- Темное тело карточки -->
             <div class="card-body">
                 <h6 class="card-title text-primary mb-1">{{ subject.title[:35]|e }}{% if subject.title|length > 35 %}...{% endif %}</h6>
-                <p class="card-text text-muted mb-1">{{ subject.description[:70]|e }}{% if subject.description|length > 70 %}...{% endif %}</p>
+                <p class="card-text text-muted mb-1">{% if subject.description %}{{ subject.description[:70]|e }}{% if subject.description|length > 70 %}...{% endif %}{% else %}Описание отсутствует{% endif %}</p>
             </div>
         </div>
     </div>
@@ -136,12 +136,8 @@
               <label class="form-label">Фон предмета</label>
               <select id="pattern-select" name="pattern_type" class="form-select">
                 <option value="circles">Круги</option>
-                <option value="hexagons">Шестигранники</option>
-                <option value="grid">Сетка</option>
-                <option value="octagons">Восьмиугольники</option>
-                <option value="herringbone">Елочка</option>
                 <option value="quilt">Лоскутное одеяло</option>
-                <option value="honeycomb">Соты</option>
+                <option value="waves">Волны</option>
               </select>
             </div>
             <div class="mb-3">
@@ -162,7 +158,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/svg-patterns.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Ждем загрузки SVGPatternGenerator
@@ -284,7 +279,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         savePatternToServer(subjectId, newPattern, button);
                     }
                     
-                    console.log(`🎨 Новый паттерн сгенерирован для карточки ${cardId}`);
                     return true;
                 }
             }
@@ -307,17 +301,10 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                console.log('✅ Паттерн успешно сохранен в базе данных');
-                showSuccess('Паттерн сохранен!', 2000);
-            } else {
-                console.error('❌ Ошибка сохранения паттерна:', data.error);
-                showError('Ошибка сохранения паттерна: ' + data.error, 3000);
-            }
+            // Паттерн сохранен без уведомлений
         })
         .catch(error => {
-            console.error('❌ Ошибка сети при сохранении паттерна:', error);
-            showError('Ошибка сети при сохранении паттерна', 3000);
+            // Ошибка без уведомлений
         })
         .finally(() => {
             // Восстанавливаем кнопку после завершения запроса

@@ -27,6 +27,29 @@
       <div class="d-grid">
         {{ form.submit(class="btn btn-primary", style='padding: 12px 16px; font-size: 0.9rem; border-radius: 8px; min-height: 44px;') }}
       </div>
+      
+      <!-- Telegram Login -->
+      <div class="text-center my-3">
+        {% if request.host and 'q.' in request.host %}
+          <!-- На поддомене - показываем информационную плашку -->
+          <div class="alert alert-info" style="background: var(--dp-03); border: 1px solid var(--border-secondary); color: var(--text-primary); font-size: 0.85rem;">
+            <i class="fab fa-telegram me-2"></i>
+            Вход через Telegram доступен только на основном домене <a href="#" class="fw-bold text-decoration-none" style="color: var(--primary-color);" onclick="window.open('https://' + 'cysu.ru' + '/login', '_blank'); return false;">cysu.ru</a>
+          </div>
+        {% else %}
+          <!-- На основном домене - показываем кнопку Telegram -->
+          <div style="display: flex; justify-content: center; align-items: center;">
+            <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                    data-telegram-login="authcysubot" 
+                    data-size="large" 
+                    data-userpic="false" 
+                    data-auth-url="{{ url_for('telegram_auth.telegram_login') }}" 
+                    data-request-access="write"
+                    data-onauth="onTelegramAuth(user)"></script>
+          </div>
+        {% endif %}
+      </div>
+      
       <div class="text-center mt-3">
         <small class="text-muted">
           Нет аккаунта? <a href="{{ url_for('auth.register') }}" class="text-decoration-none text-primary">Зарегистрироваться</a>
@@ -37,6 +60,48 @@
           <a href="{{ url_for('auth.password_reset_request') }}" class="text-decoration-none text-muted">Забыли пароль?</a>
         </small>
       </div>
+        
+        <script>
+        function onTelegramAuth(user) {
+            // Отправляем данные на сервер
+            fetch('{{ url_for("telegram_auth.telegram_login") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Успешная авторизация - перенаправляем
+                    window.location.href = data.redirect_url || '{{ url_for("main.index") }}';
+                } else {
+                    // Ошибка авторизации
+                    alert(data.message || 'Ошибка авторизации через Telegram');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Ошибка авторизации через Telegram');
+            });
+        }
+        
+        // Защищаем ссылку от замены скриптом
+        document.addEventListener('DOMContentLoaded', function() {
+            const telegramLink = document.querySelector('a[onclick*="cysu.ru"]');
+            if (telegramLink) {
+                // Восстанавливаем правильный onclick если он был изменен
+                const correctOnclick = "window.open('https://' + 'cysu.ru' + '/login', '_blank'); return false;";
+                if (telegramLink.onclick.toString() !== correctOnclick) {
+                    telegramLink.onclick = function() {
+                        window.open('https://' + 'cysu.ru' + '/login', '_blank');
+                        return false;
+                    };
+                }
+            }
+        });
+        </script>
     </form>
   </div>
 </div>
