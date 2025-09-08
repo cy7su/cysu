@@ -94,7 +94,7 @@ def create_app():
     app.logger.info(f"UPLOAD_FOLDER exists: {os.path.exists(upload_folder)}")
     if os.path.exists(upload_folder):
         app.logger.info(f"UPLOAD_FOLDER contents: {os.listdir(upload_folder)}")
-    max_content_length = int(os.getenv('MAX_CONTENT_LENGTH', 200 * 1024 * 1024))
+    max_content_length = int(os.getenv('MAX_CONTENT_LENGTH', 500 * 1024 * 1024))  # 500MB по умолчанию
     app.config['MAX_CONTENT_LENGTH'] = max_content_length
     app.logger.info(f"MAX_CONTENT_LENGTH установлен: {max_content_length} байт ({max_content_length / (1024*1024):.1f} MB)")
     

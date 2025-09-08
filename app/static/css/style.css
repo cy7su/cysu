@@ -1037,6 +1037,94 @@ a:hover {
     .admin-users .table {
         font-size: 0.8rem;
     }
+    
+    /* ========================================
+       МОБИЛЬНЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ ПРЕДМЕТА
+       ======================================== */
+    
+    /* Контейнер кнопок на мобильных - всегда справа */
+    .mobile-buttons-container {
+        order: 2;
+        flex-shrink: 0;
+        margin-left: auto;
+    }
+    
+    /* Кнопки файлов и решений на мобильных */
+    .mobile-file-btn,
+    .mobile-solution-btn,
+    .mobile-upload-btn {
+        min-width: 80px;
+        font-size: 0.75rem !important;
+        padding: 4px 6px !important;
+        white-space: nowrap;
+    }
+    
+    /* Кнопки удаления на мобильных - более светлые */
+    .mobile-delete-btn {
+        background-color: rgba(244, 67, 54, 0.1) !important;
+        border-color: rgba(244, 67, 54, 0.3) !important;
+        color: rgba(244, 67, 54, 0.8) !important;
+        font-size: 0.75rem !important;
+        padding: 4px 6px !important;
+    }
+    
+    .mobile-delete-btn:hover {
+        background-color: rgba(244, 67, 54, 0.2) !important;
+        border-color: rgba(244, 67, 54, 0.5) !important;
+        color: rgba(244, 67, 54, 1) !important;
+    }
+    
+    /* Админские кнопки редактирования и удаления - более светлые */
+    .mobile-edit-btn {
+        background-color: rgba(255, 152, 0, 0.1) !important;
+        border-color: rgba(255, 152, 0, 0.3) !important;
+        color: rgba(255, 152, 0, 0.8) !important;
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+    }
+    
+    .mobile-edit-btn:hover {
+        background-color: rgba(255, 152, 0, 0.2) !important;
+        border-color: rgba(255, 152, 0, 0.5) !important;
+        color: rgba(255, 152, 0, 1) !important;
+    }
+    
+    .mobile-delete-subject-btn {
+        background-color: rgba(244, 67, 54, 0.1) !important;
+        border-color: rgba(244, 67, 54, 0.3) !important;
+        color: rgba(244, 67, 54, 0.8) !important;
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+    }
+    
+    .mobile-delete-subject-btn:hover {
+        background-color: rgba(244, 67, 54, 0.2) !important;
+        border-color: rgba(244, 67, 54, 0.5) !important;
+        color: rgba(244, 67, 54, 1) !important;
+    }
+    
+    /* Адаптивность для очень маленьких экранов */
+    @media (max-width: 480px) {
+        .mobile-buttons-container {
+            flex-direction: column;
+            gap: 4px !important;
+        }
+        
+        .mobile-file-btn,
+        .mobile-solution-btn,
+        .mobile-upload-btn,
+        .mobile-delete-btn {
+            min-width: 70px;
+            font-size: 0.7rem !important;
+            padding: 3px 5px !important;
+        }
+        
+        .mobile-edit-btn,
+        .mobile-delete-subject-btn {
+            font-size: 0.7rem !important;
+            padding: 3px 6px !important;
+        }
+    }
 }
 
 /* ========================================

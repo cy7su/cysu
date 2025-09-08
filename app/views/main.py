@@ -376,7 +376,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                 full_solution_path, relative_solution_path = (
                     FileStorageManager.get_material_upload_path(
                         subject.id,
-                        f"solution_{original_solution_filename}",
+                        original_solution_filename,
                     )
                 )
 
@@ -572,7 +572,7 @@ def add_solution_file(material_id: int) -> Response:
 
         # Создаем путь для файла решения
         full_path, relative_path = FileStorageManager.get_material_upload_path(
-            subject.id, f"admin_solution_{original_filename}"
+            subject.id, original_filename
         )
 
         # Сохраняем файл
@@ -646,7 +646,7 @@ def submit_solution(material_id: int) -> Response:
 
         # Создаем путь для файла решения пользователя
         full_path, relative_path = FileStorageManager.get_subject_upload_path(
-            subject.id, current_user.id, f"user_solution_{original_filename}"
+            subject.id, current_user.id, original_filename
         )
 
         # Сохраняем файл
@@ -796,12 +796,13 @@ def serve_file(subject_id: int, filename: str) -> Response:
     import time
     
     current_app.logger.info(f"serve_file вызвана: subject_id={subject_id}, filename={filename}")
+    current_app.logger.info(f"UPLOAD_FOLDER: {current_app.config['UPLOAD_FOLDER']}")
     start_time = time.time()
     
     # Получаем полный путь к файлу
     # Сначала пробуем найти файл по разным вариантам путей
     possible_paths = [
-        # Если filename уже содержит subject_id (например, "13/Fajrvol.pdf")
+        # Если filename уже содержит полный путь (например, "13/users/123/filename.pdf")
         os.path.join(current_app.config['UPLOAD_FOLDER'], filename),
         # Если filename только имя файла (например, "Fajrvol.pdf")
         os.path.join(current_app.config['UPLOAD_FOLDER'], str(subject_id), filename),
@@ -812,9 +813,12 @@ def serve_file(subject_id: int, filename: str) -> Response:
     ]
     
     file_path = None
-    for path in possible_paths:
+    for i, path in enumerate(possible_paths):
+        current_app.logger.info(f"Проверяем путь {i+1}: {path}")
+        current_app.logger.info(f"Путь существует: {os.path.exists(path)}")
         if os.path.exists(path):
             file_path = path
+            current_app.logger.info(f"Файл найден по пути: {path}")
             break
     
     if not file_path:

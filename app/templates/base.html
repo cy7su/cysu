@@ -486,8 +486,8 @@
         }
         
         .list-group-item:hover {
-            background-color: var(--dp-04) !important;
-            z-index: 2 !important;
+            background-color: none !important;
+            z-index: 1 !important;
         }
         
         /* Первый элемент - без закруглений сверху */
@@ -500,7 +500,7 @@
         .list-group-item:last-child {
             border-bottom-left-radius: 8px !important;
             border-bottom-right-radius: 8px !important;
-            border-bottom: 1px solid var(--border-secondary) !important;
+            border-bottom: 0px solid var(--border-secondary) !important;
         }
         
         /* Средние элементы - без закруглений */
@@ -543,7 +543,7 @@
         }
         
         .list-group-item:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+            box-shadow: none !important;
         }
         
         /* Обеспечиваем полную непрозрачность */
@@ -866,7 +866,6 @@
         
         /* Мобильные стили для заголовков страниц */
         .mobile-device .d-flex.justify-content-between.align-items-center {
-            flex-direction: column !important;
             align-items: flex-start !important;
             gap: 0.5rem !important;
         }
