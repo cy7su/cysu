@@ -1,7 +1,7 @@
 {
     "name": "cysu",
     "short_name": "cysu",
-    "description": "Современная платформа для студентов",
+    "description": "Современная образовательная платформа для изучения чего угодно. Альтернатива eiso/Moodle.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0e0e0f",

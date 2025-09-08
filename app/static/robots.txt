@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://cysu.ru/sitemap.xml
+
+# Дополнительные директивы для поисковых систем
+Crawl-delay: 1
+
+# Разрешаем индексацию всех страниц
+Disallow: /admin/
+Disallow: /api/
+Disallow: /static/logs/
+Disallow: /static/temp/
+
+# Разрешаем индексацию основных страниц
+Allow: /
+Allow: /subjects/
+Allow: /materials/
+Allow: /profile/
+Allow: /about/
+Allow: /contact/
+Allow: /wiki/
+Allow: /privacy/
+Allow: /terms/
