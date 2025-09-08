@@ -2531,7 +2531,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const adminDropdown = document.getElementById('adminDropdown');
             console.log('adminDropdown элемент:', adminDropdown);
             
-            if (adminDropdown) {
+            if (adminDropdown && adminDropdown !== null) {
                 try {
                     // Инициализация Bootstrap dropdown только для десктопных устройств
                     const dropdown = new bootstrap.Dropdown(adminDropdown, {

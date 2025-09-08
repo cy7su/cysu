@@ -16,13 +16,13 @@
                     {% endif %}
                     
                         {% if material.file %}
-    <a href="{{ url_for("static", filename='uploads/' + material.file) }}" class="btn btn-primary" target="_blank">
+    <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}" class="btn btn-primary" target="_blank">
         <i class="fas fa-download me-2"></i>Скачать материал
     </a>
     {% endif %}
                     
                     {% if material.solution_file %}
-                        <a href="{{ url_for("static", filename='uploads/' + material.solution_file) }}" class="btn btn-success" target="_blank">
+                        <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.solution_file | extract_filename) }}" class="btn btn-success" target="_blank">
                             <i class="fas fa-check me-2"></i>Готовое решение
                         </a>
                     {% endif %}

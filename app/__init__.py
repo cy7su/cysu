@@ -19,57 +19,20 @@ csrf = CSRFProtect()
 
 def create_app():
     # Определяем правильный путь к статическим файлам
-    app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # /root
-    static_folder_path = os.path.join(app_root, 'app', 'static')  # /root/app/static
+    app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # /root/cysu
+    static_folder_path = os.path.join(app_root, 'app', 'static')  # /root/cysu/app/static
     
     app = Flask(__name__, 
                 instance_path=None, 
                 instance_relative_config=False,
                 static_folder=static_folder_path,
-                static_url_path='/static',
-                subdomain_matching=True)
+                static_url_path='/static')
     
-    
-    # Middleware для замены URL на поддомене
-    @app.after_request
-    def replace_urls_for_subdomain(response):
-        """Заменяет все URL на поддомен в HTML ответе"""
-        try:
-            if (hasattr(request, 'host') and request.host and '.' in request.host and 
-                not request.host.startswith('www.') and request.host != 'cysu.ru'):
-                
-                subdomain = request.host.split('.')[0]
-                if subdomain != 'cysu':  # Не основной домен
-                    # Проверяем, что это HTML ответ
-                    if response.content_type and 'text/html' in response.content_type:
-                        # Получаем HTML контент
-                        html = response.get_data(as_text=True)
-                        
-                        # Заменяем все ссылки на основной домен на поддомен
-                        html = html.replace('https://cysu.ru', f'https://{request.host}')
-                        html = html.replace('http://cysu.ru', f'https://{request.host}')
-                        
-                        # Заменяем относительные ссылки на абсолютные с поддоменом
-                        import re
-                        # Паттерн для href и src с относительными путями (исключаем уже обработанные)
-                        html = re.sub(r'href="(/[^"]*)"', rf'href="https://{request.host}\1"', html)
-                        html = re.sub(r'src="(/[^"]*)"', rf'src="https://{request.host}\1"', html)
-                        html = re.sub(r'action="(/[^"]*)"', rf'action="https://{request.host}\1"', html)
-                        # Заменяем data-url атрибуты
-                        html = re.sub(r'data-url="(/[^"]*)"', rf'data-url="https://{request.host}\1"', html)
-                        
-                        # Устанавливаем новый контент
-                        response.set_data(html)
-        except Exception as e:
-            # В случае ошибки просто пропускаем
-            pass
-        
-        return response
     
     
     # Конфигурация из переменных окружения
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key-change-in-production')
-    # Настройка для работы с поддоменами
+    # Настройка сервера
     app.config['SERVER_NAME'] = os.getenv('SERVER_NAME', 'cysu.ru')
     # Конфигурация базы данных - создаем в корне проекта
     db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'app.db'))
@@ -84,12 +47,38 @@ def create_app():
 
     
     # Конфигурация загрузки файлов
-    # Создаем абсолютные пути относительно корня приложения
-    # __file__ = /root/cysu/app/__init__.py, поэтому app_root должен быть /root/cysu
-    app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # /root/cysu
-    # Создаем абсолютные пути
-    upload_folder = os.getenv('UPLOAD_FOLDER', os.path.join(app_root, 'app', 'static', 'uploads'))
-    ticket_folder = os.getenv('TICKET_FILES_FOLDER', os.path.join(app_root, 'app', 'static', 'ticket_files'))
+    # Используем уже определенный app_root
+    
+    # Сначала пробуем найти правильный путь
+    possible_upload_paths = [
+        os.path.join(app_root, 'app', 'static', 'uploads'),
+        '/root/cysu/app/static/uploads'
+    ]
+    
+    upload_folder = None
+    for path in possible_upload_paths:
+        if os.path.exists(path):
+            upload_folder = path
+            break
+    
+    # Если не нашли, используем переменную окружения или создаем по умолчанию
+    if not upload_folder:
+        upload_folder = os.getenv('UPLOAD_FOLDER', os.path.join(app_root, 'app', 'static', 'uploads'))
+    
+    # Аналогично для ticket_folder
+    possible_ticket_paths = [
+        os.path.join(app_root, 'app', 'static', 'ticket_files'),
+        '/root/cysu/app/static/ticket_files'
+    ]
+    
+    ticket_folder = None
+    for path in possible_ticket_paths:
+        if os.path.exists(path):
+            ticket_folder = path
+            break
+    
+    if not ticket_folder:
+        ticket_folder = os.getenv('TICKET_FILES_FOLDER', os.path.join(app_root, 'app', 'static', 'ticket_files'))
     # Убеждаемся что пути абсолютные
     upload_folder = os.path.abspath(upload_folder)
     ticket_folder = os.path.abspath(ticket_folder)
@@ -98,9 +87,13 @@ def create_app():
     app.config['TICKET_FILES_FOLDER'] = ticket_folder
     
     # Логируем пути для отладки
+    app.logger.info(f"APP_ROOT: {app_root}")
     app.logger.info(f"STATIC_FOLDER: {static_folder_path}")
     app.logger.info(f"UPLOAD_FOLDER: {upload_folder}")
     app.logger.info(f"TICKET_FILES_FOLDER: {ticket_folder}")
+    app.logger.info(f"UPLOAD_FOLDER exists: {os.path.exists(upload_folder)}")
+    if os.path.exists(upload_folder):
+        app.logger.info(f"UPLOAD_FOLDER contents: {os.listdir(upload_folder)}")
     max_content_length = int(os.getenv('MAX_CONTENT_LENGTH', 200 * 1024 * 1024))
     app.config['MAX_CONTENT_LENGTH'] = max_content_length
     app.logger.info(f"MAX_CONTENT_LENGTH установлен: {max_content_length} байт ({max_content_length / (1024*1024):.1f} MB)")
@@ -121,7 +114,7 @@ def create_app():
     
     # Конфигурация платежей
     app.config['YOOKASSA_SHOP_ID'] = os.getenv('YOOKASSA_SHOP_ID', 'your-shop-id')
-    app.config['YOOKASSA_SECRET_KEY'] = os.getenv('YOOKASHA_SECRET_KEY', 'your-secret-key')
+    app.config['YOOKASSA_SECRET_KEY'] = os.getenv('YOOKASSA_SECRET_KEY', 'your-secret-key')
     app.config['YOOKASSA_TEST_MODE'] = os.getenv('YOOKASSA_TEST_MODE', 'True').lower() == 'true'
     
     # Цены подписки
@@ -214,7 +207,6 @@ def create_app():
         main_bp, auth_bp, payment_bp, 
         tickets_bp, admin_bp, api_bp
     )
-    from .views.subdomain import subdomain_bp
     from .views.telegram_auth import telegram_auth_bp
     
     app.register_blueprint(main_bp)
@@ -225,16 +217,17 @@ def create_app():
     app.register_blueprint(api_bp)
     app.register_blueprint(telegram_auth_bp)
     
-    # Регистрируем blueprint для поддомена q
-    app.register_blueprint(subdomain_bp, subdomain='q')
     
     # Регистрируем фильтры шаблонов
-    from .utils.template_filters import make_links_clickable, format_description, smart_truncate, format_user_contact, get_telegram_link
+    from .utils.template_filters import make_links_clickable, format_description, smart_truncate, format_user_contact, get_telegram_link, extract_filename, get_cdn_url, get_cdn_url_production
     app.jinja_env.filters['make_links_clickable'] = make_links_clickable
     app.jinja_env.filters['format_description'] = format_description
     app.jinja_env.filters['smart_truncate'] = smart_truncate
+    app.jinja_env.filters['get_cdn_url'] = get_cdn_url
+    app.jinja_env.filters['get_cdn_url_production'] = get_cdn_url_production
     app.jinja_env.filters['format_user_contact'] = format_user_contact
     app.jinja_env.filters['get_telegram_link'] = get_telegram_link
+    app.jinja_env.filters['extract_filename'] = extract_filename
     
     # Context processor для проверки технических работ
     @app.context_processor
@@ -306,38 +299,70 @@ def create_app():
     def not_found(error):
         """Обработчик ошибки 404 Not Found"""
         app.logger.warning(f"404 ошибка: {request.url}")
+        app.logger.warning(f"Endpoint: {request.endpoint}")
+        app.logger.warning(f"Method: {request.method}")
+        app.logger.warning(f"Path: {request.path}")
         return render_template("404.html"), 404
     
     # Настройка заголовков кеширования для статических файлов
     @app.after_request
     def add_cache_headers(response):
-        if response.mimetype in ['image/png', 'image/x-icon', 'image/jpeg', 'image/gif', 'image/webp']:
-            # Для иконок и изображений - короткий кеш
-            response.cache_control.max_age = 300  # 5 минут
-            response.cache_control.public = True
-        elif response.mimetype in ['text/css', 'application/javascript']:
-            # Для CSS и JS - средний кеш
-            response.cache_control.max_age = 3600  # 1 час
-            response.cache_control.public = True
-        else:
-            # Для остальных файлов - стандартный кеш
-            response.cache_control.max_age = 86400  # 24 часа
-            response.cache_control.public = True
+        if request.endpoint == 'static' or request.endpoint == 'main.serve_file':
+            filename = request.path.split('/')[-1]
+            
+            # Специальная обработка PDF файлов
+            if filename.lower().endswith('.pdf'):
+                # Для PDF файлов заголовки уже установлены в serve_file
+                if request.endpoint == 'static':
+                    response.headers['Content-Type'] = 'application/pdf'
+                    response.headers['Content-Disposition'] = 'attachment'
+                    response.cache_control.max_age = 3600  # 1 час
+                    response.cache_control.public = True
+                    # Отключаем сжатие для PDF
+                    response.headers['Content-Encoding'] = 'identity'
+            elif response.mimetype in ['image/png', 'image/x-icon', 'image/jpeg', 'image/gif', 'image/webp']:
+                # Для иконок и изображений - короткий кеш
+                response.cache_control.max_age = 300  # 5 минут
+                response.cache_control.public = True
+            elif response.mimetype in ['text/css', 'application/javascript']:
+                # Для CSS и JS - средний кеш
+                response.cache_control.max_age = 3600  # 1 час
+                response.cache_control.public = True
+            else:
+                # Для остальных файлов - стандартный кеш
+                response.cache_control.max_age = 86400  # 24 часа
+                response.cache_control.public = True
         return response
     
-    # Тестовый маршрут для проверки статических файлов
-    @app.route('/test-static')
-    def test_static():
-        """Тестовый маршрут для проверки статических файлов"""
+
+    # Дублирующий маршрут serve_pdf удален - используется основной serve_file
+
+    # Тестовый маршрут для проверки PDF файлов
+    @app.route('/test-pdf')
+    def test_pdf():
+        """Тестовый маршрут для проверки PDF файлов"""
         import os
-        static_path = os.path.join(os.path.dirname(__file__), 'static')
-        js_path = os.path.join(static_path, 'js', 'svg-patterns.js')
+        from flask import jsonify
         
-        if os.path.exists(js_path):
-            with open(js_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            return f'<h1>Статический файл найден!</h1><pre>{content[:500]}...</pre>'
-        else:
-            return f'<h1>Файл не найден!</h1><p>Путь: {js_path}</p><p>Существует static: {os.path.exists(static_path)}</p>'
+        upload_folder = app.config.get('UPLOAD_FOLDER', 'app/static/uploads')
+        pdf_files = []
+        
+        # Ищем PDF файлы в папке uploads
+        for root, dirs, files in os.walk(upload_folder):
+            for file in files:
+                if file.lower().endswith('.pdf'):
+                    relative_path = os.path.relpath(os.path.join(root, file), upload_folder)
+                    pdf_files.append({
+                        'filename': file,
+                        'path': relative_path,
+                        'url': f'/static/uploads/{relative_path}',
+                        'size': os.path.getsize(os.path.join(root, file))
+                    })
+        
+        return jsonify({
+            'pdf_files': pdf_files,
+            'total_count': len(pdf_files)
+        })
+    
     
     return app 

@@ -6,7 +6,6 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from ..utils.transliteration import get_safe_filename
-from ..utils.subdomain_url import get_subdomain_redirect
 from sqlalchemy.orm import joinedload
 from typing import Union, Dict, Any
 import os
@@ -123,7 +122,7 @@ def index() -> Union[str, Response]:
                         current_app.logger.error(f"Ошибка создания папки для предмета {subject.id}: {folder_error}")
                     
                     flash("Предмет добавлен")
-                    return get_subdomain_redirect("main.index")
+                    return redirect(url_for("main.index"))
                 except Exception as e:
                     current_app.logger.error(f"Error creating subject: {e}")
                     flash("Ошибка при создании предмета", "error")
@@ -227,14 +226,14 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
     except Exception as e:
         current_app.logger.error(f"Error loading subject {subject_id}: {e}")
         flash("Ошибка загрузки предмета.", "error")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
     
     # Проверяем доступ к предмету
     if current_user.is_authenticated:
         accessible_subjects = current_user.get_accessible_subjects()
         if subject not in accessible_subjects:
             flash("У вас нет доступа к этому предмету.", "error")
-            return get_subdomain_redirect("main.index")
+            return redirect(url_for("main.index"))
 
     # Проверяем подписку для аутентифицированных пользователей
     if current_user.is_authenticated:
@@ -244,7 +243,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
             # Проверяем подписку пользователя
             if not payment_service.check_user_subscription(current_user):
                 flash("Для доступа к предметам необходима активная подписка.", "warning")
-                return get_subdomain_redirect("payment.subscription")
+                return redirect(url_for("payment.subscription"))
             
             # Проверяем доступ к предмету по группе (если пользователь не админ)
             if not current_user.is_effective_admin():
@@ -257,14 +256,14 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                     ).first()
                     if not subject_group:
                         flash("У вас нет доступа к этому предмету.", "error")
-                        return get_subdomain_redirect("main.index")
+                        return redirect(url_for("main.index"))
                 else:
                     flash("У вас не назначена группа. Обратитесь к администратору.", "error")
-                    return get_subdomain_redirect("main.index")
+                    return redirect(url_for("main.index"))
         except Exception as e:
             current_app.logger.error(f"Error checking subscription in subject_detail: {e}")
             flash("Ошибка проверки подписки.", "error")
-            return get_subdomain_redirect("main.index")
+            return redirect(url_for("main.index"))
 
     try:
         lectures = Material.query.filter_by(subject_id=subject.id, type="lecture").all()
@@ -330,7 +329,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                     if file_size > current_app.config.get('MAX_CONTENT_LENGTH'):
                         current_app.logger.error(f"Файл слишком большой: {file_size} байт > {current_app.config.get('MAX_CONTENT_LENGTH')} байт")
                         flash(f"Файл слишком большой. Максимальный размер: {current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.1f} MB", "error")
-                        return get_subdomain_redirect("main.subject_detail", subject_id=subject_id)
+                        return redirect(url_for("main.subject_detail", subject_id=subject_id))
 
                 # Создаем путь для файла материала
                 full_path, relative_path = FileStorageManager.get_material_upload_path(
@@ -348,11 +347,11 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                     else:
                         current_app.logger.error(f"Ошибка сохранения файла материала: {original_filename}")
                         flash("Ошибка при сохранении файла материала", "error")
-                        return get_subdomain_redirect("main.subject_detail", subject_id=subject_id)
+                        return redirect(url_for("main.subject_detail", subject_id=subject_id))
                 except Exception as e:
                     current_app.logger.error(f"Исключение при сохранении файла материала {original_filename}: {str(e)}")
                     flash(f"Ошибка при сохранении файла: {str(e)}", "error")
-                    return get_subdomain_redirect("main.subject_detail", subject_id=subject_id)
+                    return redirect(url_for("main.subject_detail", subject_id=subject_id))
 
             if form.type.data == "assignment" and form.solution_file.data:
                 solution_file = form.solution_file.data
@@ -371,7 +370,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                     if solution_file_size > current_app.config.get('MAX_CONTENT_LENGTH'):
                         current_app.logger.error(f"Файл решения слишком большой: {solution_file_size} байт > {current_app.config.get('MAX_CONTENT_LENGTH')} байт")
                         flash(f"Файл решения слишком большой. Максимальный размер: {current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.1f} MB", "error")
-                        return get_subdomain_redirect("main.subject_detail", subject_id=subject_id)
+                        return redirect(url_for("main.subject_detail", subject_id=subject_id))
 
                 # Создаем путь для файла решения
                 full_solution_path, relative_solution_path = (
@@ -388,7 +387,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                 else:
                     current_app.logger.error(f"Ошибка сохранения файла решения: {original_solution_filename}")
                     flash("Ошибка при сохранении файла решения", "error")
-                    return get_subdomain_redirect("main.subject_detail", subject_id=subject_id)
+                    return redirect(url_for("main.subject_detail", subject_id=subject_id))
             
             material = Material(
                 title=form.title.data,
@@ -402,7 +401,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
             db.session.add(material)
             db.session.commit()
             flash("Материал добавлен")
-            return get_subdomain_redirect("main.subject_detail", subject_id=subject.id)
+            return redirect(url_for("main.subject_detail", subject_id=subject.id))
         else:
             current_app.logger.warning(f"Форма не валидна: {form.errors}")
             for field, errors in form.errors.items():
@@ -434,7 +433,7 @@ def edit_subject(subject_id: int) -> Response:
     """Редактирование предмета"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
     
     subject = Subject.query.get_or_404(subject_id)
     
@@ -446,15 +445,15 @@ def edit_subject(subject_id: int) -> Response:
         # Валидация
         if not new_title:
             flash("Название предмета не может быть пустым", "error")
-            return get_subdomain_redirect("main.subject_detail", subject_id=subject_id)
+            return redirect(url_for("main.subject_detail", subject_id=subject_id))
         
         if len(new_title) > 255:
             flash("Название предмета слишком длинное (максимум 255 символов)", "error")
-            return get_subdomain_redirect("main.subject_detail", subject_id=subject_id)
+            return redirect(url_for("main.subject_detail", subject_id=subject_id))
         
         if len(new_description) > 500:
             flash("Описание слишком длинное (максимум 500 символов)", "error")
-            return get_subdomain_redirect("main.subject_detail", subject_id=subject_id)
+            return redirect(url_for("main.subject_detail", subject_id=subject_id))
         
         # Обновляем данные
         subject.title = new_title
@@ -469,7 +468,7 @@ def edit_subject(subject_id: int) -> Response:
         flash("Ошибка при обновлении предмета", "error")
         db.session.rollback()
     
-    return get_subdomain_redirect("main.subject_detail", subject_id=subject_id)
+    return redirect(url_for("main.subject_detail", subject_id=subject_id))
 
 
 @main_bp.route("/subject/<int:subject_id>/delete", methods=["POST"])
@@ -478,7 +477,7 @@ def delete_subject(subject_id: int) -> Response:
     """Удаление предмета"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
     
     subject = Subject.query.get_or_404(subject_id)
     
@@ -500,7 +499,7 @@ def delete_subject(subject_id: int) -> Response:
     db.session.delete(subject)
     db.session.commit()
     flash("Предмет удалён")
-    return get_subdomain_redirect("main.index")
+    return redirect(url_for("main.index"))
 
 
 @main_bp.route("/material/<int:material_id>")
@@ -514,7 +513,7 @@ def material_detail(material_id: int) -> Union[str, Response]:
     # Проверяем подписку пользователя
     if not payment_service.check_user_subscription(current_user):
         flash("Для доступа к материалам необходима активная подписка.", "warning")
-        return get_subdomain_redirect("payment.subscription")
+        return redirect(url_for("payment.subscription"))
 
     return render_template("subjects/material_detail.html", material=material)
 
@@ -540,7 +539,7 @@ def add_solution_file(material_id: int) -> Response:
                     current_app.logger.info(f"Размер файла {key}: неизвестен")
     if not current_user.can_manage_materials():
         flash("Доступ запрещён")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
     
     material = Material.query.get_or_404(material_id)
     
@@ -549,7 +548,7 @@ def add_solution_file(material_id: int) -> Response:
         accessible_subjects = current_user.get_accessible_subjects()
         if material.subject not in accessible_subjects:
             flash("У вас нет доступа к этому предмету.", "error")
-            return get_subdomain_redirect("main.index")
+            return redirect(url_for("main.index"))
     file = request.files.get("solution_file")
     if file:
         # Получаем информацию о предмете
@@ -569,7 +568,7 @@ def add_solution_file(material_id: int) -> Response:
             if file_size > current_app.config.get('MAX_CONTENT_LENGTH'):
                 current_app.logger.error(f"Файл готового решения слишком большой: {file_size} байт > {current_app.config.get('MAX_CONTENT_LENGTH')} байт")
                 flash(f"Файл слишком большой. Максимальный размер: {current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.1f} MB", "error")
-                return get_subdomain_redirect("main.subject_detail", subject_id=material.subject_id)
+                return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
 
         # Создаем путь для файла решения
         full_path, relative_path = FileStorageManager.get_material_upload_path(
@@ -590,7 +589,7 @@ def add_solution_file(material_id: int) -> Response:
             current_app.logger.error(f"Исключение при сохранении готового решения {original_filename}: {str(e)}")
             flash(f"Ошибка при сохранении файла: {str(e)}", "error")
     
-    return get_subdomain_redirect("main.subject_detail", subject_id=material.subject_id)
+    return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
 
 
 @main_bp.route("/material/<int:material_id>/submit_solution", methods=["POST"])
@@ -618,11 +617,11 @@ def submit_solution(material_id: int) -> Response:
     payment_service = YooKassaService()
     if not payment_service.check_user_subscription(current_user):
         flash("Для загрузки решений необходима активная подписка.", "warning")
-        return get_subdomain_redirect("payment.subscription")
+        return redirect(url_for("payment.subscription"))
 
     if material.type != "assignment":
         flash("Можно загружать решение только для практик")
-        return get_subdomain_redirect("main.subject_detail", subject_id=material.subject_id)
+        return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
     
     file = request.files.get("solution_file")
     if file:
@@ -643,7 +642,7 @@ def submit_solution(material_id: int) -> Response:
             if file_size > current_app.config.get('MAX_CONTENT_LENGTH'):
                 current_app.logger.error(f"Файл решения пользователя слишком большой: {file_size} байт > {current_app.config.get('MAX_CONTENT_LENGTH')} байт")
                 flash(f"Файл слишком большой. Максимальный размер: {current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.1f} MB", "error")
-                return get_subdomain_redirect("main.subject_detail", subject_id=material.subject_id)
+                return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
 
         # Создаем путь для файла решения пользователя
         full_path, relative_path = FileStorageManager.get_subject_upload_path(
@@ -675,7 +674,7 @@ def submit_solution(material_id: int) -> Response:
             current_app.logger.error(f"Исключение при сохранении решения пользователя {current_user.id} {original_filename}: {str(e)}")
             flash(f"Ошибка при сохранении файла: {str(e)}", "error")
     
-    return get_subdomain_redirect("main.subject_detail", subject_id=material.subject_id)
+    return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
 
 
 @main_bp.route("/toggle-admin-mode", methods=["POST"])
@@ -684,7 +683,7 @@ def toggle_admin_mode() -> Response:
     """Переключение режима админа"""
     if not current_user.is_admin:
         flash("Доступ запрещён")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
     
     current_user.admin_mode_enabled = not current_user.admin_mode_enabled
     db.session.commit()
@@ -701,7 +700,7 @@ def delete_material(material_id: int) -> Response:
     """Удаление материала"""
     if not current_user.can_manage_materials():
         flash("Доступ запрещён")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
     
     material = Material.query.get_or_404(material_id)
     subject_id = material.subject_id
@@ -711,7 +710,7 @@ def delete_material(material_id: int) -> Response:
         accessible_subjects = current_user.get_accessible_subjects()
         if material.subject not in accessible_subjects:
             flash("У вас нет доступа к этому предмету.", "error")
-            return get_subdomain_redirect("main.index")
+            return redirect(url_for("main.index"))
     
     # Удаляем файл материала, если он существует
     if material.file:
@@ -738,7 +737,7 @@ def delete_material(material_id: int) -> Response:
     db.session.delete(material)
     db.session.commit()
     flash("Материал удалён")
-    return get_subdomain_redirect("main.subject_detail", subject_id=subject_id)
+    return redirect(url_for("main.subject_detail", subject_id=subject_id))
 
 
 @main_bp.route("/privacy")
@@ -762,7 +761,7 @@ def not_found() -> tuple:
 @main_bp.app_errorhandler(404)
 def handle_404(error) -> Response:
     """Обработчик ошибки 404"""
-    return get_subdomain_redirect('main.not_found')
+    return redirect(url_for('main.not_found'))
 
 
 @main_bp.route("/maintenance")
@@ -787,3 +786,180 @@ def macro_time() -> str:
 def macro() -> str:
     """Страница макросов"""
     return render_template("for_my_love/macro.html")
+
+
+@main_bp.route('/files/<int:subject_id>/<path:filename>', methods=['GET', 'HEAD'])
+def serve_file(subject_id: int, filename: str) -> Response:
+    """Отдача файлов с поддержкой Range запросов для PDF"""
+    from flask import Response, abort, request
+    import os
+    import time
+    
+    current_app.logger.info(f"serve_file вызвана: subject_id={subject_id}, filename={filename}")
+    start_time = time.time()
+    
+    # Получаем полный путь к файлу
+    # Сначала пробуем найти файл по разным вариантам путей
+    possible_paths = [
+        # Если filename уже содержит subject_id (например, "13/Fajrvol.pdf")
+        os.path.join(current_app.config['UPLOAD_FOLDER'], filename),
+        # Если filename только имя файла (например, "Fajrvol.pdf")
+        os.path.join(current_app.config['UPLOAD_FOLDER'], str(subject_id), filename),
+        # Если filename начинается с subject_id/
+        os.path.join(current_app.config['UPLOAD_FOLDER'], f"{subject_id}/{filename}"),
+        # Если filename содержит только basename
+        os.path.join(current_app.config['UPLOAD_FOLDER'], str(subject_id), os.path.basename(filename))
+    ]
+    
+    file_path = None
+    for path in possible_paths:
+        if os.path.exists(path):
+            file_path = path
+            break
+    
+    if not file_path:
+        current_app.logger.error(f"Файл не найден: {filename} для subject_id {subject_id}")
+        current_app.logger.error(f"Проверенные пути: {possible_paths}")
+        abort(404)
+    
+    # Определяем Content-Type по расширению
+    if filename.lower().endswith('.pdf'):
+        mimetype = 'application/pdf'
+    elif filename.lower().endswith(('.jpg', '.jpeg')):
+        mimetype = 'image/jpeg'
+    elif filename.lower().endswith('.png'):
+        mimetype = 'image/png'
+    else:
+        mimetype = 'application/octet-stream'
+    
+    try:
+        file_size = os.path.getsize(file_path)
+        current_app.logger.info(f"Размер файла {filename}: {file_size} байт")
+        
+        # Обработка Range запросов для больших файлов
+        range_header = request.headers.get('Range')
+        if range_header:
+            current_app.logger.info(f"Range запрос: {range_header}")
+            return _handle_range_request(file_path, file_size, mimetype, filename)
+        
+        # Для HEAD запросов возвращаем только заголовки
+        if request.method == 'HEAD':
+            response = Response(
+                status=200,
+                mimetype=mimetype,
+                headers={
+                    'Content-Length': str(file_size),
+                    'Accept-Ranges': 'bytes',
+                    'Cache-Control': 'public, max-age=3600',
+                    'X-Content-Type-Options': 'nosniff',
+                    'X-Frame-Options': 'SAMEORIGIN'
+                }
+            )
+            
+            # Для PDF файлов устанавливаем принудительное скачивание
+            if filename.lower().endswith('.pdf'):
+                response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
+            
+            return response
+        
+        # Потоковая передача файла
+        def generate_file():
+            try:
+                with open(file_path, 'rb') as f:
+                    while True:
+                        chunk = f.read(65536)  # Читаем по 64KB для лучшей производительности
+                        if not chunk:
+                            break
+                        yield chunk
+            except Exception as e:
+                current_app.logger.error(f"Ошибка чтения файла {file_path}: {e}")
+                return
+        
+        response = Response(
+            generate_file(),
+            mimetype=mimetype,
+            headers={
+                'Content-Length': str(file_size),
+                'Accept-Ranges': 'bytes',
+                'Cache-Control': 'public, max-age=3600',
+                'X-Content-Type-Options': 'nosniff',
+                'X-Frame-Options': 'SAMEORIGIN'
+            }
+        )
+        
+        # Для PDF файлов устанавливаем принудительное скачивание
+        if filename.lower().endswith('.pdf'):
+            response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
+        
+        # Логируем время выполнения
+        execution_time = time.time() - start_time
+        current_app.logger.info(f"Файл {filename} обработан за {execution_time:.3f} секунд")
+        
+        return response
+        
+    except Exception as e:
+        current_app.logger.error(f"Ошибка обработки файла {file_path}: {e}")
+        abort(500)
+
+
+def _handle_range_request(file_path: str, file_size: int, mimetype: str, filename: str) -> Response:
+    """Обработка HTTP Range запросов для частичной загрузки файлов"""
+    from flask import request, Response
+    import re
+    
+    # Парсим Range заголовок
+    range_match = re.match(r'bytes=(\d+)-(\d*)', request.headers.get('Range', ''))
+    if not range_match:
+        current_app.logger.warning("Некорректный Range заголовок")
+        return Response('Bad Request', status=400)
+    
+    start = int(range_match.group(1))
+    end = int(range_match.group(2)) if range_match.group(2) else file_size - 1
+    
+    # Проверяем корректность диапазона
+    if start >= file_size or end >= file_size or start > end:
+        current_app.logger.warning(f"Некорректный диапазон: {start}-{end} для файла размером {file_size}")
+        return Response('Requested Range Not Satisfiable', status=416)
+    
+    # Вычисляем длину контента
+    content_length = end - start + 1
+    
+    current_app.logger.info(f"Range запрос: {start}-{end} из {file_size} байт")
+    
+    def generate_range():
+        try:
+            with open(file_path, 'rb') as f:
+                f.seek(start)
+                remaining = content_length
+                while remaining > 0:
+                    chunk_size = min(65536, remaining)  # Читаем по 64KB для лучшей производительности
+                    chunk = f.read(chunk_size)
+                    if not chunk:
+                        break
+                    remaining -= len(chunk)
+                    yield chunk
+        except Exception as e:
+            current_app.logger.error(f"Ошибка чтения диапазона файла {file_path}: {e}")
+            return
+    
+    response = Response(
+        generate_range(),
+        status=206,  # Partial Content
+        mimetype=mimetype,
+        headers={
+            'Content-Length': str(content_length),
+            'Content-Range': f'bytes {start}-{end}/{file_size}',
+            'Accept-Ranges': 'bytes',
+            'Cache-Control': 'public, max-age=3600',
+            'X-Content-Type-Options': 'nosniff',
+            'X-Frame-Options': 'SAMEORIGIN'
+        }
+    )
+    
+    # Для PDF файлов устанавливаем принудительное скачивание
+    if filename.lower().endswith('.pdf'):
+        response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
+    
+    return response
+
+

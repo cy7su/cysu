@@ -1,5 +1,5 @@
 # ========================================
-# КОНФИДЕНЦИАЛЬНЫЕ ФАЙЛЫ
+# КОНФИДЕНЦИАЛЬНЫЕ ФАЙЛЫ CYSU
 # ========================================
 .env
 .env.local
@@ -20,16 +20,35 @@ config.py
 credentials.json
 service-account.json
 
+# Telegram бот токены
+TG_TOKEN
+TG_ID
+
+# YooKassa ключи
+YOOKASSA_SHOP_ID
+YOOKASSA_SECRET_KEY
+
+# Email настройки
+MAIL_PASSWORD
+MAIL_USERNAME
+
 # ========================================
-# БАЗА ДАННЫХ
+# БАЗА ДАННЫХ CYSU
 # ========================================
 *.db
 *.sqlite
 *.sqlite3
 *.sql
+app.db
+app.db.backup
 instance/
 migrations/
 alembic.ini
+
+# Резервные копии БД
+*.db.backup
+*.db.bak
+backup_*.db
 
 # ========================================
 # ЛОГИ И ОТЛАДКА
@@ -120,7 +139,7 @@ Thumbs.db
 desktop.ini
 
 # ========================================
-# ЗАГРУЖЕННЫЕ ФАЙЛЫ
+# ЗАГРУЖЕННЫЕ ФАЙЛЫ CYSU
 # ========================================
 app/static/uploads/
 app/static/ticket_files/
@@ -130,6 +149,13 @@ app/static/attachments/
 app/static/avatars/
 app/static/documents/
 app/static/cache/
+app/static/chat_files/
+
+# Файлы пользователей
+user_uploads/
+user_files/
+submissions/
+solutions/
 
 # ========================================
 # КОНФИГУРАЦИОННЫЕ ФАЙЛЫ
@@ -178,6 +204,15 @@ main_backup.py
 backup/
 old/
 archive/
+
+# CDN файлы (удалены)
+cdn/
+async_app.py
+async_requirements.txt
+
+# Старые конфигурации
+nginx.conf.old
+run.py.old
 
 # ========================================
 # ДОПОЛНИТЕЛЬНЫЕ ИСКЛЮЧЕНИЯ
@@ -240,7 +275,7 @@ _site/
 .jekyll-metadata
 
 # ========================================
-# РАЗВЕРТЫВАНИЕ
+# РАЗВЕРТЫВАНИЕ CYSU
 # ========================================
 deploy/
 deployment/
@@ -249,3 +284,13 @@ staging/
 *.tar.gz
 *.zip
 *.rar
+
+# SSL сертификаты (системные)
+/etc/letsencrypt/
+
+# Nginx конфигурации (системные)
+/etc/nginx/sites-available/
+/etc/nginx/sites-enabled/
+
+# Systemd сервисы
+*.service

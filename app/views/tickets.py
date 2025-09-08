@@ -9,7 +9,6 @@ from typing import Union, Dict, Any
 
 from ..models import Ticket, TicketFile, TicketMessage, Notification, User
 from ..utils.file_storage import FileStorageManager
-from ..utils.subdomain_url import get_subdomain_redirect
 from .. import db
 
 tickets_bp = Blueprint("tickets", __name__)
@@ -46,7 +45,7 @@ def ticket_detail(ticket_id: int) -> Union[str, Response]:
     # Проверяем права доступа
     if not current_user.is_admin and ticket.user_id != current_user.id:
         flash("Доступ запрещен", "error")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
 
     return render_template("tickets/ticket_detail.html", ticket=ticket)
 
@@ -66,7 +65,7 @@ def accept_ticket(ticket_id: int) -> Union[Response, Dict[str, Any]]:
     db.session.commit()
 
     flash("Тикет принят", "success")
-    return get_subdomain_redirect("tickets.ticket_detail", ticket_id=ticket_id)
+    return redirect(url_for("tickets.ticket_detail", ticket_id=ticket_id))
 
 
 @tickets_bp.route("/tickets/<int:ticket_id>/reject", methods=["POST"])
@@ -84,7 +83,7 @@ def reject_ticket(ticket_id: int) -> Union[Response, Dict[str, Any]]:
     db.session.commit()
 
     flash("Тикет отклонен", "success")
-    return get_subdomain_redirect("tickets.tickets")
+    return redirect(url_for("tickets.tickets"))
 
 
 @tickets_bp.route("/tickets/<int:ticket_id>/close", methods=["POST"])
@@ -102,7 +101,7 @@ def close_ticket(ticket_id: int) -> Union[Response, Dict[str, Any]]:
     db.session.commit()
 
     flash("Тикет закрыт", "success")
-    return get_subdomain_redirect("tickets.tickets")
+    return redirect(url_for("tickets.tickets"))
 
 
 @tickets_bp.route("/api/ticket/create", methods=["POST"])

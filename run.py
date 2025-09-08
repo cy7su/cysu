@@ -13,6 +13,7 @@ def run_website():
     app = create_app()
     app.run(host='0.0.0.0', port=8001, debug=False)
 
+
 def run_telegram_bot():
     """Запуск Telegram бота"""
     import logging
@@ -34,7 +35,7 @@ def main():
     try:
         # Запускаем процессы
         website_process.start()
-        time.sleep(2)
+        time.sleep(1)
         bot_process.start()
         
         # Ждем завершения процессов

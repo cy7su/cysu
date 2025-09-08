@@ -11,7 +11,6 @@ from typing import Union
 from ..models import User, EmailVerification, PasswordReset, SiteSettings
 from ..forms import LoginForm, RegistrationForm, EmailVerificationForm, PasswordResetRequestForm, PasswordResetForm
 from ..utils.email_service import EmailService
-from ..utils.subdomain_url import get_subdomain_redirect
 from .. import db, login_manager
 
 auth_bp = Blueprint("auth", __name__)
@@ -31,14 +30,14 @@ def load_user(user_id: str):
 def login() -> Union[str, Response]:
     """Страница входа"""
     if current_user.is_authenticated:
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
     
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            return get_subdomain_redirect("main.index")
+            return redirect(url_for("main.index"))
         flash("Неверное имя пользователя или пароль")
     
     return render_template("auth/login.html", form=form)
@@ -48,7 +47,7 @@ def login() -> Union[str, Response]:
 def register() -> Union[str, Response]:
     """Страница регистрации"""
     if current_user.is_authenticated:
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
     
     form = RegistrationForm()
     current_app.logger.info(f"Регистрация - метод: {request.method}")
@@ -97,7 +96,7 @@ def register() -> Union[str, Response]:
             if EmailService.send_verification_email(form.email.data, verification.code):
                 flash("Проверьте вашу почту для подтверждения email.")
                 session["pending_verification_id"] = verification.id
-                return get_subdomain_redirect("auth.email_verification")
+                return redirect(url_for("auth.email_verification"))
             else:
                 flash("Ошибка отправки email. Попробуйте еще раз.")
                 db.session.delete(verification)
@@ -124,7 +123,7 @@ def email_verification() -> Union[str, Response]:
 
     if not verification_id or not pending_registration:
         flash("Сначала зарегистрируйтесь.")
-        return get_subdomain_redirect("auth.register")
+        return redirect(url_for("auth.register"))
 
     form = EmailVerificationForm()
 
@@ -173,7 +172,7 @@ def email_verification() -> Union[str, Response]:
                 flash(
                     "Регистрация успешно завершена! Теперь вы можете войти в систему."
                 )
-                return get_subdomain_redirect("auth.login")
+                return redirect(url_for("auth.login"))
 
             except Exception as e:
                 current_app.logger.error(
@@ -181,7 +180,7 @@ def email_verification() -> Union[str, Response]:
                 )
                 db.session.rollback()
                 flash("Ошибка при завершении регистрации. Попробуйте еще раз.")
-                return get_subdomain_redirect("auth.register")
+                return redirect(url_for("auth.register"))
         else:
             flash("Неверный код или код истек. Попробуйте еще раз.")
 
@@ -200,7 +199,7 @@ def resend_verification() -> Union[str, Response]:
 
     if not verification_id or not pending_registration:
         flash("Сначала зарегистрируйтесь.")
-        return get_subdomain_redirect("auth.register")
+        return redirect(url_for("auth.register"))
 
     try:
         # Удаляем старый код подтверждения
@@ -233,14 +232,14 @@ def resend_verification() -> Union[str, Response]:
         db.session.rollback()
         flash("Ошибка при отправке кода. Попробуйте еще раз.")
 
-    return get_subdomain_redirect("auth.email_verification")
+    return redirect(url_for("auth.email_verification"))
 
 
 @auth_bp.route("/password/reset", methods=["GET", "POST"])
 def password_reset_request() -> Union[str, Response]:
     """Страница запроса восстановления пароля"""
     if current_user.is_authenticated:
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
 
     form = PasswordResetRequestForm()
     if form.validate_on_submit():
@@ -266,7 +265,7 @@ def password_reset_request() -> Union[str, Response]:
                     "Код восстановления отправлен на вашу почту. Проверьте email и введите код.",
                     "info",
                 )
-                return get_subdomain_redirect("auth.password_reset_confirm")
+                return redirect(url_for("auth.password_reset_confirm"))
             else:
                 flash("Ошибка отправки email. Попробуйте позже.", "error")
         else:
@@ -275,7 +274,7 @@ def password_reset_request() -> Union[str, Response]:
                 "Если указанный email зарегистрирован, код восстановления будет отправлен.",
                 "info",
             )
-            return get_subdomain_redirect("auth.password_reset_confirm")
+            return redirect(url_for("auth.password_reset_confirm"))
 
     return render_template("auth/password_reset_request.html", form=form)
 
@@ -284,7 +283,7 @@ def password_reset_request() -> Union[str, Response]:
 def password_reset_confirm() -> Union[str, Response]:
     """Страница подтверждения кода и смены пароля"""
     if current_user.is_authenticated:
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
 
     form = PasswordResetForm()
     if form.validate_on_submit():
@@ -314,7 +313,7 @@ def password_reset_confirm() -> Union[str, Response]:
                     "Пароль успешно изменен! Теперь вы можете войти с новым паролем.",
                     "success",
                 )
-                return get_subdomain_redirect("auth.login")
+                return redirect(url_for("auth.login"))
             else:
                 flash("Ошибка: пользователь не найден.", "error")
         else:
@@ -328,4 +327,4 @@ def password_reset_confirm() -> Union[str, Response]:
 def logout() -> Response:
     """Выход из системы"""
     logout_user()
-    return get_subdomain_redirect("main.index")
+    return redirect(url_for("main.index"))

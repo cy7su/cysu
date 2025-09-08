@@ -11,7 +11,6 @@ import random
 import string
 from typing import Union, Dict, Any
 
-from ..utils.subdomain_url import get_subdomain_redirect
 
 from ..models import (
     User, Material, Subject, Payment, ChatMessage, EmailVerification, 
@@ -35,7 +34,7 @@ def admin_users() -> Union[str, Response]:
     """Админка для управления пользователями"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
 
     form = AdminUserForm()
     password_map = {}
@@ -266,7 +265,7 @@ def admin_users() -> Union[str, Response]:
                         current_app.logger.error(f"Traceback: {traceback.format_exc()}")
                         db.session.rollback()
                         flash(f"Ошибка при удалении пользователя {username}", "error")
-                        return get_subdomain_redirect("admin.admin_users")
+                        return redirect(url_for("admin.admin_users"))
             else:
                 flash("Пользователь не найден", "error")
         except Exception as e:
@@ -317,7 +316,7 @@ def admin_users() -> Union[str, Response]:
                         flash(f"Пользователь {user.username} перемещен в группу '{group.name}'")
                     else:
                         flash("Группа не найдена", "error")
-                        return get_subdomain_redirect("admin.admin_users")
+                        return redirect(url_for("admin.admin_users"))
                 else:
                     user.group_id = None
                     flash(f"Пользователь {user.username} убран из группы")
@@ -442,7 +441,7 @@ def admin_groups() -> Union[str, Response]:
     """Админка для управления группами"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
 
     # Проверяем CSRF токен для POST запросов
     if request.method == "POST":
@@ -453,7 +452,7 @@ def admin_groups() -> Union[str, Response]:
         if not request.form.get('csrf_token'):
             current_app.logger.error("CSRF токен отсутствует в запросе")
             flash("Ошибка безопасности: отсутствует CSRF токен", "error")
-            return get_subdomain_redirect("admin.admin_groups")
+            return redirect(url_for("admin.admin_groups"))
 
     form = GroupForm()
     message = ""
@@ -607,7 +606,7 @@ def admin_subject_groups() -> Union[str, Response]:
     """Админка для управления предметами по группам"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
 
     # Получаем все предметы с их группами
     try:
@@ -765,7 +764,7 @@ def admin_settings() -> Union[str, Response]:
     """Админка для управления настройками сайта"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
-        return get_subdomain_redirect("main.index")
+        return redirect(url_for("main.index"))
 
     form = SiteSettingsForm()
     
@@ -785,7 +784,7 @@ def admin_settings() -> Union[str, Response]:
             SiteSettings.set_setting('pattern_generation_enabled', form.pattern_generation_enabled.data, 'Включить/выключить кнопку генерации паттернов')
             
             flash('Настройки успешно сохранены', 'success')
-            return get_subdomain_redirect('admin.admin_settings')
+            return redirect('admin.admin_settings')
         except Exception as e:
             current_app.logger.error(f"Ошибка сохранения настроек: {str(e)}")
             flash('Ошибка при сохранении настроек', 'error')

@@ -414,7 +414,7 @@ class TelegramBotManager:
                     # Обновляем пароль
                     user = User.query.get(target_user_id)
                     if user:
-                        user.password_hash = generate_password_hash(new_password)
+                        user.password = generate_password_hash(new_password)
                         db.session.commit()
                         
                         await update.message.reply_text(f"✅ Пароль для пользователя {user.username} изменен")

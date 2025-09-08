@@ -156,3 +156,41 @@ def smart_truncate(text: str, length: int = 60) -> Markup:
         return Markup(text[:length] + "...")
     
     return Markup(text)
+
+
+def extract_filename(file_path: str) -> str:
+    """
+    Извлекает только имя файла из пути
+    Например: "14/1.pdf" -> "1.pdf"
+    """
+    if not file_path:
+        return ""
+    
+    # Разделяем по слешу и берем последнюю часть
+    return file_path.split('/')[-1]
+
+
+def get_cdn_url(file_path: str, subject_id: int) -> str:
+    """
+    Генерирует URL для CDN
+    Например: "14/1.pdf" + subject_id=14 -> "http://cdn.localhost:5001/14/1.pdf"
+    """
+    if not file_path:
+        return ""
+    
+    # Извлекаем только имя файла
+    filename = extract_filename(file_path)
+    
+    # Возвращаем CDN URL
+    return f"http://cdn.localhost:5001/{subject_id}/{filename}"
+
+
+def get_cdn_url_production(file_path: str, subject_id: int) -> str:
+    """
+    Генерирует URL для CDN в продакшене
+    """
+    if not file_path:
+        return ""
+    
+    filename = extract_filename(file_path)
+    return f"https://cdn.yourdomain.com/{subject_id}/{filename}"
