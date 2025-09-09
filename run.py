@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Скрипт для запуска сайта и Telegram бота одновременно
-"""
-
 import signal
 import time
 from multiprocessing import Process

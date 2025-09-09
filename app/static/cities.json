@@ -1,0 +1,688 @@
+{
+  "cities": [
+    {
+      "name": "Калининград",
+      "offset": -2,
+      "timezone": "МСК-1 (UTC+2)",
+      "region": "Калининградская область",
+      "zone_number": 1
+    },
+    {
+      "name": "Москва",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "г. Москва",
+      "zone_number": 2
+    },
+    {
+      "name": "Санкт-Петербург",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "г. Санкт-Петербург",
+      "zone_number": 2
+    },
+    {
+      "name": "Севастополь",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "г. Севастополь",
+      "zone_number": 2
+    },
+    {
+      "name": "Архангельск",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Архангельская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Белгород",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Белгородская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Брянск",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Брянская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Владимир",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Владимирская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Волгоград",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Волгоградская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Вологда",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Вологодская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Воронеж",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Воронежская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Иваново",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Ивановская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Калуга",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Калужская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Киров",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Кировская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Кострома",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Костромская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Курск",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Курская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Ленинградская область",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Ленинградская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Липецк",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Липецкая область",
+      "zone_number": 2
+    },
+    {
+      "name": "Московская область",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Московская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Мурманск",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Мурманская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Нижний Новгород",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Нижегородская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Новгород",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Новгородская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Орел",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Орловская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Пенза",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Пензенская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Псков",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Псковская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Ростов-на-Дону",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Ростовская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Рязань",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Рязанская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Смоленск",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Смоленская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Тамбов",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Тамбовская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Тверь",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Тверская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Тула",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Тульская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Ярославль",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Ярославская область",
+      "zone_number": 2
+    },
+    {
+      "name": "Краснодар",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Краснодарский край",
+      "zone_number": 2
+    },
+    {
+      "name": "Ставрополь",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Ставропольский край",
+      "zone_number": 2
+    },
+    {
+      "name": "Майкоп",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Адыгея",
+      "zone_number": 2
+    },
+    {
+      "name": "Махачкала",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Дагестан",
+      "zone_number": 2
+    },
+    {
+      "name": "Назрань",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Ингушетия",
+      "zone_number": 2
+    },
+    {
+      "name": "Нальчик",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Кабардино-Балкарская Республика",
+      "zone_number": 2
+    },
+    {
+      "name": "Элиста",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Калмыкия",
+      "zone_number": 2
+    },
+    {
+      "name": "Черкесск",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Карачаево-Черкесская Республика",
+      "zone_number": 2
+    },
+    {
+      "name": "Петрозаводск",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Карелия",
+      "zone_number": 2
+    },
+    {
+      "name": "Сыктывкар",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Коми",
+      "zone_number": 2
+    },
+    {
+      "name": "Симферополь",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Крым",
+      "zone_number": 2
+    },
+    {
+      "name": "Йошкар-Ола",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Марий Эл",
+      "zone_number": 2
+    },
+    {
+      "name": "Саранск",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Мордовия",
+      "zone_number": 2
+    },
+    {
+      "name": "Владикавказ",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Северная Осетия - Алания",
+      "zone_number": 2
+    },
+    {
+      "name": "Казань",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Республика Татарстан",
+      "zone_number": 2
+    },
+    {
+      "name": "Грозный",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Чеченская Республика",
+      "zone_number": 2
+    },
+    {
+      "name": "Чебоксары",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Чувашская Республика",
+      "zone_number": 2
+    },
+    {
+      "name": "Нарьян-Мар",
+      "offset": -1,
+      "timezone": "МСК (UTC+3)",
+      "region": "Ненецкий автономный округ",
+      "zone_number": 2
+    },
+    {
+      "name": "Самара",
+      "offset": 0,
+      "timezone": "МСК+1 (UTC+4)",
+      "region": "Самарская область",
+      "zone_number": 3
+    },
+    {
+      "name": "Саратов",
+      "offset": 0,
+      "timezone": "МСК+1 (UTC+4)",
+      "region": "Саратовская область",
+      "zone_number": 3
+    },
+    {
+      "name": "Астрахань",
+      "offset": 0,
+      "timezone": "МСК+1 (UTC+4)",
+      "region": "Астраханская область",
+      "zone_number": 3
+    },
+    {
+      "name": "Ульяновск",
+      "offset": 0,
+      "timezone": "МСК+1 (UTC+4)",
+      "region": "Ульяновская область",
+      "zone_number": 3
+    },
+    {
+      "name": "Ижевск",
+      "offset": 0,
+      "timezone": "МСК+1 (UTC+4)",
+      "region": "Удмуртская Республика",
+      "zone_number": 3
+    },
+    {
+      "name": "Екатеринбург",
+      "offset": 1,
+      "timezone": "МСК+2 (UTC+5)",
+      "region": "Свердловская область",
+      "zone_number": 4
+    },
+    {
+      "name": "Курган",
+      "offset": 1,
+      "timezone": "МСК+2 (UTC+5)",
+      "region": "Курганская область",
+      "zone_number": 4
+    },
+    {
+      "name": "Оренбург",
+      "offset": 1,
+      "timezone": "МСК+2 (UTC+5)",
+      "region": "Оренбургская область",
+      "zone_number": 4
+    },
+    {
+      "name": "Тюмень",
+      "offset": 1,
+      "timezone": "МСК+2 (UTC+5)",
+      "region": "Тюменская область",
+      "zone_number": 4
+    },
+    {
+      "name": "Челябинск",
+      "offset": 1,
+      "timezone": "МСК+2 (UTC+5)",
+      "region": "Челябинская область",
+      "zone_number": 4
+    },
+    {
+      "name": "Пермь",
+      "offset": 1,
+      "timezone": "МСК+2 (UTC+5)",
+      "region": "Пермский край",
+      "zone_number": 4
+    },
+    {
+      "name": "Уфа",
+      "offset": 1,
+      "timezone": "МСК+2 (UTC+5)",
+      "region": "Республика Башкортостан",
+      "zone_number": 4
+    },
+    {
+      "name": "Ханты-Мансийск",
+      "offset": 1,
+      "timezone": "МСК+2 (UTC+5)",
+      "region": "Ханты-Мансийский автономный округ",
+      "zone_number": 4
+    },
+    {
+      "name": "Салехард",
+      "offset": 1,
+      "timezone": "МСК+2 (UTC+5)",
+      "region": "Ямало-Ненецкий автономный округ",
+      "zone_number": 4
+    },
+    {
+      "name": "Омск",
+      "offset": 2,
+      "timezone": "МСК+3 (UTC+6)",
+      "region": "Омская область",
+      "zone_number": 5
+    },
+    {
+      "name": "Новосибирск",
+      "offset": 3,
+      "timezone": "МСК+4 (UTC+7)",
+      "region": "Новосибирская область",
+      "zone_number": 6
+    },
+    {
+      "name": "Кемерово",
+      "offset": 3,
+      "timezone": "МСК+4 (UTC+7)",
+      "region": "Кемеровская область",
+      "zone_number": 6
+    },
+    {
+      "name": "Томск",
+      "offset": 3,
+      "timezone": "МСК+4 (UTC+7)",
+      "region": "Томская область",
+      "zone_number": 6
+    },
+    {
+      "name": "Барнаул",
+      "offset": 3,
+      "timezone": "МСК+4 (UTC+7)",
+      "region": "Алтайский край",
+      "zone_number": 6
+    },
+    {
+      "name": "Красноярск",
+      "offset": 3,
+      "timezone": "МСК+4 (UTC+7)",
+      "region": "Красноярский край",
+      "zone_number": 6
+    },
+    {
+      "name": "Горно-Алтайск",
+      "offset": 3,
+      "timezone": "МСК+4 (UTC+7)",
+      "region": "Республика Алтай",
+      "zone_number": 6
+    },
+    {
+      "name": "Кызыл",
+      "offset": 3,
+      "timezone": "МСК+4 (UTC+7)",
+      "region": "Республика Тыва",
+      "zone_number": 6
+    },
+    {
+      "name": "Абакан",
+      "offset": 3,
+      "timezone": "МСК+4 (UTC+7)",
+      "region": "Республика Хакасия",
+      "zone_number": 6
+    },
+    {
+      "name": "Иркутск",
+      "offset": 4,
+      "timezone": "МСК+5 (UTC+8)",
+      "region": "Иркутская область",
+      "zone_number": 7
+    },
+    {
+      "name": "Улан-Удэ",
+      "offset": 4,
+      "timezone": "МСК+5 (UTC+8)",
+      "region": "Республика Бурятия",
+      "zone_number": 7
+    },
+    {
+      "name": "Якутск",
+      "offset": 5,
+      "timezone": "МСК+6 (UTC+9)",
+      "region": "Республика Саха (Якутия)",
+      "zone_number": 8
+    },
+    {
+      "name": "Благовещенск",
+      "offset": 5,
+      "timezone": "МСК+6 (UTC+9)",
+      "region": "Амурская область",
+      "zone_number": 8
+    },
+    {
+      "name": "Чита",
+      "offset": 5,
+      "timezone": "МСК+6 (UTC+9)",
+      "region": "Забайкальский край",
+      "zone_number": 8
+    },
+    {
+      "name": "Владивосток",
+      "offset": 6,
+      "timezone": "МСК+7 (UTC+10)",
+      "region": "Приморский край",
+      "zone_number": 9
+    },
+    {
+      "name": "Хабаровск",
+      "offset": 6,
+      "timezone": "МСК+7 (UTC+10)",
+      "region": "Хабаровский край",
+      "zone_number": 9
+    },
+    {
+      "name": "Биробиджан",
+      "offset": 6,
+      "timezone": "МСК+7 (UTC+10)",
+      "region": "Еврейская автономная область",
+      "zone_number": 9
+    },
+    {
+      "name": "Магадан",
+      "offset": 7,
+      "timezone": "МСК+8 (UTC+11)",
+      "region": "Магаданская область",
+      "zone_number": 10
+    },
+    {
+      "name": "Южно-Сахалинск",
+      "offset": 7,
+      "timezone": "МСК+8 (UTC+11)",
+      "region": "Сахалинская область",
+      "zone_number": 10
+    },
+    {
+      "name": "Петропавловск-Камчатский",
+      "offset": 8,
+      "timezone": "МСК+9 (UTC+12)",
+      "region": "Камчатский край",
+      "zone_number": 11
+    },
+    {
+      "name": "Анадырь",
+      "offset": 8,
+      "timezone": "МСК+9 (UTC+12)",
+      "region": "Чукотский автономный округ",
+      "zone_number": 11
+    }
+  ],
+  "timezones": [
+    {
+      "zone_number": 1,
+      "name": "Калининградское время",
+      "abbreviation": "МСК-1",
+      "utc_offset": "+2",
+      "description": "Время МСК-1 (UTC+2) - Калининградская область"
+    },
+    {
+      "zone_number": 2,
+      "name": "Московское время",
+      "abbreviation": "МСК",
+      "utc_offset": "+3",
+      "description": "Время МСК (UTC+3) - Центральная Россия, Северо-Запад, Юг, Северный Кавказ"
+    },
+    {
+      "zone_number": 3,
+      "name": "Самарское время",
+      "abbreviation": "МСК+1",
+      "utc_offset": "+4",
+      "description": "Время МСК+1 (UTC+4) - Поволжье, Удмуртия"
+    },
+    {
+      "zone_number": 4,
+      "name": "Екатеринбургское время",
+      "abbreviation": "МСК+2",
+      "utc_offset": "+5",
+      "description": "Время МСК+2 (UTC+5) - Урал, Западная Сибирь"
+    },
+    {
+      "zone_number": 5,
+      "name": "Омское время",
+      "abbreviation": "МСК+3",
+      "utc_offset": "+6",
+      "description": "Время МСК+3 (UTC+6) - Омская область"
+    },
+    {
+      "zone_number": 6,
+      "name": "Красноярское время",
+      "abbreviation": "МСК+4",
+      "utc_offset": "+7",
+      "description": "Время МСК+4 (UTC+7) - Центральная Сибирь, Алтай"
+    },
+    {
+      "zone_number": 7,
+      "name": "Иркутское время",
+      "abbreviation": "МСК+5",
+      "utc_offset": "+8",
+      "description": "Время МСК+5 (UTC+8) - Восточная Сибирь, Бурятия"
+    },
+    {
+      "zone_number": 8,
+      "name": "Якутское время",
+      "abbreviation": "МСК+6",
+      "utc_offset": "+9",
+      "description": "Время МСК+6 (UTC+9) - Якутия, Забайкалье, Амурская область"
+    },
+    {
+      "zone_number": 9,
+      "name": "Владивостокское время",
+      "abbreviation": "МСК+7",
+      "utc_offset": "+10",
+      "description": "Время МСК+7 (UTC+10) - Дальний Восток, Хабаровский край, Приморье"
+    },
+    {
+      "zone_number": 10,
+      "name": "Магаданское время",
+      "abbreviation": "МСК+8",
+      "utc_offset": "+11",
+      "description": "Время МСК+8 (UTC+11) - Магаданская область, Сахалин"
+    },
+    {
+      "zone_number": 11,
+      "name": "Камчатское время",
+      "abbreviation": "МСК+9",
+      "utc_offset": "+12",
+      "description": "Время МСК+9 (UTC+12) - Камчатский край, Чукотка"
+    }
+  ],
+  "metadata": {
+    "total_cities": 85,
+    "total_timezones": 11,
+    "base_city": "Саратов",
+    "base_timezone": "МСК+1 (UTC+4)",
+    "base_offset": 0,
+    "last_updated": "2024",
+    "source": "Официальные часовые пояса России",
+    "description": "Список всех российских городов с их часовыми поясами относительно Саратова (UTC+4)"
+  }
+}
