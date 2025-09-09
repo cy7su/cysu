@@ -734,6 +734,57 @@ def toggle_admin_mode() -> Response:
     return redirect(request.referrer or url_for("main.index"))
 
 
+@main_bp.route("/material/<int:material_id>/edit", methods=["POST"])
+@login_required
+def edit_material(material_id: int) -> Response:
+    """Редактирование материала"""
+    if not current_user.can_manage_materials():
+        flash("Доступ запрещён")
+        return redirect(url_for("main.index"))
+    
+    material = Material.query.get_or_404(material_id)
+    
+    # Проверяем доступ к предмету для модераторов
+    if current_user.is_moderator:
+        accessible_subjects = current_user.get_accessible_subjects()
+        if material.subject not in accessible_subjects:
+            flash("У вас нет доступа к этому предмету.", "error")
+            return redirect(url_for("main.index"))
+    
+    try:
+        # Получаем данные из формы
+        new_title = request.form.get("title", "").strip()
+        new_description = request.form.get("description", "").strip()
+        
+        # Валидация
+        if not new_title:
+            flash("Название материала не может быть пустым", "error")
+            return redirect(url_for("main.material_detail", material_id=material.id))
+        
+        if len(new_title) > 255:
+            flash("Название материала слишком длинное (максимум 255 символов)", "error")
+            return redirect(url_for("main.material_detail", material_id=material.id))
+        
+        if len(new_description) > 300:
+            flash("Описание слишком длинное (максимум 300 символов)", "error")
+            return redirect(url_for("main.material_detail", material_id=material.id))
+        
+        # Обновляем данные материала
+        material.title = new_title
+        material.description = new_description if new_description else None
+        
+        db.session.commit()
+        flash("Материал успешно обновлён")
+        current_app.logger.info(f"Материал {material.id} обновлён пользователем {current_user.id}")
+        
+    except Exception as e:
+        current_app.logger.error(f"Ошибка редактирования материала {material_id}: {e}")
+        flash("Ошибка при обновлении материала", "error")
+        db.session.rollback()
+    
+    return redirect(url_for("main.material_detail", material_id=material.id))
+
+
 @main_bp.route("/material/<int:material_id>/delete", methods=["POST"])
 @login_required
 def delete_material(material_id: int) -> Response:

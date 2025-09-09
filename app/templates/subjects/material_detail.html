@@ -7,8 +7,13 @@
     <div class="row">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h2 class="mb-0">{{ material.title }}</h2>
+                    {% if current_user.is_authenticated and current_user.can_manage_materials() %}
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
+                            <i class="fas fa-edit me-1"></i>Редактировать
+                        </button>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     {% if material.description %}
@@ -69,4 +74,53 @@
         </div>
     </div>
 </div>
+
+<!-- Модальное окно для редактирования материала -->
+{% if current_user.is_authenticated and current_user.can_manage_materials() %}
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">
+                    <i class="fas fa-edit me-2"></i>Редактирование материала
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('main.edit_material', material_id=material.id) }}">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Название</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ material.title }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" maxlength="300">{{ material.description or '' }}</textarea>
+                        <div class="form-text">Максимум 300 символов</div>
+                    </div>
+                    
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Информация о материале</h6>
+                            <p class="card-text mb-1"><strong>Предмет:</strong> {{ material.subject.title }}</p>
+                            <p class="card-text mb-1"><strong>Тип:</strong> {{ 'Лекция' if material.type == 'lecture' else 'Практика' }}</p>
+                            <p class="card-text mb-0"><strong>Создан:</strong> {{ material.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Отмена
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Сохранить изменения
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %} 
