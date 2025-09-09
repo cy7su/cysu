@@ -138,8 +138,8 @@ def format_description(text: str) -> Markup:
     # Сначала делаем ссылки кликабельными
     text_with_links = make_links_clickable(text)
     
-    # Заменяем переносы строк на <br>
-    text_with_breaks = str(text_with_links).replace('\n', '<br>')
+    # Заменяем экранированные \n на реальные переносы строк, затем на <br>
+    text_with_breaks = str(text_with_links).replace('\\n', '\n').replace('\n', '<br>')
     
     return Markup(text_with_breaks)
 

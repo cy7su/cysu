@@ -87,7 +87,7 @@ class PasswordResetForm(FlaskForm):
 
 class MaterialForm(FlaskForm):
     title = StringField('Название', validators=[DataRequired()])
-    description = TextAreaField('Описание', validators=[Length(max=100, message='Описание не должно превышать 100 символов')])
+    description = TextAreaField('Описание', validators=[Length(max=300, message='Описание не должно превышать 300 символов')])
     type = SelectField('Тип', choices=[('lecture', 'Лекция'), ('assignment', 'Задание')])
     subject_id = SelectField('Предмет', coerce=int, validators=[DataRequired()])
     file = FileField('Файл')
@@ -137,11 +137,17 @@ class GroupForm(FlaskForm):
     """Форма для создания/редактирования группы"""
     name = StringField('Название группы', validators=[
         DataRequired(message='Введите название группы'),
-        Length(min=2, max=100, message='Название должно содержать от 2 до 100 символов')
+        Length(min=2, max=300, message='Название должно содержать от 2 до 300 символов')
     ])
     description = TextAreaField('Описание')
     is_active = BooleanField('Активна')
     submit = SubmitField('Сохранить')
+
+class SolutionForm(FlaskForm):
+    """Форма для загрузки решения задания"""
+    text = TextAreaField('Текстовое решение', validators=[Optional()])
+    file = FileField('Файл решения', validators=[Optional()])
+    submit = SubmitField('Загрузить решение')
 
 class SubjectGroupForm(FlaskForm):
     """Форма для назначения предметов группам"""

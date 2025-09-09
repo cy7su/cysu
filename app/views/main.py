@@ -515,7 +515,13 @@ def material_detail(material_id: int) -> Union[str, Response]:
         flash("Для доступа к материалам необходима активная подписка.", "warning")
         return redirect(url_for("payment.subscription"))
 
-    return render_template("subjects/material_detail.html", material=material)
+    # Создаем форму для загрузки решения (только для заданий)
+    form = None
+    if material.type == 'assignment':
+        from app.forms import SolutionForm
+        form = SolutionForm()
+
+    return render_template("subjects/material_detail.html", material=material, form=form)
 
 
 @main_bp.route("/material/<int:material_id>/add_solution", methods=["POST"])

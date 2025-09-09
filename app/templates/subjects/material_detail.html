@@ -29,7 +29,7 @@
                 </div>
             </div>
             
-            {% if current_user.is_authenticated and material.type == 'assignment' %}
+            {% if current_user.is_authenticated and material.type == 'assignment' and form %}
                 <div class="card mt-4">
                     <div class="card-header">
                         <h4 class="mb-0">Загрузить решение</h4>
