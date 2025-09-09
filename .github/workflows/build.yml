@@ -77,9 +77,117 @@ jobs:
         cache-to: type=gha,mode=max
         platforms: linux/amd64
 
-  deploy:
-    name: 🚀 Deploy
+  release:
+    name: 🚀 Create Release & Package
     needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/TEST'
+    outputs:
+      version: ${{ steps.version.outputs.new_version }}
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🔧 Setup Git
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+    
+    - name: 📈 Calculate version
+      id: version
+      run: |
+        # Получаем последний тег
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+        echo "📌 Last tag: $LAST_TAG"
+        
+        # Парсим версию
+        IFS='.' read -r major minor patch <<< "$LAST_TAG"
+        
+        # Увеличиваем patch версию
+        patch=$((patch + 1))
+        
+        NEW_VERSION="$major.$minor.$patch"
+        echo "🎯 New version: $NEW_VERSION"
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+    
+    - name: 🏷️ Create and push tag
+      run: |
+        TAG_NAME="v${{ steps.version.outputs.new_version }}"
+        echo "🏷️ Creating tag: $TAG_NAME"
+        
+        git tag -a "$TAG_NAME" -m "🚀 Release $TAG_NAME
+        
+        📦 Changes in this release:
+        - Docker image built and pushed 🐳
+        - Code quality checks passed ✅
+        - Automated release via GitHub Actions 🤖
+        
+        🔧 Version: ${{ steps.version.outputs.new_version }}
+        🐍 Python: 3.11
+        🐳 Docker: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+        
+        git push origin "$TAG_NAME"
+        echo "✅ Tag $TAG_NAME pushed successfully"
+    
+    - name: 📦 Create source package
+      run: |
+        echo "📦 Creating source package..."
+        tar -czf cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz \
+          --exclude='.git' \
+          --exclude='__pycache__' \
+          --exclude='*.pyc' \
+          --exclude='.env' \
+          --exclude='app.db' \
+          --exclude='logs' \
+          .
+        echo "✅ Source package created: cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz"
+    
+    - name: 📝 Create GitHub Release with Package
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz
+        tag_name: v${{ steps.version.outputs.new_version }}
+        name: 🚀 Release v${{ steps.version.outputs.new_version }}
+        body: |
+          ## 🎉 New Release v${{ steps.version.outputs.new_version }}
+          
+          ### ✅ Quality Checks
+          - **Code Quality**: All flake8 checks passed
+          - **Python Version**: 3.11
+          - **Tests**: Basic import tests passed
+          
+          ### 🐳 Docker Images
+          - **Latest**: `${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest`
+          - **Tagged**: `${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}`
+          
+          ### 📦 Packages
+          - **Source Code**: `cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz`
+          
+          ### 🚀 How to use
+          ```bash
+          # Pull latest image
+          docker pull ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          
+          # Run container
+          docker run -d -p 8001:8001 \
+            -e SECRET_KEY=your-secret-key \
+            -e DATABASE_URL=sqlite:///app.db \
+            ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          ```
+          
+          ---
+          *🤖 This release was created automatically by GitHub Actions*
+        draft: false
+        prerelease: false
+
+  deploy:
+    name: 🚀 Deploy Summary
+    needs: [build, release]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/TEST'
     steps:
@@ -88,4 +196,6 @@ jobs:
         echo "🎉 Deployment completed successfully!"
         echo "🐳 Docker Image: ${{ needs.build.outputs.image }}"
         echo "📝 Digest: ${{ needs.build.outputs.digest }}"
-        echo "🏷️ Tag: ${{ github.sha }}"
+        echo "🏷️ Version: v${{ needs.release.outputs.version }}"
+        echo "📦 Package: cysu-source-v${{ needs.release.outputs.version }}.tar.gz"
+        echo "🔗 Release: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.release.outputs.version }}"
