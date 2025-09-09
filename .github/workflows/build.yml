@@ -114,8 +114,12 @@ jobs:
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
         echo "📌 Last tag: $LAST_TAG"
         
+        # Убираем 'v' префикс если есть
+        VERSION_NUMBER=${LAST_TAG#v}
+        echo "📌 Version number: $VERSION_NUMBER"
+        
         # Парсим версию
-        IFS='.' read -r major minor patch <<< "$LAST_TAG"
+        IFS='.' read -r major minor patch <<< "$VERSION_NUMBER"
         
         # Увеличиваем версию в зависимости от выбранного типа
         case "${{ github.event.inputs.version_type }}" in
@@ -206,9 +210,7 @@ jobs:
         name: 🚀 Release v${{ steps.version.outputs.new_version }}
         generate_release_notes: true
         body: |
-          ## 🎉 New Release v${{ steps.version.outputs.new_version }}
-          
-          ### ✅ Quality Checks
+          ## ✅ Quality Checks
           - **Code Quality**: All flake8 checks passed
           - **Python Version**: 3.11
           - **Tests**: Basic import tests passed
