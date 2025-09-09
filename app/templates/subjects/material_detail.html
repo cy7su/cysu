@@ -29,26 +29,29 @@
                 </div>
             </div>
             
-            {% if current_user.is_authenticated and material.type == 'assignment' and form %}
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h4 class="mb-0">Загрузить решение</h4>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" enctype="multipart/form-data">
-                            {{ form.hidden_tag() }}
-                            <div class="mb-3">
-                                {{ form.text.label(class="form-label") }}
-                                {{ form.text(class="form-control", rows=5) }}
+            {% if current_user.is_authenticated and material.type == 'assignment' %}
+                {% set my_submission = user_submissions.get(material.id) if user_submissions else None %}
+                {% if my_submission and my_submission.file %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Моё решение</h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">Вы уже загрузили решение для этого задания.</p>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=my_submission.file) }}" class="btn btn-success" target="_blank">
+                                    <i class="fas fa-download me-2"></i>Скачать моё решение
+                                </a>
+                                <form method="POST" action="{{ url_for('main.delete_solution', submission_id=my_submission.id) }}" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Удалить решение?')">
+                                        <i class="fas fa-trash me-2"></i>Удалить решение
+                                    </button>
+                                </form>
                             </div>
-                            <div class="mb-3">
-                                {{ form.file.label(class="form-label") }}
-                                {{ form.file(class="form-control") }}
-                            </div>
-                            {{ form.submit(class="btn btn-primary") }}
-                        </form>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             {% endif %}
         </div>
         

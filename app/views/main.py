@@ -515,13 +515,47 @@ def material_detail(material_id: int) -> Union[str, Response]:
         flash("Для доступа к материалам необходима активная подписка.", "warning")
         return redirect(url_for("payment.subscription"))
 
-    # Создаем форму для загрузки решения (только для заданий)
-    form = None
-    if material.type == 'assignment':
-        from app.forms import SolutionForm
-        form = SolutionForm()
+    # Получаем решения пользователя для заданий
+    user_submissions = {}
+    if material.type == 'assignment' and current_user.is_authenticated:
+        from app.models import Submission
+        submission = Submission.query.filter_by(
+            user_id=current_user.id, 
+            material_id=material_id
+        ).first()
+        if submission:
+            user_submissions[material_id] = submission
 
-    return render_template("subjects/material_detail.html", material=material, form=form)
+    return render_template("subjects/material_detail.html", material=material, user_submissions=user_submissions)
+
+
+@main_bp.route("/submission/<int:submission_id>/delete", methods=["POST"])
+@login_required
+def delete_solution(submission_id: int) -> Response:
+    """Удаление решения пользователя"""
+    from app.models import Submission
+    from app.utils.file_storage import FileStorageManager
+    
+    submission = Submission.query.get_or_404(submission_id)
+    
+    # Проверяем, что пользователь может удалить это решение
+    if submission.user_id != current_user.id:
+        flash("Доступ запрещён", "error")
+        return redirect(url_for("main.index"))
+    
+    # Удаляем файл с диска
+    if submission.file:
+        try:
+            FileStorageManager.delete_file(submission.file)
+        except Exception as e:
+            current_app.logger.error(f"Ошибка при удалении файла {submission.file}: {e}")
+    
+    # Удаляем запись из базы данных
+    db.session.delete(submission)
+    db.session.commit()
+    
+    flash("Решение удалено", "success")
+    return redirect(url_for("main.material_detail", material_id=submission.material_id))
 
 
 @main_bp.route("/material/<int:material_id>/add_solution", methods=["POST"])
