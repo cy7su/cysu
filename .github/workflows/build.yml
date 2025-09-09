@@ -5,6 +5,7 @@ on:
     branches: [ TEST ]
   pull_request:
     branches: [ TEST ]
+  workflow_dispatch:
 
 env:
   DOCKER_REGISTRY: docker.io
