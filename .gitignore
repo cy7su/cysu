@@ -1,73 +1,11 @@
-# ========================================
-# КОНФИДЕНЦИАЛЬНЫЕ ФАЙЛЫ CYSU
-# ========================================
+# Environment variables
 .env
 .env.local
 .env.production
 .env.staging
-.env.development
-.env.test
-secrets.json
-config_secret.py
-secrets.py
-config.py
-*.key
-*.pem
-*.p12
-*.crt
-*.pfx
-*.jks
-credentials.json
-service-account.json
+.env.*.local
 
-# Telegram бот токены
-TG_TOKEN
-TG_ID
-
-# YooKassa ключи
-YOOKASSA_SHOP_ID
-YOOKASSA_SECRET_KEY
-
-# Email настройки
-MAIL_PASSWORD
-MAIL_USERNAME
-
-# ========================================
-# БАЗА ДАННЫХ CYSU
-# ========================================
-*.db
-*.sqlite
-*.sqlite3
-*.sql
-app.db
-app.db.backup
-instance/
-migrations/
-alembic.ini
-
-# Резервные копии БД
-*.db.backup
-*.db.bak
-backup_*.db
-
-# ========================================
-# ЛОГИ И ОТЛАДКА
-# ========================================
-*.log
-logs/
-err.log
-debug.log
-access.log
-error.log
-*.log.*
-app.log
-flask.log
-gunicorn.log
-nginx.log
-
-# ========================================
-# КЭШ PYTHON
-# ========================================
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -88,47 +26,68 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.env/
+.ENV/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+app.db
+app.db.backup
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Logs
+logs/
+*.log
+app.log
+*.log.*
+log/
+
+# Uploads and user content
+app/static/uploads/
+app/static/ticket_files/
+chat_files/
+uploads/
+media/
+
+# Cache directories
+.cache/
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
 .nox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
 
-# ========================================
-# ВИРТУАЛЬНОЕ ОКРУЖЕНИЕ
-# ========================================
-venv/
-env/
-ENV/
-.venv/
-.ENV/
-env.bak/
-venv.bak/
-
-# ========================================
-# IDE И РЕДАКТОРЫ
-# ========================================
+# IDE and editors
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .project
-.classpath
+.pydevproject
 .settings/
 *.sublime-project
 *.sublime-workspace
 
-# ========================================
-# ВРЕМЕННЫЕ ФАЙЛЫ
-# ========================================
-*.tmp
-*.temp
-*.bak
-*.backup
-*.old
-*.orig
-*.rej
+# OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -137,160 +96,79 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 desktop.ini
-
-# ========================================
-# ЗАГРУЖЕННЫЕ ФАЙЛЫ CYSU
-# ========================================
-app/static/uploads/
-app/static/ticket_files/
-app/static/user_files/
-app/static/materials/
-app/static/attachments/
-app/static/avatars/
-app/static/documents/
-app/static/cache/
-app/static/chat_files/
-
-# Файлы пользователей
-user_uploads/
-user_files/
-submissions/
-solutions/
-
-# ========================================
-# КОНФИГУРАЦИОННЫЕ ФАЙЛЫ
-# ========================================
-local_settings.py
-local_config.py
-settings_local.py
-config_local.py
-*.json
-!package.json
-!package-lock.json
-!yarn.lock
-
-# ========================================
-# СИСТЕМНЫЕ ФАЙЛЫ
-# ========================================
-Thumbs.db
-ehthumbs.db
-Desktop.ini
 $RECYCLE.BIN/
-*.cab
-*.msi
-*.msix
-*.msm
-*.msp
-*.lnk
 
-# ========================================
-# CURSOR И РАЗРАБОТКА
-# ========================================
-.cursor-server/
-.cursor/
-.cursorrules
-.cursorignore
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*~
 
-# ========================================
-# УСТАРЕВШИЕ ФАЙЛЫ
-# ========================================
-app/views.py
-app/static/css/style_old.css
-app/services/shortlink_service.py
-app/templates/chat/
-app/templates/tickets/user_ticket_detail.html
+# Project specific
+migrations/
 scrpt/
-main_backup.py
-backup/
-old/
-archive/
+node_modules/
+.npm/
+.yarn/
+package-lock.json
+yarn.lock
 
-# CDN файлы (удалены)
-cdn/
-async_app.py
-async_requirements.txt
+# Flask specific
+instance/
+.webassets-cache
 
-# Старые конфигурации
-nginx.conf.old
-run.py.old
-
-# ========================================
-# ДОПОЛНИТЕЛЬНЫЕ ИСКЛЮЧЕНИЯ
-# ========================================
-*.pid
-*.seed
-*.pid.lock
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
-
-# ========================================
-# DOCKER И КОНТЕЙНЕРЫ
-# ========================================
-.dockerignore
-docker-compose.override.yml
-.docker/
-docker-data/
-
-# ========================================
-# CI/CD И АВТОМАТИЗАЦИЯ
-# ========================================
-.github/workflows/secrets/
-.gitlab-ci-local/
-.circleci/
-.travis.yml
-Jenkinsfile
-azure-pipelines.yml
-
-# ========================================
-# МОНИТОРИНГ И МЕТРИКИ
-# ========================================
-.prometheus/
-.grafana/
-monitoring/
-metrics/
-*.metrics
-
-# ========================================
-# ТЕСТИРОВАНИЕ
-# ========================================
-.coverage
+# Coverage reports
 htmlcov/
-.pytest_cache/
-.tox/
-.nox/
-test-results/
+.coverage
+.coverage.*
 coverage.xml
-junit.xml
+*.cover
+.hypothesis/
 
-# ========================================
-# ДОКУМЕНТАЦИЯ
-# ========================================
-docs/_build/
-site/
-_site/
-.jekyll-cache/
-.jekyll-metadata
+# Jupyter Notebook
+.ipynb_checkpoints
 
-# ========================================
-# РАЗВЕРТЫВАНИЕ CYSU
-# ========================================
-deploy/
-deployment/
-production/
-staging/
-*.tar.gz
-*.zip
-*.rar
+# pyenv
+.python-version
 
-# SSL сертификаты (системные)
-/etc/letsencrypt/
+# pipenv
+Pipfile.lock
 
-# Nginx конфигурации (системные)
-/etc/nginx/sites-available/
-/etc/nginx/sites-enabled/
+# PEP 582
+__pypackages__/
 
-# Systemd сервисы
-*.service
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Security
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
