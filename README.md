@@ -1,5 +1,3 @@
-# 🚀 cysu - Educational Platform
-
 <div align="center">
 
 <img src="https://img.shields.io/badge/Status-%20Active-B595FF?style=for-the-badge&logo=rocket" alt="Status">
