@@ -153,10 +153,10 @@ jobs:
           --exclude='.github/workflows' \
           . temp_package/
         # Создаем архив из временной директории
-        tar -czf cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz -C temp_package .
+        tar -czf cysu-v${{ steps.version.outputs.new_version }}.tar.gz -C temp_package .
         # Удаляем временную директорию
         rm -rf temp_package
-        echo "✅ Source package created: cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz"
+        echo "✅ Source package created: cysu-v${{ steps.version.outputs.new_version }}.tar.gz"
     
     - name: 📦 Publish to GitHub Packages
       run: |
@@ -201,7 +201,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        files: cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz
+        files: cysu-v${{ steps.version.outputs.new_version }}.tar.gz
         tag_name: v${{ steps.version.outputs.new_version }}
         name: 🚀 Release v${{ steps.version.outputs.new_version }}
         generate_release_notes: true
@@ -218,7 +218,7 @@ jobs:
           - **Tagged**: `${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}`
           
           ### 📦 Packages
-          - **Source Code**: `cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz`
+          - **Source Code**: `cysu-v${{ steps.version.outputs.new_version }}.tar.gz`
           - **NPM Package**: `@${{ github.repository_owner }}/cysu@${{ steps.version.outputs.new_version }}`
           
           ### 🚀 How to use
@@ -263,7 +263,7 @@ jobs:
         
         if [ "${{ needs.release.result }}" == "success" ]; then
           echo "🚀 Release created: v${{ needs.release.outputs.version }}"
-          echo "📦 Package: cysu-source-v${{ needs.release.outputs.version }}.tar.gz"
+          echo "📦 Package: cysu-v${{ needs.release.outputs.version }}.tar.gz"
           echo "🔗 Release: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.release.outputs.version }}"
         else
           echo "ℹ️ No release created (disabled or failed)"
