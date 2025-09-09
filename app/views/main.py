@@ -788,6 +788,49 @@ def macro() -> str:
     return render_template("for_my_love/macro.html")
 
 
+@main_bp.route("/redirect")
+def redirect_page() -> str:
+    """Страница редиректа на cysu.ru"""
+    return render_template("redirect.html")
+
+
+@main_bp.route("/redirect/download")
+def download_redirect() -> Response:
+    """Скачивание HTML файла редиректа без кнопки скачать"""
+    from flask import make_response
+    
+    # Читаем содержимое шаблона
+    with open('/root/cysu/app/templates/redirect.html', 'r', encoding='utf-8') as f:
+        html_content = f.read()
+    
+    # Удаляем кнопку скачать из HTML
+    # Ищем и удаляем кнопку скачать и связанные с ней стили
+    import re
+    
+    # Удаляем кнопку скачать из модальных действий
+    html_content = re.sub(
+        r'<a href="/redirect/download"[^>]*download="cysu\.html"[^>]*>.*?</a>\s*',
+        '',
+        html_content,
+        flags=re.DOTALL
+    )
+    
+    # Удаляем стили для кнопки скачать
+    html_content = re.sub(
+        r'\.btn-download\s*\{[^}]*\}',
+        '',
+        html_content,
+        flags=re.DOTALL
+    )
+    
+    # Создаем ответ с HTML файлом
+    response = make_response(html_content)
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    response.headers['Content-Disposition'] = 'attachment; filename="cysu.html"'
+    
+    return response
+
+
 @main_bp.route('/files/<int:subject_id>/<path:filename>', methods=['GET', 'HEAD'])
 def serve_file(subject_id: int, filename: str) -> Response:
     """Отдача файлов с поддержкой Range запросов для PDF"""
