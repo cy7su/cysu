@@ -2,13 +2,14 @@ name: 🐍 Pylint & 🚀 Release
 
 on:
   push:
-    branches: [ test ]
+    branches: [ TEST ]
   pull_request:
-    branches: [ test ]
+    branches: [ TEST ]
+  workflow_dispatch:
 
 env:
   DOCKER_REGISTRY: docker.io
-  IMAGE_NAME: your-app
+  IMAGE_NAME: cysu
 
 jobs:
   pylint:
