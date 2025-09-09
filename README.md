@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)](https://cysu.ru)
 
-## 🚀 Быстрый старт
+## Быстрый старт
 
 ### 1. Клонирование репозитория
 ```bash
