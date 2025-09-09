@@ -58,7 +58,6 @@ jobs:
     name: 🐳 Build Docker Image
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/TEST'
     outputs:
       image: ${{ steps.build.outputs.image }}
       digest: ${{ steps.build.outputs.digest }}
