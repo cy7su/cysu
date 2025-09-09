@@ -114,24 +114,11 @@ jobs:
         echo "🎯 New version: $NEW_VERSION"
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
     
-    - name: 🏷️ Create and push tag
+    - name: 🏷️ Prepare release info
       run: |
         TAG_NAME="v${{ steps.version.outputs.new_version }}"
-        echo "🏷️ Creating tag: $TAG_NAME"
-        
-        git tag -a "$TAG_NAME" -m "🚀 Release $TAG_NAME
-        
-        📦 Changes in this release:
-        - Docker image built and pushed 🐳
-        - Code quality checks passed ✅
-        - Automated release via GitHub Actions 🤖
-        
-        🔧 Version: ${{ steps.version.outputs.new_version }}
-        🐍 Python: 3.11
-        🐳 Docker: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
-        
-        git push origin "$TAG_NAME"
-        echo "✅ Tag $TAG_NAME pushed successfully"
+        echo "🏷️ Preparing release: $TAG_NAME"
+        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
     
     - name: 📦 Create source package
       run: |
@@ -154,6 +141,7 @@ jobs:
         files: cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz
         tag_name: v${{ steps.version.outputs.new_version }}
         name: 🚀 Release v${{ steps.version.outputs.new_version }}
+        generate_release_notes: true
         body: |
           ## 🎉 New Release v${{ steps.version.outputs.new_version }}
           
