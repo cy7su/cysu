@@ -123,14 +123,22 @@ jobs:
     - name: 📦 Create source package
       run: |
         echo "📦 Creating source package..."
-        tar -czf cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz \
-          --exclude='.git' \
+        # Создаем временную директорию для архивации
+        mkdir -p temp_package
+        # Копируем файлы, исключая ненужные
+        rsync -av --exclude='.git' \
           --exclude='__pycache__' \
           --exclude='*.pyc' \
           --exclude='.env' \
           --exclude='app.db' \
           --exclude='logs' \
-          .
+          --exclude='temp_package' \
+          --exclude='.github/workflows' \
+          . temp_package/
+        # Создаем архив из временной директории
+        tar -czf cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz -C temp_package .
+        # Удаляем временную директорию
+        rm -rf temp_package
         echo "✅ Source package created: cysu-source-v${{ steps.version.outputs.new_version }}.tar.gz"
     
     - name: 📝 Create GitHub Release with Package
