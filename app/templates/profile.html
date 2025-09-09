@@ -35,10 +35,11 @@
                                 <div class="col-12">
                                     <div class="p-3" style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 8px;">
                                         <div class="d-flex align-items-center mb-2">
-                                            <i class="fas fa-envelope me-3 text-primary" style="width: 20px;"></i>
+                                            {% set contact = user | format_user_contact %}
+                                            <i class="{{ contact.icon }} me-3 text-primary" style="width: 20px;"></i>
                                             <div class="flex-grow-1">
-                                                <small class="text-muted d-block">Email</small>
-                                                <span class="text-primary">{{ user.email }}</span>
+                                                <small class="text-muted d-block">{{ 'Telegram' if contact.type == 'telegram' else 'Email' }}</small>
+                                                <span class="text-primary">{{ contact.display }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -93,9 +94,12 @@
                                             <i class="fas fa-crown me-3 text-primary" style="width: 20px;"></i>
                                             <div class="flex-grow-1">
                                                 <small class="text-muted d-block">Статус подписки</small>
-                                                {% if is_subscribed %}
+                                                {% if subscription_type == "trial" %}
+                                                    <span class="text-info">Пробная</span>
+                                                    <br><small class="text-muted">Действует до: {{ subscription_expires.strftime('%d.%m.%Y') if subscription_expires else 'Не указано' }}</small>
+                                                {% elif subscription_type == "active" %}
                                                     <span class="text-success">Активна</span>
-                                                    <br><small class="text-muted">Действует до: {{ user.subscription_expires.strftime('%d.%m.%Y') if user.subscription_expires else 'Не указано' }}</small>
+                                                    <br><small class="text-muted">Действует до: {{ subscription_expires.strftime('%d.%m.%Y') if subscription_expires else 'Не указано' }}</small>
                                                 {% else %}
                                                     <span class="text-warning">Неактивна</span>
                                                     <br><small class="text-muted">Для доступа ко всем материалам необходима активная подписка</small>

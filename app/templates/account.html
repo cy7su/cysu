@@ -9,7 +9,7 @@
         <div class="card mb-3">
             <div class="card-body">
                 <h5 class="card-title">{{ sub.material.title }}</h5>
-                <a href="{{ url_for('static', filename='uploads/' + sub.file) }}" target="_blank">Файл</a>
+                <a href="{{ url_for('main.serve_file', subject_id=sub.material.subject_id, filename=sub.file | extract_filename) }}" target="_blank">Файл</a>
             </div>
         </div>
     {% endfor %}

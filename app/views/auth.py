@@ -15,7 +15,6 @@ from .. import db, login_manager
 
 auth_bp = Blueprint("auth", __name__)
 
-
 @login_manager.user_loader
 def load_user(user_id: str):
     """Загрузчик пользователя для Flask-Login"""
@@ -25,13 +24,12 @@ def load_user(user_id: str):
         current_app.logger.error(f"Error loading user {user_id}: {e}")
         return None
 
-
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login() -> Union[str, Response]:
     """Страница входа"""
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
-    
+
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -39,16 +37,15 @@ def login() -> Union[str, Response]:
             login_user(user)
             return redirect(url_for("main.index"))
         flash("Неверное имя пользователя или пароль")
-    
-    return render_template("auth/login.html", form=form)
 
+    return render_template("auth/login.html", form=form)
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register() -> Union[str, Response]:
     """Страница регистрации"""
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
-    
+
     form = RegistrationForm()
     current_app.logger.info(f"Регистрация - метод: {request.method}")
 
@@ -114,7 +111,6 @@ def register() -> Union[str, Response]:
 
     return render_template("auth/register.html", form=form)
 
-
 @auth_bp.route("/email/verification", methods=["GET", "POST"])
 def email_verification() -> Union[str, Response]:
     """Страница подтверждения email"""
@@ -139,9 +135,10 @@ def email_verification() -> Union[str, Response]:
                 hashed_password = generate_password_hash(
                     pending_registration["password"]
                 )
-                # Проверяем настройку пробной подписки
+                # Проверяем настройки пробной подписки
                 trial_enabled = SiteSettings.get_setting('trial_subscription_enabled', True)
-                
+                trial_days = int(SiteSettings.get_setting('trial_subscription_days', 7))
+
                 user = User(
                     username=pending_registration["username"],
                     email=pending_registration["email"],
@@ -149,7 +146,7 @@ def email_verification() -> Union[str, Response]:
                     is_verified=True,  # Пользователь подтвержден
                     group_id=pending_registration.get("group_id") if pending_registration.get("group_id") else None,
                     is_trial_subscription=trial_enabled,  # Активируем пробную подписку только если включено
-                    trial_subscription_expires=datetime.utcnow() + timedelta(days=14) if trial_enabled else None,  # 14 дней пробной подписки
+                    trial_subscription_expires=datetime.utcnow() + timedelta(days=trial_days) if trial_enabled else None,  # Используем настройку количества дней
                 )
                 db.session.add(user)
                 db.session.commit()
@@ -188,7 +185,6 @@ def email_verification() -> Union[str, Response]:
         form=form,
         user_email=pending_registration["email"],
     )
-
 
 @auth_bp.route("/email/resend", methods=["GET", "POST"])
 def resend_verification() -> Union[str, Response]:
@@ -233,7 +229,6 @@ def resend_verification() -> Union[str, Response]:
 
     return redirect(url_for("auth.email_verification"))
 
-
 @auth_bp.route("/password/reset", methods=["GET", "POST"])
 def password_reset_request() -> Union[str, Response]:
     """Страница запроса восстановления пароля"""
@@ -277,7 +272,6 @@ def password_reset_request() -> Union[str, Response]:
 
     return render_template("auth/password_reset_request.html", form=form)
 
-
 @auth_bp.route("/password/reset/confirm", methods=["GET", "POST"])
 def password_reset_confirm() -> Union[str, Response]:
     """Страница подтверждения кода и смены пароля"""
@@ -319,7 +313,6 @@ def password_reset_confirm() -> Union[str, Response]:
             flash("Неверный код или код истек. Попробуйте еще раз.", "error")
 
     return render_template("auth/password_reset_confirm.html", form=form)
-
 
 @auth_bp.route("/logout")
 @login_required

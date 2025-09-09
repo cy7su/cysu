@@ -7,8 +7,13 @@
     <div class="row">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h2 class="mb-0">{{ material.title }}</h2>
+                    {% if current_user.is_authenticated and current_user.can_manage_materials() %}
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
+                            <i class="fas fa-edit me-1"></i>Редактировать
+                        </button>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     {% if material.description %}
@@ -16,13 +21,13 @@
                     {% endif %}
                     
                         {% if material.file %}
-    <a href="{{ url_for('static', filename='uploads/' + material.file) }}" class="btn btn-primary" target="_blank">
+    <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}" class="btn btn-primary" target="_blank">
         <i class="fas fa-download me-2"></i>Скачать материал
     </a>
     {% endif %}
                     
                     {% if material.solution_file %}
-                        <a href="{{ url_for('static', filename='uploads/' + material.solution_file) }}" class="btn btn-success" target="_blank">
+                        <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.solution_file | extract_filename) }}" class="btn btn-success" target="_blank">
                             <i class="fas fa-check me-2"></i>Готовое решение
                         </a>
                     {% endif %}
@@ -30,25 +35,28 @@
             </div>
             
             {% if current_user.is_authenticated and material.type == 'assignment' %}
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h4 class="mb-0">Загрузить решение</h4>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" enctype="multipart/form-data">
-                            {{ form.hidden_tag() }}
-                            <div class="mb-3">
-                                {{ form.text.label(class="form-label") }}
-                                {{ form.text(class="form-control", rows=5) }}
+                {% set my_submission = user_submissions.get(material.id) if user_submissions else None %}
+                {% if my_submission and my_submission.file %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Моё решение</h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">Вы уже загрузили решение для этого задания.</p>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=my_submission.file) }}" class="btn btn-success" target="_blank">
+                                    <i class="fas fa-download me-2"></i>Скачать моё решение
+                                </a>
+                                <form method="POST" action="{{ url_for('main.delete_solution', submission_id=my_submission.id) }}" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Удалить решение?')">
+                                        <i class="fas fa-trash me-2"></i>Удалить решение
+                                    </button>
+                                </form>
                             </div>
-                            <div class="mb-3">
-                                {{ form.file.label(class="form-label") }}
-                                {{ form.file(class="form-control") }}
-                            </div>
-                            {{ form.submit(class="btn btn-primary") }}
-                        </form>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             {% endif %}
         </div>
         
@@ -66,4 +74,53 @@
         </div>
     </div>
 </div>
+
+<!-- Модальное окно для редактирования материала -->
+{% if current_user.is_authenticated and current_user.can_manage_materials() %}
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">
+                    <i class="fas fa-edit me-2"></i>Редактирование материала
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('main.edit_material', material_id=material.id) }}">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Название</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ material.title }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" maxlength="300">{{ material.description or '' }}</textarea>
+                        <div class="form-text">Максимум 300 символов</div>
+                    </div>
+                    
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Информация о материале</h6>
+                            <p class="card-text mb-1"><strong>Предмет:</strong> {{ material.subject.title }}</p>
+                            <p class="card-text mb-1"><strong>Тип:</strong> {{ 'Лекция' if material.type == 'lecture' else 'Практика' }}</p>
+                            <p class="card-text mb-0"><strong>Создан:</strong> {{ material.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Отмена
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Сохранить изменения
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %} 

@@ -1,0 +1,31 @@
+# Основные зависимости Flask
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-Migrate==4.0.5
+Flask-Mail==0.9.1
+Flask-WTF==1.2.1
+
+# База данных
+SQLAlchemy==2.0.23
+
+# Формы и валидация
+WTForms==3.1.1
+
+# Безопасность
+Werkzeug==3.0.1
+
+# Переменные окружения
+python-dotenv==1.0.0
+
+# HTTP запросы
+requests==2.31.0
+
+# Telegram Bot
+python-telegram-bot==20.7
+
+# Почта
+blinker==1.7.0
+
+# Утилиты
+MarkupSafe==2.1.3

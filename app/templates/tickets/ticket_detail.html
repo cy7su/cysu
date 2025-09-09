@@ -3,192 +3,133 @@
 {% block title %}Тикет #{{ ticket.id }} - cysu{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <!-- Заголовок тикета -->
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0">
-                        <i class="fas fa-ticket-alt text-primary me-2"></i>
-                        Тикет #{{ ticket.id }}: {{ ticket.subject }}
-                    </h5>
-                    <small class="text-muted">Создан {{ ticket.created_at.strftime('%d.%m.%Y в %H:%M') }}</small>
-                </div>
-                <div class="d-flex gap-2">
-                    {% if ticket.status == 'pending' %}
-                        <span class="badge bg-warning text-dark">Ожидает обработки</span>
-                    {% elif ticket.status == 'accepted' %}
-                        <span class="badge bg-success">Принят</span>
-                    {% elif ticket.status == 'rejected' %}
-                        <span class="badge bg-danger">Отклонен</span>
-                    {% elif ticket.status == 'closed' %}
-                        <span class="badge bg-secondary">Закрыт</span>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
+<div class="container py-4">
+    <!-- Простой заголовок -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Тикет #{{ ticket.id }}</h2>
+            <p class="text-muted mb-0">{{ ticket.subject }}</p>
+        </div>
+        <div>
+            {% if ticket.status == 'pending' %}
+                <span class="badge bg-warning text-dark">Ожидает</span>
+            {% elif ticket.status == 'accepted' %}
+                <span class="badge bg-success">Принят</span>
+            {% elif ticket.status == 'rejected' %}
+                <span class="badge bg-danger">Отклонен</span>
+            {% elif ticket.status == 'closed' %}
+                <span class="badge bg-secondary">Закрыт</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Информация о тикете -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-2"><strong>Создан:</strong> {{ ticket.created_at.strftime('%d.%m.%Y в %H:%M') }}</p>
                     {% if current_user.is_admin and current_user.admin_mode_enabled %}
-                    <div class="col-md-6">
-                        <h6 class="text-white mb-2">Информация о пользователе</h6>
-                        <p class="mb-1"><strong class="text-white">Имя:</strong> <span class="text-muted">{{ ticket.user.username }}</span></p>
-                        <p class="mb-1"><strong class="text-white">Email:</strong> <span class="text-muted">{{ ticket.user.email }}</span></p>
-                        <p class="mb-0"><strong class="text-white">ID пользователя:</strong> <span class="text-muted">{{ ticket.user.id }}</span></p>
-                    </div>
+                    <p class="mb-2"><strong>Автор:</strong> {{ ticket.user.username }}</p>
+                    <p class="mb-0"><strong>Email:</strong> {{ ticket.user.email }}</p>
                     {% endif %}
-                    <div class="col-md-6">
-                        <h6 class="text-white mb-2">Детали тикета</h6>
-                        <p class="mb-1"><strong class="text-white">Статус:</strong> 
-                            {% if ticket.status == 'pending' %}
-                                <span class="text-warning">Ожидает</span>
-                            {% elif ticket.status == 'accepted' %}
-                                <span class="text-success">Принят</span>
-                            {% elif ticket.status == 'rejected' %}
-                                <span class="text-danger">Отклонен</span>
-                            {% elif ticket.status == 'closed' %}
-                                <span class="text-secondary">Закрыт</span>
-                            {% endif %}
-                        </p>
-                        <p class="mb-1"><strong class="text-white">Создан:</strong> <span class="text-muted">{{ ticket.created_at.strftime('%d.%m.%Y в %H:%M') }}</span></p>
-                        {% if ticket.updated_at != ticket.created_at %}
-                        <p class="mb-0"><strong class="text-white">Обновлен:</strong> <span class="text-muted">{{ ticket.updated_at.strftime('%d.%m.%Y в %H:%M') }}</span></p>
-                        {% endif %}
-                    </div>
+                </div>
+                <div class="col-md-6">
+                    {% if ticket.updated_at != ticket.created_at %}
+                    <p class="mb-0"><strong>Обновлен:</strong> {{ ticket.updated_at.strftime('%d.%m.%Y в %H:%M') }}</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Сообщения тикета -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-comments text-primary me-2"></i>
-                    Переписка
-                </h6>
-            </div>
-            <div class="card-body" style="max-height: 500px; overflow-y: auto;">
-                <!-- Исходное сообщение -->
-                <div class="message mb-3">
-                    <div class="d-flex align-items-start">
-                        <div class="flex-shrink-0">
-                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                <i class="fas fa-user text-white"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <div class="bg-light rounded p-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <strong class="text-dark">{{ ticket.user.username }}</strong>
-                                    <small class="text-muted">{{ ticket.created_at.strftime('%d.%m.%Y в %H:%M') }}</small>
-                                </div>
-                                <p class="mb-0 text-dark">{{ ticket.message }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сообщения переписки -->
-                {% for message in ticket.messages %}
-                <div class="message mb-3">
-                    <div class="d-flex align-items-start">
-                        <div class="flex-shrink-0">
-                            {% if message.is_admin %}
-                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-user-shield text-white"></i>
-                                </div>
-                            {% else %}
-                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-user text-white"></i>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <div class="{% if message.is_admin %}bg-success{% else %}bg-light{% endif %} rounded p-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <strong class="{% if message.is_admin %}text-white{% else %}text-dark{% endif %}">
-                                        {% if message.is_admin %}Администратор{% else %}{{ message.user.username }}{% endif %}
-                                    </strong>
-                                    <small class="{% if message.is_admin %}text-white-50{% else %}text-muted{% endif %}">
-                                        {{ message.created_at.strftime('%d.%m.%Y в %H:%M') }}
-                                    </small>
-                                </div>
-                                <p class="mb-0 {% if message.is_admin %}text-white{% else %}text-dark{% endif %}">{{ message.message }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+    <!-- Сообщения -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Сообщения</h5>
         </div>
-
-        <!-- Форма ответа -->
-        {% if ticket.status != 'closed' %}
-        <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-reply text-primary me-2"></i>
-                    Ответить
-                </h6>
+        <div class="card-body">
+            <!-- Исходное сообщение -->
+            <div class="mb-3">
+                <div class="d-flex {% if ticket.user_id == current_user.id %}justify-content-end{% else %}justify-content-start{% endif %}">
+                    <div class="{% if ticket.user_id == current_user.id %}text-end{% else %}text-start{% endif %}" style="max-width: 70%;">
+                        <div class="{% if ticket.user_id == current_user.id %}text-white{% else %}bg-light{% endif %} rounded-3 p-3 mb-1" {% if ticket.user_id == current_user.id %}style="background-color: var(--primary-color) !important;"{% endif %}>
+                            <p class="mb-0">{{ ticket.message }}</p>
+                        </div>
+                        <small class="text-muted">{{ ticket.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <form id="responseForm" enctype="multipart/form-data">
-                    <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
-                    <div class="mb-3">
-                        <label for="message" class="form-label">Сообщение</label>
-                        <textarea class="form-control" id="message" name="message" rows="4" required placeholder="Введите ваш ответ..."></textarea>
+
+            <!-- Ответы -->
+            {% for message in ticket.messages %}
+            <div class="mb-3">
+                <div class="d-flex {% if message.user_id == current_user.id %}justify-content-end{% else %}justify-content-start{% endif %}">
+                    <div class="{% if message.user_id == current_user.id %}text-end{% else %}text-start{% endif %}" style="max-width: 70%;">
+                        <div class="{% if message.user_id == current_user.id %}text-white{% else %}bg-light{% endif %} rounded-3 p-3 mb-1" {% if message.user_id == current_user.id %}style="background-color: var(--primary-color) !important;"{% endif %}>
+                            <p class="mb-0">{{ message.message }}</p>
+                        </div>
+                        <small class="text-muted">{{ message.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
                     </div>
-                    <div class="mb-3">
-                        <label for="files" class="form-label">Прикрепить файлы (необязательно)</label>
-                        <input type="file" class="form-control" id="files" name="files" multiple accept=".png,.jpg,.jpeg,.gif,.pdf,.doc,.docx,.txt,.zip,.rar">
-                        <div class="form-text">Максимальный размер файла: 10MB</div>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ url_for('tickets.tickets') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Назад к списку
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane me-2"></i>Отправить ответ
-                        </button>
-                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Форма ответа -->
+    {% if ticket.status != 'closed' %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Ответить</h5>
+        </div>
+        <div class="card-body">
+            <form id="responseForm" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+                <div class="mb-3">
+                    <label for="message" class="form-label">Сообщение</label>
+                    <textarea class="form-control" id="message" name="message" rows="4" required placeholder="Введите ваш ответ..."></textarea>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('tickets.tickets') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Назад
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-2"></i>Отправить
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Админские действия -->
+    {% if current_user.is_admin and current_user.admin_mode_enabled and ticket.status != 'closed' %}
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">Действия администратора</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex gap-2 flex-wrap">
+                {% if ticket.status == 'pending' %}
+                    <form method="POST" action="{{ url_for('tickets.accept_ticket', ticket_id=ticket.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-success">Принять</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('tickets.reject_ticket', ticket_id=ticket.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-danger">Отклонить</button>
+                    </form>
+                {% endif %}
+                <form method="POST" action="{{ url_for('tickets.close_ticket', ticket_id=ticket.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-secondary">Закрыть</button>
                 </form>
             </div>
         </div>
-        {% endif %}
-
-        <!-- Админские действия -->
-        {% if current_user.is_admin and current_user.admin_mode_enabled and ticket.status != 'closed' %}
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-cogs text-warning me-2"></i>
-                    Действия администратора
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="d-flex gap-2 flex-wrap">
-                    {% if ticket.status == 'pending' %}
-                        <form method="POST" action="{{ url_for('tickets.accept_ticket', ticket_id=ticket.id) }}" class="d-inline">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-check me-2"></i>Принять
-                            </button>
-                        </form>
-                        <form method="POST" action="{{ url_for('tickets.reject_ticket', ticket_id=ticket.id) }}" class="d-inline">
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-times me-2"></i>Отклонить
-                            </button>
-                        </form>
-                    {% endif %}
-                    <form method="POST" action="{{ url_for('tickets.close_ticket', ticket_id=ticket.id) }}" class="d-inline">
-                        <button type="submit" class="btn btn-secondary">
-                            <i class="fas fa-lock me-2"></i>Закрыть
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        {% endif %}
     </div>
+    {% endif %}
 </div>
 
 <script>
@@ -204,9 +145,17 @@ document.getElementById('responseForm').addEventListener('submit', function(e) {
     
     fetch('{{ url_for("tickets.ticket_response") }}', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+        }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             location.reload();
@@ -216,7 +165,7 @@ document.getElementById('responseForm').addEventListener('submit', function(e) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Произошла ошибка при отправке ответа');
+        alert('Произошла ошибка при отправке ответа: ' + error.message);
     })
     .finally(() => {
         submitBtn.innerHTML = originalText;

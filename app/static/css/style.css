@@ -250,8 +250,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    transform: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .card-header {
@@ -538,7 +538,6 @@ a:hover {
 
 /* Ссылки в описании материалов */
 .text-muted a {
-    color: #B595FF !important;
     text-decoration: none;
     word-break: break-all;
     font-size: 0.8rem;
@@ -547,7 +546,7 @@ a:hover {
 }
 
 .text-muted a:hover {
-    color: #9A7FE6 !important;
+    color: #B595FF !important;
     text-decoration: underline;
     opacity: 1;
 }
@@ -604,12 +603,15 @@ a:hover {
 
 .dropdown-menu {
     background-color: var(--dp-02);
-    border: 1px solid var(--border-secondary);
-    border-radius: 20px;
+    border: none;
+    border-radius: 0;
     z-index: 1050;
     position: absolute;
     min-width: 200px;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    box-shadow: none;
+    padding: 0;
+    backdrop-filter: none;
+    overflow: hidden;
 }
 
 .dropdown-menu.show {
@@ -618,27 +620,36 @@ a:hover {
 
 .dropdown-item {
     color: var(--text-primary);
-    padding: 0.5rem 1rem;
-    border-radius: 10px;
-    margin: 0.25rem;
-    transition: all 0.2s ease;
+    padding: 12px 16px;
+    border-radius: 0;
+    margin: 0;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    border: none;
+    background-color: transparent !important;
 }
 
 .dropdown-item:hover {
-    background-color: var(--dp-04);
-    color: var(--text-primary);
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
 }
 
 .dropdown-item:focus {
-    background-color: var(--dp-04);
-    color: var(--text-primary);
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
     outline: none;
-    box-shadow: 0 0 0 2px var(--primary-color);
 }
 
 .dropdown-item:active {
-    background-color: var(--dp-04);
-    color: var(--text-primary);
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+}
+
+.dropdown-divider {
+    border-color: var(--border-secondary);
+    margin: 8px 0;
 }
 
 /* ========================================
@@ -728,7 +739,7 @@ a:hover {
 
 .subject-card:hover {
     background-color: var(--dp-04);
-    transform: translateY(-2px);
+    transform: none;
     border-color: var(--primary-color);
     border-width: 2px;
 }
@@ -808,7 +819,7 @@ a:hover {
    ======================================== */
 
 .bg-light, .bg-white, .bg-body, .bg-body-tertiary {
-    background-color: var(--dp-02);
+    background-color: var(--dp-08) !important;
 }
 
 .text-dark, .text-body {
@@ -1025,6 +1036,94 @@ a:hover {
     
     .admin-users .table {
         font-size: 0.8rem;
+    }
+    
+    /* ========================================
+       МОБИЛЬНЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ ПРЕДМЕТА
+       ======================================== */
+    
+    /* Контейнер кнопок на мобильных - всегда справа */
+    .mobile-buttons-container {
+        order: 2;
+        flex-shrink: 0;
+        margin-left: auto;
+    }
+    
+    /* Кнопки файлов и решений на мобильных */
+    .mobile-file-btn,
+    .mobile-solution-btn,
+    .mobile-upload-btn {
+        min-width: 80px;
+        font-size: 0.75rem !important;
+        padding: 4px 6px !important;
+        white-space: nowrap;
+    }
+    
+    /* Кнопки удаления на мобильных - более светлые */
+    .mobile-delete-btn {
+        background-color: rgba(244, 67, 54, 0.1) !important;
+        border-color: rgba(244, 67, 54, 0.3) !important;
+        color: rgba(244, 67, 54, 0.8) !important;
+        font-size: 0.75rem !important;
+        padding: 4px 6px !important;
+    }
+    
+    .mobile-delete-btn:hover {
+        background-color: rgba(244, 67, 54, 0.2) !important;
+        border-color: rgba(244, 67, 54, 0.5) !important;
+        color: rgba(244, 67, 54, 1) !important;
+    }
+    
+    /* Админские кнопки редактирования и удаления - более светлые */
+    .mobile-edit-btn {
+        background-color: rgba(255, 152, 0, 0.1) !important;
+        border-color: rgba(255, 152, 0, 0.3) !important;
+        color: rgba(255, 152, 0, 0.8) !important;
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+    }
+    
+    .mobile-edit-btn:hover {
+        background-color: rgba(255, 152, 0, 0.2) !important;
+        border-color: rgba(255, 152, 0, 0.5) !important;
+        color: rgba(255, 152, 0, 1) !important;
+    }
+    
+    .mobile-delete-subject-btn {
+        background-color: rgba(244, 67, 54, 0.1) !important;
+        border-color: rgba(244, 67, 54, 0.3) !important;
+        color: rgba(244, 67, 54, 0.8) !important;
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+    }
+    
+    .mobile-delete-subject-btn:hover {
+        background-color: rgba(244, 67, 54, 0.2) !important;
+        border-color: rgba(244, 67, 54, 0.5) !important;
+        color: rgba(244, 67, 54, 1) !important;
+    }
+    
+    /* Адаптивность для очень маленьких экранов */
+    @media (max-width: 480px) {
+        .mobile-buttons-container {
+            flex-direction: column;
+            gap: 4px !important;
+        }
+        
+        .mobile-file-btn,
+        .mobile-solution-btn,
+        .mobile-upload-btn,
+        .mobile-delete-btn {
+            min-width: 70px;
+            font-size: 0.7rem !important;
+            padding: 3px 5px !important;
+        }
+        
+        .mobile-edit-btn,
+        .mobile-delete-subject-btn {
+            font-size: 0.7rem !important;
+            padding: 3px 6px !important;
+        }
     }
 }
 
@@ -1716,4 +1815,96 @@ body.modal-open {
     min-height: 120px;
     position: relative;
     overflow: hidden;
+}
+
+/* ========================================
+   СТИЛИ ДЛЯ ССЫЛОК
+   ======================================== */
+
+/* Стили для внешних ссылок */
+.external-link {
+    display: inline-block;
+    background-color: transparent;
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.external-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.external-link:hover {
+    color: var(--primary-color);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.external-link:hover::before {
+    width: 100%;
+    left: 0;
+    transform: translateX(0);
+}
+
+.external-link::after {
+    content: "↗";
+    margin-left: 4px;
+    font-size: 0.8rem;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.external-link:hover::after {
+    opacity: 1;
+}
+
+/* Специальные стили для GitHub Gist ссылок */
+.gist-link {
+    color: var(--primary-color);
+}
+
+.gist-link::before {
+    background-color: var(--primary-color);
+}
+
+.gist-link:hover {
+    color: var(--primary-hover);
+}
+
+.gist-link:hover::before {
+    background-color: var(--primary-hover);
+}
+
+/* Адаптивные стили для ссылок */
+@media (max-width: 768px) {
+    .external-link {
+        max-width: 150px;
+        font-size: 0.8rem;
+        padding: 3px 6px;
+    }
+}
+
+@media (max-width: 576px) {
+    .external-link {
+        max-width: 120px;
+        font-size: 0.75rem;
+        padding: 2px 4px;
+    }
 }

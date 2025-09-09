@@ -21,7 +21,7 @@
                 <td>{{ material.title }}</td>
                 <td>{{ material.subject.title }}</td>
                 <td>{{ material.type }}</td>
-                <td>{% if material.file %}<a href="{{ url_for('static', filename='uploads/' + material.file) }}" target="_blank">Файл</a>{% endif %}</td>
+                <td>{% if material.file %}<a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}" target="_blank">Файл</a>{% endif %}</td>
                 <td>
                     <form method="post" action="{{ url_for('main.delete_material', material_id=material.id) }}" style="display:inline;">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

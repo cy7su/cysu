@@ -5,7 +5,6 @@ from flask import current_app
 
 logger = logging.getLogger(__name__)
 
-
 class EmailService:
     """
     Сервис для отправки email сообщений (вертикальный современный шаблон)
@@ -37,116 +36,145 @@ class EmailService:
                     body {{
                         margin: 0;
                         padding: 20px;
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        background-color: #0e0e0f;
-                        color: #ffffff;
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                        background-color: #f8f9fa;
+                        color: #212529;
+                        line-height: 1.6;
                     }}
                     .container {{
                         max-width: 600px;
                         margin: 0 auto;
-                        background: #1a1a1a;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                        background: #ffffff;
+                        border-radius: 20px;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                         overflow: hidden;
+                        border: 1px solid #e9ecef;
                     }}
                     .header {{
-                        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-                        padding: 25px 30px;
+                        background: linear-gradient(135deg, #B595FF 0%, #9A7FE6 100%);
+                        padding: 40px 30px;
                         text-align: center;
                         color: white;
+                        position: relative;
+                    }}
+                    .header::before {{
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: linear-gradient(45deg, rgba(181, 149, 255, 0.1) 0%, rgba(154, 127, 230, 0.1) 100%);
+                    }}
+                    .header-content {{
+                        position: relative;
+                        z-index: 1;
                     }}
                     .header h1 {{
                         margin: 0;
-                        font-size: 24px;
+                        font-size: 28px;
                         font-weight: 600;
                     }}
                     .header p {{
-                        margin: 8px 0 0 0;
-                        opacity: 0.9;
-                        font-size: 14px;
+                        margin: 10px 0 0 0;
+                        opacity: 0.95;
+                        font-size: 16px;
+                        font-weight: 400;
                     }}
                     .content {{
                         padding: 40px 30px;
                         text-align: center;
                     }}
                     .verification-title {{
-                        font-size: 22px;
+                        font-size: 24px;
                         font-weight: 600;
-                        color: #ffffff;
-                        margin-bottom: 10px;
+                        color: #212529;
+                        margin-bottom: 15px;
                     }}
                     .verification-desc {{
-                        color: #b0b0b0;
+                        color: #6c757d;
                         font-size: 16px;
-                        margin-bottom: 30px;
-                        line-height: 1.5;
+                        margin-bottom: 35px;
+                        line-height: 1.6;
                     }}
                     .code-container {{
-                        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-                        border: 2px solid #3a3a3a;
-                        border-radius: 12px;
-                        padding: 30px;
-                        margin: 20px 0;
+                        background: #f8f9fa;
+                        border: 2px solid #e9ecef;
+                        border-radius: 20px;
+                        padding: 35px;
+                        margin: 25px 0;
                         display: inline-block;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
                     }}
                     .verification-code {{
-                        font-size: 36px;
+                        font-size: 42px;
                         font-weight: 700;
                         font-family: 'Courier New', monospace;
-                        color: #ffffff;
-                        letter-spacing: 8px;
+                        color: #B595FF;
+                        letter-spacing: 12px;
                         margin: 0;
                     }}
                     .code-info {{
-                        color: #b0b0b0;
+                        color: #6c757d;
                         font-size: 14px;
-                        margin-top: 15px;
+                        margin-top: 20px;
+                        font-weight: 500;
                     }}
                     .footer {{
-                        background: #0e0e0f;
+                        background: #f8f9fa;
                         padding: 30px;
                         text-align: center;
-                        border-top: 1px solid #2a2a2a;
+                        border-top: 1px solid #e9ecef;
                     }}
                     .footer p {{
-                        margin: 5px 0;
-                        color: #b0b0b0;
+                        margin: 8px 0;
+                        color: #6c757d;
                         font-size: 14px;
                     }}
                     .warning {{
-                        background: rgba(255, 193, 7, 0.1);
-                        border: 1px solid #ffc107;
-                        border-radius: 8px;
-                        padding: 15px;
-                        margin: 20px 0;
-                        color: #ffc107;
+                        background: rgba(255, 152, 0, 0.1);
+                        border: 1px solid #FF9800;
+                        border-radius: 20px;
+                        padding: 20px;
+                        margin: 25px 0;
+                        color: #FF9800;
                         font-size: 14px;
+                        font-weight: 500;
+                    }}
+                    .logo {{
+                        font-size: 32px;
+                        font-weight: 600;
+                        color: white;
+                        margin-bottom: 10px;
                     }}
                 </style>
             </head>
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>Добро пожаловать в cysu</h1>
-                        <p>Современная образовательная платформа нового поколения</p>
+                        <div class="header-content">
+                            <div class="logo">cysu</div>
+                            <h1>Добро пожаловать!</h1>
+                            <p>Современная образовательная платформа</p>
+                        </div>
                     </div>
                     <div class="content">
-                        <div class="verification-title">Подтвердите ваш email!</div>
+                        <div class="verification-title">Подтвердите ваш email</div>
                         <div class="verification-desc">
                             Для завершения регистрации введите код<br>
                             подтверждения ниже
                         </div>
                         <div class="code-container">
-                            <div class="verification-code">{' '.join(verification_code)}</div>
+                            <div class="verification-code">{verification_code}</div>
                             <div class="code-info">Код действителен в течение 15 минут</div>
                         </div>
                         <div class="warning">
-                            Если вы не регистрировались в cysu, просто проигнорируйте это письмо.
+                            ⚠️ Если вы не регистрировались в cysu, просто проигнорируйте это письмо.
                         </div>
                     </div>
                     <div class="footer">
                         <p>© 2025 cysu. Все права защищены.</p>
-                        <p>Современная образовательная платформа</p>
+                        <p>Современная образовательная платформа нового поколения</p>
                     </div>
                 </div>
             </body>
@@ -154,15 +182,15 @@ class EmailService:
             """
             text_body = f"""
             Добро пожаловать в cysu!
-            
+
             Для завершения регистрации введите следующий код подтверждения:
-            
-            {' '.join(verification_code)}
-            
+
+            {verification_code}
+
             Код действителен в течение 15 минут.
-            
+
             Если вы не регистрировались в cysu, просто проигнорируйте это письмо.
-            
+
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
@@ -170,7 +198,7 @@ class EmailService:
             )
             mail.send(msg)
             logger.info(
-                f"Verification email sent successfully to {user_email} with code: {' '.join(verification_code)}"
+                f"Verification email sent successfully to {user_email} with code: {verification_code}"
             )
             return True
         except Exception as e:
@@ -203,116 +231,145 @@ class EmailService:
                     body {{
                         margin: 0;
                         padding: 20px;
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        background-color: #0e0e0f;
-                        color: #ffffff;
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                        background-color: #f8f9fa;
+                        color: #212529;
+                        line-height: 1.6;
                     }}
                     .container {{
                         max-width: 600px;
                         margin: 0 auto;
-                        background: #1a1a1a;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                        background: #ffffff;
+                        border-radius: 20px;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                         overflow: hidden;
+                        border: 1px solid #e9ecef;
                     }}
                     .header {{
-                        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-                        padding: 25px 30px;
+                        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                        padding: 40px 30px;
                         text-align: center;
                         color: white;
+                        position: relative;
+                    }}
+                    .header::before {{
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: linear-gradient(45deg, rgba(76, 175, 80, 0.1) 0%, rgba(69, 160, 73, 0.1) 100%);
+                    }}
+                    .header-content {{
+                        position: relative;
+                        z-index: 1;
                     }}
                     .header h1 {{
                         margin: 0;
-                        font-size: 24px;
+                        font-size: 28px;
                         font-weight: 600;
                     }}
                     .header p {{
-                        margin: 8px 0 0 0;
-                        opacity: 0.9;
-                        font-size: 14px;
+                        margin: 10px 0 0 0;
+                        opacity: 0.95;
+                        font-size: 16px;
+                        font-weight: 400;
                     }}
                     .content {{
                         padding: 40px 30px;
                         text-align: center;
                     }}
                     .verification-title {{
-                        font-size: 22px;
+                        font-size: 24px;
                         font-weight: 600;
-                        color: #ffffff;
-                        margin-bottom: 10px;
+                        color: #212529;
+                        margin-bottom: 15px;
                     }}
                     .verification-desc {{
-                        color: #b0b0b0;
+                        color: #6c757d;
                         font-size: 16px;
-                        margin-bottom: 30px;
-                        line-height: 1.5;
+                        margin-bottom: 35px;
+                        line-height: 1.6;
                     }}
                     .code-container {{
-                        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-                        border: 2px solid #3a3a3a;
-                        border-radius: 12px;
-                        padding: 30px;
-                        margin: 20px 0;
+                        background: #f8f9fa;
+                        border: 2px solid #e9ecef;
+                        border-radius: 20px;
+                        padding: 35px;
+                        margin: 25px 0;
                         display: inline-block;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
                     }}
                     .verification-code {{
-                        font-size: 36px;
+                        font-size: 42px;
                         font-weight: 700;
                         font-family: 'Courier New', monospace;
-                        color: #ffffff;
-                        letter-spacing: 8px;
+                        color: #4CAF50;
+                        letter-spacing: 12px;
                         margin: 0;
                     }}
                     .code-info {{
-                        color: #b0b0b0;
+                        color: #6c757d;
                         font-size: 14px;
-                        margin-top: 15px;
+                        margin-top: 20px;
+                        font-weight: 500;
                     }}
                     .footer {{
-                        background: #0e0e0f;
+                        background: #f8f9fa;
                         padding: 30px;
                         text-align: center;
-                        border-top: 1px solid #2a2a2a;
+                        border-top: 1px solid #e9ecef;
                     }}
                     .footer p {{
-                        margin: 5px 0;
-                        color: #b0b0b0;
+                        margin: 8px 0;
+                        color: #6c757d;
                         font-size: 14px;
                     }}
                     .warning {{
-                        background: rgba(255, 193, 7, 0.1);
-                        border: 1px solid #ffc107;
-                        border-radius: 8px;
-                        padding: 15px;
-                        margin: 20px 0;
-                        color: #ffc107;
+                        background: rgba(255, 152, 0, 0.1);
+                        border: 1px solid #FF9800;
+                        border-radius: 20px;
+                        padding: 20px;
+                        margin: 25px 0;
+                        color: #FF9800;
                         font-size: 14px;
+                        font-weight: 500;
+                    }}
+                    .logo {{
+                        font-size: 32px;
+                        font-weight: 600;
+                        color: white;
+                        margin-bottom: 10px;
                     }}
                 </style>
             </head>
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>Новый код подтверждения</h1>
-                        <p>Мы отправили вам новый код для завершения регистрации</p>
+                        <div class="header-content">
+                            <div class="logo">cysu</div>
+                            <h1>Новый код подтверждения</h1>
+                            <p>Мы отправили вам новый код для завершения регистрации</p>
+                        </div>
                     </div>
                     <div class="content">
-                        <div class="verification-title">Подтвердите ваш email!</div>
+                        <div class="verification-title">Подтвердите ваш email</div>
                         <div class="verification-desc">
                             Для завершения регистрации введите новый код<br>
                             подтверждения ниже
                         </div>
                         <div class="code-container">
-                            <div class="verification-code">{' '.join(verification_code)}</div>
+                            <div class="verification-code">{verification_code}</div>
                             <div class="code-info">Код действителен в течение 15 минут</div>
                         </div>
                         <div class="warning">
-                            Если вы не регистрировались в cysu, просто проигнорируйте это письмо.
+                            ⚠️ Если вы не регистрировались в cysu, просто проигнорируйте это письмо.
                         </div>
                     </div>
                     <div class="footer">
                         <p>© 2025 cysu. Все права защищены.</p>
-                        <p>Современная образовательная платформа</p>
+                        <p>Современная образовательная платформа нового поколения</p>
                     </div>
                 </div>
             </body>
@@ -320,15 +377,15 @@ class EmailService:
             """
             text_body = f"""
             Новый код подтверждения - cysu
-            
+
             Для завершения регистрации введите следующий код подтверждения:
-            
-            {' '.join(verification_code)}
-            
+
+            {verification_code}
+
             Код действителен в течение 15 минут.
-            
+
             Если вы не регистрировались в cysu, просто проигнорируйте это письмо.
-            
+
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
@@ -336,7 +393,7 @@ class EmailService:
             )
             mail.send(msg)
             logger.info(
-                f"Resend verification email sent successfully to {user_email} with code: {' '.join(verification_code)}"
+                f"Resend verification email sent successfully to {user_email} with code: {verification_code}"
             )
             return True
         except Exception as e:
@@ -360,7 +417,7 @@ class EmailService:
         try:
             subject = "Восстановление пароля - cysu"
             current_app.logger.info(f"Sending password reset email to {user_email} with code: '{reset_code}' (type: {type(reset_code)}, length: {len(reset_code)})")
-            
+
             html_body = f"""
             <!DOCTYPE html>
             <html lang="ru">
@@ -372,98 +429,127 @@ class EmailService:
                     body {{
                         margin: 0;
                         padding: 20px;
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        background-color: #0e0e0f;
-                        color: #ffffff;
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                        background-color: #f8f9fa;
+                        color: #212529;
+                        line-height: 1.6;
                     }}
                     .container {{
                         max-width: 600px;
                         margin: 0 auto;
-                        background: #1a1a1a;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                        background: #ffffff;
+                        border-radius: 20px;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                         overflow: hidden;
+                        border: 1px solid #e9ecef;
                     }}
                     .header {{
-                        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-                        padding: 25px 30px;
+                        background: linear-gradient(135deg, #F44336 0%, #d32f2f 100%);
+                        padding: 40px 30px;
                         text-align: center;
                         color: white;
+                        position: relative;
+                    }}
+                    .header::before {{
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: linear-gradient(45deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.1) 100%);
+                    }}
+                    .header-content {{
+                        position: relative;
+                        z-index: 1;
                     }}
                     .header h1 {{
                         margin: 0;
-                        font-size: 24px;
+                        font-size: 28px;
                         font-weight: 600;
                     }}
                     .header p {{
-                        margin: 8px 0 0 0;
-                        opacity: 0.9;
-                        font-size: 14px;
+                        margin: 10px 0 0 0;
+                        opacity: 0.95;
+                        font-size: 16px;
+                        font-weight: 400;
                     }}
                     .content {{
                         padding: 40px 30px;
                         text-align: center;
                     }}
                     .verification-title {{
-                        font-size: 22px;
+                        font-size: 24px;
                         font-weight: 600;
-                        color: #ffffff;
-                        margin-bottom: 10px;
+                        color: #212529;
+                        margin-bottom: 15px;
                     }}
                     .verification-desc {{
-                        color: #b0b0b0;
+                        color: #6c757d;
                         font-size: 16px;
-                        margin-bottom: 30px;
-                        line-height: 1.5;
+                        margin-bottom: 35px;
+                        line-height: 1.6;
                     }}
                     .code-container {{
-                        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-                        border: 2px solid #3a3a3a;
-                        border-radius: 12px;
-                        padding: 30px;
-                        margin: 20px 0;
+                        background: #f8f9fa;
+                        border: 2px solid #e9ecef;
+                        border-radius: 20px;
+                        padding: 35px;
+                        margin: 25px 0;
                         display: inline-block;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
                     }}
                     .verification-code {{
                         font-size: 36px;
                         font-weight: 700;
                         font-family: 'Courier New', monospace;
-                        color: #ffffff;
+                        color: #F44336;
                         letter-spacing: 8px;
                         margin: 0;
                     }}
                     .code-info {{
-                        color: #b0b0b0;
+                        color: #6c757d;
                         font-size: 14px;
-                        margin-top: 15px;
+                        margin-top: 20px;
+                        font-weight: 500;
                     }}
                     .footer {{
-                        background: #0e0e0f;
+                        background: #f8f9fa;
                         padding: 30px;
                         text-align: center;
-                        border-top: 1px solid #2a2a2a;
+                        border-top: 1px solid #e9ecef;
                     }}
                     .footer p {{
-                        margin: 5px 0;
-                        color: #b0b0b0;
+                        margin: 8px 0;
+                        color: #6c757d;
                         font-size: 14px;
                     }}
                     .warning {{
-                        background: rgba(220, 53, 69, 0.1);
-                        border: 1px solid #dc3545;
-                        border-radius: 8px;
-                        padding: 15px;
-                        margin: 20px 0;
-                        color: #dc3545;
+                        background: rgba(244, 67, 54, 0.1);
+                        border: 1px solid #F44336;
+                        border-radius: 20px;
+                        padding: 20px;
+                        margin: 25px 0;
+                        color: #F44336;
                         font-size: 14px;
+                        font-weight: 500;
+                    }}
+                    .logo {{
+                        font-size: 32px;
+                        font-weight: 600;
+                        color: white;
+                        margin-bottom: 10px;
                     }}
                 </style>
             </head>
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>Восстановление пароля</h1>
-                        <p>Безопасное восстановление доступа к вашему аккаунту</p>
+                        <div class="header-content">
+                            <div class="logo">cysu</div>
+                            <h1>Восстановление пароля</h1>
+                            <p>Безопасное восстановление доступа к вашему аккаунту</p>
+                        </div>
                     </div>
                     <div class="content">
                         <div class="verification-title">Создайте новый пароль</div>
@@ -471,16 +557,16 @@ class EmailService:
                             Введите код ниже для создания нового пароля
                         </div>
                         <div class="code-container">
-                            <div class="verification-code">{' '.join(reset_code)}</div>
+                            <div class="verification-code">{reset_code}</div>
                             <div class="code-info">Код действителен в течение 15 минут</div>
                         </div>
                         <div class="warning">
-                            Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.
+                            ⚠️ Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.
                         </div>
                     </div>
                     <div class="footer">
                         <p>© 2025 cysu. Все права защищены.</p>
-                        <p>Современная образовательная платформа</p>
+                        <p>Современная образовательная платформа нового поколения</p>
                     </div>
                 </div>
             </body>
@@ -488,15 +574,15 @@ class EmailService:
             """
             text_body = f"""
             Восстановление пароля - cysu
-            
+
             Вы запросили восстановление пароля. Введите следующий код для создания нового пароля:
-            
-            {' '.join(reset_code)}
-            
+
+            {reset_code}
+
             Код действителен в течение 15 минут.
-            
+
             Важно: Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.
-            
+
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
@@ -504,7 +590,7 @@ class EmailService:
             )
             mail.send(msg)
             logger.info(
-                f"Password reset email sent successfully to {user_email} with code: {' '.join(reset_code)}"
+                f"Password reset email sent successfully to {user_email} with code: {reset_code}"
             )
             return True
         except Exception as e:

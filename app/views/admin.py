@@ -12,12 +12,12 @@ import string
 from typing import Union, Dict, Any
 
 from ..models import (
-    User, Material, Subject, Payment, ChatMessage, EmailVerification, 
+    User, Material, Subject, Payment, ChatMessage, EmailVerification,
     Ticket, TicketFile, TicketMessage, Notification, Submission,
     Group, SubjectGroup, SiteSettings
 )
 from ..forms import (
-    AdminUserForm, MaterialForm, SubjectForm, GroupForm, 
+    AdminUserForm, MaterialForm, SubjectForm, GroupForm,
     SubjectGroupForm, SiteSettingsForm
 )
 from ..utils.file_storage import FileStorageManager
@@ -25,7 +25,6 @@ from ..utils.file_storage import FileStorageManager
 from .. import db
 
 admin_bp = Blueprint("admin", __name__)
-
 
 @admin_bp.route("/admin/users", methods=["GET", "POST"])
 @login_required
@@ -306,7 +305,7 @@ def admin_users() -> Union[str, Response]:
             user_id = int(request.form.get("change_group_user_id"))
             new_group_id = request.form.get("new_group_id")
             user = User.query.get(user_id)
-            
+
             if user:
                 if new_group_id:
                     group = Group.query.get(int(new_group_id))
@@ -319,7 +318,7 @@ def admin_users() -> Union[str, Response]:
                 else:
                     user.group_id = None
                     flash(f"Пользователь {user.username} убран из группы")
-                
+
                 db.session.commit()
             else:
                 flash("Пользователь не найден", "error")
@@ -327,7 +326,7 @@ def admin_users() -> Union[str, Response]:
             current_app.logger.error(f"Ошибка изменения группы пользователя: {str(e)}")
             db.session.rollback()
             flash("Ошибка при изменении группы пользователя", "error")
-    
+
     # Обработка изменения статуса пользователя
     if request.method == "POST" and request.form.get("change_status_user_id"):
         try:
@@ -335,13 +334,13 @@ def admin_users() -> Union[str, Response]:
             new_role = request.form.get("new_role")
             admin_mode_enabled = request.form.get("admin_mode_enabled") == "on"
             user = User.query.get(user_id)
-            
+
             if user:
                 # Сбрасываем все роли
                 user.is_admin = False
                 user.is_moderator = False
                 user.admin_mode_enabled = False
-                
+
                 # Устанавливаем новую роль
                 if new_role == "admin":
                     user.is_admin = True
@@ -353,7 +352,7 @@ def admin_users() -> Union[str, Response]:
                     flash(f"Пользователь {user.username} назначен модератором")
                 else:  # user
                     flash(f"Пользователь {user.username} назначен обычным пользователем")
-                
+
                 db.session.commit()
             else:
                 flash("Пользователь не найден", "error")
@@ -386,16 +385,17 @@ def admin_users() -> Union[str, Response]:
                     )
                     status = "отозвана"
                 else:
-                    # Выдаем подписку на 30 дней
+                    # Выдаем подписку на количество дней из настроек
+                    trial_days = int(SiteSettings.get_setting('trial_subscription_days', 14))
                     current_app.logger.info(
-                        f"Выдаем подписку пользователю {user.username} на 30 дней"
+                        f"Выдаем подписку пользователю {user.username} на {trial_days} дней"
                     )
                     user.is_subscribed = True
-                    user.subscription_expires = datetime.utcnow() + timedelta(days=30)
+                    user.subscription_expires = datetime.utcnow() + timedelta(days=trial_days)
                     user.is_manual_subscription = (
                         True  # Устанавливаем флаг ручной подписки
                     )
-                    status = "выдана на 30 дней"
+                    status = f"выдана на {trial_days} дней"
 
                 db.session.commit()
                 current_app.logger.info(
@@ -432,7 +432,6 @@ def admin_users() -> Union[str, Response]:
         groups=Group.query.all(),  # Добавляем группы для модальных окон
     )
 
-
 @admin_bp.route("/admin/groups", methods=["GET", "POST"])
 @login_required
 def admin_groups() -> Union[str, Response]:
@@ -445,7 +444,7 @@ def admin_groups() -> Union[str, Response]:
     if request.method == "POST":
         current_app.logger.info(f"POST запрос в admin_groups: {request.form}")
         current_app.logger.info(f"CSRF токен в запросе: {request.form.get('csrf_token', 'НЕ НАЙДЕН')}")
-        
+
         # Проверяем, что CSRF токен присутствует
         if not request.form.get('csrf_token'):
             current_app.logger.error("CSRF токен отсутствует в запросе")
@@ -491,18 +490,18 @@ def admin_groups() -> Union[str, Response]:
                 if group:
                     current_app.logger.info(f"Обновляем группу: {group.name} (ID: {group_id})")
                     current_app.logger.info(f"Новые данные: name='{request.form.get('name')}', description='{request.form.get('description')}', is_active='{request.form.get('is_active')}'")
-                    
+
                     group.name = request.form.get("name")
                     group.description = request.form.get("description")
-                    
+
                     # Обновляем статус активности группы
                     is_active_value = request.form.get("is_active")
                     if is_active_value is not None:
                         group.is_active = bool(int(is_active_value))
                         current_app.logger.info(f"Статус активности обновлен: {group.is_active}")
-                    
+
                     db.session.commit()
-                    
+
                     # Возвращаем JSON ответ для AJAX
                     if request.headers.get('Accept') == 'application/json':
                         return jsonify({
@@ -536,7 +535,7 @@ def admin_groups() -> Union[str, Response]:
             try:
                 group_id = int(request.form.get("group_id"))
                 current_app.logger.info(f"Попытка удаления группы с ID: {group_id}")
-                
+
                 group = Group.query.get(group_id)
                 if group:
                     current_app.logger.info(f"Группа найдена: {group.name}")
@@ -597,7 +596,6 @@ def admin_groups() -> Union[str, Response]:
         message=message,
     )
 
-
 @admin_bp.route("/admin/subject-groups", methods=["GET", "POST"])
 @login_required
 def admin_subject_groups() -> Union[str, Response]:
@@ -629,10 +627,10 @@ def admin_subject_groups() -> Union[str, Response]:
                 try:
                     subject_id = form.subject_id.data
                     group_ids = form.group_ids.data
-                    
+
                     # Удаляем существующие связи для этого предмета
                     SubjectGroup.query.filter_by(subject_id=subject_id).delete()
-                    
+
                     # Создаем новые связи
                     for group_id in group_ids:
                         subject_group = SubjectGroup(
@@ -640,10 +638,10 @@ def admin_subject_groups() -> Union[str, Response]:
                             group_id=group_id
                         )
                         db.session.add(subject_group)
-                    
+
                     db.session.commit()
                     flash(f"Предмет успешно назначен группам")
-                    
+
                     # Очищаем форму
                     form.subject_id.data = 0
                     form.group_ids.data = []
@@ -657,10 +655,10 @@ def admin_subject_groups() -> Union[str, Response]:
             try:
                 subject_id = int(request.form.get("edit_subject_id"))
                 group_ids = request.form.getlist("edit_group_ids")
-                
+
                 # Удаляем существующие связи для этого предмета
                 SubjectGroup.query.filter_by(subject_id=subject_id).delete()
-                
+
                 # Создаем новые связи
                 for group_id in group_ids:
                     if group_id:  # Проверяем, что group_id не пустой
@@ -669,7 +667,7 @@ def admin_subject_groups() -> Union[str, Response]:
                             group_id=int(group_id)
                         )
                         db.session.add(subject_group)
-                
+
                 db.session.commit()
                 flash(f"Группы предмета успешно обновлены")
             except Exception as e:
@@ -677,7 +675,61 @@ def admin_subject_groups() -> Union[str, Response]:
                 db.session.rollback()
                 flash("Ошибка при обновлении групп предмета", "error")
 
-        # Удаление всех связей предмета с группами
+        # Массовое назначение предметов группам
+        elif request.form.get("action") == "mass_assign":
+            try:
+                subject_ids = request.form.getlist("subject_ids")
+                group_ids = request.form.getlist("group_ids")
+
+                if not subject_ids or not group_ids:
+                    flash("Выберите предметы и группы", "error")
+                else:
+                    # Обрабатываем каждый предмет
+                    for subject_id in subject_ids:
+                        subject_id = int(subject_id)
+
+                        # Удаляем существующие связи для этого предмета
+                        SubjectGroup.query.filter_by(subject_id=subject_id).delete()
+
+                        # Создаем новые связи
+                        for group_id in group_ids:
+                            if group_id:  # Проверяем, что group_id не пустой
+                                subject_group = SubjectGroup(
+                                    subject_id=subject_id,
+                                    group_id=int(group_id)
+                                )
+                                db.session.add(subject_group)
+
+                    db.session.commit()
+                    flash(f"Успешно назначено {len(subject_ids)} предметов группам")
+
+            except Exception as e:
+                current_app.logger.error(f"Ошибка массового назначения предметов группам: {str(e)}")
+                db.session.rollback()
+                flash("Ошибка при массовом назначении предметов группам", "error")
+
+        # Массовое удаление предметов из всех групп
+        elif request.form.get("action") == "mass_remove":
+            try:
+                subject_ids = request.form.getlist("subject_ids")
+
+                if not subject_ids:
+                    flash("Выберите предметы для удаления из групп", "error")
+                else:
+                    # Удаляем все связи для выбранных предметов
+                    for subject_id in subject_ids:
+                        subject_id = int(subject_id)
+                        SubjectGroup.query.filter_by(subject_id=subject_id).delete()
+
+                    db.session.commit()
+                    flash(f"Успешно убрано {len(subject_ids)} предметов из всех групп")
+
+            except Exception as e:
+                current_app.logger.error(f"Ошибка массового удаления предметов из групп: {str(e)}")
+                db.session.rollback()
+                flash("Ошибка при массовом удалении предметов из групп", "error")
+
+        # Удаление всех связей предмета с группами (одиночное)
         elif request.form.get("remove_all_groups"):
             try:
                 subject_id = int(request.form.get("remove_all_groups"))
@@ -701,7 +753,6 @@ def admin_subject_groups() -> Union[str, Response]:
         message=message,
     )
 
-
 @admin_bp.route("/admin/settings", methods=["GET", "POST"])
 @login_required
 def admin_settings() -> Union[str, Response]:
@@ -711,22 +762,26 @@ def admin_settings() -> Union[str, Response]:
         return redirect(url_for("main.index"))
 
     form = SiteSettingsForm()
-    
+
     # Загружаем текущие настройки
     if request.method == "GET":
         form.maintenance_mode.data = SiteSettings.get_setting('maintenance_mode', False)
         form.trial_subscription_enabled.data = SiteSettings.get_setting('trial_subscription_enabled', True)
-    
+        form.trial_subscription_days.data = SiteSettings.get_setting('trial_subscription_days', 14)
+        form.pattern_generation_enabled.data = SiteSettings.get_setting('pattern_generation_enabled', True)
+
     if request.method == "POST" and form.validate_on_submit():
         try:
             # Сохраняем настройки
             SiteSettings.set_setting('maintenance_mode', form.maintenance_mode.data, 'Включить/выключить режим технических работ')
             SiteSettings.set_setting('trial_subscription_enabled', form.trial_subscription_enabled.data, 'Включить/выключить пробную подписку для новых аккаунтов')
-            
+            SiteSettings.set_setting('trial_subscription_days', form.trial_subscription_days.data, 'Количество дней пробной подписки')
+            SiteSettings.set_setting('pattern_generation_enabled', form.pattern_generation_enabled.data, 'Включить/выключить кнопку генерации паттернов')
+
             flash('Настройки успешно сохранены', 'success')
-            return redirect(url_for('admin.admin_settings'))
+            return redirect('admin.admin_settings')
         except Exception as e:
             current_app.logger.error(f"Ошибка сохранения настроек: {str(e)}")
             flash('Ошибка при сохранении настроек', 'error')
-    
+
     return render_template("admin/settings.html", form=form)

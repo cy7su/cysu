@@ -31,7 +31,7 @@
             </div>
             <div class="mb-3">
               <label for="{{ form.description.id }}" class="form-label">Описание</label>
-              {{ form.description(class_='form-control', placeholder='Введите описание предмета', style='background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px; min-height: 80px; resize: vertical;') }}
+              {{ form.description(class_='form-control', placeholder='Введите описание предмета', style='background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px; min-height: 80px; height: 95px; resize: vertical;') }}
               {% if form.description.errors %}
                 <div class="text-danger small">
                   {% for error in form.description.errors %}
@@ -109,7 +109,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/svg-patterns.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const patternSelect = document.getElementById('pattern-select');

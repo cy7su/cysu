@@ -20,11 +20,11 @@ def tickets() -> Union[str, Response]:
     """Страница списка тикетов"""
     if current_user.is_admin:
         # Для админов показываем все тикеты
-                    tickets_list = (
-                Ticket.query.join(User, Ticket.user_id == User.id)
-                .order_by(Ticket.created_at.desc())
-                .all()
-            )
+        tickets_list = (
+            Ticket.query.join(User, Ticket.user_id == User.id)
+            .order_by(Ticket.created_at.desc())
+            .all()
+        )
     else:
         # Для пользователей показываем только их тикеты
         tickets_list = (
@@ -120,7 +120,7 @@ def create_ticket() -> Dict[str, Any]:
             subject=subject,
             message=message,
             user_id=current_user.id,
-            status="open",
+            status="pending",
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow()
         )
@@ -136,7 +136,7 @@ def create_ticket() -> Dict[str, Any]:
                     # Здесь можно добавить логику сохранения файлов
                     pass
         
-        return jsonify({"success": True, "ticket_id": ticket.id})
+        return jsonify({"success": True, "message": "Тикет успешно создан", "ticket_id": ticket.id})
         
     except Exception as e:
         current_app.logger.error(f"Ошибка создания тикета: {str(e)}")
@@ -171,7 +171,7 @@ def upload_ticket_file(ticket_id: int) -> Dict[str, Any]:
         # Проверяем размер файла
         if not FileStorageManager.validate_file_size(file):
             return jsonify(
-                {"success": False, "error": "Файл слишком большой (максимум 10MB)"}
+                {"success": False, "error": "Файл слишком большой (максимум 200MB)"}
             )
 
         # Проверяем тип файла
@@ -295,17 +295,27 @@ def get_ticket_files(ticket_id: int) -> Dict[str, Any]:
 def ticket_response() -> Dict[str, Any]:
     """API для ответа на тикет (для пользователей и админов)"""
     try:
+        # Проверяем CSRF токен
+        csrf_token = request.headers.get('X-CSRFToken')
+        if not csrf_token:
+            return jsonify({"success": False, "error": "Отсутствует CSRF токен"}), 400
+        
         # Получаем данные из формы
         ticket_id = request.form.get("ticket_id")
         message = request.form.get("message", "").strip()
         files = request.files.getlist("files")
+        
+        current_app.logger.info(f"Ответ на тикет: ticket_id={ticket_id}, message_length={len(message)}, user={current_user.username}")
 
         # Валидация
-        if not message or len(message) < 5:
+        if not ticket_id:
+            return jsonify({"success": False, "error": "ID тикета не указан"})
+            
+        if not message or len(message) < 1:
             return jsonify(
                 {
                     "success": False,
-                    "error": "Сообщение должно содержать минимум 5 символов",
+                    "error": "Сообщение не может быть пустым",
                 }
             )
 
@@ -357,12 +367,12 @@ def ticket_response() -> Dict[str, Any]:
         if files:
             for file in files:
                 if file and file.filename and file.filename.strip():
-                    # Проверяем размер файла (максимум 10MB)
+                    # Проверяем размер файла (максимум 200MB)
                     file.seek(0, 2)
                     file_size = file.tell()
                     file.seek(0)
 
-                    if file_size > 10 * 1024 * 1024:  # 10MB
+                    if file_size > 200 * 1024 * 1024:  # 200MB
                         continue
 
                     # Проверяем расширение файла
@@ -409,8 +419,8 @@ def ticket_response() -> Dict[str, Any]:
         return jsonify({"success": True, "message": "Ответ отправлен"})
 
     except Exception as e:
-        current_app.logger.error(f"Ошибка отправки ответа: {str(e)}")
-        return jsonify({"success": False, "error": "Ошибка отправки ответа"})
+        current_app.logger.error(f"Ошибка отправки ответа: {str(e)}", exc_info=True)
+        return jsonify({"success": False, "error": f"Ошибка отправки ответа: {str(e)}"})
 
 
 @tickets_bp.route("/api/delete_all_closed_tickets", methods=["POST"])

@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
-{% block title %}Главная{% endblock %}
+{% block title %}cysu | Образовательная платформа{% endblock %}
+{% block meta_description %}CYSU - современная альтернатива. Лучшая замена Moodle для изучения программирования. Лекции, практические задания, материалы по информационным технологиям.{% endblock %}
+{% block meta_keywords %}иос сгту, eios sstu, eios, moodle, ppk, ппк, сгту, sstu, CYSU, образовательная платформа, программирование, обучение, лекции, практика, IT, разработка, Python, JavaScript, Java, C++, веб-разработка, базы данных, алгоритмы, СГТУ, информационные технологии, электронное обучение, дистанционное образование{% endblock %}
 {% block content %}
 
 {% if not current_user.is_authenticated %}
@@ -9,8 +11,9 @@
         <header class="text-center">
             <!-- Заголовок -->
             <div class="mb-5">
-                <h1 class="display-5 fw-bold text-white mb-3">Добро пожаловать в cysu</h1>
-                <p class="text-muted">ДЛЯ ВСЕХ ТЕХ КТО НЕНАВИДИТ MOODLE</p>
+                <h1 class="display-5 fw-bold text-white mb-3">cysu</h1>
+                <p class="text-muted mb-3">Современная замена Moodle</p>
+                <p class="text-muted small">ДЛЯ ВСЕХ ТЕХ КТО НЕНАВИДИТ MOODLE</p>
             </div>
             
             <!-- Быстрые возможности -->
@@ -88,8 +91,8 @@
     {% for subject in subjects %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
         <div class="card shadow-sm subject-card position-relative" id="subject-card-{{ subject.id }}" data-subject-id="{{ subject.id }}" data-url="{{ url_for('main.subject_detail', subject_id=subject.id) }}" onclick="window.location.href=this.getAttribute('data-url')">
-            <!-- Кнопка генерации паттерна (только для админов) -->
-            {% if current_user.is_effective_admin() %}
+            <!-- Кнопка генерации паттерна (только для админов и если настройка включена) -->
+            {% if current_user.is_effective_admin() and pattern_generation_enabled %}
             <button class="admin-pattern-btn" onclick="event.stopPropagation(); generateNewPattern('subject-card-{{ subject.id }}')" title="Сгенерировать новый паттерн">
                 <i class="fas fa-palette"></i>
             </button>
@@ -103,7 +106,7 @@
             <!-- Темное тело карточки -->
             <div class="card-body">
                 <h6 class="card-title text-primary mb-1">{{ subject.title[:35]|e }}{% if subject.title|length > 35 %}...{% endif %}</h6>
-                <p class="card-text text-muted mb-1">{{ subject.description[:70]|e }}{% if subject.description|length > 70 %}...{% endif %}</p>
+                <p class="card-text text-muted mb-1">{% if subject.description %}{{ subject.description[:70]|e }}{% if subject.description|length > 70 %}...{% endif %}{% else %}Описание отсутствует{% endif %}</p>
             </div>
         </div>
     </div>
@@ -136,12 +139,8 @@
               <label class="form-label">Фон предмета</label>
               <select id="pattern-select" name="pattern_type" class="form-select">
                 <option value="circles">Круги</option>
-                <option value="hexagons">Шестигранники</option>
-                <option value="grid">Сетка</option>
-                <option value="octagons">Восьмиугольники</option>
-                <option value="herringbone">Елочка</option>
                 <option value="quilt">Лоскутное одеяло</option>
-                <option value="honeycomb">Соты</option>
+                <option value="waves">Волны</option>
               </select>
             </div>
             <div class="mb-3">
@@ -162,7 +161,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/svg-patterns.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Ждем загрузки SVGPatternGenerator
@@ -207,6 +205,33 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             useFallbackPatterns();
         }
+    }
+    
+    // Функция fallback паттернов
+    function useFallbackPatterns() {
+        console.log('Используем fallback паттерны');
+        const subjectCards = document.querySelectorAll('.dashboard-card-img');
+        
+        if (subjectCards.length === 0) {
+            return;
+        }
+        
+        // Простые CSS градиенты как fallback
+        const fallbackPatterns = [
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+            'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)'
+        ];
+        
+        subjectCards.forEach(function(card, index) {
+            const patternIndex = index % fallbackPatterns.length;
+            card.style.background = fallbackPatterns[patternIndex];
+        });
     }
     
     // Запускаем инициализацию
@@ -284,7 +309,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         savePatternToServer(subjectId, newPattern, button);
                     }
                     
-                    console.log(`🎨 Новый паттерн сгенерирован для карточки ${cardId}`);
                     return true;
                 }
             }
@@ -307,17 +331,10 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                console.log('✅ Паттерн успешно сохранен в базе данных');
-                showSuccess('Паттерн сохранен!', 2000);
-            } else {
-                console.error('❌ Ошибка сохранения паттерна:', data.error);
-                showError('Ошибка сохранения паттерна: ' + data.error, 3000);
-            }
+            // Паттерн сохранен без уведомлений
         })
         .catch(error => {
-            console.error('❌ Ошибка сети при сохранении паттерна:', error);
-            showError('Ошибка сети при сохранении паттерна', 3000);
+            // Ошибка без уведомлений
         })
         .finally(() => {
             // Восстанавливаем кнопку после завершения запроса
@@ -433,4 +450,22 @@ function deleteSubject(subjectId) {
     }
 }
 </script>
+
+<!-- Скрытый SEO контент для поисковиков -->
+<div style="position: absolute; left: -9999px; top: -9999px; visibility: hidden;">
+    <h1>ИОС СГТУ альтернатива</h1>
+    <h2>EIOS SSTU замена</h2>
+    <h3>CYSU вместо Moodle</h3>
+    <p>CYSU - это современная образовательная платформа, которая является лучшей альтернативой ИОС СГТУ и EIOS SSTU. Если вы ищете замену устаревшим системам электронного обучения, то CYSU - это именно то, что вам нужно.</p>
+    <p>Наша платформа превосходит EIOS, Moodle, PPK по удобству использования и функциональности. Студенты СГТУ могут использовать CYSU как полноценную замену официальной ИОС СГТУ.</p>
+    <ul>
+        <li>ИОС СГТУ альтернатива</li>
+        <li>EIOS SSTU замена</li>
+        <li>Moodle альтернатива</li>
+        <li>PPK замена</li>
+        <li>Образовательная платформа СГТУ</li>
+        <li>Электронное обучение СГТУ</li>
+    </ul>
+</div>
+
 {% endblock %} 

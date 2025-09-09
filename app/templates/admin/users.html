@@ -111,7 +111,7 @@
                 <tr>
                   <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">ID</th>
                   <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Пользователь</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Email</th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Контакт</th>
                   <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Группа</th>
                   <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Статус</th>
                   <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Подписка</th>
@@ -129,7 +129,18 @@
                     {% endif %}
                   </td>
                   <td>
-                    <small class="text-muted">{{ user.email }}</small>
+                    {% set contact = user | format_user_contact %}
+                    {% if contact.type == 'telegram' %}
+                      <a href="{{ contact.link }}" class="text-decoration-none" target="_blank">
+                        <i class="{{ contact.icon }} me-1"></i>
+                        <small class="text-primary">{{ contact.display }}</small>
+                      </a>
+                    {% else %}
+                      <a href="{{ contact.link }}" class="text-decoration-none">
+                        <i class="{{ contact.icon }} me-1"></i>
+                        <small class="text-muted">{{ contact.display }}</small>
+                      </a>
+                    {% endif %}
                   </td>
                   <td>
                     {% if user.group %}

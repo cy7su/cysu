@@ -12,68 +12,121 @@ class SVGPatternGenerator {
         this.primaryHover = '#9A7FE6';
         this.backgroundColor = '#1a1a1a';
         
-        // Расширенные структурированные цветовые палитры
+        // Расширенные структурированные цветовые палитры (20 палитр по 20 цветов)
         this.colorPalettes = {
-            // Зелено-бирюзовая палитра (12 цветов)
-            teal: ['#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669'],
-            // Желто-оранжевая палитра (12 цветов)
-            yellow: ['#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58', '#F57F17', '#FF8F00', '#FFC107', '#FFD54F', '#FFECB3', '#FFF8E1', '#F9A825'],
-            // Голубая палитра (12 цветов)
-            blue: ['#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5', '#1976D2', '#0D47A1', '#81D4FA', '#4FC3F7', '#29B6F6', '#03A9F4', '#0288D1'],
-            // Розовая палитра (12 цветов)
-            pink: ['#FCE4EC', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#C2185B', '#880E4F', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#E91E63'],
-            // Фиолетовая палитра (12 цветов)
-            purple: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#7B1FA2', '#4A148C', '#D1C4E9', '#B39DDB', '#9575CD', '#7E57C2', '#673AB7'],
-            // Серая палитра (12 цветов)
-            grey: ['#F5F5F5', '#EEEEEE', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#616161', '#424242', '#FAFAFA', '#F0F0F0', '#E8E8E8', '#D0D0D0', '#A0A0A0'],
-            // Мятная палитра (12 цветов)
-            mint: ['#E6FFFA', '#B2F5EA', '#81E6D9', '#4FD1C7', '#38B2AC', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669'],
-            // Коралловая палитра (12 цветов)
-            coral: ['#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#D32F2F', '#B71C1C', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#F44336'],
-            // Изумрудная палитра (12 цветов)
-            emerald: ['#E8F5E8', '#C8E6C9', '#A5D6A7', '#81C784', '#66BB6A', '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#E0F2E0', '#B8E6B8', '#90EE90'],
-            // Лавандовая палитра (12 цветов)
-            lavender: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#9C27B0', '#7B1FA2', '#6A1B9A', '#4A148C', '#E8DAEF', '#D1C4E9', '#B39DDB'],
-            // Персиковая палитра (12 цветов)
-            peach: ['#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D', '#FFA726', '#FF9800', '#F57C00', '#EF6C00', '#E65100', '#FFE0B2', '#FFCC80', '#FFB74D'],
-            // Аквамариновая палитра (12 цветов)
-            aqua: ['#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#26C6DA', '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#B2EBF2', '#80DEEA', '#4DD0E1']
+            // Зелено-бирюзовая палитра (20 цветов)
+            teal: ['#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B', '#B2F5EA', '#7DD3FC', '#38BDF8', '#0EA5E9', '#0284C7'],
+            // Желто-оранжевая палитра (20 цветов)
+            yellow: ['#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58', '#F57F17', '#FF8F00', '#FFC107', '#FFD54F', '#FFECB3', '#FFF8E1', '#F9A825', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#FEF3C7', '#FDE68A'],
+            // Голубая палитра (20 цветов)
+            blue: ['#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5', '#1976D2', '#0D47A1', '#81D4FA', '#4FC3F7', '#29B6F6', '#03A9F4', '#0288D1', '#0277BD', '#01579B', '#0F172A', '#1E293B', '#334155', '#475569', '#DBEAFE', '#BFDBFE'],
+            // Розовая палитра (20 цветов)
+            pink: ['#FCE4EC', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#C2185B', '#880E4F', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#E91E63', '#DB2777', '#BE185D', '#9D174D', '#831843', '#500724', '#FDF2F8', '#FCE7F3', '#FBCFE8'],
+            // Фиолетовая палитра (20 цветов)
+            purple: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#7B1FA2', '#4A148C', '#D1C4E9', '#B39DDB', '#9575CD', '#7E57C2', '#673AB7', '#5B21B6', '#4C1D95', '#581C87', '#3B0764', '#1E1B4B', '#312E81', '#F3E8FF', '#E9D5FF'],
+            // Серая палитра (20 цветов)
+            grey: ['#F5F5F5', '#EEEEEE', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#616161', '#424242', '#FAFAFA', '#F0F0F0', '#E8E8E8', '#D0D0D0', '#A0A0A0', '#808080', '#606060', '#404040', '#202020', '#0F0F0F', '#F8FAFC', '#F1F5F9', '#E2E8F0'],
+            // Мятная палитра (20 цветов)
+            mint: ['#E6FFFA', '#B2F5EA', '#81E6D9', '#4FD1C7', '#38B2AC', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B', '#B2F5EA', '#7DD3FC', '#38BDF8', '#0EA5E9', '#0284C7'],
+            // Коралловая палитра (20 цветов)
+            coral: ['#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#D32F2F', '#B71C1C', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#F44336', '#E11D48', '#BE123C', '#9F1239', '#881337', '#4C0519', '#FEF2F2', '#FEE2E2', '#FECACA'],
+            // Изумрудная палитра (20 цветов)
+            emerald: ['#E8F5E8', '#C8E6C9', '#A5D6A7', '#81C784', '#66BB6A', '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#E0F2E0', '#B8E6B8', '#90EE90', '#16A34A', '#15803D', '#166534', '#14532D', '#052E16', '#F0FDF4', '#DCFCE7', '#BBF7D0'],
+            // Лавандовая палитра (20 цветов)
+            lavender: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#9C27B0', '#7B1FA2', '#6A1B9A', '#4A148C', '#E8DAEF', '#D1C4E9', '#B39DDB', '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#F5F3FF', '#EDE9FE', '#DDD6FE'],
+            // Персиковая палитра (20 цветов)
+            peach: ['#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D', '#FFA726', '#FF9800', '#F57C00', '#EF6C00', '#E65100', '#FFE0B2', '#FFCC80', '#FFB74D', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#FEF3C7', '#FDE68A', '#FCD34D'],
+            // Аквамариновая палитра (20 цветов)
+            aqua: ['#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#26C6DA', '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#B2EBF2', '#80DEEA', '#4DD0E1', '#06B6D4', '#0891B2', '#0E7490', '#155E75', '#164E63', '#F0FDFA', '#CCFBF1', '#99F6E4'],
+            // Золотая палитра (20 цветов)
+            gold: ['#FFFBEB', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#FFD700', '#FFA500', '#FF8C00', '#FF7F50', '#FF6347', '#FF4500', '#FFD700', '#FFA500', '#FF8C00'],
+            // Серебряная палитра (20 цветов)
+            silver: ['#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A', '#C0C0C0', '#A8A8A8', '#909090', '#787878', '#606060', '#484848', '#303030', '#E5E7EB', '#D1D5DB', '#9CA3AF'],
+            // Бронзовая палитра (20 цветов)
+            bronze: ['#FEF7ED', '#FED7AA', '#FDBA74', '#FB923C', '#F97316', '#EA580C', '#DC2626', '#B91C1C', '#991B1B', '#7F1D1D', '#CD7F32', '#B8860B', '#DAA520', '#B8860B', '#CD853F', '#D2691E', '#A0522D', '#8B4513', '#654321', '#3E2723'],
+            // Неоновая палитра (20 цветов)
+            neon: ['#00FF00', '#00FFFF', '#FF00FF', '#FFFF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000'],
+            // Пастельная палитра (20 цветов)
+            pastel: ['#FFE4E1', '#FFD1DC', '#FFB6C1', '#FFA0B4', '#FF91A4', '#FFB6C1', '#FFC0CB', '#FFCCCB', '#FFD1DC', '#FFE4E1', '#E6E6FA', '#D8BFD8', '#DDA0DD', '#DA70D6', '#EE82EE', '#F0E68C', '#F5DEB3', '#FFE4B5', '#FFEFD5', '#FFF8DC'],
+            // Темная палитра (20 цветов)
+            dark: ['#1A1A1A', '#2D2D2D', '#404040', '#525252', '#666666', '#7A7A7A', '#8E8E8E', '#A2A2A2', '#B6B6B6', '#CACACA', '#0D1117', '#161B22', '#21262D', '#30363D', '#484F58', '#6E7681', '#8B949E', '#A8B2BF', '#C9D1D9', '#F0F6FC'],
+            // Яркая палитра (20 цветов)
+            bright: ['#FF0000', '#FF4000', '#FF8000', '#FFBF00', '#FFFF00', '#BFFF00', '#80FF00', '#40FF00', '#00FF00', '#00FF40', '#00FF80', '#00FFBF', '#00FFFF', '#00BFFF', '#0080FF', '#0040FF', '#0000FF', '#4000FF', '#8000FF', '#BF00FF'],
+            // Природная палитра (20 цветов)
+            nature: ['#228B22', '#32CD32', '#00FF00', '#7CFC00', '#ADFF2F', '#9ACD32', '#6B8E23', '#556B2F', '#8FBC8F', '#90EE90', '#98FB98', '#8FBC8F', '#2E8B57', '#3CB371', '#20B2AA', '#48D1CC', '#40E0D0', '#00CED1', '#00BFFF', '#87CEEB']
         };
         
-        // Общая палитра для случайного выбора
+        // Расширенная общая палитра для случайного выбора (100+ цветов)
         this.colorPalette = [
-            '#FFFFFF', '#F8F9FA', '#F1F3F4', '#E8EAED', '#DADCE0',
-            '#FFF8E1', '#FFF3E0', '#FFECB3', '#FFE0B2', '#FFCCBC',
-            '#FCE4EC', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A',
-            '#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC',
-            '#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5',
-            '#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A',
-            '#F1F8E9', '#DCEDC8', '#C5E1A5', '#AED581', '#9CCC65',
-            '#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58',
-            '#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D', '#FFA726',
-            '#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350',
-            '#F0F4F8', '#E2E8F0', '#CBD5E0', '#A0AEC0', '#718096',
-            '#E6FFFA', '#B2F5EA', '#81E6D9', '#4FD1C7', '#38B2AC'
+            // Белые и светлые тона
+            '#FFFFFF', '#F8F9FA', '#F1F3F4', '#E8EAED', '#DADCE0', '#F5F5F5', '#EEEEEE', '#E0E0E0', '#FAFAFA', '#F0F0F0',
+            // Желтые и оранжевые тона
+            '#FFF8E1', '#FFF3E0', '#FFECB3', '#FFE0B2', '#FFCCBC', '#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58',
+            '#FFC107', '#FFD54F', '#FFECB3', '#FFF8E1', '#F9A825', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F',
+            // Розовые и красные тона
+            '#FCE4EC', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350',
+            '#F44336', '#E91E63', '#C2185B', '#880E4F', '#DB2777', '#BE185D', '#9F1239', '#881337', '#4C0519', '#FF0000',
+            // Фиолетовые и сиреневые тона
+            '#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#9C27B0', '#7B1FA2', '#6A1B9A', '#4A148C', '#673AB7',
+            '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#581C87', '#3B0764', '#1E1B4B', '#312E81', '#8000FF',
+            // Синие и голубые тона
+            '#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5', '#1976D2', '#0D47A1', '#81D4FA', '#4FC3F7', '#29B6F6',
+            '#03A9F4', '#0288D1', '#0277BD', '#01579B', '#0F172A', '#1E293B', '#334155', '#475569', '#0000FF', '#0080FF',
+            // Зеленые и бирюзовые тона
+            '#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A', '#00695C', '#004D40', '#E8F5E8', '#C8E6C9', '#A5D6A7',
+            '#81C784', '#66BB6A', '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#16A34A', '#15803D', '#166534', '#00FF00',
+            // Мятные и аквамариновые тона
+            '#E6FFFA', '#B2F5EA', '#81E6D9', '#4FD1C7', '#38B2AC', '#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#26C6DA',
+            '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#06B6D4', '#0891B2', '#0E7490', '#155E75', '#164E63', '#00FFFF',
+            // Серые и нейтральные тона
+            '#F0F4F8', '#E2E8F0', '#CBD5E0', '#A0AEC0', '#718096', '#BDBDBD', '#9E9E9E', '#616161', '#424242', '#212121',
+            '#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A',
+            // Золотые и бронзовые тона
+            '#FFFBEB', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#FFD700', '#FFA500', '#FF8C00', '#FF7F50', '#FF6347',
+            '#FEF7ED', '#FED7AA', '#FDBA74', '#FB923C', '#F97316', '#CD7F32', '#B8860B', '#DAA520', '#CD853F', '#D2691E',
+            // Серебряные и металлические тона
+            '#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#C0C0C0', '#A8A8A8', '#909090', '#787878', '#606060',
+            '#E5E7EB', '#D1D5DB', '#9CA3AF', '#6B7280', '#4B5563', '#374151', '#1F2937', '#111827', '#0F172A', '#000000',
+            // Неоновые и яркие тона
+            '#00FF00', '#00FFFF', '#FF00FF', '#FFFF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00',
+            '#FF4000', '#FF8000', '#FFBF00', '#BFFF00', '#80FF00', '#40FF00', '#00FF40', '#00FF80', '#00FFBF', '#00BFFF',
+            // Пастельные тона
+            '#FFE4E1', '#FFD1DC', '#FFB6C1', '#FFA0B4', '#FF91A4', '#FFC0CB', '#FFCCCB', '#E6E6FA', '#D8BFD8', '#DDA0DD',
+            '#DA70D6', '#EE82EE', '#F0E68C', '#F5DEB3', '#FFE4B5', '#FFEFD5', '#FFF8DC', '#F0FFF0', '#F5FFFA', '#F0F8FF'
         ];
         
-        // Темные и около темные фоновые цвета с большей вариативностью
+        // Расширенная палитра темных и около темных фоновых цветов (80+ цветов)
         this.backgroundPalette = [
             // Очень темные серые
-            '#0f0f0f', '#121212', '#141414', '#161616', '#181818',
-            '#1a1a1a', '#1c1c1c', '#1e1e1e', '#202020', '#212121',
+            '#0f0f0f', '#121212', '#141414', '#161616', '#181818', '#1a1a1a', '#1c1c1c', '#1e1e1e', '#202020', '#212121',
             // Темные серые
-            '#242424', '#262626', '#282828', '#2a2a2a', '#2c2c2c',
-            '#2d2d2d', '#2f2f2f', '#313131', '#333333', '#353535',
+            '#242424', '#262626', '#282828', '#2a2a2a', '#2c2c2c', '#2d2d2d', '#2f2f2f', '#313131', '#333333', '#353535',
+            // Средние темные серые
+            '#373737', '#393939', '#3b3b3b', '#3d3d3d', '#3f3f3f', '#404040', '#424242', '#444444', '#464646', '#484848',
             // Темно-синие
-            '#0d1117', '#161b22', '#21262d', '#30363d', '#484f58',
+            '#0d1117', '#161b22', '#21262d', '#30363d', '#484f58', '#0f172a', '#1e293b', '#334155', '#475569', '#64748b',
+            '#1e3a8a', '#1e40af', '#1d4ed8', '#2563eb', '#3b82f6', '#0c4a6e', '#075985', '#0369a1', '#0284c7', '#0ea5e9',
             // Темно-фиолетовые
-            '#1a0d1a', '#2d1b2d', '#3d2a3d', '#4a2c4a', '#5a3a5a',
+            '#1a0d1a', '#2d1b2d', '#3d2a3d', '#4a2c4a', '#5a3a5a', '#581c87', '#6b21a8', '#7c2d12', '#7c3aed', '#8b5cf6',
+            '#4c1d95', '#5b21b6', '#6d28d9', '#7c3aed', '#8b5cf6', '#1e1b4b', '#312e81', '#3730a3', '#4338ca', '#4f46e5',
             // Темно-зеленые
-            '#0d1a0d', '#1a2d1a', '#2a3d2a', '#3a4a3a', '#4a5a4a',
+            '#0d1a0d', '#1a2d1a', '#2a3d2a', '#3a4a3a', '#4a5a4a', '#14532d', '#166534', '#15803d', '#16a34a', '#22c55e',
+            '#052e16', '#064e3b', '#065f46', '#047857', '#059669', '#0f172a', '#1e293b', '#334155', '#475569', '#64748b',
             // Темно-коричневые
-            '#1a0f0d', '#2d1a16', '#3d2a24', '#4a3a33', '#5a4a43',
+            '#1a0f0d', '#2d1a16', '#3d2a24', '#4a3a33', '#5a4a43', '#451a03', '#78350f', '#92400e', '#b45309', '#d97706',
+            '#7c2d12', '#991b1b', '#b91c1c', '#dc2626', '#ef4444', '#3e2723', '#4e342e', '#5d4037', '#6d4c41', '#8d6e63',
             // Темно-красные
-            '#1a0d0d', '#2d1616', '#3d2424', '#4a3333', '#5a4343'
+            '#1a0d0d', '#2d1616', '#3d2424', '#4a3333', '#5a4343', '#7f1d1d', '#991b1b', '#b91c1b', '#dc2626', '#ef4444',
+            '#881337', '#9f1239', '#be123c', '#e11d48', '#f43f5e', '#4c0519', '#7c2d12', '#991b1b', '#b91c1b', '#dc2626',
+            // Темно-желтые и оранжевые
+            '#451a03', '#78350f', '#92400e', '#b45309', '#d97706', '#ea580c', '#f97316', '#fb923c', '#fdba74', '#fed7aa',
+            '#7c2d12', '#9a3412', '#c2410c', '#ea580c', '#f97316', '#1c1917', '#292524', '#44403c', '#57534e', '#78716c',
+            // Темно-бирюзовые и мятные
+            '#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#0c4a6e', '#075985', '#0369a1', '#0284c7', '#0ea5e9',
+            '#164e63', '#155e75', '#0e7490', '#0891b2', '#06b6d4', '#134e4a', '#115e59', '#0f766e', '#0d9488', '#14b8a6',
+            // Темно-розовые и малиновые
+            '#500724', '#831843', '#9d174d', '#be185d', '#db2777', '#ec4899', '#f472b6', '#f9a8d4', '#fbcfe8', '#fce7f3',
+            '#4c0519', '#7c2d12', '#991b1b', '#b91c1b', '#dc2626', '#881337', '#9f1239', '#be123c', '#e11d48', '#f43f5e'
         ];
         
     }
@@ -89,11 +142,22 @@ class SVGPatternGenerator {
         return this.colorPalette[Math.floor(Math.random() * this.colorPalette.length)];
     }
     
-    // Получить случайную палитру
+    // Получить случайную палитру (4-12 цветов из одной палитры)
     getRandomPalette() {
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
-        return this.colorPalettes[randomPaletteName];
+        const selectedPalette = this.colorPalettes[randomPaletteName];
+        
+        // Выбираем 4-12 случайных цветов из выбранной палитры с случайной прозрачностью
+        const numColors = this.randomInt(4, 12);
+        const paletteColors = [];
+        for (let i = 0; i < numColors; i++) {
+            const randomColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+            const randomOpacity = this.random(0.3, 0.9); // Случайная прозрачность от 0.3 до 0.9
+            paletteColors.push({ color: randomColor, opacity: randomOpacity });
+        }
+        
+        return paletteColors;
     }
     
     // Получить цвет из конкретной палитры
@@ -154,85 +218,38 @@ class SVGPatternGenerator {
 
     generatePattern(patternType) {
         try {
-            switch (patternType) {
-                case 'circles':
-                    return this.generateCirclesPattern();
-                case 'hexagons':
-                    return this.generateHexagonsPattern();
-                case 'grid':
-                    return this.generateGridPattern();
-                case 'octagons':
-                    return this.generateOctagonsPattern();
-                case 'herringbone':
-                    return this.generateHerringbonePattern();
-                case 'quilt':
-                    return this.generateQuiltPattern();
-                case 'honeycomb':
-                    return this.generateHoneycombPattern();
-                default:
-                    return this.generateCirclesPattern();
-            }
+            // Всегда генерируем только круги
+            return this.generateCirclesPattern();
         } catch (error) {
             return this.generateCirclesPattern();
         }
     }
 
     generateRandomPattern() {
-        const patterns = ['circles', 'hexagons', 'grid', 'octagons', 'herringbone', 'quilt', 'honeycomb'];
-        const randomType = patterns[this.randomInt(0, patterns.length - 1)];
-        console.log(`🎲 Случайный паттерн: ${randomType}`);
-        return this.generatePattern(randomType);
+        // Всегда генерируем только круги
+        return this.generateCirclesPattern();
     }
 
-    // Крутой геометрический паттерн с точками - идеальная сетка
-    generateDotsPattern() {
-        const size = this.getRandomSize();
-        const dots = [];
-        const palette = this.getRandomPalette();
-        
-        // Создаем идеальную геометрическую сетку
-        const gridSize = this.randomInt(10, 16);
-        const cellWidth = size.width / gridSize;
-        const cellHeight = size.height / gridSize;
-        
-        // Создаем паттерн шахматной доски или диагональных линий
-        const patternType = this.randomInt(0, 2);
-        
-        for (let row = 0; row < gridSize; row++) {
-            for (let col = 0; col < gridSize; col++) {
-                let shouldDraw = false;
-                
-                if (patternType === 0) {
-                    // Шахматная доска
-                    shouldDraw = (row + col) % 2 === 0;
-                } else if (patternType === 1) {
-                    // Диагональные линии
-                    shouldDraw = (row + col) % 3 === 0;
-                }
-                
-                if (shouldDraw) {
-                    const x = col * cellWidth + cellWidth / 2;
-                    const y = row * cellHeight + cellHeight / 2;
-                    
-                    // Размеры точек в зависимости от позиции в сетке
-                    const baseRadius = Math.min(cellWidth, cellHeight) * 0.3;
-                    const radius = baseRadius + this.random(-baseRadius * 0.3, baseRadius * 0.3);
-                    const opacity = this.random(0.4, 0.9);
-                    const color = palette[Math.floor(Math.random() * palette.length)];
-                    
-                    dots.push(`<circle cx="${x}" cy="${y}" r="${radius}" fill="${color}" opacity="${opacity}"/>`);
-                }
-            }
-        }
-        
-        return this.createSVG(size.width, size.height, dots.join(''));
-    }
 
-    // Крутой геометрический паттерн с кругами - идеальные перекрывающиеся круги
+
+    // Крутой геометрический паттерн с кругами - идеальные перекрывающиеся круги с цветами из одной палитры
     generateCirclesPattern() {
         const size = this.getRandomSize();
         const circles = [];
-        const palette = this.getRandomPalette();
+        
+        // Выбираем одну случайную палитру
+        const paletteNames = Object.keys(this.colorPalettes);
+        const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
+        const selectedPalette = this.colorPalettes[randomPaletteName];
+        
+        // Выбираем 4-12 случайных цветов из выбранной палитры с случайной прозрачностью
+        const numColors = this.randomInt(4, 12);
+        const paletteColors = [];
+        for (let i = 0; i < numColors; i++) {
+            const randomColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+            const randomOpacity = this.random(0.3, 0.9); // Случайная прозрачность от 0.3 до 0.9
+            paletteColors.push({ color: randomColor, opacity: randomOpacity });
+        }
         
         // Создаем идеальную сетку кругов
         const gridSize = this.randomInt(4, 8);
@@ -240,28 +257,45 @@ class SVGPatternGenerator {
         const cellHeight = size.height / gridSize;
         
         // Создаем несколько слоев для глубины
-        const layers = this.randomInt(2, 3);
+        const layers = this.randomInt(3, 5); // Больше слоев для богатства
         
         for (let layer = 0; layer < layers; layer++) {
-            const layerRadius = this.randomInt(20, 50);
-            const layerOpacity = this.random(0.3, 0.7);
+            const layerRadius = this.randomInt(15, 60); // Больше вариативности размеров
+            const layerOpacity = this.random(0.2, 0.8); // Больше вариативности прозрачности
             
             for (let row = 0; row < gridSize; row++) {
                 for (let col = 0; col < gridSize; col++) {
                     const x = col * cellWidth + cellWidth / 2;
                     const y = row * cellHeight + cellHeight / 2;
                     
-                    // Добавляем небольшое смещение для каждого слоя
-                    const offsetX = this.random(-cellWidth * 0.2, cellWidth * 0.2);
-                    const offsetY = this.random(-cellHeight * 0.2, cellHeight * 0.2);
+                    // Добавляем больше смещения для каждого слоя
+                    const offsetX = this.random(-cellWidth * 0.3, cellWidth * 0.3);
+                    const offsetY = this.random(-cellHeight * 0.3, cellHeight * 0.3);
                     
                     const finalX = x + offsetX;
                     const finalY = y + offsetY;
                     
-                    const radius = layerRadius + this.random(-layerRadius * 0.2, layerRadius * 0.2);
-                    const color = palette[Math.floor(Math.random() * palette.length)];
+                    const radius = layerRadius + this.random(-layerRadius * 0.3, layerRadius * 0.3);
+                    const colorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
+                    const color = colorObj.color;
+                    const colorOpacity = colorObj.opacity;
                     
-                    circles.push(`<circle cx="${finalX}" cy="${finalY}" r="${radius}" fill="${color}" opacity="${layerOpacity}"/>`);
+                    // Добавляем градиентные эффекты для некоторых кругов
+                    const hasGradient = this.randomInt(0, 3) === 0;
+                    if (hasGradient) {
+                        const gradientId = `gradient_${layer}_${row}_${col}`;
+                        const gradientColorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
+                        const gradientColor = gradientColorObj.color;
+                                                circles.push(`<defs>
+                            <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" style="stop-color:${color};stop-opacity:${colorOpacity}"/>
+                                <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${colorOpacity * 0.3}"/>
+                            </radialGradient>
+                        </defs>`);
+                        circles.push(`<circle cx="${finalX}" cy="${finalY}" r="${radius}" fill="url(#${gradientId})"/>`);
+                    } else {
+                        circles.push(`<circle cx="${finalX}" cy="${finalY}" r="${radius}" fill="${color}" opacity="${colorOpacity}"/>`);
+                    }
                 }
             }
         }
@@ -269,203 +303,17 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, circles.join(''));
     }
 
-    // Крутой геометрический паттерн с треугольниками - идеальная мозаика
-    generateTrianglesPattern() {
-        const size = this.getRandomSize();
-        const triangles = [];
-        const palette = this.getRandomPalette();
-        
-        // Создаем идеальную мозаику из треугольников
-        const triangleSize = this.randomInt(25, 40);
-        const cols = Math.ceil(size.width / triangleSize);
-        const rows = Math.ceil(size.height / triangleSize);
-        
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                const x = col * triangleSize;
-                const y = row * triangleSize;
-                
-                // Создаем два треугольника в каждой ячейке (ромб)
-                const color1 = palette[Math.floor(Math.random() * palette.length)];
-                const color2 = palette[Math.floor(Math.random() * palette.length)];
-                const opacity = this.random(0.4, 0.8);
-                
-                // Верхний треугольник
-                const topTriangle = `${x},${y} ${x + triangleSize/2},${y + triangleSize/2} ${x + triangleSize},${y}`;
-                triangles.push(`<polygon points="${topTriangle}" fill="${color1}" opacity="${opacity}"/>`);
-                
-                // Нижний треугольник
-                const bottomTriangle = `${x},${y + triangleSize} ${x + triangleSize/2},${y + triangleSize/2} ${x + triangleSize},${y + triangleSize}`;
-                triangles.push(`<polygon points="${bottomTriangle}" fill="${color2}" opacity="${opacity}"/>`);
-            }
-        }
-        
-        return this.createSVG(size.width, size.height, triangles.join(''));
-    }
-
-    // Генерирует повернутый треугольник
-    generateRotatedTriangle(centerX, centerY, size, rotation) {
-        const points = [];
-        for (let i = 0; i < 3; i++) {
-            const angle = (i * Math.PI * 2 / 3) + rotation;
-            const x = centerX + size * Math.cos(angle);
-            const y = centerY + size * Math.sin(angle);
-            points.push(`${x},${y}`);
-        }
-        return points.join(' ');
-    }
 
 
 
-    // Улучшенный паттерн с шестигранниками - полностью рандомный
-    // Крутой геометрический паттерн с шестиугольниками - идеальная мозаика
-    generateHexagonsPattern() {
-        const size = this.getRandomSize();
-        const hexagons = [];
-        const palette = this.getRandomPalette();
-        
-        // Создаем идеальную мозаику из шестиугольников
-        const hexSize = this.randomInt(20, 35);
-        const hexWidth = hexSize * Math.sqrt(3);
-        const hexHeight = hexSize * 2;
-        
-        const cols = Math.ceil(size.width / (hexWidth * 0.75)) + 1;
-        const rows = Math.ceil(size.height / (hexHeight * 0.5)) + 1;
-        
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                const x = col * hexWidth * 0.75;
-                const y = row * hexHeight * 0.5;
-                
-                // Смещение для четных рядов
-                const offsetX = (row % 2) * hexWidth * 0.375;
-                const finalX = x + offsetX;
-                
-                if (finalX < size.width + hexSize && y < size.height + hexSize) {
-                    const color = palette[Math.floor(Math.random() * palette.length)];
-                    const opacity = this.random(0.4, 0.8);
-                    const points = this.generateHexagonPoints(finalX, y, hexSize);
-                    
-                    hexagons.push(`<polygon points="${points}" 
-                        fill="${color}" opacity="${opacity}"/>`);
-                }
-            }
-        }
-        
-        return this.createSVG(size.width, size.height, hexagons.join(''));
-    }
-
-    generateHexagonPoints(centerX, centerY, size) {
-        const points = [];
-        for (let i = 0; i < 6; i++) {
-            const angle = (i * Math.PI) / 3;
-            const x = centerX + size * Math.cos(angle);
-            const y = centerY + size * Math.sin(angle);
-            points.push(`${x},${y}`);
-        }
-        return points.join(' ');
-    }
-
-    // Улучшенный паттерн с волнами - больше вариативности
-    generateWavesPattern() {
-        const size = this.getRandomSize();
-        const waves = [];
-        const numWaves = this.randomInt(8, 35); // Больше вариативности в количестве
-        
-        for (let i = 0; i < numWaves; i++) {
-            const y = this.random(0, size.height); // Случайное расположение по Y
-            const amplitude = this.random(5, 80); // Больше вариаций амплитуды
-            const frequency = this.random(0.003, 0.05); // Больше вариаций частоты
-            const phase = this.random(0, Math.PI * 2);
-            
-            // Случайные стили волн
-            const waveStyle = this.randomInt(0, 3);
-            const opacity = this.random(0.05, 0.8); // Больше вариативности прозрачности
-            const color = this.getRandomColor();
-            const strokeWidth = this.random(0.5, 6); // Больше вариаций толщины
-            
-            let wave;
-            if (waveStyle === 0) {
-                // Обычная волна
-                const path = this.generateComplexWave(size.width, y, amplitude, frequency, phase);
-                wave = `<path d="${path}" fill="none" stroke="${color}" 
-                    style="opacity:${opacity};stroke-width:${strokeWidth}px;"/>`;
-            } else if (waveStyle === 1) {
-                // Волна с заливкой
-                const path = this.generateComplexWave(size.width, y, amplitude, frequency, phase);
-                const fillPath = path + ` L${size.width},${size.height} L0,${size.height} Z`;
-                wave = `<path d="${fillPath}" fill="${color}" opacity="${opacity * 0.3}"/>`;
-            } else {
-                // Двойная волна
-                const path1 = this.generateComplexWave(size.width, y, amplitude, frequency, phase);
-                const path2 = this.generateComplexWave(size.width, y + 10, amplitude * 0.7, frequency * 1.5, phase + Math.PI);
-                wave = `<path d="${path1}" fill="none" stroke="${color}" 
-                    style="opacity:${opacity};stroke-width:${strokeWidth}px;"/>
-                    <path d="${path2}" fill="none" stroke="${this.getRandomColor()}" 
-                    style="opacity:${opacity * 0.6};stroke-width:${strokeWidth * 0.7}px;"/>`;
-            }
-            
-            waves.push(wave);
-        }
-        
-        return this.createSVG(size.width, size.height, waves.join(''));
-    }
-
-    // Генерирует сложную волну
-    generateComplexWave(width, y, amplitude, frequency, phase) {
-        const points = [];
-        const steps = 60; // Больше точек для плавности
-        
-        for (let i = 0; i <= steps; i++) {
-            const x = (i / steps) * width;
-            const waveY = y + amplitude * Math.sin(frequency * x + phase);
-            points.push(`${x},${waveY}`);
-        }
-        
-        return `M${points.join(' L')}`;
-    }
 
 
 
-    // Улучшенный паттерн со звездами - полностью рандомный
-    generateStarsPattern() {
 
-        const size = this.getRandomSize();
-        const stars = [];
-        const numStars = this.randomInt(25, 50);
-        
-        for (let i = 0; i < numStars; i++) {
-            const x = this.random(0, size.width);
-            const y = this.random(0, size.height);
-            const starSize = this.random(5, 20); // Больше вариаций размеров
-            const points = this.randomInt(5, 10); // Больше вариаций лучей
-            const opacity = this.random(0.2, 0.9);
-            const color = this.getRandomColor();
-            
-            const starPath = this.generateStarPath(x, y, starSize, points);
-            stars.push(`<path d="${starPath}" fill="${color}" opacity="${opacity}"/>`);
-        }
-        
-        return this.createSVG(size.width, size.height, stars.join(''));
-    }
 
-    generateStarPath(centerX, centerY, size, points) {
-        const path = [];
-        for (let i = 0; i < points * 2; i++) {
-            const angle = (i * Math.PI) / points;
-            const radius = i % 2 === 0 ? size : size * 0.5;
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
-            
-            if (i === 0) {
-                path.push(`M${x},${y}`);
-            } else {
-                path.push(`L${x},${y}`);
-            }
-        }
-        path.push('Z');
-        return path.join(' ');
-    }
+
+
+
 
     // Улучшенный паттерн со спиралями - полностью рандомный
     generateSpiralPattern() {
@@ -511,31 +359,7 @@ class SVGPatternGenerator {
         return points.join(' ');
     }
 
-    // Крутой геометрический паттерн с сеткой - идеальная сетка
-    generateGridPattern() {
-        const size = this.getRandomSize();
-        const grid = [];
-        const palette = this.getRandomPalette();
-        const cellSize = this.randomInt(25, 45);
-        const opacity = this.random(0.3, 0.6);
-        const strokeWidth = this.random(1.5, 3);
-        
-        // Вертикальные линии
-        for (let x = 0; x <= size.width; x += cellSize) {
-            const color = palette[Math.floor(Math.random() * palette.length)];
-            grid.push(`<line x1="${x}" y1="0" x2="${x}" y2="${size.height}" 
-                stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
-        }
-        
-        // Горизонтальные линии
-        for (let y = 0; y <= size.height; y += cellSize) {
-            const color = palette[Math.floor(Math.random() * palette.length)];
-            grid.push(`<line x1="0" y1="${y}" x2="${size.width}" y2="${y}" 
-                stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
-        }
-        
-        return this.createSVG(size.width, size.height, grid.join(''));
-    }
+
 
 
 
@@ -653,38 +477,7 @@ class SVGPatternGenerator {
     }
 
     // Крутой геометрический паттерн с восьмиугольниками - идеальная мозаика
-    generateOctagonsPattern() {
-        const size = this.getRandomSize();
-        const octagons = [];
-        const palette = this.getRandomPalette();
-        
-        // Создаем идеальную мозаику из восьмиугольников
-        const octagonSize = this.randomInt(20, 35);
-        const cols = Math.ceil(size.width / (octagonSize * 1.5)) + 1;
-        const rows = Math.ceil(size.height / (octagonSize * 1.5)) + 1;
-        
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                const x = col * octagonSize * 1.5;
-                const y = row * octagonSize * 1.5;
-                
-                // Смещение для четных рядов
-                const offsetX = (row % 2) * octagonSize * 0.75;
-                const finalX = x + offsetX;
-                
-                if (finalX < size.width + octagonSize && y < size.height + octagonSize) {
-                    const color = palette[Math.floor(Math.random() * palette.length)];
-                    const opacity = this.random(0.4, 0.8);
-                    const points = this.generateOctagonPoints(finalX + octagonSize/2, y + octagonSize/2, octagonSize);
-                    
-                    octagons.push(`<polygon points="${points}" 
-                        fill="${color}" opacity="${opacity}"/>`);
-                }
-            }
-        }
-        
-        return this.createSVG(size.width, size.height, octagons.join(''));
-    }
+
 
     // Крутой геометрический паттерн с шевронами - идеальная мозаика
     generateChevronsPattern() {
@@ -718,66 +511,168 @@ class SVGPatternGenerator {
     }
 
     // Крутой геометрический паттерн елочкой - идеальная мозаика
-    generateHerringbonePattern() {
-        const size = this.getRandomSize();
-        const herringbone = [];
-        const palette = this.getRandomPalette();
-        
-        // Создаем идеальную мозаику елочкой
-        const brickWidth = this.randomInt(25, 40);
-        const brickHeight = this.randomInt(15, 25);
-        const cols = Math.ceil(size.width / brickWidth) + 1;
-        const rows = Math.ceil(size.height / brickHeight) + 1;
-        
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                const x = col * brickWidth;
-                const y = row * brickHeight;
-                
-                // Смещение для четных рядов
-                const offsetX = (row % 2) * brickWidth / 2;
-                const finalX = x + offsetX;
-                
-                if (finalX < size.width + brickWidth && y < size.height + brickHeight) {
-                    const color = palette[Math.floor(Math.random() * palette.length)];
-                    const opacity = this.random(0.4, 0.8);
-                    
-                    // Создаем кирпич елочкой
-                    herringbone.push(`<rect x="${finalX}" y="${y}" 
-                        width="${brickWidth}" height="${brickHeight}" 
-                        fill="${color}" opacity="${opacity}"/>`);
-                }
-            }
-        }
-        
-        return this.createSVG(size.width, size.height, herringbone.join(''));
-    }
 
-    // Крутой геометрический паттерн лоскутного одеяла - идеальная мозаика
+
+    // Крутой геометрический паттерн лоскутного одеяла - идеальная мозаика с крутыми эффектами
     generateQuiltPattern() {
         const size = this.getRandomSize();
         const quilt = [];
-        const palette = this.getRandomPalette();
         
-        // Создаем идеальную мозаику лоскутного одеяла
-        const patchSize = this.randomInt(20, 35);
-        const cols = Math.ceil(size.width / patchSize);
-        const rows = Math.ceil(size.height / patchSize);
+        // Выбираем одну случайную палитру для лоскутного одеяла
+        const paletteNames = Object.keys(this.colorPalettes);
+        const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
+        const selectedPalette = this.colorPalettes[randomPaletteName];
+        
+        // Выбираем 4-12 случайных цветов из выбранной палитры с случайной прозрачностью
+        const numColors = this.randomInt(4, 12);
+        const paletteColors = [];
+        for (let i = 0; i < numColors; i++) {
+            const randomColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+            const randomOpacity = this.random(0.3, 0.9); // Случайная прозрачность от 0.3 до 0.9
+            paletteColors.push({ color: randomColor, opacity: randomOpacity });
+        }
+        
+        // Создаем идеальную мозаику лоскутного одеяла с разными размерами лоскутов
+        const basePatchSize = this.randomInt(15, 30);
+        const cols = Math.ceil(size.width / basePatchSize) + 2;
+        const rows = Math.ceil(size.height / basePatchSize) + 2;
+        
+        // Создаем несколько слоев для глубины
+        const layers = this.randomInt(2, 4);
+        
+        for (let layer = 0; layer < layers; layer++) {
+            const layerOpacity = this.random(0.3, 0.7);
+            const layerOffset = layer * 3;
         
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-                const x = col * patchSize;
-                const y = row * patchSize;
-                
-                const color = palette[Math.floor(Math.random() * palette.length)];
-                const opacity = this.random(0.4, 0.8);
-                
-                // Создаем лоскут (квадрат с закругленными углами)
+                    const x = col * basePatchSize + layerOffset;
+                    const y = row * basePatchSize + layerOffset;
+                    
+                    if (x < size.width && y < size.height) {
+                        // Разные размеры лоскутов для более интересного эффекта
+                        const patchSize = basePatchSize + this.randomInt(-5, 10);
+                        const colorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
+                        const color = colorObj.color;
+                        const colorOpacity = colorObj.opacity;
+                        const secondaryColorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
+                        const secondaryColor = secondaryColorObj.color;
+                        const secondaryOpacity = secondaryColorObj.opacity;
+                        
+                        // Создаем разные типы лоскутов
+                        const patchType = this.randomInt(0, 6);
+                        
+                        if (patchType === 0) {
+                            // Обычный лоскут с закругленными углами
+                            const cornerRadius = patchSize * this.random(0.05, 0.2);
+                            quilt.push(`<rect x="${x}" y="${y}" 
+                                width="${patchSize}" height="${patchSize}" 
+                                rx="${cornerRadius}" ry="${cornerRadius}"
+                                fill="${color}" opacity="${colorOpacity}"/>`);
+                        } else if (patchType === 1) {
+                            // Лоскут с градиентом
+                            const gradientId = `quilt_grad_${layer}_${row}_${col}`;
+                            quilt.push(`<defs>
+                                <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:${color};stop-opacity:${colorOpacity}"/>
+                                    <stop offset="100%" style="stop-color:${secondaryColor};stop-opacity:${secondaryOpacity}"/>
+                                </linearGradient>
+                            </defs>`);
+                            quilt.push(`<rect x="${x}" y="${y}" 
+                                width="${patchSize}" height="${patchSize}" 
+                                rx="${patchSize * 0.1}" ry="${patchSize * 0.1}"
+                                fill="url(#${gradientId})"/>`);
+                        } else if (patchType === 2) {
+                            // Лоскут с внутренним узором
                 const cornerRadius = patchSize * 0.1;
-                quilt.push(`<rect x="${x}" y="${y}" 
-                    width="${patchSize}" height="${patchSize}" 
-                    rx="${cornerRadius}" ry="${cornerRadius}"
-                    fill="${color}" opacity="${opacity}"/>`);
+                                            quilt.push(`<rect x="${x}" y="${y}" 
+                                width="${patchSize}" height="${patchSize}" 
+                                rx="${cornerRadius}" ry="${cornerRadius}"
+                                fill="${color}" opacity="${colorOpacity}"/>`);
+                            
+                            // Внутренний узор
+                            const innerSize = patchSize * 0.6;
+                            const innerX = x + (patchSize - innerSize) / 2;
+                            const innerY = y + (patchSize - innerSize) / 2;
+                            quilt.push(`<rect x="${innerX}" y="${innerY}" 
+                                width="${innerSize}" height="${innerSize}" 
+                                rx="${cornerRadius * 0.5}" ry="${cornerRadius * 0.5}"
+                                fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
+                        } else if (patchType === 3) {
+                            // Лоскут в виде ромба
+                            const centerX = x + patchSize / 2;
+                            const centerY = y + patchSize / 2;
+                            const diamondSize = patchSize * 0.8;
+                            const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
+                            quilt.push(`<polygon points="${points}" 
+                                fill="${color}" opacity="${colorOpacity}"/>`);
+                        } else if (patchType === 4) {
+                            // Лоскут с круговым узором
+                            const cornerRadius = patchSize * 0.1;
+                            quilt.push(`<rect x="${x}" y="${y}" 
+                                width="${patchSize}" height="${patchSize}" 
+                                rx="${cornerRadius}" ry="${cornerRadius}"
+                                fill="${color}" opacity="${colorOpacity}"/>`);
+                            
+                            // Круговой узор
+                            const centerX = x + patchSize / 2;
+                            const centerY = y + patchSize / 2;
+                            const circleRadius = patchSize * 0.3;
+                            quilt.push(`<circle cx="${centerX}" cy="${centerY}" r="${circleRadius}" 
+                                fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
+                        } else {
+                            // Лоскут с звездчатым узором
+                            const cornerRadius = patchSize * 0.1;
+                            quilt.push(`<rect x="${x}" y="${y}" 
+                                width="${patchSize}" height="${patchSize}" 
+                                rx="${cornerRadius}" ry="${cornerRadius}"
+                                fill="${color}" opacity="${colorOpacity}"/>`);
+                            
+                            // Звездчатый узор
+                            const centerX = x + patchSize / 2;
+                            const centerY = y + patchSize / 2;
+                            const starRadius = patchSize * 0.25;
+                            const starPoints = this.generateStarPoints(centerX, centerY, starRadius, 5);
+                            quilt.push(`<polygon points="${starPoints}" 
+                                fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
+                        }
+                        
+                        // Добавляем декоративные элементы для некоторых лоскутов
+                        if (this.randomInt(0, 4) === 0) {
+                            const decorType = this.randomInt(0, 3);
+                            const decorColorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
+                            const decorColor = decorColorObj.color;
+                            const decorOpacity = decorColorObj.opacity;
+                            
+                            if (decorType === 0) {
+                                // Декоративные точки
+                                for (let i = 0; i < 3; i++) {
+                                    const dotX = x + this.random(5, patchSize - 5);
+                                    const dotY = y + this.random(5, patchSize - 5);
+                                    const dotRadius = this.random(1, 3);
+                                    quilt.push(`<circle cx="${dotX}" cy="${dotY}" r="${dotRadius}" 
+                                        fill="${decorColor}" opacity="${decorOpacity}"/>`);
+                                }
+                            } else if (decorType === 1) {
+                                // Декоративные линии
+                                const lineX1 = x + this.random(0, patchSize);
+                                const lineY1 = y + this.random(0, patchSize);
+                                const lineX2 = x + this.random(0, patchSize);
+                                const lineY2 = y + this.random(0, patchSize);
+                                quilt.push(`<line x1="${lineX1}" y1="${lineY1}" x2="${lineX2}" y2="${lineY2}" 
+                                    stroke="${decorColor}" stroke-width="${this.random(1, 3)}" opacity="${decorOpacity}"/>`);
+                            } else {
+                                // Декоративные треугольники
+                                const triX = x + patchSize / 2;
+                                const triY = y + patchSize / 2;
+                                const triSize = this.random(3, 8);
+                                const triPoints = `${triX},${triY - triSize} ${triX + triSize},${triY + triSize} ${triX - triSize},${triY + triSize}`;
+                                quilt.push(`<polygon points="${triPoints}" 
+                                    fill="${decorColor}" opacity="${decorOpacity}"/>`);
+                            }
+                        }
+                    }
+                }
             }
         }
         
@@ -820,48 +715,7 @@ class SVGPatternGenerator {
     }
 
     // Классный паттерн соты - идеальная мозаика
-    generateHoneycombPattern() {
-        const size = this.getRandomSize();
-        const honeycomb = [];
-        const palette = this.getRandomPalette();
-        
-        // Создаем идеальную мозаику из сот
-        const hexSize = this.randomInt(18, 28);
-        const hexWidth = hexSize * Math.sqrt(3);
-        const hexHeight = hexSize * 2;
-        
-        const cols = Math.ceil(size.width / (hexWidth * 0.75)) + 2;
-        const rows = Math.ceil(size.height / (hexHeight * 0.5)) + 2;
-        
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                const x = col * hexWidth * 0.75;
-                const y = row * hexHeight * 0.5;
-                
-                // Смещение для четных рядов
-                const offsetX = (row % 2) * hexWidth * 0.375;
-                const finalX = x + offsetX;
-                
-                if (finalX < size.width + hexSize && y < size.height + hexSize) {
-                    const color = palette[Math.floor(Math.random() * palette.length)];
-                    const opacity = this.random(0.3, 0.7);
-                    const points = this.generateHexagonPoints(finalX + hexSize/2, y + hexSize/2, hexSize);
-                    
-                    // Создаем соту с внутренним элементом
-                    honeycomb.push(`<polygon points="${points}" 
-                        fill="${color}" opacity="${opacity}"/>`);
-                    
-                    // Добавляем внутренний элемент
-                    const innerColor = palette[Math.floor(Math.random() * palette.length)];
-                    const innerRadius = hexSize * 0.3;
-                    honeycomb.push(`<circle cx="${finalX + hexSize/2}" cy="${y + hexSize/2}" r="${innerRadius}" 
-                        fill="${innerColor}" opacity="${opacity * 0.8}"/>`);
-                }
-            }
-        }
-        
-        return this.createSVG(size.width, size.height, honeycomb.join(''));
-    }
+
 
     // Классный паттерн кирпичная кладка - идеальная структура
     generateBrickPattern() {
@@ -1554,12 +1408,8 @@ class SVGPatternGenerator {
         try {
             return [
                 this.generateCirclesPattern(),
-                this.generateHexagonsPattern(),
-                this.generateGridPattern(),
-                this.generateOctagonsPattern(),
-                this.generateHerringbonePattern(),
-                this.generateQuiltPattern(),
-                this.generateHoneycombPattern()
+                this.generateCirclesPattern(),
+                this.generateCirclesPattern()
             ];
         } catch (error) {
             return [this.generateCirclesPattern()];
@@ -1600,7 +1450,6 @@ function generateNewPatternForCard(cardId) {
             const patternContainer = card.querySelector('.pattern-container');
             if (patternContainer) {
                 patternContainer.innerHTML = newPattern;
-                console.log(`🎨 Новый паттерн сгенерирован для карточки ${cardId}`);
                 return true;
             }
         }

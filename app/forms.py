@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField, SelectField, BooleanField, SelectMultipleField
-from wtforms.validators import DataRequired, Email, Length, EqualTo, URL, Optional
-from .models import User, Group
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField, SelectField, BooleanField, SelectMultipleField, IntegerField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, URL, Optional, NumberRange
+from .models import Group
 
 class LoginForm(FlaskForm):
     username = StringField('Имя пользователя', validators=[DataRequired()])
@@ -22,7 +22,6 @@ class RegistrationForm(FlaskForm):
         self.group_id.choices = [('', 'Выберите группу')] + [
             (str(group.id), group.name) for group in Group.query.filter_by(is_active=True).order_by(Group.name).all()
         ]
-
 
 class AdminUserForm(FlaskForm):
     """Форма для создания пользователей в админке (группа необязательна)"""
@@ -87,7 +86,7 @@ class PasswordResetForm(FlaskForm):
 
 class MaterialForm(FlaskForm):
     title = StringField('Название', validators=[DataRequired()])
-    description = TextAreaField('Описание', validators=[Length(max=100, message='Описание не должно превышать 100 символов')])
+    description = TextAreaField('Описание', validators=[Length(max=300, message='Описание не должно превышать 300 символов')])
     type = SelectField('Тип', choices=[('lecture', 'Лекция'), ('assignment', 'Задание')])
     subject_id = SelectField('Предмет', coerce=int, validators=[DataRequired()])
     file = FileField('Файл')
@@ -98,15 +97,10 @@ class SubjectForm(FlaskForm):
     title = StringField('Название предмета', validators=[DataRequired()])
     description = TextAreaField('Описание')
     pattern_type = SelectField('Фон предмета', choices=[
-        ('dots', 'Точки'),
-        ('lines', 'Линии'),
-        ('grid', 'Сетка'),
         ('circles', 'Круги'),
-        ('hexagons', 'Шестигранники'),
-        ('waves', 'Волны'),
-        ('stars', 'Звезды'),
-        ('triangles', 'Треугольники')
-    ], default='dots')
+        ('quilt', 'Лоскутное одеяло'),
+        ('waves', 'Волны')
+    ], default='circles')
     submit = SubmitField('Сохранить')
 
 class SubmissionForm(FlaskForm):
@@ -135,18 +129,23 @@ class TicketForm(FlaskForm):
         Length(min=10, message='Сообщение должно содержать минимум 10 символов')
     ])
     files = FileField('Прикрепить файлы (до 5 МБ каждый)', render_kw={'multiple': True})
-    submit = SubmitField('Отправить тикет') 
-
+    submit = SubmitField('Отправить тикет')
 
 class GroupForm(FlaskForm):
     """Форма для создания/редактирования группы"""
     name = StringField('Название группы', validators=[
         DataRequired(message='Введите название группы'),
-        Length(min=2, max=100, message='Название должно содержать от 2 до 100 символов')
+        Length(min=2, max=300, message='Название должно содержать от 2 до 300 символов')
     ])
     description = TextAreaField('Описание')
     is_active = BooleanField('Активна')
     submit = SubmitField('Сохранить')
+
+class SolutionForm(FlaskForm):
+    """Форма для загрузки решения задания"""
+    text = TextAreaField('Текстовое решение', validators=[Optional()])
+    file = FileField('Файл решения', validators=[Optional()])
+    submit = SubmitField('Загрузить решение')
 
 class SubjectGroupForm(FlaskForm):
     """Форма для назначения предметов группам"""
@@ -169,9 +168,12 @@ class SubjectGroupForm(FlaskForm):
             (group.id, group.name) for group in groups
         ]
 
-
 class SiteSettingsForm(FlaskForm):
     """Форма для управления настройками сайта"""
     maintenance_mode = BooleanField('Технические работы')
     trial_subscription_enabled = BooleanField('Включить пробную подписку для новых аккаунтов')
+    trial_subscription_days = IntegerField('Количество дней пробной подписки', validators=[
+        NumberRange(min=1, max=365, message='Количество дней должно быть от 1 до 365')
+    ])
+    pattern_generation_enabled = BooleanField('Включить кнопку генерации паттернов')
     submit = SubmitField('Сохранить настройки')

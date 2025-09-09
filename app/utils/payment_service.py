@@ -10,7 +10,6 @@ from typing import Dict, Any
 import requests
 import base64
 
-
 class YooKassaService:
     """Сервис для работы с платежами ЮKassa"""
 
@@ -199,7 +198,7 @@ class YooKassaService:
                         "currency": current_app.config["SUBSCRIPTION_CURRENCY"],
                     },
                     "confirmation": {
-                        "type": "redirect", 
+                        "type": "redirect",
                         "return_url": return_url
                     },
                     "capture": True,
@@ -306,18 +305,18 @@ class YooKassaService:
                 current_app.logger.info(f"Время создания: {payment_record.created_at}")
                 current_app.logger.info(f"Текущее время: {datetime.utcnow()}")
                 current_app.logger.info(f"Разница: {datetime.utcnow() - payment_record.created_at}")
-                
+
                 # Если платеж создан более 5 минут назад и статус все еще pending,
                 # считаем что он был отменен
                 if (datetime.utcnow() - payment_record.created_at) > timedelta(minutes=5):
                     payment_record.status = "canceled"
                     payment_record.updated_at = datetime.utcnow()
                     db.session.commit()
-                    
+
                     current_app.logger.info(
                         f"Симуляция: платеж {payment_id} помечен как отмененный (таймаут)"
                     )
-                    
+
                     return {
                         "payment_id": payment_id,
                         "status": "canceled",
@@ -513,15 +512,15 @@ class YooKassaService:
     def get_subscription_info(self, user: User) -> dict:
         """
         Получает полную информацию о подписке пользователя (включая пробную)
-        
+
         Параметры:
             user (User): Пользователь
-            
+
         Возвращает:
             dict: Информация о подписке
         """
         now = datetime.utcnow()
-        
+
         # Проверяем пробную подписку
         if user.is_trial_subscription:
             if not user.trial_subscription_expires:
@@ -532,7 +531,7 @@ class YooKassaService:
                     'days_left': None,
                     'type': 'trial'
                 }
-            
+
             if user.trial_subscription_expires < now:
                 # Пробная подписка истекла
                 user.is_trial_subscription = False
@@ -545,10 +544,10 @@ class YooKassaService:
                     'days_left': 0,
                     'type': 'none'
                 }
-            
+
             time_left = user.trial_subscription_expires - now
             days_left = time_left.days
-            
+
             return {
                 'is_subscribed': True,
                 'is_trial': True,
@@ -556,7 +555,7 @@ class YooKassaService:
                 'days_left': days_left,
                 'type': 'trial'
             }
-        
+
         # Проверяем обычную подписку
         if not user.is_subscribed:
             return {
@@ -566,7 +565,7 @@ class YooKassaService:
                 'days_left': 0,
                 'type': 'none'
             }
-        
+
         # Если подписка выдана вручную администратором
         if user.is_manual_subscription:
             if user.subscription_expires and user.subscription_expires < now:
@@ -581,10 +580,10 @@ class YooKassaService:
                     'days_left': 0,
                     'type': 'none'
                 }
-            
+
             time_left = user.subscription_expires - now if user.subscription_expires else None
             days_left = time_left.days if time_left else None
-            
+
             return {
                 'is_subscribed': True,
                 'is_trial': False,
@@ -592,10 +591,10 @@ class YooKassaService:
                 'days_left': days_left,
                 'type': 'manual'
             }
-        
+
         # Проверяем платежи
         # ... (остальная логика проверки платежей)
-        
+
         return {
             'is_subscribed': False,
             'is_trial': False,
@@ -620,14 +619,14 @@ class YooKassaService:
                 'days_left': 0,
                 'expires_at': None
             }
-        
+
         if not user.trial_subscription_expires:
             return {
                 'is_trial': True,
                 'days_left': 0,
                 'expires_at': None
             }
-        
+
         now = datetime.utcnow()
         if user.trial_subscription_expires < now:
             # Пробная подписка истекла
@@ -639,12 +638,12 @@ class YooKassaService:
                 'days_left': 0,
                 'expires_at': None
             }
-        
+
         # Вычисляем оставшиеся дни
         time_left = user.trial_subscription_expires - now
         days_left = time_left.days
         hours_left = time_left.seconds // 3600
-        
+
         return {
             'is_trial': True,
             'days_left': days_left,

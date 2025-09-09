@@ -39,7 +39,29 @@
                             </label>
                             <div class="form-text text-muted" style="color: var(--text-secondary);">
                                 <i class="fas fa-info-circle me-1"></i>
-                                При включении новые пользователи автоматически получат пробную подписку на 14 дней
+                                При включении новые пользователи автоматически получат пробную подписку
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3" id="trial-days-group">
+                            <label class="form-label" for="trial_subscription_days" style="color: var(--text-primary);">
+                                <strong>{{ form.trial_subscription_days.label }}</strong>
+                            </label>
+                            {{ form.trial_subscription_days(class="form-control", id="trial_subscription_days", style="background-color: var(--dp-02); border-color: var(--border-secondary); color: var(--text-primary);", min="1", max="365") }}
+                            <div class="form-text text-muted" style="color: var(--text-secondary);">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Укажите количество дней для пробной подписки (от 1 до 365 дней)
+                            </div>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            {{ form.pattern_generation_enabled(class="form-check-input", id="pattern_generation_enabled", style="background-color: var(--dp-02); border-color: var(--border-secondary);") }}
+                            <label class="form-check-label" for="pattern_generation_enabled" style="color: var(--text-primary);">
+                                <strong>{{ form.pattern_generation_enabled.label }}</strong>
+                            </label>
+                            <div class="form-text text-muted" style="color: var(--text-secondary);">
+                                <i class="fas fa-info-circle me-1"></i>
+                                При включении администраторы смогут генерировать новые паттерны для карточек предметов
                             </div>
                         </div>
                     </div>
@@ -55,4 +77,27 @@
     </div>
 </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const trialEnabledSwitch = document.getElementById('trial_subscription_enabled');
+    const trialDaysGroup = document.getElementById('trial-days-group');
+    
+    function toggleTrialDaysField() {
+        if (trialEnabledSwitch.checked) {
+            trialDaysGroup.style.display = 'block';
+        } else {
+            trialDaysGroup.style.display = 'none';
+        }
+    }
+    
+    // Инициализируем состояние при загрузке
+    toggleTrialDaysField();
+    
+    // Обрабатываем изменения переключателя
+    trialEnabledSwitch.addEventListener('change', toggleTrialDaysField);
+});
+</script>
 {% endblock %}
