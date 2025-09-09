@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField, SelectField, BooleanField, SelectMultipleField, IntegerField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, URL, Optional, NumberRange
-from .models import User, Group
+from .models import Group
 
 class LoginForm(FlaskForm):
     username = StringField('Имя пользователя', validators=[DataRequired()])
@@ -22,7 +22,6 @@ class RegistrationForm(FlaskForm):
         self.group_id.choices = [('', 'Выберите группу')] + [
             (str(group.id), group.name) for group in Group.query.filter_by(is_active=True).order_by(Group.name).all()
         ]
-
 
 class AdminUserForm(FlaskForm):
     """Форма для создания пользователей в админке (группа необязательна)"""
@@ -130,8 +129,7 @@ class TicketForm(FlaskForm):
         Length(min=10, message='Сообщение должно содержать минимум 10 символов')
     ])
     files = FileField('Прикрепить файлы (до 5 МБ каждый)', render_kw={'multiple': True})
-    submit = SubmitField('Отправить тикет') 
-
+    submit = SubmitField('Отправить тикет')
 
 class GroupForm(FlaskForm):
     """Форма для создания/редактирования группы"""
@@ -169,7 +167,6 @@ class SubjectGroupForm(FlaskForm):
         self.group_ids.choices = [
             (group.id, group.name) for group in groups
         ]
-
 
 class SiteSettingsForm(FlaskForm):
     """Форма для управления настройками сайта"""

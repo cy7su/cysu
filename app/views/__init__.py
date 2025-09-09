@@ -11,7 +11,7 @@ from .api import api_bp
 
 __all__ = [
     'main_bp',
-    'auth_bp', 
+    'auth_bp',
     'payment_bp',
     'tickets_bp',
     'admin_bp',

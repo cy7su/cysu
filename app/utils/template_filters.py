@@ -5,7 +5,6 @@
 import re
 from markupsafe import Markup
 
-
 def format_user_contact(user):
     """
     Форматирует контактную информацию пользователя для отображения в шаблонах
@@ -28,7 +27,6 @@ def format_user_contact(user):
             'link': f"mailto:{user.email}"
         }
 
-
 def get_telegram_link(user):
     """
     Получает ссылку на Telegram пользователя
@@ -36,15 +34,14 @@ def get_telegram_link(user):
     if user.email.endswith('@telegram.org'):
         telegram_id = user.email.replace('@telegram.org', '')
         return f"tg://user?id={telegram_id}"
-    
+
     # Ищем связанного Telegram пользователя
     from app.models import TelegramUser
     telegram_user = TelegramUser.query.filter_by(user_id=user.id).first()
     if telegram_user:
         return f"tg://user?id={telegram_user.telegram_id}"
-    
-    return None
 
+    return None
 
 def make_links_clickable(text: str) -> Markup:
     """
@@ -52,7 +49,7 @@ def make_links_clickable(text: str) -> Markup:
     """
     if not text:
         return Markup("")
-    
+
     # Ищем только https:// ссылки
     if 'https://' in text:
         # Простая замена - находим https:// и делаем ссылку до пробела
@@ -73,9 +70,8 @@ def make_links_clickable(text: str) -> Markup:
                     css_class = _get_link_class(url)
                     result += f'<a href="{url}" target="_blank" class="{css_class}" title="{url}">{display_text}</a>' + part[space_pos:]
             return Markup(result)
-    
-    return Markup(text)
 
+    return Markup(text)
 
 def _shorten_url(url: str) -> str:
     """
@@ -84,33 +80,32 @@ def _shorten_url(url: str) -> str:
     # Убираем https://
     if url.startswith('https://'):
         url = url[8:]
-    
+
     # Специальная обработка для GitHub Gist
     if url.startswith('gist.github.com/'):
         return 'gist.github.com'
-    
+
     # Специальная обработка для других популярных сервисов
     if url.startswith('github.com/'):
         parts = url.split('/')
         if len(parts) >= 3:
             return f'github.com/{parts[1]}'
-    
+
     if url.startswith('gitlab.com/'):
         parts = url.split('/')
         if len(parts) >= 3:
             return f'gitlab.com/{parts[1]}'
-    
+
     if url.startswith('bitbucket.org/'):
         parts = url.split('/')
         if len(parts) >= 3:
             return f'bitbucket.org/{parts[1]}'
-    
+
     # Для остальных ссылок берем только домен
     if '/' in url:
         return url.split('/')[0]
-    
-    return url
 
+    return url
 
 def _get_link_class(url: str) -> str:
     """
@@ -118,31 +113,29 @@ def _get_link_class(url: str) -> str:
     """
     if 'gist.github.com' in url:
         return 'external-link gist-link'
-    
-    return 'external-link'
 
+    return 'external-link'
 
 def format_description(text: str) -> Markup:
     """
     Форматирует описание материала с поддержкой ссылок и переносов строк
-    
+
     Args:
         text: Текст описания
-        
+
     Returns:
         Markup: Отформатированный HTML
     """
     if not text:
         return Markup("")
-    
+
     # Сначала делаем ссылки кликабельными
     text_with_links = make_links_clickable(text)
-    
+
     # Заменяем экранированные \n на реальные переносы строк, затем на <br>
     text_with_breaks = str(text_with_links).replace('\\n', '\n').replace('\n', '<br>')
-    
-    return Markup(text_with_breaks)
 
+    return Markup(text_with_breaks)
 
 def smart_truncate(text: str, length: int = 60) -> Markup:
     """
@@ -150,13 +143,12 @@ def smart_truncate(text: str, length: int = 60) -> Markup:
     """
     if not text:
         return Markup("")
-    
+
     # Просто обрезаем и добавляем многоточие
     if len(text) > length:
         return Markup(text[:length] + "...")
-    
-    return Markup(text)
 
+    return Markup(text)
 
 def extract_filename(file_path: str) -> str:
     """
@@ -165,10 +157,9 @@ def extract_filename(file_path: str) -> str:
     """
     if not file_path:
         return ""
-    
+
     # Разделяем по слешу и берем последнюю часть
     return file_path.split('/')[-1]
-
 
 def get_cdn_url(file_path: str, subject_id: int) -> str:
     """
@@ -177,13 +168,12 @@ def get_cdn_url(file_path: str, subject_id: int) -> str:
     """
     if not file_path:
         return ""
-    
+
     # Извлекаем только имя файла
     filename = extract_filename(file_path)
-    
+
     # Возвращаем CDN URL
     return f"http://cdn.localhost:5001/{subject_id}/{filename}"
-
 
 def get_cdn_url_production(file_path: str, subject_id: int) -> str:
     """
@@ -191,6 +181,6 @@ def get_cdn_url_production(file_path: str, subject_id: int) -> str:
     """
     if not file_path:
         return ""
-    
+
     filename = extract_filename(file_path)
     return f"https://cdn.yourdomain.com/{subject_id}/{filename}"

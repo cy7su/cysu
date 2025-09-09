@@ -20,11 +20,11 @@ def tickets() -> Union[str, Response]:
     """Страница списка тикетов"""
     if current_user.is_admin:
         # Для админов показываем все тикеты
-                    tickets_list = (
-                Ticket.query.join(User, Ticket.user_id == User.id)
-                .order_by(Ticket.created_at.desc())
-                .all()
-            )
+        tickets_list = (
+            Ticket.query.join(User, Ticket.user_id == User.id)
+            .order_by(Ticket.created_at.desc())
+            .all()
+        )
     else:
         # Для пользователей показываем только их тикеты
         tickets_list = (

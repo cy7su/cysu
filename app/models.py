@@ -2,7 +2,7 @@ from . import db
 from flask_login import UserMixin
 from datetime import datetime, timedelta
 import secrets
-from typing import Optional
+
 
 class Group(db.Model):
     """Модель для хранения групп пользователей"""
@@ -11,11 +11,11 @@ class Group(db.Model):
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
-    
+
     # Связи
     users = db.relationship('User', backref='group', lazy=True)
     subjects = db.relationship('SubjectGroup', backref='group', lazy=True, cascade='all, delete-orphan')
-    
+
     def __repr__(self) -> str:
         return f'<Group {self.name}>'
 
@@ -25,10 +25,10 @@ class SubjectGroup(db.Model):
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     # Уникальность комбинации
     __table_args__ = (db.UniqueConstraint('subject_id', 'group_id'),)
-    
+
     def __repr__(self) -> str:
         return f'<SubjectGroup subject_id={self.subject_id} group_id={self.group_id}>'
 
@@ -52,23 +52,23 @@ class User(UserMixin, db.Model):
     payments = db.relationship('Payment', backref='user', lazy=True, cascade='all, delete-orphan')
     tickets = db.relationship('Ticket', foreign_keys='Ticket.user_id', backref='user', lazy=True, cascade='all, delete-orphan')
     notifications = db.relationship('Notification', backref='user', lazy=True, cascade='all, delete-orphan')
-    
+
     def is_effective_admin(self):
         """Проверяет, является ли пользователь эффективным админом (админ в админ режиме)"""
         return self.is_admin and self.admin_mode_enabled
-    
+
     def can_manage_materials(self):
         """Проверяет, может ли пользователь управлять материалами (админ в админ режиме или модератор)"""
         return (self.is_admin and self.admin_mode_enabled) or self.is_moderator
-    
+
     def can_see_all_subjects(self):
         """Проверяет, может ли пользователь видеть все предметы (только админ в админ режиме)"""
         return self.is_admin and self.admin_mode_enabled
-    
+
     def get_accessible_subjects(self):
         """Возвращает предметы, доступные пользователю"""
         from .models import Subject, SubjectGroup
-        
+
         if self.can_see_all_subjects():
             # Админ в админ режиме видит все предметы
             return Subject.query.all()
@@ -80,7 +80,7 @@ class User(UserMixin, db.Model):
         else:
             # Пользователь без группы не видит предметов
             return []
-    
+
     def can_add_materials_to_subject(self, subject):
         """Проверяет, может ли пользователь добавлять материалы к предмету"""
         if self.is_admin and self.admin_mode_enabled:
@@ -125,36 +125,35 @@ class EmailVerification(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime, nullable=False)
     is_used = db.Column(db.Boolean, default=False)
-    
+
     # Связь с пользователем
     user = db.relationship('User', backref=db.backref('email_verifications', cascade='all, delete-orphan'))
-    
+
     def __repr__(self) -> str:
         return f'<EmailVerification {self.id}: {self.user.email if self.user else "Unknown"}>'
-    
+
     @classmethod
     def generate_code(cls) -> str:
         """Генерирует 6-значный код подтверждения"""
         import logging
         logger = logging.getLogger(__name__)
-        
+
         code = ''.join(secrets.choice('0123456789') for _ in range(6))
         logger.info(f"Generated verification code: '{code}' (type: {type(code)}, length: {len(code)})")
         return code
-    
+
     @classmethod
     def create_verification(cls, user_id: int = None, email: str = None, expires_in_minutes: int = 15) -> 'EmailVerification':
         """Создает новый код подтверждения для пользователя или email"""
         code = cls.generate_code()
         expires_at = datetime.utcnow() + timedelta(minutes=expires_in_minutes)
-        
+
         return cls(
             user_id=user_id,
             email=email,
             code=code,
             expires_at=expires_at
         )
-
 
 class PasswordReset(db.Model):
     """Модель для хранения кодов восстановления пароля"""
@@ -164,26 +163,26 @@ class PasswordReset(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime, nullable=False)
     is_used = db.Column(db.Boolean, default=False)
-    
+
     def __repr__(self) -> str:
         return f'<PasswordReset {self.id}: {self.email}>'
-    
+
     @classmethod
     def generate_code(cls) -> str:
         """Генерирует 8-значный код восстановления"""
         import logging
         logger = logging.getLogger(__name__)
-        
+
         code = ''.join(secrets.choice('0123456789') for _ in range(8))
         logger.info(f"Generated password reset code: '{code}' (type: {type(code)}, length: {len(code)})")
         return code
-    
+
     @classmethod
     def create_reset(cls, email: str, expires_in_minutes: int = 15) -> 'PasswordReset':
         """Создает новый код восстановления для email"""
         code = cls.generate_code()
         expires_at = datetime.utcnow() + timedelta(minutes=expires_in_minutes)
-        
+
         return cls(
             email=email,
             code=code,
@@ -233,7 +232,7 @@ class Payment(db.Model):
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     def __repr__(self) -> str:
         return f'<Payment {self.yookassa_payment_id}: {self.status}>'
 
@@ -246,12 +245,12 @@ class ChatMessage(db.Model):
     file_name = db.Column(db.String(255))  # Оригинальное имя файла
     file_type = db.Column(db.String(50))   # Тип файла (image, document, etc.)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     # Связь с пользователем
     user = db.relationship('User', backref=db.backref('chat_messages', cascade='all, delete-orphan'))
-    
+
     def __repr__(self) -> str:
-        return f'<ChatMessage {self.id}: {self.user.username if self.user else "Unknown"}>' 
+        return f'<ChatMessage {self.id}: {self.user.username if self.user else "Unknown"}>'
 
 class Ticket(db.Model):
     """Модель для хранения тикетов поддержки"""
@@ -267,13 +266,13 @@ class Ticket(db.Model):
     admin_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # ID администратора, который обработал тикет
     user_response = db.Column(db.Text)  # Ответ пользователя на ответ администратора
     user_response_at = db.Column(db.DateTime)  # Время ответа пользователя
-    
+
     # Связь с файлами тикета
     files = db.relationship('TicketFile', backref='ticket', lazy=True, cascade='all, delete-orphan')
-    
+
     # Связь с администратором
     admin = db.relationship('User', foreign_keys=[admin_id], backref='administered_tickets')
-    
+
     def __repr__(self) -> str:
         return f'<Ticket {self.id}: {self.subject}>'
 
@@ -286,7 +285,7 @@ class TicketFile(db.Model):
     file_size = db.Column(db.Integer)  # Размер файла в байтах
     file_type = db.Column(db.String(50))  # MIME тип файла
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     def __repr__(self) -> str:
         return f'<TicketFile {self.id}: {self.file_name}>'
 
@@ -298,11 +297,11 @@ class TicketMessage(db.Model):
     message = db.Column(db.Text, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)  # True если сообщение от администратора
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     # Связи
     ticket = db.relationship('Ticket', backref='messages')
     user = db.relationship('User', backref='ticket_messages')
-    
+
     def __repr__(self) -> str:
         return f'<TicketMessage {self.id}: {"Admin" if self.is_admin else "User"}>'
 
@@ -316,10 +315,9 @@ class Notification(db.Model):
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     link = db.Column(db.String(255))  # Ссылка для перехода
-    
-    def __repr__(self) -> str:
-        return f'<Notification {self.id}: {self.title}>' 
 
+    def __repr__(self) -> str:
+        return f'<Notification {self.id}: {self.title}>'
 
 class ShortLink(db.Model):
     """Модель для хранения сокращённых ссылок"""
@@ -356,7 +354,6 @@ class ShortLink(db.Model):
         db.session.commit()
         return link
 
-
 class ShortLinkRule(db.Model):
     """Политика ограничения для короткой ссылки (время/количество кликов)."""
     id = db.Column(db.Integer, primary_key=True)
@@ -371,7 +368,6 @@ class ShortLinkRule(db.Model):
     def __repr__(self) -> str:
         return f'<ShortLinkRule link_id={self.short_link_id} expires_at={self.expires_at} max_clicks={self.max_clicks}>'
 
-
 class SiteSettings(db.Model):
     """Модель для хранения настроек сайта"""
     id = db.Column(db.Integer, primary_key=True)
@@ -379,10 +375,10 @@ class SiteSettings(db.Model):
     value = db.Column(db.Text, nullable=False)
     description = db.Column(db.String(255))
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     def __repr__(self) -> str:
         return f'<SiteSettings {self.key}: {self.value}>'
-    
+
     @classmethod
     def get_setting(cls, key: str, default=None):
         """Получает значение настройки по ключу"""
@@ -393,7 +389,7 @@ class SiteSettings(db.Model):
                 return setting.value.lower() == 'true'
             return setting.value
         return default
-    
+
     @classmethod
     def set_setting(cls, key: str, value: str, description: str = None):
         """Устанавливает значение настройки"""
@@ -420,13 +416,13 @@ class TelegramUser(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Связь с пользователем сайта
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_activity = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     # Связи
     user = db.relationship('User', backref='telegram_account', uselist=False)
-    
+
     def __repr__(self) -> str:
         return f'<TelegramUser {self.telegram_id}: {self.username or self.first_name}>'
-    
+
     @classmethod
     def get_or_create(cls, telegram_id, username=None, first_name=None, last_name=None, is_bot=False, language_code=None):
         """Получить или создать Telegram пользователя"""

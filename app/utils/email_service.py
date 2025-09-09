@@ -5,7 +5,6 @@ from flask import current_app
 
 logger = logging.getLogger(__name__)
 
-
 class EmailService:
     """
     Сервис для отправки email сообщений (вертикальный современный шаблон)
@@ -183,15 +182,15 @@ class EmailService:
             """
             text_body = f"""
             Добро пожаловать в cysu!
-            
+
             Для завершения регистрации введите следующий код подтверждения:
-            
+
             {verification_code}
-            
+
             Код действителен в течение 15 минут.
-            
+
             Если вы не регистрировались в cysu, просто проигнорируйте это письмо.
-            
+
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
@@ -378,15 +377,15 @@ class EmailService:
             """
             text_body = f"""
             Новый код подтверждения - cysu
-            
+
             Для завершения регистрации введите следующий код подтверждения:
-            
+
             {verification_code}
-            
+
             Код действителен в течение 15 минут.
-            
+
             Если вы не регистрировались в cysu, просто проигнорируйте это письмо.
-            
+
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
@@ -418,7 +417,7 @@ class EmailService:
         try:
             subject = "Восстановление пароля - cysu"
             current_app.logger.info(f"Sending password reset email to {user_email} with code: '{reset_code}' (type: {type(reset_code)}, length: {len(reset_code)})")
-            
+
             html_body = f"""
             <!DOCTYPE html>
             <html lang="ru">
@@ -575,15 +574,15 @@ class EmailService:
             """
             text_body = f"""
             Восстановление пароля - cysu
-            
+
             Вы запросили восстановление пароля. Введите следующий код для создания нового пароля:
-            
+
             {reset_code}
-            
+
             Код действителен в течение 15 минут.
-            
+
             Важно: Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.
-            
+
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
