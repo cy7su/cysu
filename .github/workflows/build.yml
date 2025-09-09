@@ -40,7 +40,14 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install -r requirements.txt
-        pip install flake8 bandit safety semgrep radon mypy isort black hadolint pip-check pip-audit py-spy
+        pip install flake8 bandit safety semgrep radon mypy isort black pip-check pip-audit py-spy
+    
+    - name: 🐳 Install hadolint
+      run: |
+        # Устанавливаем hadolint (не Python пакет)
+        wget -O hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+        chmod +x hadolint
+        sudo mv hadolint /usr/local/bin/
     
     - name: 🔍 Code quality check
       run: |
