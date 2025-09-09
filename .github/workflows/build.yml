@@ -1,0 +1,245 @@
+name: 🐍 Pylint & 🚀 Release
+
+on:
+  push:
+    branches: [ test ]
+  pull_request:
+    branches: [ test ]
+
+env:
+  DOCKER_REGISTRY: docker.io
+  IMAGE_NAME: your-app
+
+jobs:
+  pylint:
+    name: �� Code Quality Check
+    runs-on: ubuntu-latest
+    outputs:
+      success: ${{ steps.pylint.outputs.success }}
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: �� Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: 📦 Install dependencies
+      run: |
+        echo "🔧 Installing pylint..."
+        pip install --upgrade pip
+        pip install pylint
+        echo "✅ Dependencies installed"
+    
+    - name: 🔍 Run pylint analysis
+      id: pylint
+      run: |
+        echo "🔍 Starting pylint analysis..."
+        echo "📊 Analyzing Python files..."
+        
+        # Находим все Python файлы
+        PYTHON_FILES=$(find . -name "*.py" -not -path "./.*" -not -path "./venv/*" -not -path "./.venv/*" | head -50)
+        
+        if [ -z "$PYTHON_FILES" ]; then
+          echo "⚠️ No Python files found to analyze"
+          echo "success=true" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        
+        echo "�� Found Python files:"
+        echo "$PYTHON_FILES" | sed 's/^/  - /'
+        
+        # Запускаем pylint с детальным выводом
+        pylint --disable=all --enable=E,W,F --disable=unused-import \
+               --score=yes --reports=yes \
+               $PYTHON_FILES > pylint-report.txt 2>&1
+        
+        PYLINT_EXIT_CODE=$?
+        
+        echo "📋 Pylint Report:"
+        echo "=================="
+        cat pylint-report.txt
+        echo "=================="
+        
+        if [ $PYLINT_EXIT_CODE -eq 0 ]; then
+          echo "✅ Pylint passed successfully!"
+          echo "success=true" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Pylint found issues"
+          echo "success=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+    
+    - name: 📊 Upload pylint report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: pylint-report
+        path: pylint-report.txt
+
+  release:
+    name: 🚀 Build & Release
+    needs: pylint
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/test' && needs.pylint.outputs.success == 'true'
+    outputs:
+      version: ${{ steps.version.outputs.new_version }}
+      docker_image: ${{ steps.docker.outputs.image }}
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🔧 Setup Git
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        echo "✅ Git configured"
+    
+    - name: 📈 Calculate next version
+      id: version
+      run: |
+        echo "🔍 Analyzing version history..."
+        
+        # Получаем последний тег
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+        echo "📌 Last tag: $LAST_TAG"
+        
+        # Парсим версию
+        IFS='.' read -r major minor patch <<< "$LAST_TAG"
+        
+        # Увеличиваем patch версию
+        patch=$((patch + 1))
+        
+        # Если patch > 16, сбрасываем и увеличиваем minor
+        if [ $patch -gt 16 ]; then
+          echo "🔄 Patch version exceeded 16, incrementing minor version"
+          patch=0
+          minor=$((minor + 1))
+        fi
+        
+        NEW_VERSION="$major.$minor.$patch"
+        echo "🎯 New version: $NEW_VERSION"
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "major=$major" >> $GITHUB_OUTPUT
+        echo "minor=$minor" >> $GITHUB_OUTPUT
+        echo "patch=$patch" >> $GITHUB_OUTPUT
+    
+    - name: 🏷️ Create and push tag
+      run: |
+        TAG_NAME="v${{ steps.version.outputs.new_version }}"
+        echo "🏷️ Creating tag: $TAG_NAME"
+        
+        git tag -a "$TAG_NAME" -m "🚀 Release $TAG_NAME
+        
+        📦 Changes in this release:
+        - Code quality checks passed ✅
+        - Docker image built and pushed 🐳
+        - Automated release via GitHub Actions 🤖
+        
+        �� Version: ${{ steps.version.outputs.new_version }}
+        🐍 Python: 3.11
+        🔍 Pylint: Passed"
+        
+        git push origin "$TAG_NAME"
+        echo "✅ Tag $TAG_NAME pushed successfully"
+    
+    - name: �� Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: 🔐 Login to Docker Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: 🏗️ Build and push Docker image
+      id: docker
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.new_version }}
+          ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64,linux/arm64
+    
+    - name: 📝 Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.version.outputs.new_version }}
+        release_name: �� Release v${{ steps.version.outputs.new_version }}
+        body: |
+          ## 🎉 New Release v${{ steps.version.outputs.new_version }}
+          
+          ### ✅ Quality Checks
+          - **Pylint**: All code quality checks passed
+          - **Python Version**: 3.11
+          - **Analysis**: No critical issues found
+          
+          ### 🐳 Docker Images
+          - **Image**: `${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.new_version }}`
+          - **Latest**: `${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest`
+          
+          ### 📊 Version Info
+          - **Previous**: ${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}
+          - **Current**: ${{ steps.version.outputs.new_version }}
+          - **Increment**: Patch version
+          
+          ### 🚀 How to use
+          ```bash
+          docker pull ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.new_version }}
+          docker run -d ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.new_version }}
+          ```
+          
+          ---
+          *🤖 This release was created automatically by GitHub Actions*
+        draft: false
+        prerelease: false
+    
+    - name: 📊 Release Summary
+      run: |
+        echo "🎉 Release completed successfully!"
+        echo "📌 Version: v${{ steps.version.outputs.new_version }}"
+        echo "🐳 Docker Image: ${{ steps.docker.outputs.image }}"
+        echo "🏷️ Tag: v${{ steps.version.outputs.new_version }}"
+        echo "📝 Release: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.version.outputs.new_version }}"
+
+  notify:
+    name: 📢 Notifications
+    needs: [pylint, release]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: 📊 Job Summary
+      run: |
+        echo "## 📊 Workflow Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### �� Pylint Status: ${{ needs.pylint.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "### 🚀 Release Status: ${{ needs.release.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ needs.pylint.result }}" == "success" ]; then
+          echo "✅ **Code quality checks passed**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Code quality checks failed**" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [ "${{ needs.release.result }}" == "success" ]; then
+          echo "✅ **Release created successfully**" >> $GITHUB_STEP_SUMMARY
+          echo "📌 **Version**: v${{ needs.release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "🐳 **Docker Image**: ${{ needs.release.outputs.docker_image }}" >> $GITHUB_STEP_SUMMARY
+        elif [ "${{ needs.release.result }}" == "skipped" ]; then
+          echo "⏭️ **Release skipped** (pylint failed or not on test branch)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Release failed**" >> $GITHUB_STEP_SUMMARY
+        fi
