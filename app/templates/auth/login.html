@@ -28,9 +28,7 @@
         {{ form.submit(class="btn btn-primary", style='padding: 12px 16px; font-size: 0.9rem; border-radius: 8px; min-height: 44px;') }}
       </div>
       
-      <!-- Telegram Login -->
       <div class="text-center my-3">
-        <!-- Показываем кнопку Telegram -->
         <div id="telegram-widget-container" style="display: flex; justify-content: center; align-items: center;">
           <script async src="https://telegram.org/js/telegram-widget.js?22" 
                   data-telegram-login="authcysubot" 
@@ -41,7 +39,6 @@
                   data-onauth="onTelegramAuth(user)"></script>
         </div>
         
-        <!-- Fallback для мобильных устройств -->
         <div id="mobile-telegram-fallback" style="display: none;">
           <div class="alert alert-warning" style="background: var(--dp-03); border: 1px solid var(--border-secondary); color: var(--text-primary); font-size: 0.85rem;">
             <i class="fab fa-telegram me-2"></i>
@@ -53,7 +50,6 @@
           </div>
         </div>
         
-        <!-- Кнопка для Telegram Mini App -->
         <div id="miniapp-telegram-fallback" style="display: none;">
           <div class="alert alert-info" style="background: var(--dp-03); border: 1px solid var(--border-secondary); color: var(--text-primary); font-size: 0.85rem;">
             <i class="fab fa-telegram me-2"></i>

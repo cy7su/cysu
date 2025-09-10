@@ -1,4 +1,3 @@
-
 import time
 from multiprocessing import Process
 
@@ -19,7 +18,6 @@ def run_telegram_bot():
     bot_manager.run_bot()
 
 def main():
-    """Главная функция"""
     website_process = Process(target=run_website)
     bot_process = Process(target=run_telegram_bot)
 

@@ -1,130 +1,79 @@
-/**
- * Генератор SVG паттернов для карточек предметов
- * Улучшенная версия с более интересными и рандомными паттернами
- */
 
 
 
-// Простой класс для генерации паттернов
 class SVGPatternGenerator {
     constructor() {
         this.primaryColor = '#B595FF';
         this.primaryHover = '#9A7FE6';
         this.backgroundColor = '#1a1a1a';
         
-        // Расширенные структурированные цветовые палитры (20 палитр по 20 цветов)
         this.colorPalettes = {
-            // Зелено-бирюзовая палитра (20 цветов)
             teal: ['#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B', '#B2F5EA', '#7DD3FC', '#38BDF8', '#0EA5E9', '#0284C7'],
-            // Желто-оранжевая палитра (20 цветов)
             yellow: ['#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58', '#F57F17', '#FF8F00', '#FFC107', '#FFD54F', '#FFECB3', '#FFF8E1', '#F9A825', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#FEF3C7', '#FDE68A'],
-            // Голубая палитра (20 цветов)
             blue: ['#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5', '#1976D2', '#0D47A1', '#81D4FA', '#4FC3F7', '#29B6F6', '#03A9F4', '#0288D1', '#0277BD', '#01579B', '#0F172A', '#1E293B', '#334155', '#475569', '#DBEAFE', '#BFDBFE'],
-            // Розовая палитра (20 цветов)
             pink: ['#FCE4EC', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#C2185B', '#880E4F', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#E91E63', '#DB2777', '#BE185D', '#9D174D', '#831843', '#500724', '#FDF2F8', '#FCE7F3', '#FBCFE8'],
-            // Фиолетовая палитра (20 цветов)
             purple: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#7B1FA2', '#4A148C', '#D1C4E9', '#B39DDB', '#9575CD', '#7E57C2', '#673AB7', '#5B21B6', '#4C1D95', '#581C87', '#3B0764', '#1E1B4B', '#312E81', '#F3E8FF', '#E9D5FF'],
-            // Серая палитра (20 цветов)
             grey: ['#F5F5F5', '#EEEEEE', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#616161', '#424242', '#FAFAFA', '#F0F0F0', '#E8E8E8', '#D0D0D0', '#A0A0A0', '#808080', '#606060', '#404040', '#202020', '#0F0F0F', '#F8FAFC', '#F1F5F9', '#E2E8F0'],
-            // Мятная палитра (20 цветов)
             mint: ['#E6FFFA', '#B2F5EA', '#81E6D9', '#4FD1C7', '#38B2AC', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B', '#B2F5EA', '#7DD3FC', '#38BDF8', '#0EA5E9', '#0284C7'],
-            // Коралловая палитра (20 цветов)
             coral: ['#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#D32F2F', '#B71C1C', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#F44336', '#E11D48', '#BE123C', '#9F1239', '#881337', '#4C0519', '#FEF2F2', '#FEE2E2', '#FECACA'],
-            // Изумрудная палитра (20 цветов)
             emerald: ['#E8F5E8', '#C8E6C9', '#A5D6A7', '#81C784', '#66BB6A', '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#E0F2E0', '#B8E6B8', '#90EE90', '#16A34A', '#15803D', '#166534', '#14532D', '#052E16', '#F0FDF4', '#DCFCE7', '#BBF7D0'],
-            // Лавандовая палитра (20 цветов)
             lavender: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#9C27B0', '#7B1FA2', '#6A1B9A', '#4A148C', '#E8DAEF', '#D1C4E9', '#B39DDB', '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#F5F3FF', '#EDE9FE', '#DDD6FE'],
-            // Персиковая палитра (20 цветов)
             peach: ['#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D', '#FFA726', '#FF9800', '#F57C00', '#EF6C00', '#E65100', '#FFE0B2', '#FFCC80', '#FFB74D', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#FEF3C7', '#FDE68A', '#FCD34D'],
-            // Аквамариновая палитра (20 цветов)
             aqua: ['#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#26C6DA', '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#B2EBF2', '#80DEEA', '#4DD0E1', '#06B6D4', '#0891B2', '#0E7490', '#155E75', '#164E63', '#F0FDFA', '#CCFBF1', '#99F6E4'],
-            // Золотая палитра (20 цветов)
             gold: ['#FFFBEB', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#FFD700', '#FFA500', '#FF8C00', '#FF7F50', '#FF6347', '#FF4500', '#FFD700', '#FFA500', '#FF8C00'],
-            // Серебряная палитра (20 цветов)
             silver: ['#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A', '#C0C0C0', '#A8A8A8', '#909090', '#787878', '#606060', '#484848', '#303030', '#E5E7EB', '#D1D5DB', '#9CA3AF'],
-            // Бронзовая палитра (20 цветов)
             bronze: ['#FEF7ED', '#FED7AA', '#FDBA74', '#FB923C', '#F97316', '#EA580C', '#DC2626', '#B91C1C', '#991B1B', '#7F1D1D', '#CD7F32', '#B8860B', '#DAA520', '#B8860B', '#CD853F', '#D2691E', '#A0522D', '#8B4513', '#654321', '#3E2723'],
-            // Неоновая палитра (20 цветов)
             neon: ['#00FF00', '#00FFFF', '#FF00FF', '#FFFF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000'],
-            // Пастельная палитра (20 цветов)
             pastel: ['#FFE4E1', '#FFD1DC', '#FFB6C1', '#FFA0B4', '#FF91A4', '#FFB6C1', '#FFC0CB', '#FFCCCB', '#FFD1DC', '#FFE4E1', '#E6E6FA', '#D8BFD8', '#DDA0DD', '#DA70D6', '#EE82EE', '#F0E68C', '#F5DEB3', '#FFE4B5', '#FFEFD5', '#FFF8DC'],
-            // Темная палитра (20 цветов)
             dark: ['#1A1A1A', '#2D2D2D', '#404040', '#525252', '#666666', '#7A7A7A', '#8E8E8E', '#A2A2A2', '#B6B6B6', '#CACACA', '#0D1117', '#161B22', '#21262D', '#30363D', '#484F58', '#6E7681', '#8B949E', '#A8B2BF', '#C9D1D9', '#F0F6FC'],
-            // Яркая палитра (20 цветов)
             bright: ['#FF0000', '#FF4000', '#FF8000', '#FFBF00', '#FFFF00', '#BFFF00', '#80FF00', '#40FF00', '#00FF00', '#00FF40', '#00FF80', '#00FFBF', '#00FFFF', '#00BFFF', '#0080FF', '#0040FF', '#0000FF', '#4000FF', '#8000FF', '#BF00FF'],
-            // Природная палитра (20 цветов)
             nature: ['#228B22', '#32CD32', '#00FF00', '#7CFC00', '#ADFF2F', '#9ACD32', '#6B8E23', '#556B2F', '#8FBC8F', '#90EE90', '#98FB98', '#8FBC8F', '#2E8B57', '#3CB371', '#20B2AA', '#48D1CC', '#40E0D0', '#00CED1', '#00BFFF', '#87CEEB']
         };
         
-        // Расширенная общая палитра для случайного выбора (100+ цветов)
         this.colorPalette = [
-            // Белые и светлые тона
             '#FFFFFF', '#F8F9FA', '#F1F3F4', '#E8EAED', '#DADCE0', '#F5F5F5', '#EEEEEE', '#E0E0E0', '#FAFAFA', '#F0F0F0',
-            // Желтые и оранжевые тона
             '#FFF8E1', '#FFF3E0', '#FFECB3', '#FFE0B2', '#FFCCBC', '#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58',
             '#FFC107', '#FFD54F', '#FFECB3', '#FFF8E1', '#F9A825', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F',
-            // Розовые и красные тона
             '#FCE4EC', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350',
             '#F44336', '#E91E63', '#C2185B', '#880E4F', '#DB2777', '#BE185D', '#9F1239', '#881337', '#4C0519', '#FF0000',
-            // Фиолетовые и сиреневые тона
             '#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#9C27B0', '#7B1FA2', '#6A1B9A', '#4A148C', '#673AB7',
             '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#581C87', '#3B0764', '#1E1B4B', '#312E81', '#8000FF',
-            // Синие и голубые тона
             '#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5', '#1976D2', '#0D47A1', '#81D4FA', '#4FC3F7', '#29B6F6',
             '#03A9F4', '#0288D1', '#0277BD', '#01579B', '#0F172A', '#1E293B', '#334155', '#475569', '#0000FF', '#0080FF',
-            // Зеленые и бирюзовые тона
             '#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A', '#00695C', '#004D40', '#E8F5E8', '#C8E6C9', '#A5D6A7',
             '#81C784', '#66BB6A', '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#16A34A', '#15803D', '#166534', '#00FF00',
-            // Мятные и аквамариновые тона
             '#E6FFFA', '#B2F5EA', '#81E6D9', '#4FD1C7', '#38B2AC', '#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#26C6DA',
             '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#06B6D4', '#0891B2', '#0E7490', '#155E75', '#164E63', '#00FFFF',
-            // Серые и нейтральные тона
             '#F0F4F8', '#E2E8F0', '#CBD5E0', '#A0AEC0', '#718096', '#BDBDBD', '#9E9E9E', '#616161', '#424242', '#212121',
             '#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A',
-            // Золотые и бронзовые тона
             '#FFFBEB', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#FFD700', '#FFA500', '#FF8C00', '#FF7F50', '#FF6347',
             '#FEF7ED', '#FED7AA', '#FDBA74', '#FB923C', '#F97316', '#CD7F32', '#B8860B', '#DAA520', '#CD853F', '#D2691E',
-            // Серебряные и металлические тона
             '#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#C0C0C0', '#A8A8A8', '#909090', '#787878', '#606060',
             '#E5E7EB', '#D1D5DB', '#9CA3AF', '#6B7280', '#4B5563', '#374151', '#1F2937', '#111827', '#0F172A', '#000000',
-            // Неоновые и яркие тона
             '#00FF00', '#00FFFF', '#FF00FF', '#FFFF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00',
             '#FF4000', '#FF8000', '#FFBF00', '#BFFF00', '#80FF00', '#40FF00', '#00FF40', '#00FF80', '#00FFBF', '#00BFFF',
-            // Пастельные тона
             '#FFE4E1', '#FFD1DC', '#FFB6C1', '#FFA0B4', '#FF91A4', '#FFC0CB', '#FFCCCB', '#E6E6FA', '#D8BFD8', '#DDA0DD',
             '#DA70D6', '#EE82EE', '#F0E68C', '#F5DEB3', '#FFE4B5', '#FFEFD5', '#FFF8DC', '#F0FFF0', '#F5FFFA', '#F0F8FF'
         ];
         
-        // Расширенная палитра темных и около темных фоновых цветов (80+ цветов)
         this.backgroundPalette = [
-            // Очень темные серые
             '#0f0f0f', '#121212', '#141414', '#161616', '#181818', '#1a1a1a', '#1c1c1c', '#1e1e1e', '#202020', '#212121',
-            // Темные серые
             '#242424', '#262626', '#282828', '#2a2a2a', '#2c2c2c', '#2d2d2d', '#2f2f2f', '#313131', '#333333', '#353535',
-            // Средние темные серые
             '#373737', '#393939', '#3b3b3b', '#3d3d3d', '#3f3f3f', '#404040', '#424242', '#444444', '#464646', '#484848',
-            // Темно-синие
             '#0d1117', '#161b22', '#21262d', '#30363d', '#484f58', '#0f172a', '#1e293b', '#334155', '#475569', '#64748b',
             '#1e3a8a', '#1e40af', '#1d4ed8', '#2563eb', '#3b82f6', '#0c4a6e', '#075985', '#0369a1', '#0284c7', '#0ea5e9',
-            // Темно-фиолетовые
             '#1a0d1a', '#2d1b2d', '#3d2a3d', '#4a2c4a', '#5a3a5a', '#581c87', '#6b21a8', '#7c2d12', '#7c3aed', '#8b5cf6',
             '#4c1d95', '#5b21b6', '#6d28d9', '#7c3aed', '#8b5cf6', '#1e1b4b', '#312e81', '#3730a3', '#4338ca', '#4f46e5',
-            // Темно-зеленые
             '#0d1a0d', '#1a2d1a', '#2a3d2a', '#3a4a3a', '#4a5a4a', '#14532d', '#166534', '#15803d', '#16a34a', '#22c55e',
             '#052e16', '#064e3b', '#065f46', '#047857', '#059669', '#0f172a', '#1e293b', '#334155', '#475569', '#64748b',
-            // Темно-коричневые
             '#1a0f0d', '#2d1a16', '#3d2a24', '#4a3a33', '#5a4a43', '#451a03', '#78350f', '#92400e', '#b45309', '#d97706',
             '#7c2d12', '#991b1b', '#b91c1c', '#dc2626', '#ef4444', '#3e2723', '#4e342e', '#5d4037', '#6d4c41', '#8d6e63',
-            // Темно-красные
             '#1a0d0d', '#2d1616', '#3d2424', '#4a3333', '#5a4343', '#7f1d1d', '#991b1b', '#b91c1b', '#dc2626', '#ef4444',
             '#881337', '#9f1239', '#be123c', '#e11d48', '#f43f5e', '#4c0519', '#7c2d12', '#991b1b', '#b91c1b', '#dc2626',
-            // Темно-желтые и оранжевые
             '#451a03', '#78350f', '#92400e', '#b45309', '#d97706', '#ea580c', '#f97316', '#fb923c', '#fdba74', '#fed7aa',
             '#7c2d12', '#9a3412', '#c2410c', '#ea580c', '#f97316', '#1c1917', '#292524', '#44403c', '#57534e', '#78716c',
-            // Темно-бирюзовые и мятные
             '#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#0c4a6e', '#075985', '#0369a1', '#0284c7', '#0ea5e9',
             '#164e63', '#155e75', '#0e7490', '#0891b2', '#06b6d4', '#134e4a', '#115e59', '#0f766e', '#0d9488', '#14b8a6',
-            // Темно-розовые и малиновые
             '#500724', '#831843', '#9d174d', '#be185d', '#db2777', '#ec4899', '#f472b6', '#f9a8d4', '#fbcfe8', '#fce7f3',
             '#4c0519', '#7c2d12', '#991b1b', '#b91c1b', '#dc2626', '#881337', '#9f1239', '#be123c', '#e11d48', '#f43f5e'
         ];
@@ -137,30 +86,26 @@ class SVGPatternGenerator {
         if (background) this.backgroundColor = background;
     }
 
-    // Получить случайный цвет из палитры
     getRandomColor() {
         return this.colorPalette[Math.floor(Math.random() * this.colorPalette.length)];
     }
     
-    // Получить случайную палитру (4-12 цветов из одной палитры)
     getRandomPalette() {
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
         
-        // Выбираем 4-12 случайных цветов из выбранной палитры с случайной прозрачностью
         const numColors = this.randomInt(4, 12);
         const paletteColors = [];
         for (let i = 0; i < numColors; i++) {
             const randomColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
-            const randomOpacity = this.random(0.3, 0.9); // Случайная прозрачность от 0.3 до 0.9
+            const randomOpacity = this.random(0.3, 0.8);
             paletteColors.push({ color: randomColor, opacity: randomOpacity });
         }
         
         return paletteColors;
     }
     
-    // Получить цвет из конкретной палитры
     getColorFromPalette(paletteName) {
         const palette = this.colorPalettes[paletteName];
         if (palette) {
@@ -169,7 +114,6 @@ class SVGPatternGenerator {
         return this.getRandomColor();
     }
     
-    // Получить несколько цветов из одной палитры
     getColorsFromPalette(paletteName, count = 3) {
         const palette = this.colorPalettes[paletteName];
         if (palette) {
@@ -182,12 +126,10 @@ class SVGPatternGenerator {
         return [this.getRandomColor()];
     }
 
-    // Получить случайный фоновый цвет
     getRandomBackground() {
         return this.backgroundPalette[Math.floor(Math.random() * this.backgroundPalette.length)];
     }
 
-    // Улучшенный генератор случайных чисел с использованием crypto API
     random(min, max) {
         if (window.crypto && window.crypto.getRandomValues) {
             const array = new Uint32Array(1);
@@ -197,7 +139,6 @@ class SVGPatternGenerator {
         return Math.random() * (max - min) + min;
     }
 
-    // Получить случайное целое число
     randomInt(min, max) {
         if (window.crypto && window.crypto.getRandomValues) {
             const array = new Uint32Array(1);
@@ -207,9 +148,7 @@ class SVGPatternGenerator {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // Получить случайные размеры холста
     getRandomSize() {
-        // Размеры карточки: 306x147, SVG должен занимать 80% места
         return {
             width: 306,
             height: 147
@@ -218,7 +157,6 @@ class SVGPatternGenerator {
 
     generatePattern(patternType) {
         try {
-            // Всегда генерируем только круги
             return this.generateCirclesPattern();
         } catch (error) {
             return this.generateCirclesPattern();
@@ -226,49 +164,41 @@ class SVGPatternGenerator {
     }
 
     generateRandomPattern() {
-        // Всегда генерируем только круги
         return this.generateCirclesPattern();
     }
 
 
 
-    // Крутой геометрический паттерн с кругами - идеальные перекрывающиеся круги с цветами из одной палитры
     generateCirclesPattern() {
         const size = this.getRandomSize();
         const circles = [];
         
-        // Выбираем одну случайную палитру
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
         
-        // Выбираем 4-12 случайных цветов из выбранной палитры с случайной прозрачностью
         const numColors = this.randomInt(4, 12);
         const paletteColors = [];
         for (let i = 0; i < numColors; i++) {
             const randomColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
-            const randomOpacity = this.random(0.3, 0.9); // Случайная прозрачность от 0.3 до 0.9
+            const randomOpacity = this.random(0.3, 0.8);
             paletteColors.push({ color: randomColor, opacity: randomOpacity });
         }
         
-        // Создаем идеальную сетку кругов
         const gridSize = this.randomInt(4, 8);
         const cellWidth = size.width / gridSize;
         const cellHeight = size.height / gridSize;
         
-        // Создаем несколько слоев для глубины
-        const layers = this.randomInt(3, 5); // Больше слоев для богатства
+        const layers = this.randomInt(2, 4);
+        const layerRadius = Math.min(cellWidth, cellHeight) * 0.3;
         
         for (let layer = 0; layer < layers; layer++) {
-            const layerRadius = this.randomInt(15, 60); // Больше вариативности размеров
-            const layerOpacity = this.random(0.2, 0.8); // Больше вариативности прозрачности
             
             for (let row = 0; row < gridSize; row++) {
                 for (let col = 0; col < gridSize; col++) {
                     const x = col * cellWidth + cellWidth / 2;
                     const y = row * cellHeight + cellHeight / 2;
                     
-                    // Добавляем больше смещения для каждого слоя
                     const offsetX = this.random(-cellWidth * 0.3, cellWidth * 0.3);
                     const offsetY = this.random(-cellHeight * 0.3, cellHeight * 0.3);
                     
@@ -280,7 +210,6 @@ class SVGPatternGenerator {
                     const color = colorObj.color;
                     const colorOpacity = colorObj.opacity;
                     
-                    // Добавляем градиентные эффекты для некоторых кругов
                     const hasGradient = this.randomInt(0, 3) === 0;
                     if (hasGradient) {
                         const gradientId = `gradient_${layer}_${row}_${col}`;
@@ -315,21 +244,20 @@ class SVGPatternGenerator {
 
 
 
-    // Улучшенный паттерн со спиралями - полностью рандомный
     generateSpiralPattern() {
 
         const size = this.getRandomSize();
         const spirals = [];
         const numSpirals = this.randomInt(8, 18);
+        const maxRadius = Math.min(size.width, size.height) * 0.4;
+        const turns = this.randomInt(2, 5);
+        const strokeWidth = this.randomInt(1, 3);
         
         for (let i = 0; i < numSpirals; i++) {
             const centerX = this.random(0, size.width);
             const centerY = this.random(0, size.height);
-            const maxRadius = this.random(10, 60); // Больше вариаций радиуса
-            const turns = this.random(1, 8); // Больше вариаций витков
             const opacity = this.random(0.1, 0.6);
             const color = this.getRandomColor();
-            const strokeWidth = this.random(0.5, 3); // Больше вариаций толщины
             
             const path = this.generateSpiralPath(centerX, centerY, maxRadius, turns);
             spirals.push(`<path d="${path}" fill="none" stroke="${color}" 
@@ -341,7 +269,7 @@ class SVGPatternGenerator {
 
     generateSpiralPath(centerX, centerY, maxRadius, turns) {
         const points = [];
-        const steps = 120; // Больше точек для плавности
+        const steps = 50;
         
         for (let i = 0; i <= steps; i++) {
             const t = (i / steps) * turns * Math.PI * 2;
@@ -363,30 +291,27 @@ class SVGPatternGenerator {
 
 
 
-    // Новый паттерн с цветами (увеличенные)
     generateFlowersPattern() {
         const size = this.getRandomSize();
         const flowers = [];
-        const numFlowers = this.randomInt(8, 20); // Меньше цветов, но больше размер
+        const numFlowers = this.randomInt(8, 15);
+        const flowerSize = this.randomInt(15, 25);
+        const petalSize = this.randomInt(8, 12);
         
         for (let i = 0; i < numFlowers; i++) {
             const x = this.random(0, size.width);
             const y = this.random(0, size.height);
-            const flowerSize = this.random(20, 45); // Увеличенный размер цветов
             const petals = this.randomInt(6, 10);
             const opacity = this.random(0.3, 0.8);
             const color = this.getRandomColor();
             
-            // Центр цветка (увеличенный)
             flowers.push(`<circle cx="${x}" cy="${y}" r="${flowerSize * 0.4}" 
                 fill="${this.getRandomColor()}" opacity="${opacity}"/>`);
             
-            // Лепестки (увеличенные)
             for (let j = 0; j < petals; j++) {
                 const angle = (j * Math.PI * 2) / petals;
                 const petalX = x + flowerSize * Math.cos(angle);
                 const petalY = y + flowerSize * Math.sin(angle);
-                const petalSize = this.random(flowerSize * 0.3, flowerSize * 0.5); // Увеличенные лепестки
                 
                 flowers.push(`<ellipse cx="${petalX}" cy="${petalY}" 
                     rx="${petalSize}" ry="${petalSize * 0.7}" 
@@ -398,13 +323,11 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, flowers.join(''));
     }
 
-    // Крутой геометрический паттерн - идеальная мозаика из фигур
     generateGeometricPattern() {
         const size = this.getRandomSize();
         const shapes = [];
         const palette = this.getRandomPalette();
         
-        // Создаем идеальную мозаику из квадратов и ромбов
         const cellSize = this.randomInt(30, 50);
         const cols = Math.ceil(size.width / cellSize);
         const rows = Math.ceil(size.height / cellSize);
@@ -415,9 +338,7 @@ class SVGPatternGenerator {
                 const y = row * cellSize;
                 const opacity = this.random(0.4, 0.8);
                 
-                // Чередуем квадраты и ромбы
                 if ((row + col) % 2 === 0) {
-                    // Квадрат
                     const color = palette[Math.floor(Math.random() * palette.length)];
                     const squareSize = cellSize * 0.85;
                     const offset = (cellSize - squareSize) / 2;
@@ -425,7 +346,6 @@ class SVGPatternGenerator {
                         width="${squareSize}" height="${squareSize}" 
                         fill="${color}" opacity="${opacity}"/>`);
                 } else {
-                    // Ромб
                     const color = palette[Math.floor(Math.random() * palette.length)];
                     const centerX = x + cellSize / 2;
                     const centerY = y + cellSize / 2;
@@ -440,13 +360,11 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, shapes.join(''));
     }
 
-    // Крутой геометрический паттерн с ромбами - идеальная мозаика
     generateDiamondsPattern() {
         const size = this.getRandomSize();
         const diamonds = [];
         const palette = this.getRandomPalette();
         
-        // Создаем идеальную мозаику из ромбов
         const diamondSize = this.randomInt(25, 45);
         const cols = Math.ceil(size.width / diamondSize) + 1;
         const rows = Math.ceil(size.height / diamondSize) + 1;
@@ -456,7 +374,6 @@ class SVGPatternGenerator {
                 const x = col * diamondSize;
                 const y = row * diamondSize;
                 
-                // Смещение для четных рядов
                 const offsetX = (row % 2) * diamondSize / 2;
                 const finalX = x + offsetX;
                 
@@ -476,16 +393,13 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, diamonds.join(''));
     }
 
-    // Крутой геометрический паттерн с восьмиугольниками - идеальная мозаика
 
 
-    // Крутой геометрический паттерн с шевронами - идеальная мозаика
     generateChevronsPattern() {
         const size = this.getRandomSize();
         const chevrons = [];
         const palette = this.getRandomPalette();
         
-        // Создаем идеальную мозаику из шевронов
         const chevronWidth = this.randomInt(30, 50);
         const chevronHeight = this.randomInt(20, 35);
         const cols = Math.ceil(size.width / chevronWidth) + 1;
@@ -499,7 +413,6 @@ class SVGPatternGenerator {
                 const color = palette[Math.floor(Math.random() * palette.length)];
                 const opacity = this.random(0.4, 0.8);
                 
-                // Создаем шеврон (V-образная форма)
                 const points = `${x},${y} ${x + chevronWidth/2},${y + chevronHeight} ${x + chevronWidth},${y}`;
                 
                 chevrons.push(`<polygon points="${points}" 
@@ -510,34 +423,28 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, chevrons.join(''));
     }
 
-    // Крутой геометрический паттерн елочкой - идеальная мозаика
 
 
-    // Крутой геометрический паттерн лоскутного одеяла - идеальная мозаика с крутыми эффектами
     generateQuiltPattern() {
         const size = this.getRandomSize();
         const quilt = [];
         
-        // Выбираем одну случайную палитру для лоскутного одеяла
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
         
-        // Выбираем 4-12 случайных цветов из выбранной палитры с случайной прозрачностью
         const numColors = this.randomInt(4, 12);
         const paletteColors = [];
         for (let i = 0; i < numColors; i++) {
             const randomColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
-            const randomOpacity = this.random(0.3, 0.9); // Случайная прозрачность от 0.3 до 0.9
+            const randomOpacity = this.random(0.3, 0.8);
             paletteColors.push({ color: randomColor, opacity: randomOpacity });
         }
         
-        // Создаем идеальную мозаику лоскутного одеяла с разными размерами лоскутов
         const basePatchSize = this.randomInt(15, 30);
         const cols = Math.ceil(size.width / basePatchSize) + 2;
         const rows = Math.ceil(size.height / basePatchSize) + 2;
         
-        // Создаем несколько слоев для глубины
         const layers = this.randomInt(2, 4);
         
         for (let layer = 0; layer < layers; layer++) {
@@ -550,7 +457,6 @@ class SVGPatternGenerator {
                     const y = row * basePatchSize + layerOffset;
                     
                     if (x < size.width && y < size.height) {
-                        // Разные размеры лоскутов для более интересного эффекта
                         const patchSize = basePatchSize + this.randomInt(-5, 10);
                         const colorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
                         const color = colorObj.color;
@@ -559,18 +465,15 @@ class SVGPatternGenerator {
                         const secondaryColor = secondaryColorObj.color;
                         const secondaryOpacity = secondaryColorObj.opacity;
                         
-                        // Создаем разные типы лоскутов
                         const patchType = this.randomInt(0, 6);
                         
                         if (patchType === 0) {
-                            // Обычный лоскут с закругленными углами
                             const cornerRadius = patchSize * this.random(0.05, 0.2);
                             quilt.push(`<rect x="${x}" y="${y}" 
                                 width="${patchSize}" height="${patchSize}" 
                                 rx="${cornerRadius}" ry="${cornerRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                         } else if (patchType === 1) {
-                            // Лоскут с градиентом
                             const gradientId = `quilt_grad_${layer}_${row}_${col}`;
                             quilt.push(`<defs>
                                 <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -583,14 +486,12 @@ class SVGPatternGenerator {
                                 rx="${patchSize * 0.1}" ry="${patchSize * 0.1}"
                                 fill="url(#${gradientId})"/>`);
                         } else if (patchType === 2) {
-                            // Лоскут с внутренним узором
                 const cornerRadius = patchSize * 0.1;
                                             quilt.push(`<rect x="${x}" y="${y}" 
                                 width="${patchSize}" height="${patchSize}" 
                                 rx="${cornerRadius}" ry="${cornerRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                             
-                            // Внутренний узор
                             const innerSize = patchSize * 0.6;
                             const innerX = x + (patchSize - innerSize) / 2;
                             const innerY = y + (patchSize - innerSize) / 2;
@@ -599,7 +500,6 @@ class SVGPatternGenerator {
                                 rx="${cornerRadius * 0.5}" ry="${cornerRadius * 0.5}"
                                 fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
                         } else if (patchType === 3) {
-                            // Лоскут в виде ромба
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
                             const diamondSize = patchSize * 0.8;
@@ -607,28 +507,24 @@ class SVGPatternGenerator {
                             quilt.push(`<polygon points="${points}" 
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                         } else if (patchType === 4) {
-                            // Лоскут с круговым узором
                             const cornerRadius = patchSize * 0.1;
                             quilt.push(`<rect x="${x}" y="${y}" 
                                 width="${patchSize}" height="${patchSize}" 
                                 rx="${cornerRadius}" ry="${cornerRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                             
-                            // Круговой узор
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
                             const circleRadius = patchSize * 0.3;
                             quilt.push(`<circle cx="${centerX}" cy="${centerY}" r="${circleRadius}" 
                                 fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
                         } else {
-                            // Лоскут с звездчатым узором
                             const cornerRadius = patchSize * 0.1;
                             quilt.push(`<rect x="${x}" y="${y}" 
                                 width="${patchSize}" height="${patchSize}" 
                                 rx="${cornerRadius}" ry="${cornerRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                             
-                            // Звездчатый узор
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
                             const starRadius = patchSize * 0.25;
@@ -637,7 +533,6 @@ class SVGPatternGenerator {
                                 fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
                         }
                         
-                        // Добавляем декоративные элементы для некоторых лоскутов
                         if (this.randomInt(0, 4) === 0) {
                             const decorType = this.randomInt(0, 3);
                             const decorColorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
@@ -645,7 +540,6 @@ class SVGPatternGenerator {
                             const decorOpacity = decorColorObj.opacity;
                             
                             if (decorType === 0) {
-                                // Декоративные точки
                                 for (let i = 0; i < 3; i++) {
                                     const dotX = x + this.random(5, patchSize - 5);
                                     const dotY = y + this.random(5, patchSize - 5);
@@ -654,7 +548,6 @@ class SVGPatternGenerator {
                                         fill="${decorColor}" opacity="${decorOpacity}"/>`);
                                 }
                             } else if (decorType === 1) {
-                                // Декоративные линии
                                 const lineX1 = x + this.random(0, patchSize);
                                 const lineY1 = y + this.random(0, patchSize);
                                 const lineX2 = x + this.random(0, patchSize);
@@ -662,7 +555,6 @@ class SVGPatternGenerator {
                                 quilt.push(`<line x1="${lineX1}" y1="${lineY1}" x2="${lineX2}" y2="${lineY2}" 
                                     stroke="${decorColor}" stroke-width="${this.random(1, 3)}" opacity="${decorOpacity}"/>`);
                             } else {
-                                // Декоративные треугольники
                                 const triX = x + patchSize / 2;
                                 const triY = y + patchSize / 2;
                                 const triSize = this.random(3, 8);
@@ -679,7 +571,6 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, quilt.join(''));
     }
 
-    // Классный паттерн концентрические круги - идеальная симметрия
     generateConcentricPattern() {
         const size = this.getRandomSize();
         const concentric = [];
@@ -689,7 +580,6 @@ class SVGPatternGenerator {
         const centerY = size.height / 2;
         const maxRadius = Math.min(size.width, size.height) / 2;
         
-        // Создаем концентрические круги
         const numRings = this.randomInt(6, 12);
         const ringSpacing = maxRadius / numRings;
         
@@ -698,11 +588,9 @@ class SVGPatternGenerator {
             const opacity = this.random(0.2, 0.6);
             const color = palette[Math.floor(Math.random() * palette.length)];
             
-            // Создаем концентрический круг
             concentric.push(`<circle cx="${centerX}" cy="${centerY}" r="${radius}" 
                 fill="none" stroke="${color}" stroke-width="${this.randomInt(2, 5)}" opacity="${opacity}"/>`);
             
-            // Добавляем внутренние элементы для некоторых колец
             if (ring % 2 === 0 && ring > 0) {
                 const innerRadius = radius * 0.7;
                 const innerColor = palette[Math.floor(Math.random() * palette.length)];
@@ -714,16 +602,13 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, concentric.join(''));
     }
 
-    // Классный паттерн соты - идеальная мозаика
 
 
-    // Классный паттерн кирпичная кладка - идеальная структура
     generateBrickPattern() {
         const size = this.getRandomSize();
         const brick = [];
         const palette = this.getRandomPalette();
         
-        // Создаем идеальную кирпичную кладку
         const brickWidth = this.randomInt(30, 50);
         const brickHeight = this.randomInt(15, 25);
         const cols = Math.ceil(size.width / brickWidth) + 1;
@@ -734,7 +619,6 @@ class SVGPatternGenerator {
                 const x = col * brickWidth;
                 const y = row * brickHeight;
                 
-                // Смещение для четных рядов (кирпичная кладка)
                 const offsetX = (row % 2) * brickWidth / 2;
                 const finalX = x + offsetX;
                 
@@ -742,14 +626,12 @@ class SVGPatternGenerator {
                     const color = palette[Math.floor(Math.random() * palette.length)];
                     const opacity = this.random(0.4, 0.8);
                     
-                    // Создаем кирпич с закругленными углами
                     const cornerRadius = Math.min(brickWidth, brickHeight) * 0.1;
                     brick.push(`<rect x="${finalX}" y="${y}" 
                         width="${brickWidth}" height="${brickHeight}" 
                         rx="${cornerRadius}" ry="${cornerRadius}"
                         fill="${color}" opacity="${opacity}"/>`);
                     
-                    // Добавляем внутренний элемент
                     const innerColor = palette[Math.floor(Math.random() * palette.length)];
                     const innerWidth = brickWidth * 0.6;
                     const innerHeight = brickHeight * 0.6;
@@ -766,13 +648,11 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, brick.join(''));
     }
 
-    // Классный паттерн ромбовидная сетка - идеальная геометрия
     generateDiamondGridPattern() {
         const size = this.getRandomSize();
         const diamondGrid = [];
         const palette = this.getRandomPalette();
         
-        // Создаем идеальную ромбовидную сетку
         const diamondSize = this.randomInt(25, 40);
         const cols = Math.ceil(size.width / diamondSize) + 1;
         const rows = Math.ceil(size.height / diamondSize) + 1;
@@ -782,7 +662,6 @@ class SVGPatternGenerator {
                 const x = col * diamondSize;
                 const y = row * diamondSize;
                 
-                // Смещение для четных рядов
                 const offsetX = (row % 2) * diamondSize / 2;
                 const finalX = x + offsetX;
                 
@@ -790,7 +669,6 @@ class SVGPatternGenerator {
                     const color = palette[Math.floor(Math.random() * palette.length)];
                     const opacity = this.random(0.3, 0.7);
                     
-                    // Создаем ромб
                     const centerX = finalX + diamondSize / 2;
                     const centerY = y + diamondSize / 2;
                     const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
@@ -798,7 +676,6 @@ class SVGPatternGenerator {
                     diamondGrid.push(`<polygon points="${points}" 
                         fill="${color}" opacity="${opacity}"/>`);
                     
-                    // Добавляем внутренний элемент
                     const innerColor = palette[Math.floor(Math.random() * palette.length)];
                     const innerSize = diamondSize * 0.4;
                     const innerPoints = `${centerX},${centerY - innerSize/2} ${centerX + innerSize/2},${centerY} ${centerX},${centerY + innerSize/2} ${centerX - innerSize/2},${centerY}`;
@@ -811,7 +688,6 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, diamondGrid.join(''));
     }
 
-    // Крутой геометрический паттерн мандала - идеальная симметрия
     generateMandalaPattern() {
         const size = this.getRandomSize();
         const mandala = [];
@@ -821,7 +697,6 @@ class SVGPatternGenerator {
         const centerY = size.height / 2;
         const maxRadius = Math.min(size.width, size.height) / 2;
         
-        // Создаем концентрические круги с геометрическими элементами
         const numRings = this.randomInt(4, 8);
         const ringSpacing = maxRadius / numRings;
         
@@ -838,21 +713,17 @@ class SVGPatternGenerator {
                 
                 const color = palette[Math.floor(Math.random() * palette.length)];
                 
-                // Создаем геометрические элементы (круги, квадраты, ромбы)
                 const elementType = this.randomInt(0, 3);
                 
                 if (elementType === 0) {
-                    // Круг
                     mandala.push(`<circle cx="${x}" cy="${y}" r="${elementSize}" 
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (elementType === 1) {
-                    // Квадрат
                     mandala.push(`<rect x="${x - elementSize}" y="${y - elementSize}" 
                         width="${elementSize * 2}" height="${elementSize * 2}" 
                         fill="${color}" opacity="${opacity}" 
                         transform="rotate(${angle * 180 / Math.PI} ${x} ${y})"/>`);
                 } else {
-                    // Ромб
                     const points = `${x},${y - elementSize} ${x + elementSize},${y} ${x},${y + elementSize} ${x - elementSize},${y}`;
                     mandala.push(`<polygon points="${points}" 
                         fill="${color}" opacity="${opacity}"/>`);
@@ -863,13 +734,11 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, mandala.join(''));
     }
 
-    // Крутой геометрический паттерн тесселяция - идеальная мозаика
     generateTessellationPattern() {
         const size = this.getRandomSize();
         const tessellation = [];
         const palette = this.getRandomPalette();
         
-        // Создаем сложную тесселяцию из различных геометрических форм
         const cellSize = this.randomInt(20, 35);
         const cols = Math.ceil(size.width / cellSize) + 1;
         const rows = Math.ceil(size.height / cellSize) + 1;
@@ -882,11 +751,9 @@ class SVGPatternGenerator {
                 const color = palette[Math.floor(Math.random() * palette.length)];
                 const opacity = this.random(0.4, 0.8);
                 
-                // Создаем сложные геометрические формы
                 const shapeType = this.randomInt(0, 4);
                 
                 if (shapeType === 0) {
-                    // Сложный многоугольник
                     const numSides = this.randomInt(5, 8);
                     const points = [];
                     for (let i = 0; i < numSides; i++) {
@@ -898,7 +765,6 @@ class SVGPatternGenerator {
                     tessellation.push(`<polygon points="${points.join(' ')}" 
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (shapeType === 1) {
-                    // Звезда
                     const numPoints = this.randomInt(5, 8);
                     const outerRadius = cellSize * 0.4;
                     const innerRadius = outerRadius * 0.5;
@@ -913,7 +779,6 @@ class SVGPatternGenerator {
                     tessellation.push(`<polygon points="${points.join(' ')}" 
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (shapeType === 2) {
-                    // Сложный ромб с внутренними элементами
                     const centerX = x + cellSize/2;
                     const centerY = y + cellSize/2;
                     const diamondSize = cellSize * 0.6;
@@ -921,12 +786,10 @@ class SVGPatternGenerator {
                     tessellation.push(`<polygon points="${points}" 
                         fill="${color}" opacity="${opacity}"/>`);
                     
-                    // Добавляем внутренний элемент
                     const innerColor = palette[Math.floor(Math.random() * palette.length)];
                     tessellation.push(`<circle cx="${centerX}" cy="${centerY}" r="${diamondSize/4}" 
                         fill="${innerColor}" opacity="${opacity * 0.7}"/>`);
                 } else {
-                    // Сложный шестиугольник
                     const centerX = x + cellSize/2;
                     const centerY = y + cellSize/2;
                     const hexSize = cellSize * 0.4;
@@ -940,7 +803,6 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, tessellation.join(''));
     }
 
-    // Сложный фрактальный паттерн - рекурсивная геометрия
     generateFractalPattern() {
         const size = this.getRandomSize();
         const fractal = [];
@@ -950,7 +812,6 @@ class SVGPatternGenerator {
         const centerY = size.height / 2;
         const maxRadius = Math.min(size.width, size.height) / 2;
         
-        // Создаем фрактальную структуру
         const numLevels = this.randomInt(4, 6);
         const baseRadius = maxRadius / numLevels;
         
@@ -969,19 +830,15 @@ class SVGPatternGenerator {
                 
                 const color = palette[Math.floor(Math.random() * palette.length)];
                 
-                // Создаем сложные фрактальные элементы
                 const elementType = this.randomInt(0, 4);
                 
                 if (elementType === 0) {
-                    // Спиральная ветвь
                     const spiralPoints = this.generateSpiralPoints(startX, startY, endX, endY, 3);
                     fractal.push(`<path d="${spiralPoints}" stroke="${color}" stroke-width="${2 + level}" fill="none" opacity="${opacity}"/>`);
                 } else if (elementType === 1) {
-                    // Фрактальный круг с внутренними элементами
                     const circleRadius = branchLength * 0.3;
                     fractal.push(`<circle cx="${endX}" cy="${endY}" r="${circleRadius}" fill="${color}" opacity="${opacity}"/>`);
                     
-                    // Внутренние элементы
                     const innerColor = palette[Math.floor(Math.random() * palette.length)];
                     for (let i = 0; i < 4; i++) {
                         const innerAngle = (i * Math.PI) / 2;
@@ -990,7 +847,6 @@ class SVGPatternGenerator {
                         fractal.push(`<circle cx="${innerX}" cy="${innerY}" r="${circleRadius * 0.3}" fill="${innerColor}" opacity="${opacity * 0.7}"/>`);
                     }
                 } else if (elementType === 2) {
-                    // Фрактальный многоугольник
                     const numSides = this.randomInt(5, 8);
                     const polygonRadius = branchLength * 0.4;
                     const points = [];
@@ -1002,7 +858,6 @@ class SVGPatternGenerator {
                     }
                     fractal.push(`<polygon points="${points.join(' ')}" fill="${color}" opacity="${opacity}"/>`);
                 } else {
-                    // Фрактальная звезда
                     const starRadius = branchLength * 0.3;
                     const numPoints = this.randomInt(5, 8);
                     const starPoints = this.generateStarPoints(endX, endY, starRadius, numPoints);
@@ -1014,13 +869,11 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, fractal.join(''));
     }
 
-    // Сложный оптический паттерн - иллюзии и глубины
     generateOpticalPattern() {
         const size = this.getRandomSize();
         const optical = [];
         const palette = this.getRandomPalette();
         
-        // Создаем оптические иллюзии
         const numLayers = this.randomInt(3, 5);
         const layerSpacing = size.height / numLayers;
         
@@ -1029,11 +882,9 @@ class SVGPatternGenerator {
             const layerHeight = layerSpacing;
             const opacity = this.random(0.3, 0.7);
             
-            // Создаем разные типы оптических эффектов
             const effectType = this.randomInt(0, 3);
             
             if (effectType === 0) {
-                // Волновой эффект
                 const numWaves = this.randomInt(8, 15);
                 const waveAmplitude = layerHeight * 0.3;
                 const waveLength = size.width / numWaves;
@@ -1042,7 +893,6 @@ class SVGPatternGenerator {
                     const x = i * waveLength;
                     const color = palette[Math.floor(Math.random() * palette.length)];
                     
-                    // Создаем сложную волну
                     const wavePoints = [];
                     for (let j = 0; j < 20; j++) {
                         const waveX = x + (j * waveLength) / 20;
@@ -1053,7 +903,6 @@ class SVGPatternGenerator {
                     optical.push(`<polyline points="${wavePoints.join(' ')}" stroke="${color}" stroke-width="${3 + layer}" fill="none" opacity="${opacity}"/>`);
                 }
             } else if (effectType === 1) {
-                // Спиральный эффект
                 const centerX = size.width / 2;
                 const centerY = y + layerHeight / 2;
                 const maxRadius = Math.min(size.width, layerHeight) / 2;
@@ -1066,7 +915,6 @@ class SVGPatternGenerator {
                     optical.push(`<path d="${spiralPoints}" stroke="${color}" stroke-width="${2 + layer}" fill="none" opacity="${opacity}"/>`);
                 }
             } else {
-                // Геометрический эффект
                 const numShapes = this.randomInt(6, 12);
                 const shapeSize = Math.min(size.width, layerHeight) / numShapes;
                 
@@ -1074,11 +922,9 @@ class SVGPatternGenerator {
                     const x = i * shapeSize;
                     const color = palette[Math.floor(Math.random() * palette.length)];
                     
-                    // Создаем сложные геометрические формы
                     const shapeType = this.randomInt(0, 3);
                     
                     if (shapeType === 0) {
-                        // Сложный многоугольник
                         const numSides = this.randomInt(6, 10);
                         const points = [];
                         for (let j = 0; j < numSides; j++) {
@@ -1089,17 +935,14 @@ class SVGPatternGenerator {
                         }
                         optical.push(`<polygon points="${points.join(' ')}" fill="${color}" opacity="${opacity}"/>`);
                     } else if (shapeType === 1) {
-                        // Сложная звезда
                         const numPoints = this.randomInt(6, 10);
                         const starRadius = shapeSize * 0.4;
                         const starPoints = this.generateStarPoints(x + shapeSize/2, y + layerHeight/2, starRadius, numPoints);
                         optical.push(`<polygon points="${starPoints}" fill="${color}" opacity="${opacity}"/>`);
                     } else {
-                        // Сложный круг с внутренними элементами
                         const circleRadius = shapeSize * 0.4;
                         optical.push(`<circle cx="${x + shapeSize/2}" cy="${y + layerHeight/2}" r="${circleRadius}" fill="${color}" opacity="${opacity}"/>`);
                         
-                        // Внутренние элементы
                         const innerColor = palette[Math.floor(Math.random() * palette.length)];
                         for (let k = 0; k < 6; k++) {
                             const innerAngle = (k * Math.PI) / 3;
@@ -1115,13 +958,11 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, optical.join(''));
     }
 
-    // Сложная мозаика - многослойная геометрия
     generateMosaicPattern() {
         const size = this.getRandomSize();
         const mosaic = [];
         const palette = this.getRandomPalette();
         
-        // Создаем многослойную мозаику
         const numLayers = this.randomInt(3, 5);
         const cellSize = this.randomInt(15, 25);
         const cols = Math.ceil(size.width / cellSize) + 1;
@@ -1139,11 +980,9 @@ class SVGPatternGenerator {
                     if (x < size.width && y < size.height) {
                         const color = palette[Math.floor(Math.random() * palette.length)];
                         
-                        // Создаем сложные мозаичные элементы
                         const elementType = this.randomInt(0, 4);
                         
                         if (elementType === 0) {
-                            // Сложный многоугольник
                             const numSides = this.randomInt(5, 8);
                             const points = [];
                             for (let i = 0; i < numSides; i++) {
@@ -1154,17 +993,14 @@ class SVGPatternGenerator {
                             }
                             mosaic.push(`<polygon points="${points.join(' ')}" fill="${color}" opacity="${layerOpacity}"/>`);
                         } else if (elementType === 1) {
-                            // Сложная звезда
                             const numPoints = this.randomInt(5, 8);
                             const starRadius = cellSize * 0.4;
                             const starPoints = this.generateStarPoints(x + cellSize/2, y + cellSize/2, starRadius, numPoints);
                             mosaic.push(`<polygon points="${starPoints}" fill="${color}" opacity="${layerOpacity}"/>`);
                         } else if (elementType === 2) {
-                            // Сложный круг с внутренними элементами
                             const circleRadius = cellSize * 0.4;
                             mosaic.push(`<circle cx="${x + cellSize/2}" cy="${y + cellSize/2}" r="${circleRadius}" fill="${color}" opacity="${layerOpacity}"/>`);
                             
-                            // Внутренние элементы
                             const innerColor = palette[Math.floor(Math.random() * palette.length)];
                             for (let k = 0; k < 4; k++) {
                                 const innerAngle = (k * Math.PI) / 2;
@@ -1173,14 +1009,12 @@ class SVGPatternGenerator {
                                 mosaic.push(`<circle cx="${innerX}" cy="${innerY}" r="${circleRadius * 0.2}" fill="${innerColor}" opacity="${layerOpacity * 0.8}"/>`);
                             }
                         } else {
-                            // Сложный ромб с внутренними элементами
                             const centerX = x + cellSize/2;
                             const centerY = y + cellSize/2;
                             const diamondSize = cellSize * 0.6;
                             const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
                             mosaic.push(`<polygon points="${points}" fill="${color}" opacity="${layerOpacity}"/>`);
                             
-                            // Внутренний элемент
                             const innerColor = palette[Math.floor(Math.random() * palette.length)];
                             mosaic.push(`<circle cx="${centerX}" cy="${centerY}" r="${diamondSize/4}" fill="${innerColor}" opacity="${layerOpacity * 0.7}"/>`);
                         }
@@ -1192,13 +1026,11 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, mosaic.join(''));
     }
 
-    // Сложный кельтский паттерн - переплетающиеся узоры
     generateCelticPattern() {
         const size = this.getRandomSize();
         const celtic = [];
         const palette = this.getRandomPalette();
         
-        // Создаем кельтские узоры
         const numKnots = this.randomInt(3, 6);
         const knotSize = Math.min(size.width, size.height) / numKnots;
         
@@ -1207,24 +1039,20 @@ class SVGPatternGenerator {
             const centerY = size.height / 2;
             const opacity = this.random(0.3, 0.7);
             
-            // Создаем сложные кельтские узоры
             const knotType = this.randomInt(0, 3);
             
             if (knotType === 0) {
-                // Сложный узел
                 const numArms = this.randomInt(4, 8);
                 for (let arm = 0; arm < numArms; arm++) {
                     const angle = (arm * 2 * Math.PI) / numArms;
                     const color = palette[Math.floor(Math.random() * palette.length)];
                     
-                    // Создаем спиральную ветвь
                     const endX = centerX + knotSize * 0.8 * Math.cos(angle);
                     const endY = centerY + knotSize * 0.8 * Math.sin(angle);
                     const spiralPoints = this.generateSpiralPoints(centerX, centerY, endX, endY, 3);
                     celtic.push(`<path d="${spiralPoints}" stroke="${color}" stroke-width="${3}" fill="none" opacity="${opacity}"/>`);
                 }
             } else if (knotType === 1) {
-                // Сложная мандала
                 const numRings = this.randomInt(3, 5);
                 const ringSpacing = knotSize / (numRings * 2);
                 
@@ -1240,14 +1068,11 @@ class SVGPatternGenerator {
                         
                         const color = palette[Math.floor(Math.random() * palette.length)];
                         
-                        // Создаем сложные элементы
                         const elementType = this.randomInt(0, 2);
                         
                         if (elementType === 0) {
-                            // Сложный круг
                             celtic.push(`<circle cx="${x}" cy="${y}" r="${elementSize}" fill="${color}" opacity="${opacity}"/>`);
                             
-                            // Внутренние элементы
                             const innerColor = palette[Math.floor(Math.random() * palette.length)];
                             for (let k = 0; k < 4; k++) {
                                 const innerAngle = angle + (k * Math.PI) / 2;
@@ -1256,7 +1081,6 @@ class SVGPatternGenerator {
                                 celtic.push(`<circle cx="${innerX}" cy="${innerY}" r="${elementSize * 0.3}" fill="${innerColor}" opacity="${opacity * 0.8}"/>`);
                             }
                         } else {
-                            // Сложная звезда
                             const numPoints = this.randomInt(5, 8);
                             const starPoints = this.generateStarPoints(x, y, elementSize, numPoints);
                             celtic.push(`<polygon points="${starPoints}" fill="${color}" opacity="${opacity}"/>`);
@@ -1264,7 +1088,6 @@ class SVGPatternGenerator {
                     }
                 }
             } else {
-                // Сложная тесселяция
                 const cellSize = knotSize * 0.3;
                 const cols = Math.ceil(knotSize / cellSize);
                 const rows = Math.ceil(knotSize / cellSize);
@@ -1279,11 +1102,9 @@ class SVGPatternGenerator {
                             
                             const color = palette[Math.floor(Math.random() * palette.length)];
                             
-                            // Создаем сложные геометрические формы
                             const shapeType = this.randomInt(0, 3);
                             
                             if (shapeType === 0) {
-                                // Сложный многоугольник
                                 const numSides = this.randomInt(5, 8);
                                 const points = [];
                                 for (let i = 0; i < numSides; i++) {
@@ -1294,17 +1115,14 @@ class SVGPatternGenerator {
                                 }
                                 celtic.push(`<polygon points="${points.join(' ')}" fill="${color}" opacity="${opacity}"/>`);
                             } else if (shapeType === 1) {
-                                // Сложная звезда
                                 const numPoints = this.randomInt(5, 8);
                                 const starRadius = cellSize * 0.4;
                                 const starPoints = this.generateStarPoints(x + cellSize/2, y + cellSize/2, starRadius, numPoints);
                                 celtic.push(`<polygon points="${starPoints}" fill="${color}" opacity="${opacity}"/>`);
                             } else {
-                                // Сложный круг с внутренними элементами
                                 const circleRadius = cellSize * 0.4;
                                 celtic.push(`<circle cx="${x + cellSize/2}" cy="${y + cellSize/2}" r="${circleRadius}" fill="${color}" opacity="${opacity}"/>`);
                                 
-                                // Внутренние элементы
                                 const innerColor = palette[Math.floor(Math.random() * palette.length)];
                                 for (let k = 0; k < 6; k++) {
                                     const innerAngle = (k * Math.PI) / 3;
@@ -1322,7 +1140,6 @@ class SVGPatternGenerator {
         return this.createSVG(size.width, size.height, celtic.join(''));
     }
 
-    // Вспомогательные функции для сложных паттернов
     generateSpiralPoints(startX, startY, endX, endY, turns) {
         const points = [];
         const numPoints = 50;
@@ -1398,7 +1215,7 @@ class SVGPatternGenerator {
 
     createSVG(width, height, content) {
         const randomBackground = this.getRandomBackground();
-        return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+        return `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
             <rect x="0" y="0" width="100%" height="100%" fill="${randomBackground}"/>
             ${content}
         </svg>`;
@@ -1419,7 +1236,6 @@ class SVGPatternGenerator {
 
 
 
-// Глобальные функции
 function getRandomPattern() {
     if (typeof window !== 'undefined' && window.patternGenerator) {
         return window.patternGenerator.generateRandomPattern();
@@ -1457,16 +1273,13 @@ function generateNewPatternForCard(cardId) {
     return false;
 }
 
-// Экспорт для браузера
 if (typeof window !== 'undefined') {
-    // Создаем глобальный экземпляр
     try {
         window.patternGenerator = new SVGPatternGenerator();
     } catch (error) {
         window.patternGenerator = null;
     }
     
-    // Экспортируем класс и функции
     window.SVGPatternGenerator = SVGPatternGenerator;
     window.getRandomPattern = getRandomPattern;
     window.getAllPatterns = getAllPatterns;

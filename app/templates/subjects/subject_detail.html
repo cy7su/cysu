@@ -35,18 +35,6 @@
           <h2 class="mb-2">{{ subject.title }}</h2>
           <p class="text-muted mb-0">{{ subject.description }}</p>
         </div>
-        {% if current_user.is_authenticated and current_user.is_admin %}
-        <div class="mode-switch">
-          <form method="post" action="{{ url_for('main.toggle_admin_mode') }}" style="display: inline;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <label class="mode-toggle">
-              <input type="checkbox" {% if current_user.admin_mode_enabled %}checked{% endif %} onchange="this.form.submit()">
-              <span class="mode-slider"></span>
-            </label>
-
-          </form>
-        </div>
-        {% endif %}
       </div>
       {% if current_user.is_authenticated and current_user.is_admin and current_user.admin_mode_enabled %}
         <div class="d-flex gap-2 mobile-admin-buttons">
@@ -65,11 +53,9 @@
   </div>
 </div>
 {% if can_add_materials %}
-<!-- Кнопка для открытия модального окна -->
 <div class="d-flex justify-content-end mb-3">
   <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMaterialModal" style="padding: 4px 12px !important; font-size: 0.85rem;">Добавить материал</button>
 </div>
-<!-- Модальное окно -->
 <div class="modal fade" id="addMaterialModal" tabindex="-1" aria-labelledby="addMaterialModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -187,7 +173,6 @@
 </script>
 {% endif %}
 
-<!-- Модальное окно для редактирования предмета -->
 {% if current_user.is_authenticated and current_user.is_admin and current_user.admin_mode_enabled %}
 <div class="modal fade" id="editSubjectModal" tabindex="-1" aria-labelledby="editSubjectModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -337,7 +322,6 @@
   </div>
 </div>
 
-<!-- Модальные окна для загрузки решений -->
 {% if current_user.is_authenticated %}
   {% for material in assignments %}
     <div class="modal fade" id="submitSolutionModal{{ material.id }}" tabindex="-1" aria-labelledby="submitSolutionModalLabel{{ material.id }}" aria-hidden="true" style="z-index: 1050;">

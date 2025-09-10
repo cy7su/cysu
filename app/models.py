@@ -1,18 +1,18 @@
-from . import db
-from flask_login import UserMixin
-from datetime import datetime, timedelta
 import secrets
+from datetime import datetime, timedelta
+
+from flask_login import UserMixin
+
+from . import db
 
 
 class Group(db.Model):
-    """Модель для хранения групп пользователей"""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
 
-    # Связи
     users = db.relationship('User', backref='group', lazy=True)
     subjects = db.relationship('SubjectGroup', backref='group', lazy=True, cascade='all, delete-orphan')
 
@@ -20,13 +20,11 @@ class Group(db.Model):
         return f'<Group {self.name}>'
 
 class SubjectGroup(db.Model):
-    """Модель для связи предметов с группами (многие-ко-многим)"""
     id = db.Column(db.Integer, primary_key=True)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Уникальность комбинации
     __table_args__ = (db.UniqueConstraint('subject_id', 'group_id'),)
 
     def __repr__(self) -> str:
@@ -54,61 +52,47 @@ class User(UserMixin, db.Model):
     notifications = db.relationship('Notification', backref='user', lazy=True, cascade='all, delete-orphan')
 
     def is_effective_admin(self):
-        """Проверяет, является ли пользователь эффективным админом (админ в админ режиме)"""
         return self.is_admin and self.admin_mode_enabled
 
     def can_manage_materials(self):
-        """Проверяет, может ли пользователь управлять материалами (админ в админ режиме или модератор)"""
         return (self.is_admin and self.admin_mode_enabled) or self.is_moderator
 
     def can_see_all_subjects(self):
-        """Проверяет, может ли пользователь видеть все предметы (только админ в админ режиме)"""
         return self.is_admin and self.admin_mode_enabled
 
     def get_accessible_subjects(self):
-        """Возвращает предметы, доступные пользователю"""
         from .models import Subject, SubjectGroup
 
         if self.can_see_all_subjects():
-            # Админ в админ режиме видит все предметы
             return Subject.query.all()
         elif self.group_id:
-            # Модератор или админ в пользователь режиме видит только предметы своей группы
             return Subject.query.join(SubjectGroup).filter(
                 SubjectGroup.group_id == self.group_id
             ).all()
         else:
-            # Пользователь без группы не видит предметов
             return []
 
     def can_add_materials_to_subject(self, subject):
-        """Проверяет, может ли пользователь добавлять материалы к предмету"""
         if self.is_admin and self.admin_mode_enabled:
-            # Админ в админ режиме может добавлять материалы ко всем предметам
             return True
         elif self.is_moderator and self.group_id:
-            # Модератор может добавлять материалы только к предметам своей группы
             from .models import SubjectGroup
             return SubjectGroup.query.filter_by(
                 subject_id=subject.id,
                 group_id=self.group_id
             ).first() is not None
         else:
-            # Обычные пользователи не могут добавлять материалы
             return False
 
     def can_manage_subject_materials(self, subject):
-        """Проверяет, может ли пользователь управлять материалами предмета (добавлять/удалять)"""
         return self.can_add_materials_to_subject(subject)
 
     def has_active_subscription(self):
-        """Проверяет, есть ли у пользователя активная подписка (включая пробную)"""
         from .utils.payment_service import YooKassaService
         payment_service = YooKassaService()
         return payment_service.check_user_subscription(self)
 
     def get_role_display(self):
-        """Возвращает отображаемое название роли"""
         if self.is_admin:
             return "Администратор" + (" (Админ режим)" if self.admin_mode_enabled else " (Пользователь режим)")
         elif self.is_moderator:
@@ -117,7 +101,6 @@ class User(UserMixin, db.Model):
             return "Пользователь"
 
 class EmailVerification(db.Model):
-    """Модель для хранения кодов подтверждения email"""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Может быть NULL для временных кодов
     email = db.Column(db.String(120), nullable=True)  # Email для временных кодов
@@ -126,7 +109,6 @@ class EmailVerification(db.Model):
     expires_at = db.Column(db.DateTime, nullable=False)
     is_used = db.Column(db.Boolean, default=False)
 
-    # Связь с пользователем
     user = db.relationship('User', backref=db.backref('email_verifications', cascade='all, delete-orphan'))
 
     def __repr__(self) -> str:
@@ -134,7 +116,6 @@ class EmailVerification(db.Model):
 
     @classmethod
     def generate_code(cls) -> str:
-        """Генерирует 6-значный код подтверждения"""
         import logging
         logger = logging.getLogger(__name__)
 
@@ -144,7 +125,6 @@ class EmailVerification(db.Model):
 
     @classmethod
     def create_verification(cls, user_id: int = None, email: str = None, expires_in_minutes: int = 15) -> 'EmailVerification':
-        """Создает новый код подтверждения для пользователя или email"""
         code = cls.generate_code()
         expires_at = datetime.utcnow() + timedelta(minutes=expires_in_minutes)
 
@@ -156,7 +136,6 @@ class EmailVerification(db.Model):
         )
 
 class PasswordReset(db.Model):
-    """Модель для хранения кодов восстановления пароля"""
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), nullable=False)  # Email пользователя
     code = db.Column(db.String(8), nullable=False)  # 8-символьный код
@@ -169,7 +148,6 @@ class PasswordReset(db.Model):
 
     @classmethod
     def generate_code(cls) -> str:
-        """Генерирует 8-значный код восстановления"""
         import logging
         logger = logging.getLogger(__name__)
 
@@ -179,7 +157,6 @@ class PasswordReset(db.Model):
 
     @classmethod
     def create_reset(cls, email: str, expires_in_minutes: int = 15) -> 'PasswordReset':
-        """Создает новый код восстановления для email"""
         code = cls.generate_code()
         expires_at = datetime.utcnow() + timedelta(minutes=expires_in_minutes)
 
@@ -197,7 +174,6 @@ class Subject(db.Model):
     pattern_svg = db.Column(db.Text)  # Сгенерированный SVG паттерн (закрепляется за предметом)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     materials = db.relationship('Material', backref='subject', lazy=True)
-    # Связь с группами через SubjectGroup
     groups = db.relationship('SubjectGroup', backref='subject', lazy=True, cascade='all, delete-orphan')
 
 class Material(db.Model):
@@ -222,7 +198,6 @@ class Submission(db.Model):
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Payment(db.Model):
-    """Модель для хранения информации о платежах"""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     yookassa_payment_id = db.Column(db.String(255), unique=True, nullable=False)
@@ -237,7 +212,6 @@ class Payment(db.Model):
         return f'<Payment {self.yookassa_payment_id}: {self.status}>'
 
 class ChatMessage(db.Model):
-    """Модель для хранения сообщений чата"""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     message = db.Column(db.Text, nullable=False)
@@ -246,14 +220,12 @@ class ChatMessage(db.Model):
     file_type = db.Column(db.String(50))   # Тип файла (image, document, etc.)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Связь с пользователем
     user = db.relationship('User', backref=db.backref('chat_messages', cascade='all, delete-orphan'))
 
     def __repr__(self) -> str:
         return f'<ChatMessage {self.id}: {self.user.username if self.user else "Unknown"}>'
 
 class Ticket(db.Model):
-    """Модель для хранения тикетов поддержки"""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     subject = db.Column(db.String(255), nullable=False)
@@ -267,17 +239,14 @@ class Ticket(db.Model):
     user_response = db.Column(db.Text)  # Ответ пользователя на ответ администратора
     user_response_at = db.Column(db.DateTime)  # Время ответа пользователя
 
-    # Связь с файлами тикета
     files = db.relationship('TicketFile', backref='ticket', lazy=True, cascade='all, delete-orphan')
 
-    # Связь с администратором
     admin = db.relationship('User', foreign_keys=[admin_id], backref='administered_tickets')
 
     def __repr__(self) -> str:
         return f'<Ticket {self.id}: {self.subject}>'
 
 class TicketFile(db.Model):
-    """Модель для хранения файлов, прикрепленных к тикетам"""
     id = db.Column(db.Integer, primary_key=True)
     ticket_id = db.Column(db.Integer, db.ForeignKey('ticket.id'), nullable=False)
     file_path = db.Column(db.String(255), nullable=False)
@@ -290,7 +259,6 @@ class TicketFile(db.Model):
         return f'<TicketFile {self.id}: {self.file_name}>'
 
 class TicketMessage(db.Model):
-    """Модель для хранения сообщений в тикетах"""
     id = db.Column(db.Integer, primary_key=True)
     ticket_id = db.Column(db.Integer, db.ForeignKey('ticket.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -298,7 +266,6 @@ class TicketMessage(db.Model):
     is_admin = db.Column(db.Boolean, default=False)  # True если сообщение от администратора
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Связи
     ticket = db.relationship('Ticket', backref='messages')
     user = db.relationship('User', backref='ticket_messages')
 
@@ -306,7 +273,6 @@ class TicketMessage(db.Model):
         return f'<TicketMessage {self.id}: {"Admin" if self.is_admin else "User"}>'
 
 class Notification(db.Model):
-    """Модель для хранения уведомлений пользователей"""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.String(255), nullable=False)
@@ -320,7 +286,6 @@ class Notification(db.Model):
         return f'<Notification {self.id}: {self.title}>'
 
 class ShortLink(db.Model):
-    """Модель для хранения сокращённых ссылок"""
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(16), unique=True, nullable=False, index=True)
     original_url = db.Column(db.Text, nullable=False)
@@ -332,13 +297,11 @@ class ShortLink(db.Model):
 
     @staticmethod
     def generate_code(length: int = 3) -> str:
-        """Генерирует короткий код длиной length"""
         alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
         return ''.join(secrets.choice(alphabet) for _ in range(length))
 
     @classmethod
     def create_unique(cls, original_url: str, max_tries: int = 5) -> 'ShortLink':
-        """Создаёт уникальную запись с новым кодом"""
         for _ in range(max_tries):
             code = cls.generate_code()
             if not cls.query.filter_by(code=code).first():
@@ -346,8 +309,6 @@ class ShortLink(db.Model):
                 db.session.add(link)
                 db.session.commit()
                 return link
-        # Если по каким-то причинам код не удалось сгенерировать
-        # увеличиваем длину и пробуем ещё раз
         code = cls.generate_code(8)
         link = cls(code=code, original_url=original_url)
         db.session.add(link)
@@ -355,21 +316,18 @@ class ShortLink(db.Model):
         return link
 
 class ShortLinkRule(db.Model):
-    """Политика ограничения для короткой ссылки (время/количество кликов)."""
     id = db.Column(db.Integer, primary_key=True)
     short_link_id = db.Column(db.Integer, db.ForeignKey('short_link.id'), nullable=False, unique=True)
     expires_at = db.Column(db.DateTime, nullable=True)
     max_clicks = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    # Связь
     short_link = db.relationship('ShortLink', backref=db.backref('rule', uselist=False, cascade='all, delete-orphan'))
 
     def __repr__(self) -> str:
         return f'<ShortLinkRule link_id={self.short_link_id} expires_at={self.expires_at} max_clicks={self.max_clicks}>'
 
 class SiteSettings(db.Model):
-    """Модель для хранения настроек сайта"""
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(100), unique=True, nullable=False)
     value = db.Column(db.Text, nullable=False)
@@ -381,10 +339,8 @@ class SiteSettings(db.Model):
 
     @classmethod
     def get_setting(cls, key: str, default=None):
-        """Получает значение настройки по ключу"""
         setting = cls.query.filter_by(key=key).first()
         if setting:
-            # Пытаемся преобразовать в boolean для переключателей
             if setting.value.lower() in ['true', 'false']:
                 return setting.value.lower() == 'true'
             return setting.value
@@ -392,7 +348,6 @@ class SiteSettings(db.Model):
 
     @classmethod
     def set_setting(cls, key: str, value: str, description: str = None):
-        """Устанавливает значение настройки"""
         setting = cls.query.filter_by(key=key).first()
         if setting:
             setting.value = str(value)
@@ -405,7 +360,6 @@ class SiteSettings(db.Model):
         return setting
 
 class TelegramUser(db.Model):
-    """Модель для хранения Telegram пользователей"""
     id = db.Column(db.Integer, primary_key=True)
     telegram_id = db.Column(db.BigInteger, unique=True, nullable=False)
     username = db.Column(db.String(100), nullable=True)
@@ -417,7 +371,6 @@ class TelegramUser(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_activity = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Связи
     user = db.relationship('User', backref='telegram_account', uselist=False)
 
     def __repr__(self) -> str:
@@ -425,7 +378,6 @@ class TelegramUser(db.Model):
 
     @classmethod
     def get_or_create(cls, telegram_id, username=None, first_name=None, last_name=None, is_bot=False, language_code=None):
-        """Получить или создать Telegram пользователя"""
         tg_user = cls.query.filter_by(telegram_id=telegram_id).first()
         if not tg_user:
             tg_user = cls(
@@ -439,7 +391,6 @@ class TelegramUser(db.Model):
             db.session.add(tg_user)
             db.session.commit()
         else:
-            # Обновляем данные
             tg_user.username = username
             tg_user.first_name = first_name
             tg_user.last_name = last_name

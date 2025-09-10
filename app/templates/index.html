@@ -5,18 +5,15 @@
 {% block content %}
 
 {% if not current_user.is_authenticated %}
-<!-- Секция для неавторизованных пользователей -->
 <section class="hero-container" style="min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center;">
     <div class="container">
         <header class="text-center">
-            <!-- Заголовок -->
             <div class="mb-5">
                 <h1 class="display-5 fw-bold text-white mb-3">cysu</h1>
                 <p class="text-muted mb-3">Современная замена Moodle</p>
                 <p class="text-muted small">ДЛЯ ВСЕХ ТЕХ КТО НЕНАВИДИТ MOODLE</p>
             </div>
             
-            <!-- Быстрые возможности -->
             <section class="row g-3 justify-content-center mb-4">
                 <div class="col-md-4">
                     <div class="quick-feature p-3" style="background: var(--dp-02); border: 1px solid var(--border-secondary); border-radius: 12px;">
@@ -41,7 +38,6 @@
                 </div>
             </section>
             
-            <!-- Кнопки -->
             <nav class="d-flex gap-2 justify-content-center flex-wrap">
                 <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm px-3">
                     Регистрация
@@ -68,18 +64,6 @@
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
   <div class="d-flex align-items-center">
     <h2 class="mb-3 mb-md-0">Предметы</h2>
-    {% if current_user.is_authenticated and current_user.is_admin %}
-    <div class="mode-switch">
-      <form method="post" action="{{ url_for('main.toggle_admin_mode') }}" style="display: inline;">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label class="mode-toggle">
-          <input type="checkbox" {% if current_user.admin_mode_enabled %}checked{% endif %} onchange="this.form.submit()">
-          <span class="mode-slider"></span>
-        </label>
-
-      </form>
-    </div>
-    {% endif %}
   </div>
   {% if current_user.is_admin and current_user.admin_mode_enabled %}
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addSubjectModal" style="padding: 4px 12px !important; font-size: 0.85rem;">
@@ -91,19 +75,16 @@
     {% for subject in subjects %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
         <div class="card shadow-sm subject-card position-relative" id="subject-card-{{ subject.id }}" data-subject-id="{{ subject.id }}" data-url="{{ url_for('main.subject_detail', subject_id=subject.id) }}" onclick="window.location.href=this.getAttribute('data-url')">
-            <!-- Кнопка генерации паттерна (только для админов и если настройка включена) -->
             {% if current_user.is_effective_admin() and pattern_generation_enabled %}
             <button class="admin-pattern-btn" onclick="event.stopPropagation(); generateNewPattern('subject-card-{{ subject.id }}')" title="Сгенерировать новый паттерн">
                 <i class="fas fa-palette"></i>
             </button>
             {% endif %}
             
-            <!-- Изображение с SVG паттерном для соотношения 32:10 -->
             <div class="card-img dashboard-card-img pattern-container" data-pattern-type="{{ subject.pattern_type or 'dots' }}" data-pattern-svg="{{ subject.pattern_svg or '' }}">
                 <span class="sr-only">Изображение предмета</span>
             </div>
             
-            <!-- Темное тело карточки -->
             <div class="card-body">
                 <h6 class="card-title text-primary mb-1">{{ subject.title[:35]|e }}{% if subject.title|length > 35 %}...{% endif %}</h6>
                 <p class="card-text text-muted mb-1">{% if subject.description %}{{ subject.description[:70]|e }}{% if subject.description|length > 70 %}...{% endif %}{% else %}Описание отсутствует{% endif %}</p>
@@ -115,7 +96,6 @@
     {% endfor %}
 </div>
 {% if current_user.is_admin and current_user.admin_mode_enabled %}
-<!-- Модальное окно добавления предмета -->
 <div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
@@ -451,7 +431,6 @@ function deleteSubject(subjectId) {
 }
 </script>
 
-<!-- Скрытый SEO контент для поисковиков -->
 <div style="position: absolute; left: -9999px; top: -9999px; visibility: hidden;">
     <h1>ИОС СГТУ альтернатива</h1>
     <h2>EIOS SSTU замена</h2>

@@ -1,40 +1,31 @@
-/* ========================================
-   ОПТИМИЗИРОВАННЫЙ CSS - CYSU
-   ======================================== */
 
-/* CSS переменные */
 :root {
     --primary-color: #B595FF;
     --primary-hover: #9A7FE6;
     
-    /* Уровни возвышения Material Design */
-    --dp-00: #121212; /* Базовый темный серый */
-    --dp-01: #1E1E1E; /* Легко приподнятые элементы */
-    --dp-02: #222222; /* Карточки или панели */
-    --dp-03: #242424; /* Навигация */
-    --dp-04: #272727; /* Кнопки в покое */
-    --dp-06: #2C2C2C; /* Модальные окна */
-    --dp-08: #2E2E2E; /* Попапы */
-    --dp-12: #333333; /* Диалоги */
-    --dp-16: #343434; /* Высокие элементы */
-    --dp-24: #383838; /* Максимальное возвышение */
+    --dp-00: #121212;
+    --dp-01: #1E1E1E;
+    --dp-02: #222222;
+    --dp-03: #242424;
+    --dp-04: #272727;
+    --dp-06: #2C2C2C;
+    --dp-08: #2E2E2E;
+    --dp-12: #333333;
+    --dp-16: #343434;
+    --dp-24: #383838;
     
-    /* Цвета текста */
     --text-primary: #FFFFFF;
     --text-secondary: #B3B3B3;
     --text-disabled: #666666;
     
-    /* Цвета границ */
     --border-primary: #333333;
     --border-secondary: #404040;
     
-    /* Цвета состояний */
     --success: #4CAF50;
     --warning: #FF9800;
     --error: #F44336;
     --info: #2196F3;
     
-    /* Обратная совместимость */
     --dark-bg: var(--dp-00);
     --dark-element: var(--dp-02);
     --dark-text: var(--text-primary);
@@ -45,9 +36,13 @@
     --accent-blue-hover: var(--primary-hover);
 }
 
-/* ========================================
-   ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ
-   ======================================== */
+
+.dropdown-toggle::after {
+    margin-left: 0 !important;
+    border-right: none !important;
+    border-left: none !important;
+}
+
 
 .mode-switch {
     display: inline-flex;
@@ -102,6 +97,27 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
+.footer .mode-toggle {
+    width: 36px !important;
+    height: 20px !important;
+}
+
+.footer .mode-slider {
+    border-radius: 20px !important;
+}
+
+.footer .mode-slider:before {
+    height: 14px !important;
+    width: 14px !important;
+    left: 2px !important;
+    bottom: 2px !important;
+    font-size: 8px !important;
+}
+
+.footer .mode-toggle input:checked + .mode-slider:before {
+    transform: translateX(16px) !important;
+}
+
 .mode-toggle input:checked + .mode-slider {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
@@ -131,11 +147,7 @@
     font-weight: 500;
 }
 
-/* ========================================
-   ПЛЕЙСХОЛДЕРЫ
-   ======================================== */
 
-/* Стили для плейсхолдеров в input полях */
 .form-control::placeholder,
 .form-select::placeholder,
 input::placeholder,
@@ -144,7 +156,6 @@ textarea::placeholder {
     opacity: 0.8 !important;
 }
 
-/* Для WebKit браузеров (Chrome, Safari) */
 .form-control::-webkit-input-placeholder,
 .form-select::-webkit-input-placeholder,
 input::-webkit-input-placeholder,
@@ -153,7 +164,6 @@ textarea::-webkit-input-placeholder {
     opacity: 0.8 !important;
 }
 
-/* Для Mozilla Firefox */
 .form-control::-moz-placeholder,
 .form-select::-moz-placeholder,
 input::-moz-placeholder,
@@ -162,7 +172,6 @@ textarea::-moz-placeholder {
     opacity: 0.8 !important;
 }
 
-/* Для старых версий Firefox */
 .form-control:-moz-placeholder,
 .form-select:-moz-placeholder,
 input:-moz-placeholder,
@@ -171,7 +180,6 @@ textarea:-moz-placeholder {
     opacity: 0.8 !important;
 }
 
-/* Для Internet Explorer */
 .form-control:-ms-input-placeholder,
 .form-select:-ms-input-placeholder,
 input:-ms-input-placeholder,
@@ -180,9 +188,6 @@ textarea:-ms-input-placeholder {
     opacity: 0.8 !important;
 }
 
-/* ========================================
-   БАЗОВЫЕ СТИЛИ
-   ======================================== */
 
 html, body {
     background-color: var(--dp-00);
@@ -195,16 +200,12 @@ html, body {
     flex-direction: column;
 }
 
-/* Заголовки */
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 1rem;
 }
 
-/* ========================================
-   НАВИГАЦИЯ
-   ======================================== */
 
 .navbar {
     background-color: var(--dp-00);
@@ -236,9 +237,6 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--primary-color);
 }
 
-/* ========================================
-   КАРТОЧКИ
-   ======================================== */
 
 .card {
     background-color: var(--dp-02);
@@ -268,15 +266,11 @@ h1, h2, h3, h4, h5, h6 {
     padding: 1.5rem;
 }
 
-/* Специальные стили для карточек */
 .card-body.d-flex.flex-column {
     border: 1px solid var(--border-secondary);
     border-radius: 20px;
 }
 
-/* ========================================
-   ФОРМЫ
-   ======================================== */
 
 .form-control, .form-select {
     background-color: var(--dp-01);
@@ -307,9 +301,6 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.875rem;
 }
 
-/* ========================================
-   КНОПКИ
-   ======================================== */
 
 .btn {
     border-radius: 20px;
@@ -367,9 +358,6 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--dp-08);
 }
 
-/* ========================================
-   АЛЕРТЫ
-   ======================================== */
 
 .alert {
     background-color: var(--dp-02);
@@ -409,9 +397,6 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--info);
 }
 
-/* ========================================
-   ТАБЛИЦЫ
-   ======================================== */
 
 .table {
     background-color: var(--dp-02);
@@ -434,9 +419,6 @@ h1, h2, h3, h4, h5, h6 {
     background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* ========================================
-   СПИСКИ
-   ======================================== */
 
 .list-group {
     background-color: var(--dp-02);
@@ -450,9 +432,6 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 0.5rem;
 }
 
-/* ========================================
-   МОДАЛЬНЫЕ ОКНА
-   ======================================== */
 
 .modal-content {
     background-color: var(--dp-06);
@@ -472,9 +451,6 @@ h1, h2, h3, h4, h5, h6 {
     border-top: 1px solid var(--border-primary);
 }
 
-/* ========================================
-   ФУТЕР
-   ======================================== */
 
 footer {
     background-color: var(--dp-00);
@@ -524,9 +500,6 @@ footer .btn-primary:hover {
     border-color: var(--primary-hover) !important;
 }
 
-/* ========================================
-   ССЫЛКИ И ТЕКСТ
-   ======================================== */
 
 a {
     color: var(--primary-color);
@@ -536,7 +509,6 @@ a:hover {
     color: var(--primary-hover);
 }
 
-/* Ссылки в описании материалов */
 .text-muted a {
     text-decoration: none;
     word-break: break-all;
@@ -571,9 +543,6 @@ a:hover {
     color: var(--error);
 }
 
-/* ========================================
-   БЕЙДЖИ
-   ======================================== */
 
 .badge {
     background-color: var(--dp-04);
@@ -597,9 +566,6 @@ a:hover {
     background-color: var(--error);
 }
 
-/* ========================================
-   ДРОПДАУНЫ
-   ======================================== */
 
 .dropdown-menu {
     background-color: var(--dp-02);
@@ -652,9 +618,6 @@ a:hover {
     margin: 8px 0;
 }
 
-/* ========================================
-   ПАГИНАЦИЯ
-   ======================================== */
 
 .pagination {
     background-color: var(--dp-02);
@@ -678,9 +641,6 @@ a:hover {
     border-color: var(--primary-color);
 }
 
-/* ========================================
-   ПРОГРЕСС БАРЫ
-   ======================================== */
 
 .progress {
     background-color: var(--dp-01);
@@ -690,9 +650,6 @@ a:hover {
     background-color: var(--primary-color);
 }
 
-/* ========================================
-   ТУЛТИПЫ И ПОПОВЕРЫ
-   ======================================== */
 
 .tooltip-inner {
     background-color: var(--dp-12);
@@ -712,18 +669,12 @@ a:hover {
     color: var(--text-primary);
 }
 
-/* ========================================
-   СПЕЦИАЛЬНЫЕ ЭЛЕМЕНТЫ
-   ======================================== */
 
 .subscription-card {
     background-color: var(--dp-02);
     border: 1px solid var(--border-primary);
 }
 
-/* ========================================
-   КАРТОЧКИ ПРЕДМЕТОВ
-   ======================================== */
 
 .subject-card {
     background-color: var(--dp-03);
@@ -744,7 +695,6 @@ a:hover {
     border-width: 2px;
 }
 
-/* Компактные карточки предметов */
 .subject-card .card-body {
     padding: 0.75rem;
     background: var(--dp-03);
@@ -754,14 +704,12 @@ a:hover {
     justify-content: space-between;
 }
 
-/* Пропорции для карточек предметов */
 .subject-card {
     min-height: 220px;
     min-width: 420px;
     margin-right: 40px;
 }
 
-/* SVG изображение занимает 67% высоты карточки */
 .subject-card .card-img {
     height: 67%;
     background-size: cover;
@@ -784,9 +732,6 @@ a:hover {
     color: var(--text-secondary);
 }
 
-/* ========================================
-   ПРЕДПРОСМОТР ПАТТЕРНОВ В МОДАЛЬНОМ ОКНЕ
-   ======================================== */
 
 .pattern-preview {
     width: 100%;
@@ -814,9 +759,6 @@ a:hover {
     background-repeat: no-repeat;
 }
 
-/* ========================================
-   ПЕРЕОПРЕДЕЛЕНИЯ BOOTSTRAP
-   ======================================== */
 
 .bg-light, .bg-white, .bg-body, .bg-body-tertiary {
     background-color: var(--dp-08) !important;
@@ -826,9 +768,6 @@ a:hover {
     color: var(--text-primary);
 }
 
-/* ========================================
-   МОБИЛЬНЫЕ СТИЛИ
-   ======================================== */
 
 @media (max-width: 768px) {
     body {
@@ -1038,18 +977,13 @@ a:hover {
         font-size: 0.8rem;
     }
     
-    /* ========================================
-       МОБИЛЬНЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ ПРЕДМЕТА
-       ======================================== */
     
-    /* Контейнер кнопок на мобильных - всегда справа */
     .mobile-buttons-container {
         order: 2;
         flex-shrink: 0;
         margin-left: auto;
     }
     
-    /* Кнопки файлов и решений на мобильных */
     .mobile-file-btn,
     .mobile-solution-btn,
     .mobile-upload-btn {
@@ -1059,7 +993,6 @@ a:hover {
         white-space: nowrap;
     }
     
-    /* Кнопки удаления на мобильных - более светлые */
     .mobile-delete-btn {
         background-color: rgba(244, 67, 54, 0.1) !important;
         border-color: rgba(244, 67, 54, 0.3) !important;
@@ -1074,7 +1007,6 @@ a:hover {
         color: rgba(244, 67, 54, 1) !important;
     }
     
-    /* Админские кнопки редактирования и удаления - более светлые */
     .mobile-edit-btn {
         background-color: rgba(255, 152, 0, 0.1) !important;
         border-color: rgba(255, 152, 0, 0.3) !important;
@@ -1103,7 +1035,6 @@ a:hover {
         color: rgba(244, 67, 54, 1) !important;
     }
     
-    /* Адаптивность для очень маленьких экранов */
     @media (max-width: 480px) {
         .mobile-buttons-container {
             flex-direction: column;
@@ -1127,9 +1058,6 @@ a:hover {
     }
 }
 
-/* ========================================
-   ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ
-   ======================================== */
 
 @media (max-width: 576px) {
     body {
@@ -1217,9 +1145,6 @@ a:hover {
     }
 }
 
-/* ========================================
-   ПЛАНШЕТЫ
-   ======================================== */
 
 @media (min-width: 769px) and (max-width: 1024px) {
     .container {
@@ -1235,9 +1160,6 @@ a:hover {
     }
 }
 
-/* ========================================
-   TOUCH УСТРОЙСТВА
-   ======================================== */
 
 @media (hover: none) and (pointer: coarse) {
     .btn {
@@ -1273,9 +1195,6 @@ a:hover {
     }
 }
 
-/* ========================================
-   ВЫСОКИЙ DPI
-   ======================================== */
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .btn {
@@ -1291,9 +1210,6 @@ a:hover {
     }
 }
 
-/* ========================================
-   СИСТЕМНАЯ ТЕМНАЯ ТЕМА
-   ======================================== */
 
 @media (prefers-color-scheme: dark) {
     .notification {
@@ -1301,9 +1217,6 @@ a:hover {
     }
 }
 
-/* ========================================
-   АНИМАЦИИ
-   ======================================== */
 
 @media (max-width: 768px) {
     .notification {
@@ -1324,9 +1237,6 @@ a:hover {
     }
 }
 
-/* ========================================
-   IOS SAFARI ИСПРАВЛЕНИЯ
-   ======================================== */
 
 @supports (-webkit-touch-callout: none) {
     .form-control, .form-select {
@@ -1345,9 +1255,6 @@ a:hover {
     }
 }
 
-/* ========================================
-   ANDROID CHROME ИСПРАВЛЕНИЯ
-   ======================================== */
 
 @supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
     .form-control, .form-select {
@@ -1361,17 +1268,12 @@ a:hover {
     }
 }
 
-/* ========================================
-   ПОЛОСЫ ПРОКРУТКИ
-   ======================================== */
 
-/* Firefox */
 select[multiple] {
     scrollbar-width: thin;
     scrollbar-color: var(--primary-color) var(--dp-00);
 }
 
-/* Webkit браузеры */
 select[multiple]::-webkit-scrollbar {
     width: 8px;
 }
@@ -1397,9 +1299,6 @@ select[multiple]::-webkit-scrollbar-corner {
     background: var(--dp-00);
 }
 
-/* ========================================
-   АДМИНСКИЕ СТИЛИ
-   ======================================== */
 
 .admin-groups {
     background-color: var(--dp-00);
@@ -1415,7 +1314,6 @@ select[multiple]::-webkit-scrollbar-corner {
     transition: all 0.3s ease;
 }
 
-/* Все hover эффекты полностью отключены */
 
 .admin-groups .card-title {
     color: var(--text-primary);
@@ -1465,7 +1363,6 @@ select[multiple]::-webkit-scrollbar-corner {
     box-shadow: 0 2px 8px rgba(181, 149, 255, 0.3);
 }
 
-/* Все hover эффекты полностью отключены */
 
 .admin-groups .table {
     background: var(--dp-02);
@@ -1491,7 +1388,6 @@ select[multiple]::-webkit-scrollbar-corner {
     transition: all 0.2s ease;
 }
 
-/* Все hover эффекты полностью отключены */
 
 .admin-groups .table td {
     color: var(--text-primary);
@@ -1521,7 +1417,6 @@ select[multiple]::-webkit-scrollbar-corner {
     box-shadow: 0 2px 8px rgba(181, 149, 255, 0.3);
 }
 
-/* Все hover эффекты полностью отключены */
 
 .admin-groups .btn-danger.btn-sm {
     background: linear-gradient(135deg, var(--error), var(--dp-08));
@@ -1529,7 +1424,6 @@ select[multiple]::-webkit-scrollbar-corner {
     box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
 }
 
-/* Все hover эффекты полностью отключены */
 
 .admin-groups .modal-content {
     background: var(--dp-06);
@@ -1556,9 +1450,6 @@ select[multiple]::-webkit-scrollbar-corner {
     background: var(--dp-00);
 }
 
-/* ========================================
-   АНИМАЦИИ ДЛЯ АДМИНКИ
-   ======================================== */
 
 .admin-groups .card,
 .admin-groups .btn,
@@ -1577,9 +1468,6 @@ select[multiple]::-webkit-scrollbar-corner {
     }
 }
 
-/* ========================================
-   МОБИЛЬНАЯ АДАПТИВНОСТЬ АДМИНКИ
-   ======================================== */
 
 @media (max-width: 768px) {
     .admin-groups .container-fluid {
@@ -1600,9 +1488,6 @@ select[multiple]::-webkit-scrollbar-corner {
     }
 }
 
-/* ========================================
-   СТАБИЛИЗАЦИЯ МОДАЛЬНЫХ ОКОН
-   ======================================== */
 
 .modal {
     transform: none;
@@ -1714,9 +1599,6 @@ body.modal-open {
     forced-color-adjust: none;
 }
 
-/* ========================================
-   WEBKIT ИСПРАВЛЕНИЯ
-   ======================================== */
 
 @supports (-webkit-appearance: none) {
     .modal {
@@ -1756,9 +1638,6 @@ body.modal-open {
     }
 }
 
-/* ========================================
-   СТИЛИ ДЛЯ ПРЕДВАРИТЕЛЬНОГО ПРОСМОТРА SVG ПАТТЕРНОВ
-   ======================================== */
 
 .pattern-preview {
     background-size: 40px 40px;
@@ -1784,7 +1663,6 @@ body.modal-open {
     opacity: 1;
 }
 
-/* Стили для select паттернов */
 #pattern-select {
     background: var(--dp-01) !important;
     border: 1px solid var(--border-secondary) !important;
@@ -1804,7 +1682,6 @@ body.modal-open {
     border: none;
 }
 
-/* Стили для dashboard-card-img */
 .dashboard-card-img {
     height: 67%;
     background-size: cover;
@@ -1817,11 +1694,7 @@ body.modal-open {
     overflow: hidden;
 }
 
-/* ========================================
-   СТИЛИ ДЛЯ ССЫЛОК
-   ======================================== */
 
-/* Стили для внешних ссылок */
 .external-link {
     display: inline-block;
     background-color: transparent;
@@ -1875,7 +1748,6 @@ body.modal-open {
     opacity: 1;
 }
 
-/* Специальные стили для GitHub Gist ссылок */
 .gist-link {
     color: var(--primary-color);
 }
@@ -1892,7 +1764,6 @@ body.modal-open {
     background-color: var(--primary-hover);
 }
 
-/* Адаптивные стили для ссылок */
 @media (max-width: 768px) {
     .external-link {
         max-width: 150px;
