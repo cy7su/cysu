@@ -177,55 +177,40 @@ class SVGPatternGenerator {
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
         
-        const numColors = this.randomInt(4, 12);
+        const numColors = this.randomInt(6, 10);
         const paletteColors = [];
         for (let i = 0; i < numColors; i++) {
             const randomColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
-            const randomOpacity = this.random(0.3, 0.8);
+            const randomOpacity = this.random(0.2, 0.7);
             paletteColors.push({ color: randomColor, opacity: randomOpacity });
         }
         
-        const gridSize = this.randomInt(4, 8);
-        const cellWidth = size.width / gridSize;
-        const cellHeight = size.height / gridSize;
+        const numCircles = this.randomInt(25, 40);
         
-        const layers = this.randomInt(2, 4);
-        const layerRadius = Math.min(cellWidth, cellHeight) * 0.3;
-        
-        for (let layer = 0; layer < layers; layer++) {
+        for (let i = 0; i < numCircles; i++) {
+            const x = this.random(-20, size.width + 20);
+            const y = this.random(-20, size.height + 20);
+            const radius = this.random(20, 80);
+            const colorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
+            const color = colorObj.color;
+            const opacity = colorObj.opacity;
             
-            for (let row = 0; row < gridSize; row++) {
-                for (let col = 0; col < gridSize; col++) {
-                    const x = col * cellWidth + cellWidth / 2;
-                    const y = row * cellHeight + cellHeight / 2;
-                    
-                    const offsetX = this.random(-cellWidth * 0.3, cellWidth * 0.3);
-                    const offsetY = this.random(-cellHeight * 0.3, cellHeight * 0.3);
-                    
-                    const finalX = x + offsetX;
-                    const finalY = y + offsetY;
-                    
-                    const radius = layerRadius + this.random(-layerRadius * 0.3, layerRadius * 0.3);
-                    const colorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
-                    const color = colorObj.color;
-                    const colorOpacity = colorObj.opacity;
-                    
-                    const hasGradient = this.randomInt(0, 3) === 0;
-                    if (hasGradient) {
-                        const gradientId = `gradient_${layer}_${row}_${col}`;
-                        const gradientColorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
-                        const gradientColor = gradientColorObj.color;
-                                                circles.push(`<defs>
-                            <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" style="stop-color:${color};stop-opacity:${colorOpacity}"/>
-                                <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${colorOpacity * 0.3}"/>
-                            </radialGradient>
-                        </defs>`);
-                        circles.push(`<circle cx="${finalX}" cy="${finalY}" r="${radius}" fill="url(#${gradientId})"/>`);
-                    } else {
-                        circles.push(`<circle cx="${finalX}" cy="${finalY}" r="${radius}" fill="${color}" opacity="${colorOpacity}"/>`);
-                    }
-                }
+            const hasGradient = this.randomInt(0, 4) === 0;
+            if (hasGradient) {
+                const gradientId = `gradient_${i}`;
+                const gradientColorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
+                const gradientColor = gradientColorObj.color;
+                
+                circles.push(`<defs>
+                    <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
+                        <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${opacity * 0.3}"/>
+                    </radialGradient>
+                </defs>`);
+                circles.push(`<circle cx="${x}" cy="${y}" r="${radius}" fill="url(#${gradientId})"/>`);
+            } else {
+                circles.push(`<circle cx="${x}" cy="${y}" r="${radius}" 
+                    fill="${color}" opacity="${opacity}"/>`);
             }
         }
         
