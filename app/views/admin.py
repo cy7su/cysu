@@ -1,35 +1,56 @@
-"""
-Модуль админских функций
-"""
 
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify, Response
-from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash
-from sqlalchemy.orm import joinedload
-from datetime import datetime, timedelta
 import random
 import string
-from typing import Union, Dict, Any
+from datetime import datetime, timedelta
+from typing import Any, Dict, Union
 
-from ..models import (
-    User, Material, Subject, Payment, ChatMessage, EmailVerification,
-    Ticket, TicketFile, TicketMessage, Notification, Submission,
-    Group, SubjectGroup, SiteSettings
+from flask import (
+    Blueprint,
+    Response,
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
 )
+from flask_login import current_user, login_required
+from sqlalchemy.orm import joinedload
+from werkzeug.security import generate_password_hash
+
+from .. import db
 from ..forms import (
-    AdminUserForm, MaterialForm, SubjectForm, GroupForm,
-    SubjectGroupForm, SiteSettingsForm
+    AdminUserForm,
+    GroupForm,
+    MaterialForm,
+    SiteSettingsForm,
+    SubjectForm,
+    SubjectGroupForm,
+)
+from ..models import (
+    ChatMessage,
+    EmailVerification,
+    Group,
+    Material,
+    Notification,
+    Payment,
+    SiteSettings,
+    Subject,
+    SubjectGroup,
+    Submission,
+    Ticket,
+    TicketFile,
+    TicketMessage,
+    User,
 )
 from ..utils.file_storage import FileStorageManager
-# Сервис коротких ссылок удален
-from .. import db
 
 admin_bp = Blueprint("admin", __name__)
 
 @admin_bp.route("/admin/users", methods=["GET", "POST"])
 @login_required
 def admin_users() -> Union[str, Response]:
-    """Админка для управления пользователями"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
@@ -38,18 +59,15 @@ def admin_users() -> Union[str, Response]:
     password_map = {}
     message = ""
 
-    # Диагностика формы
     current_app.logger.info(f"Форма создана: {form}")
     current_app.logger.info(
         f"CSRF токен: {form.csrf_token.current_token if form.csrf_token else 'Нет токена'}"
     )
 
-    # Создание нового пользователя
     current_app.logger.info(f"Метод запроса: {request.method}")
     current_app.logger.info(f"Данные формы: {request.form}")
     current_app.logger.info(f"Значение submit: {request.form.get('submit')}")
 
-    # Проверяем все возможные условия
     if request.method == "POST":
         current_app.logger.info("POST запрос получен")
         if request.form.get("submit") == "Зарегистрироваться":
@@ -69,7 +87,6 @@ def admin_users() -> Union[str, Response]:
                 f"Админка - создание пользователя: {form.username.data}, {form.email.data}"
             )
             try:
-                # Проверяем, что пользователь с таким username или email не существует
                 existing_user = User.query.filter(
                     (User.username == form.username.data)
                     | (User.email == form.email.data)
@@ -126,7 +143,6 @@ def admin_users() -> Union[str, Response]:
                 for error in errors:
                     current_app.logger.warning(f"Ошибка в поле {field}: {error}")
 
-    # Сброс пароля пользователя
     if request.method == "POST" and request.form.get("reset_user_id"):
         try:
             user_id = int(request.form.get("reset_user_id"))
@@ -148,7 +164,6 @@ def admin_users() -> Union[str, Response]:
             db.session.rollback()  # Откатываем транзакцию при ошибке
             flash("Ошибка при сбросе пароля", "error")
 
-    # Удаление пользователя
     if request.method == "POST" and request.form.get("delete_user_id"):
         try:
             user_id = int(request.form.get("delete_user_id"))
@@ -168,9 +183,7 @@ def admin_users() -> Union[str, Response]:
                         f"Начинаем удаление пользователя {username} (ID: {user.id})"
                     )
 
-                    # Удаляем все связанные данные пользователя
                     try:
-                        # Удаляем уведомления
                         notifications_count = Notification.query.filter_by(
                             user_id=user.id
                         ).count()
@@ -179,7 +192,6 @@ def admin_users() -> Union[str, Response]:
                             f"Удалено уведомлений: {notifications_count}"
                         )
 
-                        # Удаляем сообщения тикетов
                         ticket_messages_count = TicketMessage.query.filter_by(
                             user_id=user.id
                         ).count()
@@ -188,12 +200,10 @@ def admin_users() -> Union[str, Response]:
                             f"Удалено сообщений тикетов: {ticket_messages_count}"
                         )
 
-                        # Удаляем тикеты пользователя
                         tickets_count = Ticket.query.filter_by(user_id=user.id).count()
                         Ticket.query.filter_by(user_id=user.id).delete()
                         current_app.logger.info(f"Удалено тикетов: {tickets_count}")
 
-                        # Удаляем коды подтверждения email
                         email_verifications_count = EmailVerification.query.filter_by(
                             user_id=user.id
                         ).count()
@@ -202,21 +212,18 @@ def admin_users() -> Union[str, Response]:
                             f"Удалено кодов подтверждения email: {email_verifications_count}"
                         )
 
-                        # Удаляем платежи
                         payments_count = Payment.query.filter_by(
                             user_id=user.id
                         ).count()
                         Payment.query.filter_by(user_id=user.id).delete()
                         current_app.logger.info(f"Удалено платежей: {payments_count}")
 
-                        # Удаляем решения
                         submissions_count = db.session.query(Submission).filter_by(
                             user_id=user.id
                         ).count()
                         db.session.query(Submission).filter_by(user_id=user.id).delete()
                         current_app.logger.info(f"Удалено решений: {submissions_count}")
 
-                        # Удаляем сообщения чата
                         chat_messages_count = ChatMessage.query.filter_by(
                             user_id=user.id
                         ).count()
@@ -225,7 +232,6 @@ def admin_users() -> Union[str, Response]:
                             f"Удалено сообщений чата: {chat_messages_count}"
                         )
 
-                        # Удаляем файлы пользователя с использованием FileStorageManager
                         if FileStorageManager.delete_user_files(user.id):
                             current_app.logger.info(
                                 f"Файлы пользователя {user.id} успешно удалены"
@@ -235,7 +241,6 @@ def admin_users() -> Union[str, Response]:
                                 f"Ошибка при удалении файлов пользователя {user.id}"
                             )
 
-                        # Удаляем файлы тикетов
                         for ticket in Ticket.query.filter_by(user_id=user.id).all():
                             if FileStorageManager.delete_ticket_files(ticket.id):
                                 current_app.logger.info(
@@ -246,7 +251,6 @@ def admin_users() -> Union[str, Response]:
                                     f"Ошибка при удалении файлов тикета {ticket.id}"
                                 )
 
-                        # Удаляем самого пользователя
                         db.session.delete(user)
                         db.session.commit()
                         current_app.logger.info(
@@ -271,7 +275,6 @@ def admin_users() -> Union[str, Response]:
             db.session.rollback()  # Откатываем транзакцию при ошибке
             flash("Ошибка при удалении пользователя", "error")
 
-    # Изменение статуса администратора
     if request.method == "POST" and request.form.get("toggle_admin_id"):
         try:
             user_id = int(request.form.get("toggle_admin_id"))
@@ -299,7 +302,6 @@ def admin_users() -> Union[str, Response]:
             db.session.rollback()  # Откатываем транзакцию при ошибке
             flash("Ошибка при изменении статуса администратора", "error")
 
-    # Изменение группы пользователя
     if request.method == "POST" and request.form.get("change_group_user_id"):
         try:
             user_id = int(request.form.get("change_group_user_id"))
@@ -327,7 +329,6 @@ def admin_users() -> Union[str, Response]:
             db.session.rollback()
             flash("Ошибка при изменении группы пользователя", "error")
 
-    # Обработка изменения статуса пользователя
     if request.method == "POST" and request.form.get("change_status_user_id"):
         try:
             user_id = int(request.form.get("change_status_user_id"))
@@ -336,12 +337,10 @@ def admin_users() -> Union[str, Response]:
             user = User.query.get(user_id)
 
             if user:
-                # Сбрасываем все роли
                 user.is_admin = False
                 user.is_moderator = False
                 user.admin_mode_enabled = False
 
-                # Устанавливаем новую роль
                 if new_role == "admin":
                     user.is_admin = True
                     user.admin_mode_enabled = admin_mode_enabled
@@ -361,7 +360,6 @@ def admin_users() -> Union[str, Response]:
             db.session.rollback()
             flash("Ошибка при изменении статуса пользователя", "error")
 
-    # Выдача/отзыв подписки
     if request.method == "POST" and request.form.get("toggle_subscription_id"):
         try:
             user_id = int(request.form.get("toggle_subscription_id"))
@@ -374,7 +372,6 @@ def admin_users() -> Union[str, Response]:
                     f"Пользователь найден: {user.username}, текущий статус подписки: {user.is_subscribed}"
                 )
                 if user.is_subscribed:
-                    # Отзываем подписку
                     current_app.logger.info(
                         f"Отзываем подписку у пользователя {user.username}"
                     )
@@ -385,7 +382,6 @@ def admin_users() -> Union[str, Response]:
                     )
                     status = "отозвана"
                 else:
-                    # Выдаем подписку на количество дней из настроек
                     trial_days = int(SiteSettings.get_setting('trial_subscription_days', 14))
                     current_app.logger.info(
                         f"Выдаем подписку пользователю {user.username} на {trial_days} дней"
@@ -413,9 +409,7 @@ def admin_users() -> Union[str, Response]:
             db.session.rollback()  # Откатываем транзакцию при ошибке
             flash("Ошибка при изменении подписки", "error")
 
-    # Функционал коротких ссылок удален
 
-    # Получаем всех пользователей с информацией о подписке
     try:
         users = User.query.all()
     except Exception as e:
@@ -435,17 +429,14 @@ def admin_users() -> Union[str, Response]:
 @admin_bp.route("/admin/groups", methods=["GET", "POST"])
 @login_required
 def admin_groups() -> Union[str, Response]:
-    """Админка для управления группами"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
 
-    # Проверяем CSRF токен для POST запросов
     if request.method == "POST":
         current_app.logger.info(f"POST запрос в admin_groups: {request.form}")
         current_app.logger.info(f"CSRF токен в запросе: {request.form.get('csrf_token', 'НЕ НАЙДЕН')}")
 
-        # Проверяем, что CSRF токен присутствует
         if not request.form.get('csrf_token'):
             current_app.logger.error("CSRF токен отсутствует в запросе")
             flash("Ошибка безопасности: отсутствует CSRF токен", "error")
@@ -455,11 +446,9 @@ def admin_groups() -> Union[str, Response]:
     message = ""
 
     if request.method == "POST":
-        # Создание новой группы
         if request.form.get("submit") == "Сохранить":
             if form.validate_on_submit():
                 try:
-                    # Проверяем уникальность названия группы
                     existing_group = Group.query.filter_by(name=form.name.data).first()
                     if existing_group:
                         flash(f'Группа с названием "{form.name.data}" уже существует', "error")
@@ -472,7 +461,6 @@ def admin_groups() -> Union[str, Response]:
                         db.session.add(group)
                         db.session.commit()
                         flash(f"Группа '{group.name}' успешно создана")
-                        # Очищаем форму
                         form.name.data = ""
                         form.description.data = ""
                         form.is_active.data = True
@@ -481,7 +469,6 @@ def admin_groups() -> Union[str, Response]:
                     db.session.rollback()
                     flash("Ошибка при создании группы", "error")
 
-        # Редактирование группы (inline)
         elif request.form.get("action") == "edit":
             try:
                 current_app.logger.info(f"Редактирование группы: {request.form}")
@@ -494,7 +481,6 @@ def admin_groups() -> Union[str, Response]:
                     group.name = request.form.get("name")
                     group.description = request.form.get("description")
 
-                    # Обновляем статус активности группы
                     is_active_value = request.form.get("is_active")
                     if is_active_value is not None:
                         group.is_active = bool(int(is_active_value))
@@ -502,7 +488,6 @@ def admin_groups() -> Union[str, Response]:
 
                     db.session.commit()
 
-                    # Возвращаем JSON ответ для AJAX
                     if request.headers.get('Accept') == 'application/json':
                         return jsonify({
                             'success': True,
@@ -529,7 +514,6 @@ def admin_groups() -> Union[str, Response]:
                 else:
                     flash("Ошибка при редактировании группы", "error")
 
-        # Удаление группы (inline)
         elif request.form.get("action") == "delete":
             current_app.logger.info(f"Получен запрос на удаление группы: {request.form}")
             try:
@@ -581,7 +565,6 @@ def admin_groups() -> Union[str, Response]:
                 else:
                     flash("Ошибка при удалении группы", "error")
 
-    # Получаем все группы
     try:
         groups = Group.query.order_by(Group.name).all()
     except Exception as e:
@@ -599,12 +582,10 @@ def admin_groups() -> Union[str, Response]:
 @admin_bp.route("/admin/subject-groups", methods=["GET", "POST"])
 @login_required
 def admin_subject_groups() -> Union[str, Response]:
-    """Админка для управления предметами по группам"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
 
-    # Получаем все предметы с их группами
     try:
         subjects = Subject.query.options(joinedload(Subject.groups)).order_by(Subject.title).all()
         groups = Group.query.filter_by(is_active=True).order_by(Group.name).all()
@@ -614,24 +595,19 @@ def admin_subject_groups() -> Union[str, Response]:
         groups = []
         flash("Ошибка загрузки предметов или групп.", "error")
 
-    # Создаем форму после получения данных
     form = SubjectGroupForm()
-    # Заполняем форму актуальными данными
     form.populate_choices(subjects, groups)
     message = ""
 
     if request.method == "POST":
-        # Назначение предмета группам
         if request.form.get("submit") == "Сохранить":
             if form.validate_on_submit():
                 try:
                     subject_id = form.subject_id.data
                     group_ids = form.group_ids.data
 
-                    # Удаляем существующие связи для этого предмета
                     SubjectGroup.query.filter_by(subject_id=subject_id).delete()
 
-                    # Создаем новые связи
                     for group_id in group_ids:
                         subject_group = SubjectGroup(
                             subject_id=subject_id,
@@ -642,7 +618,6 @@ def admin_subject_groups() -> Union[str, Response]:
                     db.session.commit()
                     flash(f"Предмет успешно назначен группам")
 
-                    # Очищаем форму
                     form.subject_id.data = 0
                     form.group_ids.data = []
                 except Exception as e:
@@ -650,16 +625,13 @@ def admin_subject_groups() -> Union[str, Response]:
                     db.session.rollback()
                     flash("Ошибка при назначении предмета группам", "error")
 
-        # Редактирование групп предмета
         elif request.form.get("edit_subject_id"):
             try:
                 subject_id = int(request.form.get("edit_subject_id"))
                 group_ids = request.form.getlist("edit_group_ids")
 
-                # Удаляем существующие связи для этого предмета
                 SubjectGroup.query.filter_by(subject_id=subject_id).delete()
 
-                # Создаем новые связи
                 for group_id in group_ids:
                     if group_id:  # Проверяем, что group_id не пустой
                         subject_group = SubjectGroup(
@@ -675,7 +647,6 @@ def admin_subject_groups() -> Union[str, Response]:
                 db.session.rollback()
                 flash("Ошибка при обновлении групп предмета", "error")
 
-        # Массовое назначение предметов группам
         elif request.form.get("action") == "mass_assign":
             try:
                 subject_ids = request.form.getlist("subject_ids")
@@ -684,14 +655,11 @@ def admin_subject_groups() -> Union[str, Response]:
                 if not subject_ids or not group_ids:
                     flash("Выберите предметы и группы", "error")
                 else:
-                    # Обрабатываем каждый предмет
                     for subject_id in subject_ids:
                         subject_id = int(subject_id)
 
-                        # Удаляем существующие связи для этого предмета
                         SubjectGroup.query.filter_by(subject_id=subject_id).delete()
 
-                        # Создаем новые связи
                         for group_id in group_ids:
                             if group_id:  # Проверяем, что group_id не пустой
                                 subject_group = SubjectGroup(
@@ -708,7 +676,6 @@ def admin_subject_groups() -> Union[str, Response]:
                 db.session.rollback()
                 flash("Ошибка при массовом назначении предметов группам", "error")
 
-        # Массовое удаление предметов из всех групп
         elif request.form.get("action") == "mass_remove":
             try:
                 subject_ids = request.form.getlist("subject_ids")
@@ -716,7 +683,6 @@ def admin_subject_groups() -> Union[str, Response]:
                 if not subject_ids:
                     flash("Выберите предметы для удаления из групп", "error")
                 else:
-                    # Удаляем все связи для выбранных предметов
                     for subject_id in subject_ids:
                         subject_id = int(subject_id)
                         SubjectGroup.query.filter_by(subject_id=subject_id).delete()
@@ -729,7 +695,6 @@ def admin_subject_groups() -> Union[str, Response]:
                 db.session.rollback()
                 flash("Ошибка при массовом удалении предметов из групп", "error")
 
-        # Удаление всех связей предмета с группами (одиночное)
         elif request.form.get("remove_all_groups"):
             try:
                 subject_id = int(request.form.get("remove_all_groups"))
@@ -756,14 +721,12 @@ def admin_subject_groups() -> Union[str, Response]:
 @admin_bp.route("/admin/settings", methods=["GET", "POST"])
 @login_required
 def admin_settings() -> Union[str, Response]:
-    """Админка для управления настройками сайта"""
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
 
     form = SiteSettingsForm()
 
-    # Загружаем текущие настройки
     if request.method == "GET":
         form.maintenance_mode.data = SiteSettings.get_setting('maintenance_mode', False)
         form.trial_subscription_enabled.data = SiteSettings.get_setting('trial_subscription_enabled', True)
@@ -772,7 +735,6 @@ def admin_settings() -> Union[str, Response]:
 
     if request.method == "POST" and form.validate_on_submit():
         try:
-            # Сохраняем настройки
             SiteSettings.set_setting('maintenance_mode', form.maintenance_mode.data, 'Включить/выключить режим технических работ')
             SiteSettings.set_setting('trial_subscription_enabled', form.trial_subscription_enabled.data, 'Включить/выключить пробную подписку для новых аккаунтов')
             SiteSettings.set_setting('trial_subscription_days', form.trial_subscription_days.data, 'Количество дней пробной подписки')

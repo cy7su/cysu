@@ -1,36 +1,35 @@
-#!/usr/bin/env python3
-"""
-Telegram бот для управления пользователями сайта
-"""
 
-import os
-import sys
-import logging
 import asyncio
+import logging
+import os
 import re
+import sys
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
 
-# Добавляем путь к приложению
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
+from telegram import BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import TelegramError
-
-# Импортируем модели из приложения
-from app import create_app, db
-from app.models import User, TelegramUser, Group
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 from werkzeug.security import generate_password_hash
 
-# Настройка логирования
+from app import create_app, db
+from app.models import Group, TelegramUser, User
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-# Конфигурация
 BOT_TOKEN = os.getenv('TG_TOKEN')
 ADMIN_TELEGRAM_ID = int(os.getenv('TG_ID', 0))
 USERS_PER_PAGE = 5
@@ -43,14 +42,11 @@ class TelegramBotManager:
         self.editing_users = {}  # Для хранения состояния редактирования
 
     def get_telegram_link(self, user: User) -> str:
-        """Получает ссылку на Telegram пользователя"""
-        # Проверяем, является ли email в формате telegram
         if user.email.endswith('@telegram.org'):
             telegram_id = user.email.replace('@telegram.org', '')
             if telegram_id.isdigit():
                 return f"tg://user?id={telegram_id}"
 
-        # Ищем связанного Telegram пользователя
         telegram_user = TelegramUser.query.filter_by(user_id=user.id).first()
         if telegram_user:
             return f"tg://user?id={telegram_user.telegram_id}"
@@ -58,11 +54,9 @@ class TelegramBotManager:
         return "Не указан"
 
     async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Обработчик команды /start"""
         user = update.effective_user
 
         with self.app.app_context():
-            # Создаем или обновляем Telegram пользователя
             try:
                 tg_user = TelegramUser.get_or_create(
                     telegram_id=user.id,
@@ -90,7 +84,6 @@ class TelegramBotManager:
                 )
 
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Обработчик команды /help"""
         user = update.effective_user
 
         if user.id == ADMIN_TELEGRAM_ID:
@@ -116,7 +109,6 @@ class TelegramBotManager:
         await update.message.reply_text(help_text)
 
     async def users_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Обработчик команды /users - управление пользователями"""
         user = update.effective_user
 
         if user.id != ADMIN_TELEGRAM_ID:
@@ -127,10 +119,8 @@ class TelegramBotManager:
             await self.show_users_page(update, context, page=0)
 
     async def show_users_page(self, update: Update, context: ContextTypes.DEFAULT_TYPE, page: int = 0):
-        """Показать страницу пользователей"""
         with self.app.app_context():
             try:
-                # Получаем пользователей с пагинацией
                 users = User.query.order_by(User.id.desc()).offset(page * USERS_PER_PAGE).limit(USERS_PER_PAGE).all()
                 total_users = User.query.count()
                 total_pages = (total_users + USERS_PER_PAGE - 1) // USERS_PER_PAGE
@@ -139,10 +129,8 @@ class TelegramBotManager:
                     await update.message.reply_text("📭 Пользователи не найдены")
                     return
 
-                # Создаем клавиатуру
                 keyboard = []
                 for user in users:
-                    # Определяем статус пользователя
                     status_icons = []
                     if user.is_admin:
                         status_icons.append("👑")
@@ -155,7 +143,6 @@ class TelegramBotManager:
 
                     status_text = " ".join(status_icons) if status_icons else "❌"
 
-                    # Определяем отображение email/telegram
                     if user.email.endswith('@telegram.org'):
                         telegram_id = user.email.replace('@telegram.org', '')
                         display_email = f"TG: {telegram_id}"
@@ -166,7 +153,6 @@ class TelegramBotManager:
                     callback_data = f"user_detail_{user.id}"
                     keyboard.append([InlineKeyboardButton(button_text, callback_data=callback_data)])
 
-                # Добавляем навигацию
                 nav_buttons = []
                 if page > 0:
                     nav_buttons.append(InlineKeyboardButton("⬅️", callback_data=f"users_page_{page-1}"))
@@ -192,7 +178,6 @@ class TelegramBotManager:
                 await update.message.reply_text("❌ Ошибка при загрузке пользователей")
 
     async def show_user_detail(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
-        """Показать детали пользователя"""
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -200,7 +185,6 @@ class TelegramBotManager:
                     await update.callback_query.answer("❌ Пользователь не найден")
                     return
 
-                # Формируем информацию о пользователе
                 status_info = []
                 if user.is_admin:
                     status_info.append("👑 Администратор")
@@ -220,10 +204,8 @@ class TelegramBotManager:
                 group_info = f"Группа: {user.group.name if user.group else 'Не назначена'}"
                 created_info = f"Создан: {user.created_at.strftime('%d.%m.%Y %H:%M') if user.created_at else 'Не указано'}"
 
-                # Получаем ссылку на Telegram
                 telegram_link = self.get_telegram_link(user)
 
-                # Определяем отображение email/telegram
                 if user.email.endswith('@telegram.org'):
                     telegram_id = user.email.replace('@telegram.org', '')
                     email_display = f"📱 Telegram: {telegram_id}"
@@ -240,7 +222,6 @@ class TelegramBotManager:
                     f"Статус:\n" + "\n".join(status_info)
                 )
 
-                # Создаем клавиатуру управления
                 keyboard = [
                     [InlineKeyboardButton("🔧 Управление", callback_data=f"user_manage_{user_id}")],
                     [InlineKeyboardButton("🗑️ Удалить", callback_data=f"user_delete_{user_id}")],
@@ -256,7 +237,6 @@ class TelegramBotManager:
                 await update.callback_query.answer("❌ Ошибка при загрузке данных")
 
     async def show_user_management(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
-        """Показать меню управления пользователем"""
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -281,7 +261,6 @@ class TelegramBotManager:
                 await update.callback_query.answer("❌ Ошибка при загрузке данных")
 
     async def show_user_edit(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
-        """Показать меню редактирования пользователя"""
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -305,7 +284,6 @@ class TelegramBotManager:
                 await update.callback_query.answer("❌ Ошибка при загрузке данных")
 
     async def start_edit_username(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
-        """Начать редактирование имени пользователя"""
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -313,7 +291,6 @@ class TelegramBotManager:
                     await update.callback_query.answer("❌ Пользователь не найден")
                     return
 
-                # Сохраняем состояние редактирования
                 self.editing_users[update.effective_user.id] = {
                     'action': 'edit_username',
                     'user_id': user_id,
@@ -334,7 +311,6 @@ class TelegramBotManager:
                 await update.callback_query.answer("❌ Ошибка при загрузке данных")
 
     async def start_edit_password(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
-        """Начать редактирование пароля пользователя"""
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -342,7 +318,6 @@ class TelegramBotManager:
                     await update.callback_query.answer("❌ Пользователь не найден")
                     return
 
-                # Сохраняем состояние редактирования
                 self.editing_users[update.effective_user.id] = {
                     'action': 'edit_password',
                     'user_id': user_id
@@ -362,7 +337,6 @@ class TelegramBotManager:
                 await update.callback_query.answer("❌ Ошибка при загрузке данных")
 
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Обработчик текстовых сообщений для редактирования"""
         user_id = update.effective_user.id
 
         if user_id not in self.editing_users:
@@ -377,18 +351,15 @@ class TelegramBotManager:
                 if action == 'edit_username':
                     new_username = update.message.text.strip()
 
-                    # Проверяем длину имени
                     if len(new_username) < 3 or len(new_username) > 50:
                         await update.message.reply_text("❌ Имя пользователя должно быть от 3 до 50 символов")
                         return
 
-                    # Проверяем уникальность
                     existing_user = User.query.filter(User.username == new_username, User.id != target_user_id).first()
                     if existing_user:
                         await update.message.reply_text("❌ Пользователь с таким именем уже существует")
                         return
 
-                    # Обновляем имя
                     user = User.query.get(target_user_id)
                     if user:
                         user.username = new_username
@@ -397,7 +368,6 @@ class TelegramBotManager:
                         await update.message.reply_text(f"✅ Имя пользователя изменено на: {new_username}")
                         del self.editing_users[user_id]
 
-                        # Показываем обновленную информацию
                         await self.show_user_detail(update, context, target_user_id)
                     else:
                         await update.message.reply_text("❌ Пользователь не найден")
@@ -406,12 +376,10 @@ class TelegramBotManager:
                 elif action == 'edit_password':
                     new_password = update.message.text.strip()
 
-                    # Проверяем длину пароля
                     if len(new_password) < 6:
                         await update.message.reply_text("❌ Пароль должен быть не менее 6 символов")
                         return
 
-                    # Обновляем пароль
                     user = User.query.get(target_user_id)
                     if user:
                         user.password = generate_password_hash(new_password)
@@ -420,7 +388,6 @@ class TelegramBotManager:
                         await update.message.reply_text(f"✅ Пароль для пользователя {user.username} изменен")
                         del self.editing_users[user_id]
 
-                        # Показываем обновленную информацию
                         await self.show_user_detail(update, context, target_user_id)
                     else:
                         await update.message.reply_text("❌ Пользователь не найден")
@@ -433,7 +400,6 @@ class TelegramBotManager:
                     del self.editing_users[user_id]
 
     async def handle_callback_query(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Обработчик callback запросов"""
         query = update.callback_query
         await query.answer()
 
@@ -489,7 +455,6 @@ class TelegramBotManager:
             await query.answer("❌ Ошибка при обработке запроса")
 
     async def toggle_admin(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
-        """Переключить права администратора"""
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -509,7 +474,6 @@ class TelegramBotManager:
                 await update.callback_query.answer("❌ Ошибка при изменении прав")
 
     async def toggle_moderator(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
-        """Переключить права модератора"""
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -529,7 +493,6 @@ class TelegramBotManager:
                 await update.callback_query.answer("❌ Ошибка при изменении прав")
 
     async def toggle_subscription(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
-        """Переключить подписку"""
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -557,7 +520,6 @@ class TelegramBotManager:
                 await update.callback_query.answer("❌ Ошибка при изменении подписки")
 
     async def confirm_delete_user(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
-        """Подтверждение удаления пользователя"""
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -580,7 +542,6 @@ class TelegramBotManager:
                 await update.callback_query.answer("❌ Ошибка при загрузке данных")
 
     async def delete_user(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
-        """Удалить пользователя"""
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -590,10 +551,8 @@ class TelegramBotManager:
 
                 username = user.username
 
-                # Удаляем связанные записи
                 TelegramUser.query.filter_by(user_id=user_id).delete()
 
-                # Удаляем пользователя
                 db.session.delete(user)
                 db.session.commit()
 
@@ -605,14 +564,11 @@ class TelegramBotManager:
                 await update.callback_query.answer("❌ Ошибка при удалении пользователя")
 
     async def error_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Обработчик ошибок"""
         logger.error(f"Ошибка при обработке обновления: {context.error}")
         if update and update.effective_message:
             await update.effective_message.reply_text("❌ Произошла ошибка. Попробуйте позже.")
 
     def run_bot(self):
-        """Запуск бота"""
-        # Проверяем наличие токена
         if not BOT_TOKEN:
             logger.error("TG_TOKEN не найден в переменных окружения")
             return
@@ -621,10 +577,8 @@ class TelegramBotManager:
             logger.error("TG_ID не найден в переменных окружения")
             return
 
-        # Создаем приложение
         application = Application.builder().token(BOT_TOKEN).build()
 
-        # Добавляем обработчики
         application.add_handler(CommandHandler("start", self.start_command))
         application.add_handler(CommandHandler("help", self.help_command))
         application.add_handler(CommandHandler("users", self.users_command))
@@ -632,7 +586,6 @@ class TelegramBotManager:
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
         application.add_error_handler(self.error_handler)
 
-        # Устанавливаем команды бота
         commands = [
             BotCommand("start", "Запустить бота"),
             BotCommand("help", "Справка"),
@@ -644,7 +597,6 @@ class TelegramBotManager:
 
         application.post_init = post_init
 
-        # Запускаем бота
         logger.info("Запуск Telegram бота...")
         application.run_polling()
 

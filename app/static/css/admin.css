@@ -1,37 +1,21 @@
-/* Темная тема для админки с Material Design уровнями возвышения */
 :root {
     --primary-color: #B595FF;
     --primary-hover: #9A7FE6;
     
-    /* Уровни возвышения Material Design */
-    --dp-00: #121212; /* Базовый фон */
-    --dp-01: #1E1E1E; /* Легко приподнятые элементы */
-    --dp-02: #222222; /* Карточки или панели */
-    --dp-03: #242424; /* Навигация */
-    --dp-04: #272727; /* Кнопки в покое */
-    --dp-06: #2C2C2C; /* Модальные окна */
-    --dp-08: #2E2E2E; /* Попапы */
-    --dp-12: #333333; /* Диалоги */
-    --dp-16: #343434; /* Высокие элементы */
-    --dp-24: #383838; /* Максимальное возвышение */
     
-    /* Цвета текста */
     --text-primary: #FFFFFF;
     --text-secondary: #B3B3B3;
     --text-disabled: #666666;
     
-    /* Цвета границ */
     --border-primary: #333333;
     --border-secondary: #404040;
     
-    /* Цвета состояний */
     --success: #4CAF50;
     --warning: #FF9800;
     --error: #F44336;
     --info: #2196F3;
 }
 
-/* Основные стили для админки */
 .admin-users {
     background: var(--dp-00);
     color: var(--text-primary);
@@ -99,7 +83,6 @@
     background: var(--dp-02) !important;
 }
 
-/* Hover эффекты отключены */
 
 .admin-users .badge {
     background: var(--dp-06) !important;
@@ -132,7 +115,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Hover эффекты отключены */
 
 .admin-users .btn-secondary {
     background: var(--dp-04) !important;
@@ -140,7 +122,6 @@
     color: var(--text-primary) !important;
 }
 
-/* Hover эффекты отключены */
 
 .admin-users .text-primary {
     color: var(--primary-color) !important;
@@ -161,7 +142,6 @@
     color: var(--text-secondary) !important;
 }
 
-/* Стили для переключателей */
 .admin-users .form-check-input {
     background-color: var(--dp-01) !important;
     border-color: var(--border-secondary) !important;
@@ -181,7 +161,6 @@
     color: var(--text-primary) !important;
 }
 
-/* Стили для модальных окон */
 .admin-users .modal-content {
     background: var(--dp-06) !important;
     border: 1px solid var(--border-primary) !important;
@@ -198,7 +177,6 @@
     border-top: 1px solid var(--border-primary) !important;
 }
 
-/* Стили для dropdown */
 .admin-users .dropdown-menu {
     background: var(--dp-06) !important;
     border: 1px solid var(--border-primary) !important;
@@ -209,23 +187,19 @@
     color: var(--text-primary) !important;
 }
 
-/* Hover эффекты отключены */
 
-/* Стили для пагинации */
 .admin-users .pagination .page-link {
     background: var(--dp-02) !important;
     border-color: var(--border-primary) !important;
     color: var(--text-primary) !important;
 }
 
-/* Hover эффекты отключены */
 
 .admin-users .pagination .page-item.active .page-link {
     background: var(--primary-color) !important;
     border-color: var(--primary-color) !important;
 }
 
-/* Стили для алертов */
 .admin-users .alert {
     background: var(--dp-04) !important;
     border: 1px solid var(--border-secondary) !important;
@@ -241,7 +215,6 @@
     border-color: var(--border-secondary) !important;
 }
 
-/* Стили для навигации */
 .admin-users .nav-tabs {
     border-bottom: 1px solid var(--border-primary) !important;
 }
@@ -252,7 +225,6 @@
     color: var(--text-secondary) !important;
 }
 
-/* Hover эффекты отключены */
 
 .admin-users .nav-tabs .nav-link.active {
     background: var(--dp-06) !important;
@@ -260,16 +232,13 @@
     color: var(--text-primary) !important;
 }
 
-/* Стили для списков */
 .admin-users .list-group-item {
     background: var(--dp-02) !important;
     border-color: var(--border-primary) !important;
     color: var(--text-primary) !important;
 }
 
-/* Hover эффекты отключены */
 
-/* Стили для прогресс-баров */
 .admin-users .progress {
     background: var(--dp-01) !important;
 }
@@ -278,7 +247,6 @@
     background: var(--primary-color) !important;
 }
 
-/* Стили для тултипов */
 .admin-users .tooltip-inner {
     background: var(--dp-12) !important;
     color: var(--text-primary) !important;
@@ -288,7 +256,6 @@
     border-top-color: var(--dp-12) !important;
 }
 
-/* Стили для скроллбара */
 .admin-users ::-webkit-scrollbar {
     width: 8px;
 }
@@ -302,9 +269,7 @@
     border-radius: 4px;
 }
 
-/* Hover эффекты отключены */
 
-/* Стили для кнопок действий в таблице */
 .admin-users .d-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0;
@@ -323,9 +288,7 @@
     min-height: 25px;
 }
 
-/* Hover эффекты отключены */
 
-/* Стили для форм в таблице */
 .admin-users form {
     display: contents;
 }
@@ -348,9 +311,7 @@
 
 
 
-/* Стили для select элементов удалены - функционал коротких ссылок убран */
 
-/* Стили для предварительного просмотра SVG паттернов */
 .pattern-preview {
     background-size: 100%;
     background-repeat: repeat;
@@ -375,7 +336,6 @@
     opacity: 0;
 }
 
-/* Стили для select паттернов */
 #pattern-select {
     background: var(--dp-01) !important;
     border: 1px solid var(--border-secondary) !important;

@@ -1,25 +1,22 @@
-"""
-Сервис для работы с платежами ЮKassa
-"""
 
+import base64
 import uuid
 from datetime import datetime, timedelta
-from ..models import db, Payment, User
-from flask import current_app
-from typing import Dict, Any
+from typing import Any, Dict
+
 import requests
-import base64
+from flask import current_app
+
+from ..models import Payment, User, db
+
 
 class YooKassaService:
-    """Сервис для работы с платежами ЮKassa"""
 
     def __init__(self) -> None:
-        """Инициализация сервиса с настройками из конфигурации"""
         self.shop_id = current_app.config["YOOKASSA_SHOP_ID"]
         self.secret_key = current_app.config["YOOKASSA_SECRET_KEY"]
         self.base_url = "https://api.yookassa.ru/v3"
 
-        # Проверяем, что ключи настроены корректно
         if not self.shop_id or not self.secret_key:
             current_app.logger.warning(
                 "Ключи ЮKassa не настроены, используется режим симуляции"
@@ -30,23 +27,12 @@ class YooKassaService:
             current_app.logger.info("Режим реальных платежей ЮKassa активирован")
 
     def _get_auth_header(self) -> str:
-        """Создает заголовок авторизации для API ЮKassa"""
         auth_string = f"{self.shop_id}:{self.secret_key}"
         return base64.b64encode(auth_string.encode()).decode()
 
     def _get_subscription_days(self, amount: float) -> int:
-        """
-        Определяет количество дней подписки по сумме платежа
-
-        Параметры:
-            amount (float): Сумма платежа в рублях
-
-        Возвращает:
-            int: Количество дней подписки
-        """
         prices = current_app.config["SUBSCRIPTION_PRICES"]
 
-        # Определяем период по сумме
         if amount == prices.get("1", 99.0):
             return 30  # 1 месяц
         elif amount == prices.get("3", 249.0):
@@ -56,7 +42,6 @@ class YooKassaService:
         elif amount == prices.get("12", 749.0):
             return 365  # 1 год
         else:
-            # Если сумма не соответствует ни одному тарифу, используем 30 дней
             current_app.logger.warning(
                 f"Неизвестная сумма платежа: {amount}, используем 30 дней"
             )
@@ -65,17 +50,6 @@ class YooKassaService:
     def _make_api_request(
         self, endpoint: str, method: str = "GET", data: Dict[str, Any] = None
     ) -> Dict[str, Any]:
-        """
-        Выполняет запрос к API ЮKassa
-
-        Параметры:
-            endpoint (str): Конечная точка API
-            method (str): HTTP метод
-            data (Dict[str, Any]): Данные для отправки
-
-        Возвращает:
-            Dict[str, Any]: Ответ от API
-        """
         if self.simulation_mode:
             current_app.logger.info(f"Симуляция API запроса: {method} {endpoint}")
             return {"simulation": True, "status": "success"}
@@ -110,20 +84,8 @@ class YooKassaService:
     def create_smart_payment(
         self, user: User, return_url: str, price: float = None
     ) -> Dict[str, Any]:
-        """
-        Создает "Умный платеж" в ЮKassa
-
-        Параметры:
-            user (User): Пользователь, для которого создается платеж
-            return_url (str): URL для возврата после оплаты
-            price (float): Сумма платежа в рублях
-
-        Возвращает:
-            Dict[str, Any]: Информация о созданном платеже с URL для оплаты
-        """
         payment_id = str(uuid.uuid4())
 
-        # Определяем цену платежа
         current_app.logger.info(
             f"Получена цена в payment_service: {price} (тип: {type(price)})"
         )
@@ -155,12 +117,10 @@ class YooKassaService:
             f"Создание платежа: ID={payment_id}, Пользователь={user.username}, Цена={payment_price}₽"
         )
 
-        # Создаем платеж в ЮKassa
         try:
             if self.simulation_mode:
                 current_app.logger.info("Симуляция создания платежа в ЮKassa")
 
-                # Сохраняем платеж в базе данных
                 payment_record = Payment(
                     user_id=user.id,
                     yookassa_payment_id=payment_id,
@@ -174,7 +134,6 @@ class YooKassaService:
                 db.session.commit()
                 current_app.logger.info(f"Платеж сохранен в БД: {payment_id}")
 
-                # Создаем URL для симуляции успешной оплаты
                 from flask import url_for
 
                 success_url = url_for(
@@ -191,7 +150,6 @@ class YooKassaService:
                     "currency": current_app.config["SUBSCRIPTION_CURRENCY"],
                 }
             else:
-                # Реальный платеж в ЮKassa
                 payment_data = {
                     "amount": {
                         "value": str(payment_price),
@@ -206,7 +164,6 @@ class YooKassaService:
                     "metadata": {"user_id": str(user.id), "username": user.username},
                 }
 
-                # Добавляем receipt только если у пользователя есть email
                 if user.email:
                     payment_data["receipt"] = {
                         "customer": {"email": user.email},
@@ -246,7 +203,6 @@ class YooKassaService:
                     )
                     raise Exception(f"Ошибка ЮKassa: {api_response['error']}")
 
-                # Сохраняем платеж в базе данных
                 payment_record = Payment(
                     user_id=user.id,
                     yookassa_payment_id=api_response.get("id", payment_id),
@@ -277,19 +233,9 @@ class YooKassaService:
             raise e
 
     def get_payment_status(self, payment_id: str) -> Dict[str, Any]:
-        """
-        Получает статус платежа из ЮKassa
-
-        Параметры:
-            payment_id (str): ID платежа
-
-        Возвращает:
-            Dict[str, Any]: Информация о статусе платежа
-        """
         try:
             current_app.logger.info(f"Получение статуса платежа: {payment_id}")
 
-            # Находим платеж в базе данных
             payment_record = Payment.query.filter_by(
                 yookassa_payment_id=payment_id
             ).first()
@@ -299,15 +245,11 @@ class YooKassaService:
                 return {"error": "Платеж не найден"}
 
             if self.simulation_mode:
-                # В симуляционном режиме проверяем, не был ли платеж отменен
-                # Для этого смотрим на время создания платежа
                 current_app.logger.info(f"Симуляционный режим: проверяем платеж {payment_id}")
                 current_app.logger.info(f"Время создания: {payment_record.created_at}")
                 current_app.logger.info(f"Текущее время: {datetime.utcnow()}")
                 current_app.logger.info(f"Разница: {datetime.utcnow() - payment_record.created_at}")
 
-                # Если платеж создан более 5 минут назад и статус все еще pending,
-                # считаем что он был отменен
                 if (datetime.utcnow() - payment_record.created_at) > timedelta(minutes=5):
                     payment_record.status = "canceled"
                     payment_record.updated_at = datetime.utcnow()
@@ -327,7 +269,6 @@ class YooKassaService:
                         "paid": False,
                     }
                 else:
-                    # Платеж в обработке
                     payment_record.status = "pending"
                     payment_record.updated_at = datetime.utcnow()
                     db.session.commit()
@@ -346,7 +287,6 @@ class YooKassaService:
                         "paid": False,
                     }
             else:
-                # Реальный запрос к API ЮKassa
                 api_response = self._make_api_request(f"payments/{payment_id}")
 
                 if "error" in api_response:
@@ -355,7 +295,6 @@ class YooKassaService:
                     )
                     return api_response
 
-                # Обновляем статус в базе данных
                 payment_record.status = api_response.get("status", "pending")
                 payment_record.updated_at = datetime.utcnow()
                 db.session.commit()
@@ -383,15 +322,6 @@ class YooKassaService:
             return {"error": str(e)}
 
     def process_successful_payment(self, payment_id: str) -> bool:
-        """
-        Обрабатывает успешный платеж и активирует подписку
-
-        Параметры:
-            payment_id (str): ID платежа
-
-        Возвращает:
-            bool: True если подписка успешно активирована
-        """
         try:
             current_app.logger.info(f"Обработка платежа: {payment_id}")
 
@@ -403,7 +333,6 @@ class YooKassaService:
                 current_app.logger.error(f"Платеж {payment_id} не найден в базе данных")
                 return False
 
-            # Проверяем статус платежа
             payment_status = self.get_payment_status(payment_id)
 
             if payment_status.get("status") != "succeeded":
@@ -412,12 +341,10 @@ class YooKassaService:
                 )
                 return False
 
-            # Активируем подписку пользователя
             user = User.query.get(payment_record.user_id)
             if user:
                 user.is_subscribed = True
 
-                # Определяем период подписки по сумме платежа
                 subscription_days = self._get_subscription_days(payment_record.amount)
                 user.subscription_expires = datetime.utcnow() + timedelta(
                     days=subscription_days
@@ -441,19 +368,8 @@ class YooKassaService:
             return False
 
     def check_user_subscription(self, user: User) -> bool:
-        """
-        Проверяет активность подписки пользователя
-
-        Параметры:
-            user (User): Пользователь для проверки
-
-        Возвращает:
-            bool: True если подписка активна
-        """
-        # Сначала проверяем пробную подписку
         if user.is_trial_subscription:
             if user.trial_subscription_expires and user.trial_subscription_expires < datetime.utcnow():
-                # Пробная подписка истекла
                 user.is_trial_subscription = False
                 user.trial_subscription_expires = None
                 db.session.commit()
@@ -466,7 +382,6 @@ class YooKassaService:
         if not user.is_subscribed:
             return False
 
-        # Если подписка выдана вручную администратором, пропускаем проверку платежей
         if user.is_manual_subscription:
             current_app.logger.info(
                 f"Пользователь {user.username} имеет ручно выданную подписку"
@@ -475,7 +390,6 @@ class YooKassaService:
                 user.subscription_expires
                 and user.subscription_expires < datetime.utcnow()
             ):
-                # Подписка истекла
                 user.is_subscribed = False
                 user.is_manual_subscription = False
                 db.session.commit()
@@ -485,7 +399,6 @@ class YooKassaService:
                 return False
             return True
 
-        # Проверяем, есть ли успешный платеж для этой подписки
         successful_payment = (
             Payment.query.filter_by(user_id=user.id, status="succeeded")
             .order_by(Payment.created_at.desc())
@@ -493,7 +406,6 @@ class YooKassaService:
         )
 
         if not successful_payment:
-            # Нет успешного платежа - сбрасываем подписку
             user.is_subscribed = False
             db.session.commit()
             current_app.logger.warning(
@@ -502,7 +414,6 @@ class YooKassaService:
             return False
 
         if user.subscription_expires and user.subscription_expires < datetime.utcnow():
-            # Подписка истекла
             user.is_subscribed = False
             db.session.commit()
             return False
@@ -510,18 +421,8 @@ class YooKassaService:
         return True
 
     def get_subscription_info(self, user: User) -> dict:
-        """
-        Получает полную информацию о подписке пользователя (включая пробную)
-
-        Параметры:
-            user (User): Пользователь
-
-        Возвращает:
-            dict: Информация о подписке
-        """
         now = datetime.utcnow()
 
-        # Проверяем пробную подписку
         if user.is_trial_subscription:
             if not user.trial_subscription_expires:
                 return {
@@ -533,7 +434,6 @@ class YooKassaService:
                 }
 
             if user.trial_subscription_expires < now:
-                # Пробная подписка истекла
                 user.is_trial_subscription = False
                 user.trial_subscription_expires = None
                 db.session.commit()
@@ -556,7 +456,6 @@ class YooKassaService:
                 'type': 'trial'
             }
 
-        # Проверяем обычную подписку
         if not user.is_subscribed:
             return {
                 'is_subscribed': False,
@@ -566,10 +465,8 @@ class YooKassaService:
                 'type': 'none'
             }
 
-        # Если подписка выдана вручную администратором
         if user.is_manual_subscription:
             if user.subscription_expires and user.subscription_expires < now:
-                # Подписка истекла
                 user.is_subscribed = False
                 user.is_manual_subscription = False
                 db.session.commit()
@@ -592,8 +489,6 @@ class YooKassaService:
                 'type': 'manual'
             }
 
-        # Проверяем платежи
-        # ... (остальная логика проверки платежей)
 
         return {
             'is_subscribed': False,
@@ -604,15 +499,6 @@ class YooKassaService:
         }
 
     def get_trial_subscription_info(self, user: User) -> dict:
-        """
-        Получает информацию о пробной подписке пользователя
-
-        Параметры:
-            user (User): Пользователь для проверки
-
-        Возвращает:
-            dict: Словарь с информацией о пробной подписке
-        """
         if not user.is_trial_subscription:
             return {
                 'is_trial': False,
@@ -629,7 +515,6 @@ class YooKassaService:
 
         now = datetime.utcnow()
         if user.trial_subscription_expires < now:
-            # Пробная подписка истекла
             user.is_trial_subscription = False
             user.trial_subscription_expires = None
             db.session.commit()
@@ -639,7 +524,6 @@ class YooKassaService:
                 'expires_at': None
             }
 
-        # Вычисляем оставшиеся дни
         time_left = user.trial_subscription_expires - now
         days_left = time_left.days
         hours_left = time_left.seconds // 3600

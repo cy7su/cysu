@@ -1,12 +1,10 @@
-"""
-Модуль API endpoints
-"""
 
-from flask import Blueprint, request, current_app, jsonify
-from flask_login import login_required, current_user
+from typing import Any, Dict
+
+from flask import Blueprint, current_app, jsonify, request
+from flask_login import current_user, login_required
 from flask_wtf.csrf import validate_csrf
 from wtforms import ValidationError
-from typing import Dict, Any
 
 from ..models import Notification, Subject
 
@@ -15,8 +13,6 @@ api_bp = Blueprint("api", __name__)
 @api_bp.route("/api/notifications")
 @login_required
 def get_notifications() -> Dict[str, Any]:
-    """API для получения уведомлений пользователя"""
-    # Получаем все непрочитанные уведомления пользователя
     notifications = (
         Notification.query.filter_by(user_id=current_user.id, is_read=False)
         .order_by(Notification.created_at.desc())
@@ -43,12 +39,10 @@ def get_notifications() -> Dict[str, Any]:
 @api_bp.route("/api/notifications/<int:notification_id>/read", methods=["POST"])
 @login_required
 def mark_notification_read(notification_id: int) -> Dict[str, Any]:
-    """API для отметки уведомления как прочитанного"""
     from .. import db
 
     notification = Notification.query.get_or_404(notification_id)
 
-    # Проверяем, что уведомление принадлежит текущему пользователю
     if notification.user_id != current_user.id:
         return jsonify({"success": False, "error": "Доступ запрещен"})
 
@@ -60,10 +54,8 @@ def mark_notification_read(notification_id: int) -> Dict[str, Any]:
 @api_bp.route("/api/subject/<int:subject_id>/pattern", methods=["POST"])
 @login_required
 def update_subject_pattern(subject_id: int) -> Dict[str, Any]:
-    """API для обновления паттерна предмета"""
     from .. import db
 
-    # Проверяем CSRF токен
     try:
         csrf_token = request.headers.get('X-CSRFToken')
         if not csrf_token:
@@ -73,20 +65,16 @@ def update_subject_pattern(subject_id: int) -> Dict[str, Any]:
     except ValidationError:
         return jsonify({"success": False, "error": "Неверный CSRF токен"}), 400
 
-    # Проверяем, что пользователь - админ
     if not current_user.is_effective_admin():
         return jsonify({"success": False, "error": "Доступ запрещен"})
 
-    # Получаем предмет
     subject = Subject.query.get_or_404(subject_id)
 
-    # Получаем данные из запроса
     data = request.get_json()
     if not data or 'pattern_svg' not in data:
         return jsonify({"success": False, "error": "Отсутствуют данные паттерна"})
 
     try:
-        # Обновляем паттерн в базе данных
         subject.pattern_svg = data['pattern_svg']
         subject.pattern_type = data.get('pattern_type', 'random')
 
@@ -103,7 +91,6 @@ def update_subject_pattern(subject_id: int) -> Dict[str, Any]:
 
 @api_bp.errorhandler(400)
 def bad_request(error) -> Dict[str, Any]:
-    """Обработчик ошибки 400 Bad Request"""
     current_app.logger.error("=== ОШИБКА 400 BAD REQUEST ===")
     current_app.logger.error(f"Ошибка: {error}")
     current_app.logger.error(f"Запрос: {request}")

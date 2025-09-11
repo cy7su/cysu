@@ -1,23 +1,36 @@
-"""
-Модуль аутентификации и регистрации
-"""
 
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session, current_app, Response
-from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, timedelta
 from typing import Union
 
-from ..models import User, EmailVerification, PasswordReset, SiteSettings
-from ..forms import LoginForm, RegistrationForm, EmailVerificationForm, PasswordResetRequestForm, PasswordResetForm
-from ..utils.email_service import EmailService
+from flask import (
+    Blueprint,
+    Response,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+from flask_login import current_user, login_required, login_user, logout_user
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from .. import db, login_manager
+from ..forms import (
+    EmailVerificationForm,
+    LoginForm,
+    PasswordResetForm,
+    PasswordResetRequestForm,
+    RegistrationForm,
+)
+from ..models import EmailVerification, PasswordReset, SiteSettings, User
+from ..utils.email_service import EmailService
 
 auth_bp = Blueprint("auth", __name__)
 
 @login_manager.user_loader
 def load_user(user_id: str):
-    """Загрузчик пользователя для Flask-Login"""
     try:
         return User.query.get(int(user_id))
     except Exception as e:
@@ -26,7 +39,6 @@ def load_user(user_id: str):
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login() -> Union[str, Response]:
-    """Страница входа"""
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
@@ -42,7 +54,6 @@ def login() -> Union[str, Response]:
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register() -> Union[str, Response]:
-    """Страница регистрации"""
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
@@ -54,7 +65,6 @@ def register() -> Union[str, Response]:
             f"Форма валидна, проверяем данные: {form.username.data}, {form.email.data}"
         )
         try:
-            # Проверяем, что пользователь с таким username или email не существует
             existing_user = User.query.filter(
                 (User.username == form.username.data) | (User.email == form.email.data)
             ).first()
@@ -72,7 +82,6 @@ def register() -> Union[str, Response]:
                     )
                 return render_template("auth/register.html", form=form)
 
-            # Сохраняем данные регистрации в сессии
             session["pending_registration"] = {
                 "username": form.username.data,
                 "email": form.email.data,
@@ -80,7 +89,6 @@ def register() -> Union[str, Response]:
                 "group_id": form.group_id.data,
             }
 
-            # Создаем временный код подтверждения
             verification = EmailVerification.create_verification(email=form.email.data)
             db.session.add(verification)
             db.session.commit()
@@ -89,7 +97,6 @@ def register() -> Union[str, Response]:
                 f"Verification code created for pending registration ({form.email.data}): {' '.join(verification.code)} (type: {type(verification.code)}, length: {len(verification.code)})"
             )
 
-            # Отправляем email с кодом
             if EmailService.send_verification_email(form.email.data, verification.code):
                 flash("Проверьте вашу почту для подтверждения email.")
                 session["pending_verification_id"] = verification.id
@@ -113,7 +120,6 @@ def register() -> Union[str, Response]:
 
 @auth_bp.route("/email/verification", methods=["GET", "POST"])
 def email_verification() -> Union[str, Response]:
-    """Страница подтверждения email"""
     verification_id = session.get("pending_verification_id")
     pending_registration = session.get("pending_registration")
 
@@ -124,18 +130,15 @@ def email_verification() -> Union[str, Response]:
     form = EmailVerificationForm()
 
     if form.validate_on_submit():
-        # Проверяем код подтверждения
         verification = EmailVerification.query.filter_by(
             id=verification_id, code=form.code.data, is_used=False
         ).first()
 
         if verification and verification.expires_at > datetime.utcnow():
-            # Код верный и не истек - создаем пользователя
             try:
                 hashed_password = generate_password_hash(
                     pending_registration["password"]
                 )
-                # Проверяем настройки пробной подписки
                 trial_enabled = SiteSettings.get_setting('trial_subscription_enabled', True)
                 trial_days = int(SiteSettings.get_setting('trial_subscription_days', 7))
 
@@ -151,7 +154,6 @@ def email_verification() -> Union[str, Response]:
                 db.session.add(user)
                 db.session.commit()
 
-                # Обновляем verification с правильным user_id и очищаем email
                 verification.user_id = user.id
                 verification.email = None
                 verification.is_used = True
@@ -161,7 +163,6 @@ def email_verification() -> Union[str, Response]:
                     f"User created and email verified: {user.username} ({user.email}) with code: {' '.join(form.code.data)}"
                 )
 
-                # Очищаем сессию
                 session.pop("pending_verification_id", None)
                 session.pop("pending_registration", None)
 
@@ -188,7 +189,6 @@ def email_verification() -> Union[str, Response]:
 
 @auth_bp.route("/email/resend", methods=["GET", "POST"])
 def resend_verification() -> Union[str, Response]:
-    """Повторная отправка кода подтверждения"""
     verification_id = session.get("pending_verification_id")
     pending_registration = session.get("pending_registration")
 
@@ -197,10 +197,8 @@ def resend_verification() -> Union[str, Response]:
         return redirect(url_for("auth.register"))
 
     try:
-        # Удаляем старый код подтверждения
         EmailVerification.query.filter_by(id=verification_id, is_used=False).delete()
 
-        # Создаем новый код подтверждения
         verification = EmailVerification.create_verification(
             email=pending_registration["email"]
         )
@@ -211,10 +209,8 @@ def resend_verification() -> Union[str, Response]:
             f"New verification code created for pending registration ({pending_registration['email']}): {' '.join(verification.code)}"
         )
 
-        # Обновляем ID в сессии
         session["pending_verification_id"] = verification.id
 
-        # Отправляем email с новым кодом
         if EmailService.send_resend_verification_email(
             pending_registration["email"], verification.code
         ):
@@ -231,7 +227,6 @@ def resend_verification() -> Union[str, Response]:
 
 @auth_bp.route("/password/reset", methods=["GET", "POST"])
 def password_reset_request() -> Union[str, Response]:
-    """Страница запроса восстановления пароля"""
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
@@ -241,10 +236,8 @@ def password_reset_request() -> Union[str, Response]:
         user = User.query.filter_by(email=email).first()
 
         if user:
-            # Удаляем старые коды восстановления для этого email
             PasswordReset.query.filter_by(email=email, is_used=False).delete()
 
-            # Создаем новый код восстановления
             reset = PasswordReset.create_reset(email)
             db.session.add(reset)
             db.session.commit()
@@ -253,7 +246,6 @@ def password_reset_request() -> Union[str, Response]:
                 f"Password reset code created for {email}: {' '.join(reset.code)}"
             )
 
-            # Отправляем email с кодом
             if EmailService.send_password_reset_email(email, reset.code):
                 flash(
                     "Код восстановления отправлен на вашу почту. Проверьте email и введите код.",
@@ -263,7 +255,6 @@ def password_reset_request() -> Union[str, Response]:
             else:
                 flash("Ошибка отправки email. Попробуйте позже.", "error")
         else:
-            # Для безопасности не показываем, что email не найден
             flash(
                 "Если указанный email зарегистрирован, код восстановления будет отправлен.",
                 "info",
@@ -274,7 +265,6 @@ def password_reset_request() -> Union[str, Response]:
 
 @auth_bp.route("/password/reset/confirm", methods=["GET", "POST"])
 def password_reset_confirm() -> Union[str, Response]:
-    """Страница подтверждения кода и смены пароля"""
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
@@ -283,7 +273,6 @@ def password_reset_confirm() -> Union[str, Response]:
         code = form.code.data
         new_password = form.new_password.data
 
-        # Ищем активный код восстановления
         reset = (
             PasswordReset.query.filter_by(code=code, is_used=False)
             .filter(PasswordReset.expires_at > datetime.utcnow())
@@ -291,10 +280,8 @@ def password_reset_confirm() -> Union[str, Response]:
         )
 
         if reset:
-            # Находим пользователя по email
             user = User.query.filter_by(email=reset.email).first()
             if user:
-                # Обновляем пароль
                 user.password = generate_password_hash(new_password)
                 reset.is_used = True
                 db.session.commit()
@@ -317,6 +304,5 @@ def password_reset_confirm() -> Union[str, Response]:
 @auth_bp.route("/logout")
 @login_required
 def logout() -> Response:
-    """Выход из системы"""
     logout_user()
     return redirect(url_for("main.index"))

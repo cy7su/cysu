@@ -2,14 +2,12 @@
 {% block title %}Админка: Предметы{% endblock %}
 {% block content %}
 <div class="container-fluid admin-subjects">
-  <!-- Заголовок -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">Управление предметами</h2>
     <span class="badge bg-primary fs-6">{{ subjects|length }} предметов</span>
   </div>
 
   <div class="row g-4">
-    <!-- Создание предмета -->
     <div class="col-lg-4">
       <div class="card shadow-sm border-0" style="background: var(--dp-02); height: fit-content;">
         <div class="card-body">
@@ -48,7 +46,6 @@
       </div>
     </div>
 
-    <!-- Список предметов -->
     <div class="col-lg-8">
       <div class="card shadow-sm border-0" style="background: var(--dp-02);">
         <div class="card-body p-0">

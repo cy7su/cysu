@@ -4,14 +4,12 @@
 {% block content %}
 <div class="admin-users">
 <div class="container-fluid">
-  <!-- Заголовок -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">Управление пользователями</h2>
     <span class="badge bg-primary fs-6">{{ users|length }} пользователей</span>
   </div>
 
   <div class="row g-4">
-    <!-- Создание пользователя -->
     <div class="col-lg-3">
       <div class="card shadow-sm border-0" style="background: var(--dp-02); height: fit-content;">
         <div class="card-body">
@@ -76,7 +74,6 @@
               {% endif %}
             </div>
             
-            <!-- Роли пользователя -->
             <div class="mb-3">
               <label class="form-label">Роли</label>
               <div class="form-check">
@@ -101,7 +98,6 @@
       </div>
     </div>
 
-    <!-- Список пользователей -->
     <div class="col-lg-9">
       <div class="card shadow-sm border-0" style="background: var(--dp-02);">
         <div class="card-body p-0">
@@ -173,7 +169,6 @@
                       <span class="badge bg-secondary">Пользователь</span>
                     {% endif %}
                     
-                    <!-- Кнопка редактирования статуса -->
                     {% if user.id != current_user.id %}
                       <button type="button" class="btn btn-sm btn-outline-primary ms-1" 
                               data-bs-toggle="modal" 
@@ -207,7 +202,6 @@
                   </td>
                 <td>
                     <div class="d-grid">
-                      <!-- Показать новый пароль -->
                       {% if password_map.get(user.id) %}
                         <button type="button" class="btn btn-info" 
                                 data-bs-toggle="tooltip" 
@@ -216,7 +210,6 @@
                           <i class="fas fa-key"></i>
                         </button>
                       {% else %}
-                        <!-- Сброс пароля -->
                         <form method="post">
                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                           <input type="hidden" name="reset_user_id" value="{{ user.id }}">
@@ -226,7 +219,6 @@
                         </form>
                       {% endif %}
                       
-                      <!-- Изменение статуса администратора -->
                       {% if user.id != current_user.id %}
                         <form method="post">
                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -239,7 +231,6 @@
                         </form>
                       {% endif %}
                       
-                      <!-- Управление подпиской -->
                       <form method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="toggle_subscription_id" value="{{ user.id }}">
@@ -250,7 +241,6 @@
                         </button>
                       </form>
                       
-                      <!-- Удаление пользователя -->
                       {% if not user.is_admin and user.id != current_user.id %}
                         <form method="post" onsubmit="return confirm('Удалить пользователя {{ user.username }}?')">
                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -281,11 +271,8 @@
 
 
 
-<!-- Блок управления короткими ссылками удален -->
 
-<!-- Таблица ссылок удалена -->
 
-<!-- Убраны старые inline стили - теперь используется admin.css -->
 
 <script>
 // Инициализация tooltips
@@ -420,7 +407,6 @@ function showCopyNotification(message, type = 'success') {
 }
 </script>
 
-<!-- Модальные окна для изменения группы пользователя -->
 {% for user in users %}
 <div class="modal fade" id="changeGroupModal{{ user.id }}" tabindex="-1">
   <div class="modal-dialog">
@@ -455,7 +441,6 @@ function showCopyNotification(message, type = 'success') {
   </div>
 </div>
 
-<!-- Модальное окно для изменения статуса пользователя -->
 <div class="modal fade" id="changeStatusModal{{ user.id }}" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -493,7 +478,6 @@ function showCopyNotification(message, type = 'success') {
             </div>
           </div>
           
-          <!-- Дополнительные настройки для Админа -->
           <div id="admin_settings_{{ user.id }}" style="display: none;">
             <div class="mb-3">
               <div class="form-check">
