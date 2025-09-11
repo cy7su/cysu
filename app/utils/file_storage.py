@@ -3,11 +3,39 @@ import os
 import shutil
 from datetime import datetime
 from typing import List, Tuple
+import posixpath
 
 from flask import current_app
 from werkzeug.utils import secure_filename
 
 from .transliteration import get_safe_filename
+
+
+def safe_path_join(base_path: str, *path_parts: str) -> str:
+    """
+    Безопасное соединение путей, предотвращающее Path Traversal атаки
+    
+    Args:
+        base_path: Базовый путь
+        *path_parts: Части пути для соединения
+        
+    Returns:
+        str: Безопасный абсолютный путь
+    """
+    # Нормализуем базовый путь
+    base_path = os.path.abspath(base_path)
+    
+    # Соединяем все части пути
+    full_path = os.path.join(base_path, *path_parts)
+    
+    # Нормализуем полный путь
+    full_path = os.path.abspath(full_path)
+    
+    # Проверяем, что результирующий путь находится внутри базового пути
+    if not full_path.startswith(base_path):
+        raise ValueError(f"Path traversal detected: {full_path} is outside {base_path}")
+    
+    return full_path
 
 
 class FileStorageManager:
@@ -81,7 +109,13 @@ class FileStorageManager:
         ticket_base = current_app.config.get(
             "TICKET_FILES_FOLDER", "app/static/ticket_files"
         )
-        ticket_path = os.path.join(ticket_base, str(ticket_id))
+        
+        # Безопасное создание пути
+        try:
+            ticket_path = safe_path_join(ticket_base, str(ticket_id))
+        except ValueError as e:
+            current_app.logger.error(f"Path traversal attempt detected: {e}")
+            raise ValueError("Invalid path")
 
         os.makedirs(ticket_path, exist_ok=True)
 
@@ -90,7 +124,12 @@ class FileStorageManager:
         name, ext = os.path.splitext(safe_filename)
         unique_filename = f"{timestamp}_{name}{ext}"
 
-        full_path = os.path.join(ticket_path, unique_filename)
+        # Безопасное создание полного пути
+        try:
+            full_path = safe_path_join(ticket_path, unique_filename)
+        except ValueError as e:
+            current_app.logger.error(f"Path traversal attempt detected: {e}")
+            raise ValueError("Invalid filename")
 
         relative_path = os.path.join(str(ticket_id), unique_filename)
 
@@ -99,33 +138,40 @@ class FileStorageManager:
     @staticmethod
     def save_file(file, full_path: str) -> bool:
         try:
+            # Проверяем, что путь безопасен
+            try:
+                safe_full_path = safe_path_join(os.path.dirname(full_path), os.path.basename(full_path))
+            except ValueError as e:
+                current_app.logger.error(f"Path traversal attempt detected: {e}")
+                return False
+            
             file_size = getattr(file, 'content_length', None)
             file_name = getattr(file, 'filename', 'unknown')
 
-            current_app.logger.info(f"Попытка сохранения файла: {full_path}")
+            current_app.logger.info(f"Попытка сохранения файла: {safe_full_path}")
             current_app.logger.info(f"Исходное имя файла: {file_name}")
             current_app.logger.info(f"Размер файла: {file_size} байт ({file_size / (1024*1024):.2f} MB)" if file_size else "Размер файла: неизвестен")
-            current_app.logger.info(f"Папка назначения: {os.path.dirname(full_path)}")
-            current_app.logger.info(f"Папка существует: {os.path.exists(os.path.dirname(full_path))}")
+            current_app.logger.info(f"Папка назначения: {os.path.dirname(safe_full_path)}")
+            current_app.logger.info(f"Папка существует: {os.path.exists(os.path.dirname(safe_full_path))}")
 
             try:
-                statvfs = os.statvfs(os.path.dirname(full_path))
+                statvfs = os.statvfs(os.path.dirname(safe_full_path))
                 free_space = statvfs.f_frsize * statvfs.f_bavail
                 current_app.logger.info(f"Свободное место на диске: {free_space} байт ({free_space / (1024*1024):.2f} MB)")
             except Exception as e:
                 current_app.logger.warning(f"Не удалось получить информацию о свободном месте: {e}")
 
-            file.save(full_path)
+            file.save(safe_full_path)
 
-            if os.path.exists(full_path):
-                saved_size = os.path.getsize(full_path)
-                current_app.logger.info(f"Файл успешно сохранен: {full_path}")
+            if os.path.exists(safe_full_path):
+                saved_size = os.path.getsize(safe_full_path)
+                current_app.logger.info(f"Файл успешно сохранен: {safe_full_path}")
                 current_app.logger.info(f"Размер сохраненного файла: {saved_size} байт ({saved_size / (1024*1024):.2f} MB)")
 
                 if file_size and saved_size != file_size:
                     current_app.logger.warning(f"Размеры не совпадают! Ожидалось: {file_size}, получено: {saved_size}")
             else:
-                current_app.logger.error(f"Файл не найден после сохранения: {full_path}")
+                current_app.logger.error(f"Файл не найден после сохранения: {safe_full_path}")
                 return False
 
             return True

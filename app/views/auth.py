@@ -97,7 +97,24 @@ def register() -> Union[str, Response]:
                 f"Verification code created for pending registration ({form.email.data}): {' '.join(verification.code)} (type: {type(verification.code)}, length: {len(verification.code)})"
             )
 
-            if EmailService.send_verification_email(form.email.data, verification.code):
+            current_app.logger.info(f"Attempting to send verification email to {form.email.data}")
+            
+            # Проверяем, включен ли режим разработки (пропускаем email)
+            debug_mode = current_app.config.get('DEBUG', False)
+            skip_email = current_app.config.get('SKIP_EMAIL_VERIFICATION', False)
+            
+            current_app.logger.info(f"Debug mode: {debug_mode}, Skip email: {skip_email}")
+            
+            if debug_mode or skip_email:
+                current_app.logger.info(f"Debug mode: skipping email send, code is {verification.code}")
+                flash(f"Режим разработки: код подтверждения - {verification.code}")
+                session["pending_verification_id"] = verification.id
+                return redirect(url_for("auth.email_verification"))
+            
+            email_sent = EmailService.send_verification_email(form.email.data, verification.code)
+            current_app.logger.info(f"Email send result: {email_sent}")
+            
+            if email_sent:
                 flash("Проверьте вашу почту для подтверждения email.")
                 session["pending_verification_id"] = verification.id
                 return redirect(url_for("auth.email_verification"))

@@ -20,7 +20,7 @@ from werkzeug.utils import secure_filename
 from .. import db
 from ..forms import MaterialForm
 from ..models import Material, SiteSettings, Subject, SubjectGroup, User
-from ..utils.file_storage import FileStorageManager
+from ..utils.file_storage import FileStorageManager, safe_path_join
 from ..utils.payment_service import YooKassaService
 from ..utils.transliteration import get_safe_filename
 from .context_processors import (
@@ -795,12 +795,28 @@ def serve_file(subject_id: int, filename: str) -> Response:
     current_app.logger.info(f"UPLOAD_FOLDER: {current_app.config['UPLOAD_FOLDER']}")
     start_time = time.time()
 
-    possible_paths = [
-        os.path.join(current_app.config['UPLOAD_FOLDER'], filename),
-        os.path.join(current_app.config['UPLOAD_FOLDER'], str(subject_id), filename),
-        os.path.join(current_app.config['UPLOAD_FOLDER'], f"{subject_id}/{filename}"),
-        os.path.join(current_app.config['UPLOAD_FOLDER'], str(subject_id), os.path.basename(filename))
-    ]
+    # Безопасное создание возможных путей
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    safe_filename = secure_filename(filename)
+    
+    possible_paths = []
+    try:
+        # Базовый путь
+        possible_paths.append(safe_path_join(upload_folder, safe_filename))
+    except ValueError:
+        pass
+    
+    try:
+        # Путь с subject_id
+        possible_paths.append(safe_path_join(upload_folder, str(subject_id), safe_filename))
+    except ValueError:
+        pass
+    
+    try:
+        # Путь с basename
+        possible_paths.append(safe_path_join(upload_folder, str(subject_id), os.path.basename(safe_filename)))
+    except ValueError:
+        pass
 
     file_path = None
     for i, path in enumerate(possible_paths):

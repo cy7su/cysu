@@ -60,8 +60,26 @@ def make_links_clickable(text: str) -> Markup:
     return Markup(text)
 
 def _shorten_url(url: str) -> str:
+    # Безопасная обработка URL
+    if not url or not isinstance(url, str):
+        return ""
+    
+    # Очищаем URL от потенциально опасных символов
+    url = url.strip()
+    
+    # Разрешенные домены
+    allowed_domains = ['gist.github.com', 'github.com', 'gitlab.com', 'bitbucket.org']
+    
     if url.startswith('https://'):
         url = url[8:]
+
+    # Проверяем, что URL начинается с разрешенного домена
+    is_allowed = any(url.startswith(domain) for domain in allowed_domains)
+    if not is_allowed:
+        # Если домен не разрешен, возвращаем только домен
+        if '/' in url:
+            return url.split('/')[0]
+        return url
 
     if url.startswith('gist.github.com/'):
         return 'gist.github.com'
@@ -69,17 +87,23 @@ def _shorten_url(url: str) -> str:
     if url.startswith('github.com/'):
         parts = url.split('/')
         if len(parts) >= 3:
-            return f'github.com/{parts[1]}'
+            # Безопасно экранируем имя пользователя
+            username = parts[1].replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+            return f'github.com/{username}'
 
     if url.startswith('gitlab.com/'):
         parts = url.split('/')
         if len(parts) >= 3:
-            return f'gitlab.com/{parts[1]}'
+            # Безопасно экранируем имя пользователя
+            username = parts[1].replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+            return f'gitlab.com/{username}'
 
     if url.startswith('bitbucket.org/'):
         parts = url.split('/')
         if len(parts) >= 3:
-            return f'bitbucket.org/{parts[1]}'
+            # Безопасно экранируем имя пользователя
+            username = parts[1].replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+            return f'bitbucket.org/{username}'
 
     if '/' in url:
         return url.split('/')[0]

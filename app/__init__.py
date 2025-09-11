@@ -93,6 +93,9 @@ def create_app():
     app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'your-email@gmail.com')
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'your-app-password')
     app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'your-email@gmail.com')
+    app.config['MAIL_TIMEOUT'] = 10  # Таймаут 10 секунд
+    app.config['MAIL_CONNECT_TIMEOUT'] = 5  # Таймаут подключения 5 секунд
+    app.config['SKIP_EMAIL_VERIFICATION'] = os.getenv('SKIP_EMAIL_VERIFICATION', 'False').lower() == 'true'
 
     app.config['YOOKASSA_SHOP_ID'] = os.getenv('YOOKASSA_SHOP_ID', 'your-shop-id')
     app.config['YOOKASSA_SECRET_KEY'] = os.getenv('YOOKASSA_SECRET_KEY', 'your-secret-key')

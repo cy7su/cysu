@@ -2,6 +2,9 @@ from flask_mail import Message
 from .. import mail
 import logging
 from flask import current_app
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 
 logger = logging.getLogger(__name__)
 
@@ -9,6 +12,38 @@ class EmailService:
     """
     Сервис для отправки email сообщений (вертикальный современный шаблон)
     """
+    
+    @staticmethod
+    def send_email_with_timeout(msg, timeout=10):
+        """
+        Отправляет email с таймаутом
+        
+        Args:
+            msg: Message объект для отправки
+            timeout: Таймаут в секундах (по умолчанию 10)
+            
+        Returns:
+            bool: True если email отправлен успешно, False в противном случае
+        """
+        try:
+            # Устанавливаем таймаут для SMTP соединения
+            import socket
+            original_timeout = socket.getdefaulttimeout()
+            socket.setdefaulttimeout(timeout)
+            
+            try:
+                mail.send(msg)
+                return True
+            finally:
+                # Восстанавливаем оригинальный таймаут
+                socket.setdefaulttimeout(original_timeout)
+                
+        except socket.timeout:
+            logger.error(f"Email send timeout after {timeout} seconds")
+            return False
+        except Exception as e:
+            logger.error(f"Error sending email: {str(e)}")
+            return False
 
     @staticmethod
     def send_verification_email(user_email: str, verification_code: str) -> bool:
@@ -196,11 +231,17 @@ class EmailService:
             msg = Message(
                 subject=subject, recipients=[user_email], html=html_body, body=text_body
             )
-            mail.send(msg)
-            logger.info(
-                f"Verification email sent successfully to {user_email} with code: {verification_code}"
-            )
-            return True
+            
+            # Используем метод с таймаутом
+            success = EmailService.send_email_with_timeout(msg, timeout=10)
+            if success:
+                logger.info(
+                    f"Verification email sent successfully to {user_email} with code: {verification_code}"
+                )
+                return True
+            else:
+                logger.error(f"Failed to send verification email to {user_email} - timeout or error")
+                return False
         except Exception as e:
             logger.error(f"Failed to send verification email to {user_email}: {str(e)}")
             return False
@@ -391,11 +432,17 @@ class EmailService:
             msg = Message(
                 subject=subject, recipients=[user_email], html=html_body, body=text_body
             )
-            mail.send(msg)
-            logger.info(
-                f"Resend verification email sent successfully to {user_email} with code: {verification_code}"
-            )
-            return True
+            
+            # Используем метод с таймаутом
+            success = EmailService.send_email_with_timeout(msg, timeout=10)
+            if success:
+                logger.info(
+                    f"Resend verification email sent successfully to {user_email} with code: {verification_code}"
+                )
+                return True
+            else:
+                logger.error(f"Failed to send resend verification email to {user_email} - timeout or error")
+                return False
         except Exception as e:
             logger.error(
                 f"Failed to send resend verification email to {user_email}: {str(e)}"
@@ -588,11 +635,17 @@ class EmailService:
             msg = Message(
                 subject=subject, recipients=[user_email], html=html_body, body=text_body
             )
-            mail.send(msg)
-            logger.info(
-                f"Password reset email sent successfully to {user_email} with code: {reset_code}"
-            )
-            return True
+            
+            # Используем метод с таймаутом
+            success = EmailService.send_email_with_timeout(msg, timeout=10)
+            if success:
+                logger.info(
+                    f"Password reset email sent successfully to {user_email} with code: {reset_code}"
+                )
+                return True
+            else:
+                logger.error(f"Failed to send password reset email to {user_email} - timeout or error")
+                return False
         except Exception as e:
             logger.error(
                 f"Failed to send password reset email to {user_email}: {str(e)}"
