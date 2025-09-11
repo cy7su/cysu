@@ -8,26 +8,26 @@ class SVGPatternGenerator {
         this.backgroundColor = '#1a1a1a';
         
         this.colorPalettes = {
-            teal: ['#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B', '#B2F5EA', '#7DD3FC', '#38BDF8', '#0EA5E9', '#0284C7'],
-            yellow: ['#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58', '#F57F17', '#FF8F00', '#FFC107', '#FFD54F', '#FFECB3', '#FFF8E1', '#F9A825', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#FEF3C7', '#FDE68A'],
-            blue: ['#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5', '#1976D2', '#0D47A1', '#81D4FA', '#4FC3F7', '#29B6F6', '#03A9F4', '#0288D1', '#0277BD', '#01579B', '#0F172A', '#1E293B', '#334155', '#475569', '#DBEAFE', '#BFDBFE'],
-            pink: ['#FCE4EC', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#C2185B', '#880E4F', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#E91E63', '#DB2777', '#BE185D', '#9D174D', '#831843', '#500724', '#FDF2F8', '#FCE7F3', '#FBCFE8'],
-            purple: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#7B1FA2', '#4A148C', '#D1C4E9', '#B39DDB', '#9575CD', '#7E57C2', '#673AB7', '#5B21B6', '#4C1D95', '#581C87', '#3B0764', '#1E1B4B', '#312E81', '#F3E8FF', '#E9D5FF'],
-            grey: ['#F5F5F5', '#EEEEEE', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#616161', '#424242', '#FAFAFA', '#F0F0F0', '#E8E8E8', '#D0D0D0', '#A0A0A0', '#808080', '#606060', '#404040', '#202020', '#0F0F0F', '#F8FAFC', '#F1F5F9', '#E2E8F0'],
-            mint: ['#E6FFFA', '#B2F5EA', '#81E6D9', '#4FD1C7', '#38B2AC', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B', '#B2F5EA', '#7DD3FC', '#38BDF8', '#0EA5E9', '#0284C7'],
-            coral: ['#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#D32F2F', '#B71C1C', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#F44336', '#E11D48', '#BE123C', '#9F1239', '#881337', '#4C0519', '#FEF2F2', '#FEE2E2', '#FECACA'],
-            emerald: ['#E8F5E8', '#C8E6C9', '#A5D6A7', '#81C784', '#66BB6A', '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#E0F2E0', '#B8E6B8', '#90EE90', '#16A34A', '#15803D', '#166534', '#14532D', '#052E16', '#F0FDF4', '#DCFCE7', '#BBF7D0'],
-            lavender: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#9C27B0', '#7B1FA2', '#6A1B9A', '#4A148C', '#E8DAEF', '#D1C4E9', '#B39DDB', '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#F5F3FF', '#EDE9FE', '#DDD6FE'],
-            peach: ['#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D', '#FFA726', '#FF9800', '#F57C00', '#EF6C00', '#E65100', '#FFE0B2', '#FFCC80', '#FFB74D', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#FEF3C7', '#FDE68A', '#FCD34D'],
-            aqua: ['#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#26C6DA', '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#B2EBF2', '#80DEEA', '#4DD0E1', '#06B6D4', '#0891B2', '#0E7490', '#155E75', '#164E63', '#F0FDFA', '#CCFBF1', '#99F6E4'],
-            gold: ['#FFFBEB', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#FFD700', '#FFA500', '#FF8C00', '#FF7F50', '#FF6347', '#FF4500', '#FFD700', '#FFA500', '#FF8C00'],
-            silver: ['#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A', '#C0C0C0', '#A8A8A8', '#909090', '#787878', '#606060', '#484848', '#303030', '#E5E7EB', '#D1D5DB', '#9CA3AF'],
-            bronze: ['#FEF7ED', '#FED7AA', '#FDBA74', '#FB923C', '#F97316', '#EA580C', '#DC2626', '#B91C1C', '#991B1B', '#7F1D1D', '#CD7F32', '#B8860B', '#DAA520', '#B8860B', '#CD853F', '#D2691E', '#A0522D', '#8B4513', '#654321', '#3E2723'],
-            neon: ['#00FF00', '#00FFFF', '#FF00FF', '#FFFF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000'],
-            pastel: ['#FFE4E1', '#FFD1DC', '#FFB6C1', '#FFA0B4', '#FF91A4', '#FFB6C1', '#FFC0CB', '#FFCCCB', '#FFD1DC', '#FFE4E1', '#E6E6FA', '#D8BFD8', '#DDA0DD', '#DA70D6', '#EE82EE', '#F0E68C', '#F5DEB3', '#FFE4B5', '#FFEFD5', '#FFF8DC'],
-            dark: ['#1A1A1A', '#2D2D2D', '#404040', '#525252', '#666666', '#7A7A7A', '#8E8E8E', '#A2A2A2', '#B6B6B6', '#CACACA', '#0D1117', '#161B22', '#21262D', '#30363D', '#484F58', '#6E7681', '#8B949E', '#A8B2BF', '#C9D1D9', '#F0F6FC'],
-            bright: ['#FF0000', '#FF4000', '#FF8000', '#FFBF00', '#FFFF00', '#BFFF00', '#80FF00', '#40FF00', '#00FF00', '#00FF40', '#00FF80', '#00FFBF', '#00FFFF', '#00BFFF', '#0080FF', '#0040FF', '#0000FF', '#4000FF', '#8000FF', '#BF00FF'],
-            nature: ['#228B22', '#32CD32', '#00FF00', '#7CFC00', '#ADFF2F', '#9ACD32', '#6B8E23', '#556B2F', '#8FBC8F', '#90EE90', '#98FB98', '#8FBC8F', '#2E8B57', '#3CB371', '#20B2AA', '#48D1CC', '#40E0D0', '#00CED1', '#00BFFF', '#87CEEB']
+            teal: ['#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B', '#B2F5EA', '#7DD3FC', '#38BDF8', '#0EA5E9', '#0284C7', '#0D9488', '#14B8A6', '#2DD4BF', '#5EEAD4', '#99F6E4', '#CCFBF1', '#F0FDFA', '#134E4A', '#115E59', '#0F766E', '#0D9488', '#14B8A6', '#2DD4BF', '#5EEAD4', '#99F6E4', '#CCFBF1', '#F0FDFA', '#134E4A', '#115E59', '#0F766E'],
+            yellow: ['#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58', '#F57F17', '#FF8F00', '#FFC107', '#FFD54F', '#FFECB3', '#FFF8E1', '#F9A825', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#7C2D12', '#9A3412', '#C2410C', '#EA580C', '#F97316', '#FB923C', '#FDBA74', '#FED7AA', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24'],
+            blue: ['#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5', '#1976D2', '#0D47A1', '#81D4FA', '#4FC3F7', '#29B6F6', '#03A9F4', '#0288D1', '#0277BD', '#01579B', '#0F172A', '#1E293B', '#334155', '#475569', '#DBEAFE', '#BFDBFE', '#93C5FD', '#60A5FA', '#3B82F6', '#2563EB', '#1D4ED8', '#1E40AF', '#1E3A8A', '#1E40AF', '#1D4ED8', '#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE', '#DBEAFE', '#EFF6FF', '#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1'],
+            pink: ['#FCE4EC', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#C2185B', '#880E4F', '#F8BBD9', '#F48FB1', '#F06292', '#EC407A', '#E91E63', '#DB2777', '#BE185D', '#9D174D', '#831843', '#500724', '#FDF2F8', '#FCE7F3', '#FBCFE8', '#F9A8D4', '#F472B6', '#EC4899', '#DB2777', '#BE185D', '#9D174D', '#831843', '#500724', '#7C2D12', '#9A3412', '#C2410C', '#EA580C', '#F97316', '#FB923C', '#FDBA74', '#FED7AA', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24'],
+            purple: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#7B1FA2', '#4A148C', '#D1C4E9', '#B39DDB', '#9575CD', '#7E57C2', '#673AB7', '#5B21B6', '#4C1D95', '#581C87', '#3B0764', '#1E1B4B', '#312E81', '#F3E8FF', '#E9D5FF', '#DDD6FE', '#C4B5FD', '#A78BFA', '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#581C87', '#3B0764', '#1E1B4B', '#312E81', '#3730A3', '#4338CA', '#4F46E5', '#5B21B6', '#6D28D9', '#7C3AED', '#8B5CF6', '#A78BFA'],
+            grey: ['#F5F5F5', '#EEEEEE', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#616161', '#424242', '#FAFAFA', '#F0F0F0', '#E8E8E8', '#D0D0D0', '#A0A0A0', '#808080', '#606060', '#404040', '#202020', '#0F0F0F', '#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A', '#111827', '#1F2937', '#374151', '#4B5563', '#6B7280', '#9CA3AF', '#D1D5DB', '#E5E7EB', '#F3F4F6', '#F9FAFB', '#FFFFFF', '#F8FAFC', '#F1F5F9', '#E2E8F0'],
+            mint: ['#E6FFFA', '#B2F5EA', '#81E6D9', '#4FD1C7', '#38B2AC', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B', '#B2F5EA', '#7DD3FC', '#38BDF8', '#0EA5E9', '#0284C7', '#0D9488', '#14B8A6', '#2DD4BF', '#5EEAD4', '#99F6E4', '#CCFBF1', '#F0FDFA', '#134E4A', '#115E59', '#0F766E', '#0D9488', '#14B8A6', '#2DD4BF', '#5EEAD4', '#99F6E4', '#CCFBF1', '#F0FDFA', '#134E4A', '#115E59', '#0F766E'],
+            coral: ['#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#D32F2F', '#B71C1C', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#F44336', '#E11D48', '#BE123C', '#9F1239', '#881337', '#4C0519', '#FEF2F2', '#FEE2E2', '#FECACA', '#FCA5A5', '#F87171', '#EF4444', '#DC2626', '#B91C1C', '#991B1B', '#7F1D1D', '#450A0A', '#7C2D12', '#9A3412', '#C2410C', '#EA580C', '#F97316', '#FB923C', '#FDBA74', '#FED7AA', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24'],
+            emerald: ['#E8F5E8', '#C8E6C9', '#A5D6A7', '#81C784', '#66BB6A', '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#E0F2E0', '#B8E6B8', '#90EE90', '#16A34A', '#15803D', '#166534', '#14532D', '#052E16', '#F0FDF4', '#DCFCE7', '#BBF7D0', '#86EFAC', '#4ADE80', '#22C55E', '#16A34A', '#15803D', '#166534', '#14532D', '#052E16', '#0F172A', '#1E293B', '#334155', '#475569', '#64748B', '#94A3B8', '#CBD5E1', '#E2E8F0', '#F1F5F9', '#F8FAFC', '#FFFFFF', '#F0FDF4'],
+            lavender: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#9C27B0', '#7B1FA2', '#6A1B9A', '#4A148C', '#E8DAEF', '#D1C4E9', '#B39DDB', '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#F5F3FF', '#EDE9FE', '#DDD6FE', '#C4B5FD', '#A78BFA', '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#581C87', '#3B0764', '#1E1B4B', '#312E81', '#3730A3', '#4338CA', '#4F46E5', '#5B21B6', '#6D28D9', '#7C3AED', '#8B5CF6', '#A78BFA', '#C4B5FD'],
+            peach: ['#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D', '#FFA726', '#FF9800', '#F57C00', '#EF6C00', '#E65100', '#FFE0B2', '#FFCC80', '#FFB74D', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#7C2D12', '#9A3412', '#C2410C', '#EA580C', '#F97316', '#FB923C', '#FDBA74', '#FED7AA', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#F59E0B'],
+            aqua: ['#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#26C6DA', '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#B2EBF2', '#80DEEA', '#4DD0E1', '#06B6D4', '#0891B2', '#0E7490', '#155E75', '#164E63', '#F0FDFA', '#CCFBF1', '#99F6E4', '#5EEAD4', '#2DD4BF', '#14B8A6', '#0D9488', '#0F766E', '#115E59', '#134E4A', '#0F172A', '#1E293B', '#334155', '#475569', '#64748B', '#94A3B8', '#CBD5E1', '#E2E8F0', '#F1F5F9', '#F8FAFC', '#FFFFFF', '#F0FDFA', '#CCFBF1', '#99F6E4'],
+            gold: ['#FFFBEB', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#FFD700', '#FFA500', '#FF8C00', '#FF7F50', '#FF6347', '#FF4500', '#FFD700', '#FFA500', '#FF8C00', '#FF7F50', '#FF6347', '#FF4500', '#DC2626', '#B91C1C', '#991B1B', '#7F1D1D', '#450A0A', '#7C2D12', '#9A3412', '#C2410C', '#EA580C', '#F97316', '#FB923C', '#FDBA74', '#FED7AA', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24'],
+            silver: ['#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A', '#C0C0C0', '#A8A8A8', '#909090', '#787878', '#606060', '#484848', '#303030', '#E5E7EB', '#D1D5DB', '#9CA3AF', '#6B7280', '#4B5563', '#374151', '#1F2937', '#111827', '#0F172A', '#1E293B', '#334155', '#475569', '#64748B', '#94A3B8', '#CBD5E1', '#E2E8F0', '#F1F5F9', '#F8FAFC', '#FFFFFF', '#F9FAFB', '#F3F4F6', '#E5E7EB', '#D1D5DB'],
+            bronze: ['#FEF7ED', '#FED7AA', '#FDBA74', '#FB923C', '#F97316', '#EA580C', '#DC2626', '#B91C1C', '#991B1B', '#7F1D1D', '#CD7F32', '#B8860B', '#DAA520', '#B8860B', '#CD853F', '#D2691E', '#A0522D', '#8B4513', '#654321', '#3E2723', '#7C2D12', '#9A3412', '#C2410C', '#EA580C', '#F97316', '#FB923C', '#FDBA74', '#FED7AA', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#7C2D12', '#9A3412', '#C2410C'],
+            neon: ['#00FF00', '#00FFFF', '#FF00FF', '#FFFF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#00FF00', '#00FFFF', '#FF00FF', '#FFFF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000', '#0080FF', '#80FF00', '#FF0080', '#8000FF', '#00FF80', '#FF8000'],
+            pastel: ['#FFE4E1', '#FFD1DC', '#FFB6C1', '#FFA0B4', '#FF91A4', '#FFB6C1', '#FFC0CB', '#FFCCCB', '#FFD1DC', '#FFE4E1', '#E6E6FA', '#D8BFD8', '#DDA0DD', '#DA70D6', '#EE82EE', '#F0E68C', '#F5DEB3', '#FFE4B5', '#FFEFD5', '#FFF8DC', '#F0FFF0', '#F5FFFA', '#F0F8FF', '#F8F8FF', '#FFF5EE', '#FDF5E6', '#FAF0E6', '#F5F5DC', '#F0FFFF', '#E0FFFF', '#E6E6FA', '#D8BFD8', '#DDA0DD', '#DA70D6', '#EE82EE', '#F0E68C', '#F5DEB3', '#FFE4B5', '#FFEFD5', '#FFF8DC'],
+            dark: ['#1A1A1A', '#2D2D2D', '#404040', '#525252', '#666666', '#7A7A7A', '#8E8E8E', '#A2A2A2', '#B6B6B6', '#CACACA', '#0D1117', '#161B22', '#21262D', '#30363D', '#484F58', '#6E7681', '#8B949E', '#A8B2BF', '#C9D1D9', '#F0F6FC', '#111827', '#1F2937', '#374151', '#4B5563', '#6B7280', '#9CA3AF', '#D1D5DB', '#E5E7EB', '#F3F4F6', '#F9FAFB', '#FFFFFF', '#F8FAFC', '#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B'],
+            bright: ['#FF0000', '#FF4000', '#FF8000', '#FFBF00', '#FFFF00', '#BFFF00', '#80FF00', '#40FF00', '#00FF00', '#00FF40', '#00FF80', '#00FFBF', '#00FFFF', '#00BFFF', '#0080FF', '#0040FF', '#0000FF', '#4000FF', '#8000FF', '#BF00FF', '#FF0000', '#FF4000', '#FF8000', '#FFBF00', '#FFFF00', '#BFFF00', '#80FF00', '#40FF00', '#00FF00', '#00FF40', '#00FF80', '#00FFBF', '#00FFFF', '#00BFFF', '#0080FF', '#0040FF', '#0000FF', '#4000FF', '#8000FF', '#BF00FF'],
+            nature: ['#228B22', '#32CD32', '#00FF00', '#7CFC00', '#ADFF2F', '#9ACD32', '#6B8E23', '#556B2F', '#8FBC8F', '#90EE90', '#98FB98', '#8FBC8F', '#2E8B57', '#3CB371', '#20B2AA', '#48D1CC', '#40E0D0', '#00CED1', '#00BFFF', '#87CEEB', '#228B22', '#32CD32', '#00FF00', '#7CFC00', '#ADFF2F', '#9ACD32', '#6B8E23', '#556B2F', '#8FBC8F', '#90EE90', '#98FB98', '#8FBC8F', '#2E8B57', '#3CB371', '#20B2AA', '#48D1CC', '#40E0D0', '#00CED1', '#00BFFF', '#87CEEB']
         };
         
         this.colorPalette = [
@@ -173,41 +173,48 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const circles = [];
         
+        // Выбираем одну случайную палитру для всего паттерна
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
         
-        const numColors = this.randomInt(6, 10);
-        const paletteColors = [];
-        for (let i = 0; i < numColors; i++) {
-            const randomColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
-            const randomOpacity = this.random(0.2, 0.7);
-            paletteColors.push({ color: randomColor, opacity: randomOpacity });
-        }
-        
-        const numCircles = this.randomInt(25, 40);
+        const numCircles = this.randomInt(30, 60);
+        const circleTypes = ['solid', 'gradient', 'outline', 'double'];
         
         for (let i = 0; i < numCircles; i++) {
-            const x = this.random(-20, size.width + 20);
-            const y = this.random(-20, size.height + 20);
-            const radius = this.random(20, 80);
-            const colorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
-            const color = colorObj.color;
-            const opacity = colorObj.opacity;
+            const x = this.random(-30, size.width + 30);
+            const y = this.random(-30, size.height + 30);
+            const radius = this.random(15, 120);
+            const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+            const opacity = this.random(0.1, 0.9); // Более широкий диапазон прозрачности
             
-            const hasGradient = this.randomInt(0, 4) === 0;
-            if (hasGradient) {
+            const circleType = circleTypes[Math.floor(Math.random() * circleTypes.length)];
+            
+            if (circleType === 'gradient') {
                 const gradientId = `gradient_${i}`;
-                const gradientColorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
-                const gradientColor = gradientColorObj.color;
+                const gradientColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                const gradientOpacity = this.random(0.1, 0.8);
                 
                 circles.push(`<defs>
                     <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
                         <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
-                        <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${opacity * 0.3}"/>
+                        <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${gradientOpacity}"/>
                     </radialGradient>
                 </defs>`);
                 circles.push(`<circle cx="${x}" cy="${y}" r="${radius}" fill="url(#${gradientId})"/>`);
+            } else if (circleType === 'outline') {
+                const strokeWidth = this.random(2, 8);
+                circles.push(`<circle cx="${x}" cy="${y}" r="${radius}" 
+                    fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
+            } else if (circleType === 'double') {
+                const innerRadius = radius * this.random(0.3, 0.7);
+                const innerColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                const innerOpacity = this.random(0.2, 0.8);
+                
+                circles.push(`<circle cx="${x}" cy="${y}" r="${radius}" 
+                    fill="${color}" opacity="${opacity}"/>`);
+                circles.push(`<circle cx="${x}" cy="${y}" r="${innerRadius}" 
+                    fill="${innerColor}" opacity="${innerOpacity}"/>`);
             } else {
                 circles.push(`<circle cx="${x}" cy="${y}" r="${radius}" 
                     fill="${color}" opacity="${opacity}"/>`);
@@ -230,21 +237,28 @@ class SVGPatternGenerator {
 
 
     generateSpiralPattern() {
-
         const size = this.getRandomSize();
         const spirals = [];
-        const numSpirals = this.randomInt(8, 18);
-        const maxRadius = Math.min(size.width, size.height) * 0.4;
-        const turns = this.randomInt(2, 5);
-        const strokeWidth = this.randomInt(1, 3);
+        
+        // Выбираем одну случайную палитру для всего паттерна
+        const paletteNames = Object.keys(this.colorPalettes);
+        const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
+        const selectedPalette = this.colorPalettes[randomPaletteName];
+        
+        const numSpirals = this.randomInt(12, 25);
+        const maxRadius = Math.min(size.width, size.height) * 0.5;
+        const turns = this.randomInt(2, 6);
         
         for (let i = 0; i < numSpirals; i++) {
-            const centerX = this.random(0, size.width);
-            const centerY = this.random(0, size.height);
-            const opacity = this.random(0.1, 0.6);
-            const color = this.getRandomColor();
+            const centerX = this.random(-50, size.width + 50);
+            const centerY = this.random(-50, size.height + 50);
+            const opacity = this.random(0.1, 0.8); // Более широкий диапазон прозрачности
+            const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+            const strokeWidth = this.randomInt(1, 5);
+            const spiralRadius = this.random(maxRadius * 0.3, maxRadius);
+            const spiralTurns = this.randomInt(1, turns);
             
-            const path = this.generateSpiralPath(centerX, centerY, maxRadius, turns);
+            const path = this.generateSpiralPath(centerX, centerY, spiralRadius, spiralTurns);
             spirals.push(`<path d="${path}" fill="none" stroke="${color}" 
                 stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
         }
@@ -279,30 +293,96 @@ class SVGPatternGenerator {
     generateFlowersPattern() {
         const size = this.getRandomSize();
         const flowers = [];
-        const numFlowers = this.randomInt(8, 15);
-        const flowerSize = this.randomInt(15, 25);
-        const petalSize = this.randomInt(8, 12);
+        
+        // Выбираем одну случайную палитру для всего паттерна
+        const paletteNames = Object.keys(this.colorPalettes);
+        const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
+        const selectedPalette = this.colorPalettes[randomPaletteName];
+        
+        const numFlowers = this.randomInt(12, 25);
+        const flowerTypes = ['simple', 'complex', 'gradient', 'layered'];
         
         for (let i = 0; i < numFlowers; i++) {
-            const x = this.random(0, size.width);
-            const y = this.random(0, size.height);
-            const petals = this.randomInt(6, 10);
-            const opacity = this.random(0.3, 0.8);
-            const color = this.getRandomColor();
+            const x = this.random(-30, size.width + 30);
+            const y = this.random(-30, size.height + 30);
+            const flowerSize = this.randomInt(20, 50);
+            const petalSize = this.randomInt(8, 20);
+            const petals = this.randomInt(5, 12);
+            const opacity = this.random(0.2, 0.9); // Более широкий диапазон прозрачности
+            const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+            const centerColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+            const centerOpacity = this.random(0.3, 0.8);
             
-            flowers.push(`<circle cx="${x}" cy="${y}" r="${flowerSize * 0.4}" 
-                fill="${this.getRandomColor()}" opacity="${opacity}"/>`);
+            const flowerType = flowerTypes[Math.floor(Math.random() * flowerTypes.length)];
             
-            for (let j = 0; j < petals; j++) {
-                const angle = (j * Math.PI * 2) / petals;
-                const petalX = x + flowerSize * Math.cos(angle);
-                const petalY = y + flowerSize * Math.sin(angle);
+            if (flowerType === 'gradient') {
+                const gradientId = `flower_grad_${i}`;
+                const gradientColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                 
-                flowers.push(`<ellipse cx="${petalX}" cy="${petalY}" 
-                    rx="${petalSize}" ry="${petalSize * 0.7}" 
-                    fill="${color}" opacity="${opacity}" 
-                    transform="rotate(${angle * 180 / Math.PI} ${petalX} ${petalY})"/>`);
+                flowers.push(`<defs>
+                    <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
+                        <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${opacity * 0.5}"/>
+                    </radialGradient>
+                </defs>`);
+                
+                for (let j = 0; j < petals; j++) {
+                    const angle = (j * Math.PI * 2) / petals;
+                    const petalX = x + flowerSize * Math.cos(angle);
+                    const petalY = y + flowerSize * Math.sin(angle);
+                    
+                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}" 
+                        rx="${petalSize}" ry="${petalSize * 0.7}" 
+                        fill="url(#${gradientId})" 
+                        transform="rotate(${angle * 180 / Math.PI} ${petalX} ${petalY})"/>`);
+                }
+            } else if (flowerType === 'layered') {
+                // Внешний слой лепестков
+                for (let j = 0; j < petals; j++) {
+                    const angle = (j * Math.PI * 2) / petals;
+                    const petalX = x + flowerSize * Math.cos(angle);
+                    const petalY = y + flowerSize * Math.sin(angle);
+                    
+                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}" 
+                        rx="${petalSize}" ry="${petalSize * 0.7}" 
+                        fill="${color}" opacity="${opacity}" 
+                        transform="rotate(${angle * 180 / Math.PI} ${petalX} ${petalY})"/>`);
+                }
+                
+                // Внутренний слой лепестков
+                const innerPetals = Math.floor(petals / 2);
+                const innerSize = flowerSize * 0.6;
+                const innerPetalSize = petalSize * 0.7;
+                const innerColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                const innerOpacity = this.random(0.3, 0.8);
+                
+                for (let j = 0; j < innerPetals; j++) {
+                    const angle = (j * Math.PI * 2) / innerPetals;
+                    const petalX = x + innerSize * Math.cos(angle);
+                    const petalY = y + innerSize * Math.sin(angle);
+                    
+                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}" 
+                        rx="${innerPetalSize}" ry="${innerPetalSize * 0.7}" 
+                        fill="${innerColor}" opacity="${innerOpacity}" 
+                        transform="rotate(${angle * 180 / Math.PI} ${petalX} ${petalY})"/>`);
+                }
+            } else {
+                // Простой цветок
+                for (let j = 0; j < petals; j++) {
+                    const angle = (j * Math.PI * 2) / petals;
+                    const petalX = x + flowerSize * Math.cos(angle);
+                    const petalY = y + flowerSize * Math.sin(angle);
+                    
+                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}" 
+                        rx="${petalSize}" ry="${petalSize * 0.7}" 
+                        fill="${color}" opacity="${opacity}" 
+                        transform="rotate(${angle * 180 / Math.PI} ${petalX} ${petalY})"/>`);
+                }
             }
+            
+            // Центр цветка
+            flowers.push(`<circle cx="${x}" cy="${y}" r="${flowerSize * 0.3}" 
+                fill="${centerColor}" opacity="${centerOpacity}"/>`);
         }
         
         return this.createSVG(size.width, size.height, flowers.join(''));
@@ -311,33 +391,71 @@ class SVGPatternGenerator {
     generateGeometricPattern() {
         const size = this.getRandomSize();
         const shapes = [];
-        const palette = this.getRandomPalette();
         
-        const cellSize = this.randomInt(30, 50);
-        const cols = Math.ceil(size.width / cellSize);
-        const rows = Math.ceil(size.height / cellSize);
+        // Выбираем одну случайную палитру для всего паттерна
+        const paletteNames = Object.keys(this.colorPalettes);
+        const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
+        const selectedPalette = this.colorPalettes[randomPaletteName];
+        
+        const cellSize = this.randomInt(25, 60);
+        const cols = Math.ceil(size.width / cellSize) + 1;
+        const rows = Math.ceil(size.height / cellSize) + 1;
+        const shapeTypes = ['square', 'diamond', 'circle', 'triangle', 'hexagon', 'star'];
         
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const x = col * cellSize;
                 const y = row * cellSize;
-                const opacity = this.random(0.4, 0.8);
+                const opacity = this.random(0.2, 0.9); // Более широкий диапазон прозрачности
+                const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                const centerX = x + cellSize / 2;
+                const centerY = y + cellSize / 2;
+                const shapeSize = cellSize * this.random(0.6, 0.9);
                 
-                if ((row + col) % 2 === 0) {
-                    const color = palette[Math.floor(Math.random() * palette.length)];
-                    const squareSize = cellSize * 0.85;
-                    const offset = (cellSize - squareSize) / 2;
+                const shapeType = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
+                
+                if (shapeType === 'square') {
+                    const offset = (cellSize - shapeSize) / 2;
+                    const cornerRadius = this.random(0, shapeSize * 0.2);
                     shapes.push(`<rect x="${x + offset}" y="${y + offset}" 
-                        width="${squareSize}" height="${squareSize}" 
+                        width="${shapeSize}" height="${shapeSize}" 
+                        rx="${cornerRadius}" ry="${cornerRadius}"
                         fill="${color}" opacity="${opacity}"/>`);
-                } else {
-                    const color = palette[Math.floor(Math.random() * palette.length)];
-                    const centerX = x + cellSize / 2;
-                    const centerY = y + cellSize / 2;
-                    const diamondSize = cellSize * 0.7;
+                } else if (shapeType === 'diamond') {
+                    const diamondSize = shapeSize * 0.8;
                     const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
                     shapes.push(`<polygon points="${points}" 
                         fill="${color}" opacity="${opacity}"/>`);
+                } else if (shapeType === 'circle') {
+                    const radius = shapeSize / 2;
+                    shapes.push(`<circle cx="${centerX}" cy="${centerY}" r="${radius}" 
+                        fill="${color}" opacity="${opacity}"/>`);
+                } else if (shapeType === 'triangle') {
+                    const triSize = shapeSize * 0.8;
+                    const points = `${centerX},${centerY - triSize/2} ${centerX + triSize/2},${centerY + triSize/2} ${centerX - triSize/2},${centerY + triSize/2}`;
+                    shapes.push(`<polygon points="${points}" 
+                        fill="${color}" opacity="${opacity}"/>`);
+                } else if (shapeType === 'hexagon') {
+                    const hexPoints = this.generateHexagonPoints(centerX, centerY, shapeSize / 2);
+                    shapes.push(`<polygon points="${hexPoints}" 
+                        fill="${color}" opacity="${opacity}"/>`);
+                } else if (shapeType === 'star') {
+                    const starPoints = this.generateStarPoints(centerX, centerY, shapeSize / 2, this.randomInt(5, 8));
+                    shapes.push(`<polygon points="${starPoints}" 
+                        fill="${color}" opacity="${opacity}"/>`);
+                }
+                
+                // Добавляем случайные декоративные элементы
+                if (this.randomInt(0, 3) === 0) {
+                    const decorColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                    const decorOpacity = this.random(0.1, 0.5);
+                    const decorSize = this.random(2, 8);
+                    
+                    const decorX = centerX + this.random(-shapeSize/3, shapeSize/3);
+                    const decorY = centerY + this.random(-shapeSize/3, shapeSize/3);
+                    
+                    shapes.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}" 
+                        fill="${decorColor}" opacity="${decorOpacity}"/>`);
                 }
             }
         }
@@ -348,11 +466,16 @@ class SVGPatternGenerator {
     generateDiamondsPattern() {
         const size = this.getRandomSize();
         const diamonds = [];
-        const palette = this.getRandomPalette();
         
-        const diamondSize = this.randomInt(25, 45);
-        const cols = Math.ceil(size.width / diamondSize) + 1;
-        const rows = Math.ceil(size.height / diamondSize) + 1;
+        // Выбираем одну случайную палитру для всего паттерна
+        const paletteNames = Object.keys(this.colorPalettes);
+        const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
+        const selectedPalette = this.colorPalettes[randomPaletteName];
+        
+        const diamondSize = this.randomInt(20, 50);
+        const cols = Math.ceil(size.width / diamondSize) + 2;
+        const rows = Math.ceil(size.height / diamondSize) + 2;
+        const diamondTypes = ['solid', 'gradient', 'outline', 'layered'];
         
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
@@ -363,14 +486,63 @@ class SVGPatternGenerator {
                 const finalX = x + offsetX;
                 
                 if (finalX < size.width + diamondSize && y < size.height + diamondSize) {
-                    const color = palette[Math.floor(Math.random() * palette.length)];
-                    const opacity = this.random(0.4, 0.8);
+                    const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                    const opacity = this.random(0.2, 0.9); // Более широкий диапазон прозрачности
                     const centerX = finalX + diamondSize / 2;
                     const centerY = y + diamondSize / 2;
-                    const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
+                    const actualDiamondSize = diamondSize * this.random(0.7, 1.0);
+                    const points = `${centerX},${centerY - actualDiamondSize/2} ${centerX + actualDiamondSize/2},${centerY} ${centerX},${centerY + actualDiamondSize/2} ${centerX - actualDiamondSize/2},${centerY}`;
                     
-                    diamonds.push(`<polygon points="${points}" 
-                        fill="${color}" opacity="${opacity}"/>`);
+                    const diamondType = diamondTypes[Math.floor(Math.random() * diamondTypes.length)];
+                    
+                    if (diamondType === 'gradient') {
+                        const gradientId = `diamond_grad_${row}_${col}`;
+                        const gradientColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                        const gradientOpacity = this.random(0.3, 0.8);
+                        
+                        diamonds.push(`<defs>
+                            <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
+                                <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${gradientOpacity}"/>
+                            </linearGradient>
+                        </defs>`);
+                        diamonds.push(`<polygon points="${points}" 
+                            fill="url(#${gradientId})"/>`);
+                    } else if (diamondType === 'outline') {
+                        const strokeWidth = this.randomInt(1, 4);
+                        diamonds.push(`<polygon points="${points}" 
+                            fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
+                    } else if (diamondType === 'layered') {
+                        // Внешний алмаз
+                        diamonds.push(`<polygon points="${points}" 
+                            fill="${color}" opacity="${opacity}"/>`);
+                        
+                        // Внутренний алмаз
+                        const innerColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                        const innerOpacity = this.random(0.3, 0.7);
+                        const innerSize = actualDiamondSize * this.random(0.4, 0.7);
+                        const innerPoints = `${centerX},${centerY - innerSize/2} ${centerX + innerSize/2},${centerY} ${centerX},${centerY + innerSize/2} ${centerX - innerSize/2},${centerY}`;
+                        
+                        diamonds.push(`<polygon points="${innerPoints}" 
+                            fill="${innerColor}" opacity="${innerOpacity}"/>`);
+                    } else {
+                        // Простой алмаз
+                        diamonds.push(`<polygon points="${points}" 
+                            fill="${color}" opacity="${opacity}"/>`);
+                    }
+                    
+                    // Добавляем случайные декоративные элементы
+                    if (this.randomInt(0, 4) === 0) {
+                        const decorColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                        const decorOpacity = this.random(0.1, 0.6);
+                        const decorSize = this.random(1, 4);
+                        
+                        const decorX = centerX + this.random(-actualDiamondSize/4, actualDiamondSize/4);
+                        const decorY = centerY + this.random(-actualDiamondSize/4, actualDiamondSize/4);
+                        
+                        diamonds.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}" 
+                            fill="${decorColor}" opacity="${decorOpacity}"/>`);
+                    }
                 }
             }
         }
@@ -383,25 +555,97 @@ class SVGPatternGenerator {
     generateChevronsPattern() {
         const size = this.getRandomSize();
         const chevrons = [];
-        const palette = this.getRandomPalette();
         
-        const chevronWidth = this.randomInt(30, 50);
-        const chevronHeight = this.randomInt(20, 35);
-        const cols = Math.ceil(size.width / chevronWidth) + 1;
-        const rows = Math.ceil(size.height / chevronHeight) + 1;
+        // Выбираем одну случайную палитру для всего паттерна
+        const paletteNames = Object.keys(this.colorPalettes);
+        const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
+        const selectedPalette = this.colorPalettes[randomPaletteName];
+        
+        const chevronWidth = this.randomInt(25, 60);
+        const chevronHeight = this.randomInt(15, 45);
+        const cols = Math.ceil(size.width / chevronWidth) + 2;
+        const rows = Math.ceil(size.height / chevronHeight) + 2;
+        const chevronTypes = ['solid', 'gradient', 'outline', 'layered', 'double'];
         
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const x = col * chevronWidth;
                 const y = row * chevronHeight;
                 
-                const color = palette[Math.floor(Math.random() * palette.length)];
-                const opacity = this.random(0.4, 0.8);
+                const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                const opacity = this.random(0.2, 0.9); // Более широкий диапазон прозрачности
+                const actualWidth = chevronWidth * this.random(0.8, 1.2);
+                const actualHeight = chevronHeight * this.random(0.8, 1.2);
                 
-                const points = `${x},${y} ${x + chevronWidth/2},${y + chevronHeight} ${x + chevronWidth},${y}`;
+                const chevronType = chevronTypes[Math.floor(Math.random() * chevronTypes.length)];
                 
-                chevrons.push(`<polygon points="${points}" 
-                    fill="${color}" opacity="${opacity}"/>`);
+                if (chevronType === 'gradient') {
+                    const gradientId = `chevron_grad_${row}_${col}`;
+                    const gradientColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                    const gradientOpacity = this.random(0.3, 0.8);
+                    
+                    chevrons.push(`<defs>
+                        <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
+                            <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${gradientOpacity}"/>
+                        </linearGradient>
+                    </defs>`);
+                    
+                    const points = `${x},${y} ${x + actualWidth/2},${y + actualHeight} ${x + actualWidth},${y}`;
+                    chevrons.push(`<polygon points="${points}" 
+                        fill="url(#${gradientId})"/>`);
+                } else if (chevronType === 'outline') {
+                    const strokeWidth = this.randomInt(1, 4);
+                    const points = `${x},${y} ${x + actualWidth/2},${y + actualHeight} ${x + actualWidth},${y}`;
+                    chevrons.push(`<polygon points="${points}" 
+                        fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
+                } else if (chevronType === 'layered') {
+                    // Внешний шеврон
+                    const points = `${x},${y} ${x + actualWidth/2},${y + actualHeight} ${x + actualWidth},${y}`;
+                    chevrons.push(`<polygon points="${points}" 
+                        fill="${color}" opacity="${opacity}"/>`);
+                    
+                    // Внутренний шеврон
+                    const innerColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                    const innerOpacity = this.random(0.3, 0.7);
+                    const innerWidth = actualWidth * this.random(0.4, 0.7);
+                    const innerHeight = actualHeight * this.random(0.4, 0.7);
+                    const innerX = x + (actualWidth - innerWidth) / 2;
+                    const innerY = y + (actualHeight - innerHeight) / 2;
+                    const innerPoints = `${innerX},${innerY} ${innerX + innerWidth/2},${innerY + innerHeight} ${innerX + innerWidth},${innerY}`;
+                    
+                    chevrons.push(`<polygon points="${innerPoints}" 
+                        fill="${innerColor}" opacity="${innerOpacity}"/>`);
+                } else if (chevronType === 'double') {
+                    // Двойной шеврон
+                    const points1 = `${x},${y} ${x + actualWidth/2},${y + actualHeight} ${x + actualWidth},${y}`;
+                    chevrons.push(`<polygon points="${points1}" 
+                        fill="${color}" opacity="${opacity}"/>`);
+                    
+                    const secondColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                    const secondOpacity = this.random(0.2, 0.6);
+                    const points2 = `${x + actualWidth/4},${y + actualHeight/2} ${x + actualWidth/2},${y + actualHeight} ${x + 3*actualWidth/4},${y + actualHeight/2}`;
+                    chevrons.push(`<polygon points="${points2}" 
+                        fill="${secondColor}" opacity="${secondOpacity}"/>`);
+                } else {
+                    // Простой шеврон
+                    const points = `${x},${y} ${x + actualWidth/2},${y + actualHeight} ${x + actualWidth},${y}`;
+                    chevrons.push(`<polygon points="${points}" 
+                        fill="${color}" opacity="${opacity}"/>`);
+                }
+                
+                // Добавляем случайные декоративные элементы
+                if (this.randomInt(0, 5) === 0) {
+                    const decorColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                    const decorOpacity = this.random(0.1, 0.5);
+                    const decorSize = this.random(2, 6);
+                    
+                    const decorX = x + actualWidth/2 + this.random(-actualWidth/4, actualWidth/4);
+                    const decorY = y + actualHeight/2 + this.random(-actualHeight/4, actualHeight/4);
+                    
+                    chevrons.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}" 
+                        fill="${decorColor}" opacity="${decorOpacity}"/>`);
+                }
             }
         }
         
@@ -414,27 +658,20 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const quilt = [];
         
+        // Выбираем одну случайную палитру для всего паттерна
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
         
-        const numColors = this.randomInt(4, 12);
-        const paletteColors = [];
-        for (let i = 0; i < numColors; i++) {
-            const randomColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
-            const randomOpacity = this.random(0.3, 0.8);
-            paletteColors.push({ color: randomColor, opacity: randomOpacity });
-        }
-        
-        const basePatchSize = this.randomInt(15, 30);
+        const basePatchSize = this.randomInt(12, 35);
         const cols = Math.ceil(size.width / basePatchSize) + 2;
         const rows = Math.ceil(size.height / basePatchSize) + 2;
         
-        const layers = this.randomInt(2, 4);
+        const layers = this.randomInt(2, 5);
         
         for (let layer = 0; layer < layers; layer++) {
-            const layerOpacity = this.random(0.3, 0.7);
-            const layerOffset = layer * 3;
+            const layerOpacity = this.random(0.2, 0.8); // Более широкий диапазон прозрачности
+            const layerOffset = layer * 2;
         
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
@@ -442,23 +679,23 @@ class SVGPatternGenerator {
                     const y = row * basePatchSize + layerOffset;
                     
                     if (x < size.width && y < size.height) {
-                        const patchSize = basePatchSize + this.randomInt(-5, 10);
-                        const colorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
-                        const color = colorObj.color;
-                        const colorOpacity = colorObj.opacity;
-                        const secondaryColorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
-                        const secondaryColor = secondaryColorObj.color;
-                        const secondaryOpacity = secondaryColorObj.opacity;
+                        const patchSize = basePatchSize + this.randomInt(-8, 15);
+                        const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                        const colorOpacity = this.random(0.3, 0.9); // Более широкий диапазон прозрачности
+                        const secondaryColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                        const secondaryOpacity = this.random(0.2, 0.8);
                         
-                        const patchType = this.randomInt(0, 6);
+                        const patchType = this.randomInt(0, 8);
                         
                         if (patchType === 0) {
-                            const cornerRadius = patchSize * this.random(0.05, 0.2);
+                            // Простой квадрат с закругленными углами
+                            const cornerRadius = patchSize * this.random(0.05, 0.3);
                             quilt.push(`<rect x="${x}" y="${y}" 
                                 width="${patchSize}" height="${patchSize}" 
                                 rx="${cornerRadius}" ry="${cornerRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                         } else if (patchType === 1) {
+                            // Градиентный квадрат
                             const gradientId = `quilt_grad_${layer}_${row}_${col}`;
                             quilt.push(`<defs>
                                 <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -471,13 +708,14 @@ class SVGPatternGenerator {
                                 rx="${patchSize * 0.1}" ry="${patchSize * 0.1}"
                                 fill="url(#${gradientId})"/>`);
                         } else if (patchType === 2) {
-                const cornerRadius = patchSize * 0.1;
-                                            quilt.push(`<rect x="${x}" y="${y}" 
+                            // Квадрат с внутренним квадратом
+                            const cornerRadius = patchSize * 0.1;
+                            quilt.push(`<rect x="${x}" y="${y}" 
                                 width="${patchSize}" height="${patchSize}" 
                                 rx="${cornerRadius}" ry="${cornerRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                             
-                            const innerSize = patchSize * 0.6;
+                            const innerSize = patchSize * this.random(0.4, 0.8);
                             const innerX = x + (patchSize - innerSize) / 2;
                             const innerY = y + (patchSize - innerSize) / 2;
                             quilt.push(`<rect x="${innerX}" y="${innerY}" 
@@ -485,13 +723,15 @@ class SVGPatternGenerator {
                                 rx="${cornerRadius * 0.5}" ry="${cornerRadius * 0.5}"
                                 fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
                         } else if (patchType === 3) {
+                            // Алмаз
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
-                            const diamondSize = patchSize * 0.8;
+                            const diamondSize = patchSize * this.random(0.6, 0.9);
                             const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
                             quilt.push(`<polygon points="${points}" 
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                         } else if (patchType === 4) {
+                            // Квадрат с кругом
                             const cornerRadius = patchSize * 0.1;
                             quilt.push(`<rect x="${x}" y="${y}" 
                                 width="${patchSize}" height="${patchSize}" 
@@ -500,10 +740,11 @@ class SVGPatternGenerator {
                             
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
-                            const circleRadius = patchSize * 0.3;
+                            const circleRadius = patchSize * this.random(0.2, 0.4);
                             quilt.push(`<circle cx="${centerX}" cy="${centerY}" r="${circleRadius}" 
                                 fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
-                        } else {
+                        } else if (patchType === 5) {
+                            // Квадрат со звездой
                             const cornerRadius = patchSize * 0.1;
                             quilt.push(`<rect x="${x}" y="${y}" 
                                 width="${patchSize}" height="${patchSize}" 
@@ -512,17 +753,39 @@ class SVGPatternGenerator {
                             
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
-                            const starRadius = patchSize * 0.25;
-                            const starPoints = this.generateStarPoints(centerX, centerY, starRadius, 5);
+                            const starRadius = patchSize * this.random(0.2, 0.4);
+                            const starPoints = this.generateStarPoints(centerX, centerY, starRadius, this.randomInt(5, 8));
                             quilt.push(`<polygon points="${starPoints}" 
                                 fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
+                        } else if (patchType === 6) {
+                            // Треугольник
+                            const centerX = x + patchSize / 2;
+                            const centerY = y + patchSize / 2;
+                            const triSize = patchSize * this.random(0.6, 0.9);
+                            const points = `${centerX},${centerY - triSize/2} ${centerX + triSize/2},${centerY + triSize/2} ${centerX - triSize/2},${centerY + triSize/2}`;
+                            quilt.push(`<polygon points="${points}" 
+                                fill="${color}" opacity="${colorOpacity}"/>`);
+                        } else if (patchType === 7) {
+                            // Шестиугольник
+                            const centerX = x + patchSize / 2;
+                            const centerY = y + patchSize / 2;
+                            const hexSize = patchSize * this.random(0.4, 0.8);
+                            const hexPoints = this.generateHexagonPoints(centerX, centerY, hexSize);
+                            quilt.push(`<polygon points="${hexPoints}" 
+                                fill="${color}" opacity="${colorOpacity}"/>`);
+                        } else {
+                            // Круг
+                            const centerX = x + patchSize / 2;
+                            const centerY = y + patchSize / 2;
+                            const circleRadius = patchSize * this.random(0.3, 0.5);
+                            quilt.push(`<circle cx="${centerX}" cy="${centerY}" r="${circleRadius}" 
+                                fill="${color}" opacity="${colorOpacity}"/>`);
                         }
                         
                         if (this.randomInt(0, 4) === 0) {
                             const decorType = this.randomInt(0, 3);
-                            const decorColorObj = paletteColors[Math.floor(Math.random() * paletteColors.length)];
-                            const decorColor = decorColorObj.color;
-                            const decorOpacity = decorColorObj.opacity;
+                            const decorColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                            const decorOpacity = this.random(0.1, 0.6);
                             
                             if (decorType === 0) {
                                 for (let i = 0; i < 3; i++) {
@@ -554,6 +817,133 @@ class SVGPatternGenerator {
         }
         
         return this.createSVG(size.width, size.height, quilt.join(''));
+    }
+
+    generateWavesPattern() {
+        const size = this.getRandomSize();
+        const waves = [];
+        
+        // Выбираем одну случайную палитру для всего паттерна
+        const paletteNames = Object.keys(this.colorPalettes);
+        const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
+        const selectedPalette = this.colorPalettes[randomPaletteName];
+        
+        const numWaves = this.randomInt(8, 20);
+        const waveTypes = ['sine', 'cosine', 'complex', 'gradient', 'layered'];
+        
+        for (let i = 0; i < numWaves; i++) {
+            const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+            const opacity = this.random(0.1, 0.8); // Более широкий диапазон прозрачности
+            const amplitude = this.random(20, 80);
+            const frequency = this.random(0.02, 0.1);
+            const phase = this.random(0, Math.PI * 2);
+            const yOffset = this.random(0, size.height);
+            const strokeWidth = this.randomInt(1, 6);
+            
+            const waveType = waveTypes[Math.floor(Math.random() * waveTypes.length)];
+            
+            if (waveType === 'gradient') {
+                const gradientId = `wave_grad_${i}`;
+                const gradientColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                const gradientOpacity = this.random(0.2, 0.7);
+                
+                waves.push(`<defs>
+                    <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
+                        <stop offset="50%" style="stop-color:${gradientColor};stop-opacity:${gradientOpacity}"/>
+                        <stop offset="100%" style="stop-color:${color};stop-opacity:${opacity}"/>
+                    </linearGradient>
+                </defs>`);
+                
+                const path = this.generateWavePath(size.width, yOffset, amplitude, frequency, phase, 'sine');
+                waves.push(`<path d="${path}" fill="none" stroke="url(#${gradientId})" stroke-width="${strokeWidth}"/>`);
+            } else if (waveType === 'layered') {
+                // Основная волна
+                const path1 = this.generateWavePath(size.width, yOffset, amplitude, frequency, phase, 'sine');
+                waves.push(`<path d="${path1}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
+                
+                // Дополнительная волна
+                const secondaryColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                const secondaryOpacity = this.random(0.2, 0.6);
+                const secondaryAmplitude = amplitude * this.random(0.3, 0.7);
+                const secondaryFrequency = frequency * this.random(1.5, 3);
+                const secondaryPhase = phase + this.random(-Math.PI/2, Math.PI/2);
+                const secondaryYOffset = yOffset + this.random(-20, 20);
+                
+                const path2 = this.generateWavePath(size.width, secondaryYOffset, secondaryAmplitude, secondaryFrequency, secondaryPhase, 'cosine');
+                waves.push(`<path d="${path2}" fill="none" stroke="${secondaryColor}" stroke-width="${strokeWidth * 0.7}" opacity="${secondaryOpacity}"/>`);
+            } else if (waveType === 'complex') {
+                // Сложная волна с несколькими частотами
+                const path = this.generateComplexWavePath(size.width, yOffset, amplitude, frequency, phase);
+                waves.push(`<path d="${path}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
+            } else {
+                // Простая волна
+                const waveFunction = waveType === 'cosine' ? 'cosine' : 'sine';
+                const path = this.generateWavePath(size.width, yOffset, amplitude, frequency, phase, waveFunction);
+                waves.push(`<path d="${path}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
+            }
+            
+            // Добавляем случайные декоративные элементы
+            if (this.randomInt(0, 5) === 0) {
+                const decorColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
+                const decorOpacity = this.random(0.1, 0.5);
+                const decorSize = this.random(2, 8);
+                
+                const decorX = this.random(0, size.width);
+                const decorY = yOffset + amplitude * Math.sin(frequency * decorX + phase);
+                
+                waves.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}" 
+                    fill="${decorColor}" opacity="${decorOpacity}"/>`);
+            }
+        }
+        
+        return this.createSVG(size.width, size.height, waves.join(''));
+    }
+
+    generateWavePath(width, yOffset, amplitude, frequency, phase, waveFunction) {
+        const points = [];
+        const steps = 100;
+        
+        for (let i = 0; i <= steps; i++) {
+            const x = (i / steps) * width;
+            let y;
+            
+            if (waveFunction === 'cosine') {
+                y = yOffset + amplitude * Math.cos(frequency * x + phase);
+            } else {
+                y = yOffset + amplitude * Math.sin(frequency * x + phase);
+            }
+            
+            if (i === 0) {
+                points.push(`M${x},${y}`);
+            } else {
+                points.push(`L${x},${y}`);
+            }
+        }
+        
+        return points.join(' ');
+    }
+
+    generateComplexWavePath(width, yOffset, amplitude, frequency, phase) {
+        const points = [];
+        const steps = 100;
+        
+        for (let i = 0; i <= steps; i++) {
+            const x = (i / steps) * width;
+            // Сложная волна с несколькими частотами
+            const y = yOffset + 
+                amplitude * Math.sin(frequency * x + phase) +
+                amplitude * 0.5 * Math.sin(frequency * 2 * x + phase + Math.PI/4) +
+                amplitude * 0.3 * Math.sin(frequency * 3 * x + phase + Math.PI/2);
+            
+            if (i === 0) {
+                points.push(`M${x},${y}`);
+            } else {
+                points.push(`L${x},${y}`);
+            }
+        }
+        
+        return points.join(' ');
     }
 
     generateConcentricPattern() {
@@ -912,7 +1302,8 @@ class SVGPatternGenerator {
                     if (shapeType === 0) {
                         const numSides = this.randomInt(6, 10);
                         const points = [];
-                        for (let j = 0; j < numSides; j++) {
+                        for (let j = 
+                            0; j < numSides; j++) {
                             const angle = (j * 2 * Math.PI) / numSides;
                             const px = x + shapeSize/2 + (shapeSize/2 * 0.8) * Math.cos(angle);
                             const py = y + layerHeight/2 + (shapeSize/2 * 0.8) * Math.sin(angle);
@@ -1198,6 +1589,17 @@ class SVGPatternGenerator {
         return points.join(' ');
     }
 
+    generateHexagonPoints(centerX, centerY, size) {
+        const points = [];
+        for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI) / 3;
+            const x = centerX + size * Math.cos(angle);
+            const y = centerY + size * Math.sin(angle);
+            points.push(`${x},${y}`);
+        }
+        return points.join(' ');
+    }
+
     createSVG(width, height, content) {
         const randomBackground = this.getRandomBackground();
         return `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
@@ -1208,11 +1610,14 @@ class SVGPatternGenerator {
 
     getAllPatterns() {
         try {
-            return [
-                this.generateCirclesPattern(),
-                this.generateCirclesPattern(),
-                this.generateCirclesPattern()
-            ];
+            const selectedPatterns = [];
+            const numPatterns = this.randomInt(3, 6);
+            
+            for (let i = 0; i < numPatterns; i++) {
+                selectedPatterns.push(this.generateCirclesPattern());
+            }
+            
+            return selectedPatterns;
         } catch (error) {
             return [this.generateCirclesPattern()];
         }

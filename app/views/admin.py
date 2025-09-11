@@ -741,7 +741,7 @@ def admin_settings() -> Union[str, Response]:
             SiteSettings.set_setting('pattern_generation_enabled', form.pattern_generation_enabled.data, 'Включить/выключить кнопку генерации паттернов')
 
             flash('Настройки успешно сохранены', 'success')
-            return redirect('admin.admin_settings')
+            return redirect(url_for('admin.admin_settings'))
         except Exception as e:
             current_app.logger.error(f"Ошибка сохранения настроек: {str(e)}")
             flash('Ошибка при сохранении настроек', 'error')
