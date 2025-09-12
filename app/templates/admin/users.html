@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
+{% from 'macros/breadcrumbs.html' import admin_breadcrumb %}
+
 {% block title %}Админка: Управление пользователями{% endblock %}
+
+{% block breadcrumbs %}
+{{ admin_breadcrumb("Пользователи") }}
+{% endblock %}
 
 {% block content %}
 <div class="admin-users">

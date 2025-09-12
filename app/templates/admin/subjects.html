@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
+{% from 'macros/breadcrumbs.html' import admin_breadcrumb %}
+
 {% block title %}Админка: Предметы{% endblock %}
+
+{% block breadcrumbs %}
+{{ admin_breadcrumb("Предметы") }}
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid admin-subjects">
   <div class="d-flex justify-content-between align-items-center mb-4">

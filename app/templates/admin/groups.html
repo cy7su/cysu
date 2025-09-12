@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
+{% from 'macros/breadcrumbs.html' import admin_breadcrumb %}
+
 {% block title %}Админка: Управление группами{% endblock %}
+
+{% block breadcrumbs %}
+{{ admin_breadcrumb("Группы") }}
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid admin-groups">

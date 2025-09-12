@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
+{% from 'macros/breadcrumbs.html' import wiki_breadcrumb %}
 
 {% block title %}Wiki - Документация платформы cysu{% endblock %}
+
+{% block breadcrumbs %}
+{{ wiki_breadcrumb() }}
+{% endblock %}
 
 {% block content %}
 <div class="container py-5">

@@ -1,6 +1,15 @@
 {% extends "base.html" %}
+{% from 'macros/breadcrumbs.html' import render_breadcrumbs %}
 
 {% block title %}Тикеты поддержки{% endblock %}
+
+{% block breadcrumbs %}
+{{ render_breadcrumbs([
+    {"title": "Главная", "url": url_for('main.index'), "icon": "fas fa-home"},
+    {"title": "Поддержка", "url": url_for('main.support'), "icon": "fas fa-life-ring"},
+    {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-alt"}
+]) }}
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">

@@ -1,7 +1,7 @@
 {
-    "name": "cysu",
+    "name": "cysu - Образовательная платформа",
     "short_name": "cysu",
-    "description": "Современная образовательная платформа для изучения чего угодно. Альтернатива eiso/Moodle.",
+    "description": "cysu - современная образовательная платформа для изучения программирования и IT. Замена EIOS, Moodle.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0e0e0f",
@@ -21,7 +21,7 @@
             "purpose": "any maskable"
         }
     ],
-    "categories": ["education", "productivity"],
+    "categories": ["education", "productivity", "utilities"],
     "lang": "ru",
     "dir": "ltr"
 } 

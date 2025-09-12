@@ -19,13 +19,13 @@
 {% block meta_keywords %}{{ subject.title }}, eios, moodle, ppk, ппк, сгту, sstu, иос сгту, CYSU, программирование, обучение, лекции, практика, IT, {{ subject.title.lower() }}, образовательная платформа{% endblock %}
 {% block og_title %}{{ subject.title }} - CYSU{% endblock %}
 {% block og_description %}{{ subject.description or 'Изучайте программирование и информационные технологии с CYSU.' }}{% endblock %}
+{% from 'macros/breadcrumbs.html' import subject_breadcrumb %}
+
+{% block breadcrumbs %}
+{{ subject_breadcrumb(subject.title) }}
+{% endblock %}
+
 {% block content %}
-<nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-decoration-none">Главная</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ subject.title }}</li>
-  </ol>
-</nav>
 
 <div class="card mb-4">
   <div class="card-body">

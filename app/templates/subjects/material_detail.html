@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% from 'macros/breadcrumbs.html' import material_breadcrumb %}
 
 {% block title %}{{ material.title }}{% endblock %}
+
+{% block breadcrumbs %}
+{{ material_breadcrumb(material.subject.title, url_for('subjects.subject_detail', id=material.subject.id), material.title) }}
+{% endblock %}
 
 {% block content %}
 <div class="container py-5">
