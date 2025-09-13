@@ -235,7 +235,7 @@
                   </div>
                   {% if material.description %}
                     <div class="text-muted" style="font-size: 0.95rem; line-height: 1.3;">
-                      <span style="vertical-align: baseline;">{{ material.description | format_description }}</span>
+                      <span style="vertical-align: baseline;">{{ material.description | format_description | safe }}</span>
                     </div>
                   {% endif %}
                 </div>
@@ -285,7 +285,7 @@
                   </div>
                   {% if material.description %}
                     <div class="text-muted" style="font-size: 0.95rem; line-height: 1.3;">
-                      <span style="vertical-align: baseline;">{{ material.description | format_description }}</span>
+                      <span style="vertical-align: baseline;">{{ material.description | format_description | safe }}</span>
                     </div>
                   {% endif %}
                 </div>

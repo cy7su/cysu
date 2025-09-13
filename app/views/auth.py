@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta
 from typing import Union
 
@@ -29,6 +28,7 @@ from ..utils.email_service import EmailService
 
 auth_bp = Blueprint("auth", __name__)
 
+
 @login_manager.user_loader
 def load_user(user_id: str):
     try:
@@ -36,6 +36,7 @@ def load_user(user_id: str):
     except Exception as e:
         current_app.logger.error(f"Error loading user {user_id}: {e}")
         return None
+
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login() -> Union[str, Response]:
@@ -52,6 +53,7 @@ def login() -> Union[str, Response]:
 
     return render_template("auth/login.html", form=form)
 
+
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register() -> Union[str, Response]:
     if current_user.is_authenticated:
@@ -66,7 +68,8 @@ def register() -> Union[str, Response]:
         )
         try:
             existing_user = User.query.filter(
-                (User.username == form.username.data) | (User.email == form.email.data)
+                (User.username == form.username.data)
+                | (User.email == form.email.data)
             ).first()
 
             if existing_user:
@@ -89,7 +92,9 @@ def register() -> Union[str, Response]:
                 "group_id": form.group_id.data,
             }
 
-            verification = EmailVerification.create_verification(email=form.email.data)
+            verification = EmailVerification.create_verification(
+                email=form.email.data
+            )
             db.session.add(verification)
             db.session.commit()
 
@@ -97,23 +102,35 @@ def register() -> Union[str, Response]:
                 f"Verification code created for pending registration ({form.email.data}): {' '.join(verification.code)} (type: {type(verification.code)}, length: {len(verification.code)})"
             )
 
-            current_app.logger.info(f"Attempting to send verification email to {form.email.data}")
-            
+            current_app.logger.info(
+                f"Attempting to send verification email to {form.email.data}"
+            )
+
             # Проверяем, включен ли режим разработки (пропускаем email)
-            debug_mode = current_app.config.get('DEBUG', False)
-            skip_email = current_app.config.get('SKIP_EMAIL_VERIFICATION', False)
-            
-            current_app.logger.info(f"Debug mode: {debug_mode}, Skip email: {skip_email}")
-            
+            debug_mode = current_app.config.get("DEBUG", False)
+            skip_email = current_app.config.get(
+                "SKIP_EMAIL_VERIFICATION", False
+            )
+
+            current_app.logger.info(
+                f"Debug mode: {debug_mode}, Skip email: {skip_email}"
+            )
+
             if debug_mode or skip_email:
-                current_app.logger.info(f"Debug mode: skipping email send, code is {verification.code}")
-                flash(f"Режим разработки: код подтверждения - {verification.code}")
+                current_app.logger.info(
+                    f"Debug mode: skipping email send, code is {verification.code}"
+                )
+                flash(
+                    f"Режим разработки: код подтверждения - {verification.code}"
+                )
                 session["pending_verification_id"] = verification.id
                 return redirect(url_for("auth.email_verification"))
-            
-            email_sent = EmailService.send_verification_email(form.email.data, verification.code)
+
+            email_sent = EmailService.send_verification_email(
+                form.email.data, verification.code
+            )
             current_app.logger.info(f"Email send result: {email_sent}")
-            
+
             if email_sent:
                 flash("Проверьте вашу почту для подтверждения email.")
                 session["pending_verification_id"] = verification.id
@@ -124,7 +141,9 @@ def register() -> Union[str, Response]:
                 db.session.commit()
 
         except Exception as e:
-            current_app.logger.error(f"Ошибка при обработке регистрации: {str(e)}")
+            current_app.logger.error(
+                f"Ошибка при обработке регистрации: {str(e)}"
+            )
             db.session.rollback()
             flash("Ошибка при обработке регистрации. Попробуйте еще раз.")
     else:
@@ -134,6 +153,7 @@ def register() -> Union[str, Response]:
                 current_app.logger.warning(f"Ошибка в поле {field}: {error}")
 
     return render_template("auth/register.html", form=form)
+
 
 @auth_bp.route("/email/verification", methods=["GET", "POST"])
 def email_verification() -> Union[str, Response]:
@@ -156,17 +176,29 @@ def email_verification() -> Union[str, Response]:
                 hashed_password = generate_password_hash(
                     pending_registration["password"]
                 )
-                trial_enabled = SiteSettings.get_setting('trial_subscription_enabled', True)
-                trial_days = int(SiteSettings.get_setting('trial_subscription_days', 7))
+                trial_enabled = SiteSettings.get_setting(
+                    "trial_subscription_enabled", True
+                )
+                trial_days = int(
+                    SiteSettings.get_setting("trial_subscription_days", 7)
+                )
 
                 user = User(
                     username=pending_registration["username"],
                     email=pending_registration["email"],
                     password=hashed_password,
                     is_verified=True,  # Пользователь подтвержден
-                    group_id=pending_registration.get("group_id") if pending_registration.get("group_id") else None,
+                    group_id=(
+                        pending_registration.get("group_id")
+                        if pending_registration.get("group_id")
+                        else None
+                    ),
                     is_trial_subscription=trial_enabled,  # Активируем пробную подписку только если включено
-                    trial_subscription_expires=datetime.utcnow() + timedelta(days=trial_days) if trial_enabled else None,  # Используем настройку количества дней
+                    trial_subscription_expires=(
+                        datetime.utcnow() + timedelta(days=trial_days)
+                        if trial_enabled
+                        else None
+                    ),  # Используем настройку количества дней
                 )
                 db.session.add(user)
                 db.session.commit()
@@ -204,6 +236,7 @@ def email_verification() -> Union[str, Response]:
         user_email=pending_registration["email"],
     )
 
+
 @auth_bp.route("/email/resend", methods=["GET", "POST"])
 def resend_verification() -> Union[str, Response]:
     verification_id = session.get("pending_verification_id")
@@ -214,7 +247,9 @@ def resend_verification() -> Union[str, Response]:
         return redirect(url_for("auth.register"))
 
     try:
-        EmailVerification.query.filter_by(id=verification_id, is_used=False).delete()
+        EmailVerification.query.filter_by(
+            id=verification_id, is_used=False
+        ).delete()
 
         verification = EmailVerification.create_verification(
             email=pending_registration["email"]
@@ -236,11 +271,14 @@ def resend_verification() -> Union[str, Response]:
             flash("Ошибка отправки email. Попробуйте еще раз.")
 
     except Exception as e:
-        current_app.logger.error(f"Ошибка при повторной отправке кода: {str(e)}")
+        current_app.logger.error(
+            f"Ошибка при повторной отправке кода: {str(e)}"
+        )
         db.session.rollback()
         flash("Ошибка при отправке кода. Попробуйте еще раз.")
 
     return redirect(url_for("auth.email_verification"))
+
 
 @auth_bp.route("/password/reset", methods=["GET", "POST"])
 def password_reset_request() -> Union[str, Response]:
@@ -280,6 +318,7 @@ def password_reset_request() -> Union[str, Response]:
 
     return render_template("auth/password_reset_request.html", form=form)
 
+
 @auth_bp.route("/password/reset/confirm", methods=["GET", "POST"])
 def password_reset_confirm() -> Union[str, Response]:
     if current_user.is_authenticated:
@@ -317,6 +356,7 @@ def password_reset_confirm() -> Union[str, Response]:
             flash("Неверный код или код истек. Попробуйте еще раз.", "error")
 
     return render_template("auth/password_reset_confirm.html", form=form)
+
 
 @auth_bp.route("/logout")
 @login_required

@@ -298,23 +298,44 @@ function refreshTable() {
 }
 
 function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(function() {
-    // Показываем уведомление об успешном копировании
-    showNotification('Скопировано: ' + text, 'success');
-  }).catch(function(err) {
-    // Fallback для старых браузеров
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    try {
-      document.execCommand('copy');
+  // Используем современный Clipboard API
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function() {
       showNotification('Скопировано: ' + text, 'success');
-    } catch (err) {
+    }).catch(function(err) {
+      console.error('Ошибка копирования через Clipboard API:', err);
+      // Fallback для случаев, когда Clipboard API недоступен
+      fallbackCopyToClipboard(text);
+    });
+  } else {
+    // Fallback для старых браузеров или небезопасного контекста
+    fallbackCopyToClipboard(text);
+  }
+}
+
+function fallbackCopyToClipboard(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  textArea.style.top = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    const successful = document.executeCommand('copy');
+    if (successful) {
+      showNotification('Скопировано: ' + text, 'success');
+    } else {
       showNotification('Ошибка копирования', 'error');
     }
+  } catch (err) {
+    console.error('Ошибка fallback копирования:', err);
+    showNotification('Ошибка копирования', 'error');
+  } finally {
     document.body.removeChild(textArea);
-  });
+  }
 }
 
 function showNotification(message, type = 'info') {

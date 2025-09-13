@@ -1129,12 +1129,12 @@
             <div class="wysiwyg-editor">
                 <div class="editor-toolbar">
                     <div class="toolbar-group">
-                        <button class="toolbar-btn" onclick="execCommand('undo')" title="Отменить">
+                        <button class="toolbar-btn" onclick="executeCommand('undo')" title="Отменить">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/>
                             </svg>
                         </button>
-                        <button class="toolbar-btn" onclick="execCommand('redo')" title="Повторить">
+                        <button class="toolbar-btn" onclick="executeCommand('redo')" title="Повторить">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/>
                             </svg>
@@ -1142,22 +1142,22 @@
                     </div>
                     
                     <div class="toolbar-group">
-                        <button class="toolbar-btn" onclick="execCommand('bold')" title="Жирный">
+                        <button class="toolbar-btn" onclick="executeCommand('bold')" title="Жирный">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
                             </svg>
                         </button>
-                        <button class="toolbar-btn" onclick="execCommand('italic')" title="Курсив">
+                        <button class="toolbar-btn" onclick="executeCommand('italic')" title="Курсив">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/>
                             </svg>
                         </button>
-                        <button class="toolbar-btn" onclick="execCommand('underline')" title="Подчеркнутый">
+                        <button class="toolbar-btn" onclick="executeCommand('underline')" title="Подчеркнутый">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/>
                             </svg>
                         </button>
-                        <button class="toolbar-btn" onclick="execCommand('strikeThrough')" title="Зачеркнутый">
+                        <button class="toolbar-btn" onclick="executeCommand('strikeThrough')" title="Зачеркнутый">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M6.85 7.08C6.85 4.37 9.45 3 12.24 3c1.64 0 3 .49 3.9 1.28.77.65 1.46 1.73 1.46 3.24h-3.01c0-.31-.05-.59-.15-.85-.29-.86-1.2-1.28-2.25-1.28-1.86 0-2.34 1.02-2.34 1.7 0 .48.25.88.74 1.21.38.25.77.48 1.41.7H7.39c-.21-.34-.54-.89-.54-1.92zM21 12v-2H3v2h9.62c1.15.45 1.96.75 1.96 1.97 0 1.07-.78 1.97-2.49 1.97-1.93 0-2.55-.84-2.55-1.97H6.4c0 3.73 2.85 5.06 5.73 5.06 3.12 0 5.58-1.77 5.58-4.97 0-2.05-1.22-3.07-4.09-3.75H21z"/>
                             </svg>
@@ -1183,12 +1183,12 @@
                     </div>
                     
                     <div class="toolbar-group">
-                        <button class="toolbar-btn" onclick="execCommand('insertUnorderedList')" title="Маркированный список">
+                        <button class="toolbar-btn" onclick="executeCommand('insertUnorderedList')" title="Маркированный список">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/>
                             </svg>
                         </button>
-                        <button class="toolbar-btn" onclick="execCommand('insertOrderedList')" title="Нумерованный список">
+                        <button class="toolbar-btn" onclick="executeCommand('insertOrderedList')" title="Нумерованный список">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/>
                             </svg>
@@ -1196,17 +1196,17 @@
                     </div>
                     
                     <div class="toolbar-group">
-                        <button class="toolbar-btn" onclick="execCommand('justifyLeft')" title="По левому краю">
+                        <button class="toolbar-btn" onclick="executeCommand('justifyLeft')" title="По левому краю">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/>
                             </svg>
                         </button>
-                        <button class="toolbar-btn" onclick="execCommand('justifyCenter')" title="По центру">
+                        <button class="toolbar-btn" onclick="executeCommand('justifyCenter')" title="По центру">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/>
                             </svg>
                         </button>
-                        <button class="toolbar-btn" onclick="execCommand('justifyRight')" title="По правому краю">
+                        <button class="toolbar-btn" onclick="executeCommand('justifyRight')" title="По правому краю">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/>
                             </svg>
@@ -1554,7 +1554,7 @@
 
         // Вставка HTML
         function insertHTML(html) {
-            execCommand('insertHTML', html);
+            executeCommand('insertHTML', html);
         }
 
         // Копирование текста из блока
@@ -1567,27 +1567,52 @@
             const text = element.textContent.trim();
             if (!text) return; // Если текста нет, не копируем
             
-            navigator.clipboard.writeText(text).then(() => {
-                // Показываем визуальную обратную связь
-                element.classList.add('copied');
-                setTimeout(() => {
-                    element.classList.remove('copied');
-                }, 2000);
-            }).catch(() => {
-                // Fallback для старых браузеров
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
+            // Используем современный Clipboard API
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    // Показываем визуальную обратную связь
+                    element.classList.add('copied');
+                    setTimeout(() => {
+                        element.classList.remove('copied');
+                    }, 2000);
+                }).catch((err) => {
+                    console.error('Ошибка копирования через Clipboard API:', err);
+                    // Fallback для случаев, когда Clipboard API недоступен
+                    fallbackCopyTextBlock(element, text);
+                });
+            } else {
+                // Fallback для старых браузеров или небезопасного контекста
+                fallbackCopyTextBlock(element, text);
+            }
+        }
+        
+        // Fallback функция копирования
+        function fallbackCopyTextBlock(element, text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.executeCommand('copy');
+                if (successful) {
+                    // Показываем визуальную обратную связь
+                    element.classList.add('copied');
+                    setTimeout(() => {
+                        element.classList.remove('copied');
+                    }, 2000);
+                } else {
+                    console.error('Не удалось скопировать текст');
+                }
+            } catch (err) {
+                console.error('Ошибка fallback копирования:', err);
+            } finally {
                 document.body.removeChild(textArea);
-                
-                // Показываем визуальную обратную связь
-                element.classList.add('copied');
-                setTimeout(() => {
-                    element.classList.remove('copied');
-                }, 2000);
-            });
+            }
         }
 
         // Установка обработчиков для блоков текста
@@ -1603,8 +1628,8 @@
             });
         }
 
-        // Выполнение команд редактора
-        function execCommand(command, value = null) {
+        // Выполнение команд редактора с использованием современных API
+        function executeCommand(command, value = null) {
             const editor = document.getElementById('editorContent');
             const selection = window.getSelection();
             
@@ -1629,10 +1654,54 @@
                 }
             }
             
-            document.execCommand(command, false, value);
+            // Используем современные API вместо устаревшего executeCommand
+            if (command === 'insertHTML' && value) {
+                insertHTMLContent(value);
+            } else if (command === 'copy') {
+                copySelectedText();
+            } else {
+                // Fallback для других команд
+                try {
+                    document.executeCommand(command, false, value);
+                } catch (e) {
+                    console.warn(`Команда ${command} не поддерживается:`, e);
+                }
+            }
+            
             editor.focus();
-            
-            
+        }
+        
+        // Современная функция вставки HTML
+        function insertHTMLContent(html) {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const fragment = document.createDocumentFragment();
+                while (tempDiv.firstChild) {
+                    fragment.appendChild(tempDiv.firstChild);
+                }
+                range.insertNode(fragment);
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+        
+        // Современная функция копирования
+        function copySelectedText() {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(window.getSelection().toString());
+            } else {
+                // Fallback для старых браузеров
+                try {
+                    document.executeCommand('copy');
+                } catch (e) {
+                    console.error('Ошибка копирования:', e);
+                }
+            }
         }
 
         // Переключение режима редактирования
@@ -1732,21 +1801,21 @@
         function insertQuote() {
             const editor = document.getElementById('editorContent');
             const html = '<div class="quote-block" contenteditable="true"><p><br></p></div><p><br></p>';
-            execCommand('insertHTML', html);
+            executeCommand('insertHTML', html);
         }
 
         // Вставка блока текста
         function insertTextBlock() {
             const editor = document.getElementById('editorContent');
             const html = '<div class="text-block" contenteditable="true" onclick="copyTextBlock(this)"><p><br></p></div><p><br></p>';
-            execCommand('insertHTML', html);
+            executeCommand('insertHTML', html);
         }
 
         // Вставка разделителя
         function insertSeparator() {
             const editor = document.getElementById('editorContent');
             const html = '<hr class="separator"><p><br></p>';
-            execCommand('insertHTML', html);
+            executeCommand('insertHTML', html);
         }
 
 

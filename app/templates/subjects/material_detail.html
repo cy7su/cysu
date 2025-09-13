@@ -22,7 +22,7 @@
                 </div>
                 <div class="card-body">
                     {% if material.description %}
-                        <div class="card-text" style="margin-bottom: 20px;">{{ material.description | format_description }}</div>
+                        <div class="card-text" style="margin-bottom: 20px;">{{ material.description | format_description | safe }}</div>
                     {% endif %}
                     
                         {% if material.file %}

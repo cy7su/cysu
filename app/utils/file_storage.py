@@ -1,12 +1,9 @@
-
 import os
 import shutil
 from datetime import datetime
 from typing import List, Tuple
-import posixpath
 
 from flask import current_app
-from werkzeug.utils import secure_filename
 
 from .transliteration import get_safe_filename
 
@@ -14,27 +11,29 @@ from .transliteration import get_safe_filename
 def safe_path_join(base_path: str, *path_parts: str) -> str:
     """
     Безопасное соединение путей, предотвращающее Path Traversal атаки
-    
+
     Args:
         base_path: Базовый путь
         *path_parts: Части пути для соединения
-        
+
     Returns:
         str: Безопасный абсолютный путь
     """
     # Нормализуем базовый путь
     base_path = os.path.abspath(base_path)
-    
+
     # Соединяем все части пути
     full_path = os.path.join(base_path, *path_parts)
-    
+
     # Нормализуем полный путь
     full_path = os.path.abspath(full_path)
-    
+
     # Проверяем, что результирующий путь находится внутри базового пути
     if not full_path.startswith(base_path):
-        raise ValueError(f"Path traversal detected: {full_path} is outside {base_path}")
-    
+        raise ValueError(
+            f"Path traversal detected: {full_path} is outside {base_path}"
+        )
+
     return full_path
 
 
@@ -58,7 +57,9 @@ class FileStorageManager:
     ) -> Tuple[str, str]:
         safe_filename = get_safe_filename(filename)
 
-        upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+        upload_base = current_app.config.get(
+            "UPLOAD_FOLDER", "app/static/uploads"
+        )
         subject_path = os.path.join(upload_base, str(subject_id))
         users_path = os.path.join(subject_path, "users")
         user_path = os.path.join(users_path, str(user_id))
@@ -67,15 +68,21 @@ class FileStorageManager:
 
         full_path = os.path.join(user_path, safe_filename)
 
-        relative_path = os.path.join(str(subject_id), "users", str(user_id), safe_filename)
+        relative_path = os.path.join(
+            str(subject_id), "users", str(user_id), safe_filename
+        )
 
         return full_path, relative_path
 
     @staticmethod
-    def get_material_upload_path(subject_id: int, filename: str) -> Tuple[str, str]:
+    def get_material_upload_path(
+        subject_id: int, filename: str
+    ) -> Tuple[str, str]:
         safe_filename = get_safe_filename(filename)
 
-        upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+        upload_base = current_app.config.get(
+            "UPLOAD_FOLDER", "app/static/uploads"
+        )
         subject_path = os.path.join(upload_base, str(subject_id))
 
         os.makedirs(subject_path, exist_ok=True)
@@ -88,7 +95,9 @@ class FileStorageManager:
 
     @staticmethod
     def get_chat_file_path(user_id: int, filename: str) -> Tuple[str, str]:
-        chat_base = current_app.config.get("CHAT_FILES_FOLDER", "app/static/chat_files")
+        chat_base = current_app.config.get(
+            "CHAT_FILES_FOLDER", "app/static/chat_files"
+        )
         user_path = os.path.join(chat_base, str(user_id))
 
         os.makedirs(user_path, exist_ok=True)
@@ -109,7 +118,7 @@ class FileStorageManager:
         ticket_base = current_app.config.get(
             "TICKET_FILES_FOLDER", "app/static/ticket_files"
         )
-        
+
         # Безопасное создание пути
         try:
             ticket_path = safe_path_join(ticket_base, str(ticket_id))
@@ -140,44 +149,73 @@ class FileStorageManager:
         try:
             # Проверяем, что путь безопасен
             try:
-                safe_full_path = safe_path_join(os.path.dirname(full_path), os.path.basename(full_path))
+                safe_full_path = safe_path_join(
+                    os.path.dirname(full_path), os.path.basename(full_path)
+                )
             except ValueError as e:
-                current_app.logger.error(f"Path traversal attempt detected: {e}")
+                current_app.logger.error(
+                    f"Path traversal attempt detected: {e}"
+                )
                 return False
-            
-            file_size = getattr(file, 'content_length', None)
-            file_name = getattr(file, 'filename', 'unknown')
 
-            current_app.logger.info(f"Попытка сохранения файла: {safe_full_path}")
+            file_size = getattr(file, "content_length", None)
+            file_name = getattr(file, "filename", "unknown")
+
+            current_app.logger.info(
+                f"Попытка сохранения файла: {safe_full_path}"
+            )
             current_app.logger.info(f"Исходное имя файла: {file_name}")
-            current_app.logger.info(f"Размер файла: {file_size} байт ({file_size / (1024*1024):.2f} MB)" if file_size else "Размер файла: неизвестен")
-            current_app.logger.info(f"Папка назначения: {os.path.dirname(safe_full_path)}")
-            current_app.logger.info(f"Папка существует: {os.path.exists(os.path.dirname(safe_full_path))}")
+            current_app.logger.info(
+                f"Размер файла: {file_size} байт ({file_size / (1024*1024):.2f} MB)"
+                if file_size
+                else "Размер файла: неизвестен"
+            )
+            current_app.logger.info(
+                f"Папка назначения: {os.path.dirname(safe_full_path)}"
+            )
+            current_app.logger.info(
+                f"Папка существует: {os.path.exists(os.path.dirname(safe_full_path))}"
+            )
 
             try:
                 statvfs = os.statvfs(os.path.dirname(safe_full_path))
                 free_space = statvfs.f_frsize * statvfs.f_bavail
-                current_app.logger.info(f"Свободное место на диске: {free_space} байт ({free_space / (1024*1024):.2f} MB)")
+                current_app.logger.info(
+                    f"Свободное место на диске: {free_space} байт ({free_space / (1024*1024):.2f} MB)"
+                )
             except Exception as e:
-                current_app.logger.warning(f"Не удалось получить информацию о свободном месте: {e}")
+                current_app.logger.warning(
+                    f"Не удалось получить информацию о свободном месте: {e}"
+                )
 
             file.save(safe_full_path)
 
             if os.path.exists(safe_full_path):
                 saved_size = os.path.getsize(safe_full_path)
-                current_app.logger.info(f"Файл успешно сохранен: {safe_full_path}")
-                current_app.logger.info(f"Размер сохраненного файла: {saved_size} байт ({saved_size / (1024*1024):.2f} MB)")
+                current_app.logger.info(
+                    f"Файл успешно сохранен: {safe_full_path}"
+                )
+                current_app.logger.info(
+                    f"Размер сохраненного файла: {saved_size} байт ({saved_size / (1024*1024):.2f} MB)"
+                )
 
                 if file_size and saved_size != file_size:
-                    current_app.logger.warning(f"Размеры не совпадают! Ожидалось: {file_size}, получено: {saved_size}")
+                    current_app.logger.warning(
+                        f"Размеры не совпадают! Ожидалось: {file_size}, получено: {saved_size}"
+                    )
             else:
-                current_app.logger.error(f"Файл не найден после сохранения: {safe_full_path}")
+                current_app.logger.error(
+                    f"Файл не найден после сохранения: {safe_full_path}"
+                )
                 return False
 
             return True
         except Exception as e:
-            current_app.logger.error(f"Ошибка сохранения файла {full_path}: {str(e)}")
+            current_app.logger.error(
+                f"Ошибка сохранения файла {full_path}: {str(e)}"
+            )
             import traceback
+
             current_app.logger.error(f"Traceback: {traceback.format_exc()}")
             return False
 
@@ -192,7 +230,9 @@ class FileStorageManager:
                 return True
             return False
         except Exception as e:
-            current_app.logger.error(f"Ошибка удаления файла {relative_path}: {str(e)}")
+            current_app.logger.error(
+                f"Ошибка удаления файла {relative_path}: {str(e)}"
+            )
             return False
 
     @staticmethod
@@ -223,7 +263,9 @@ class FileStorageManager:
             if os.path.exists(chat_path):
                 shutil.rmtree(chat_path)
 
-            upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+            upload_base = current_app.config.get(
+                "UPLOAD_FOLDER", "app/static/uploads"
+            )
             if os.path.exists(upload_base):
                 for subject_folder in os.listdir(upload_base):
                     subject_path = os.path.join(upload_base, subject_folder)
@@ -312,7 +354,9 @@ class FileStorageManager:
                 continue
 
             if not FileStorageManager.validate_file_size(file):
-                current_app.logger.warning(f"Файл {file.filename} слишком большой")
+                current_app.logger.warning(
+                    f"Файл {file.filename} слишком большой"
+                )
                 continue
 
             if not FileStorageManager.is_allowed_file(file.filename):
@@ -330,13 +374,17 @@ class FileStorageManager:
                     "file_path": relative_path,
                     "file_name": file.filename,
                     "file_size": FileStorageManager.get_file_size(file),
-                    "file_type": FileStorageManager.get_file_type(file.filename),
+                    "file_type": FileStorageManager.get_file_type(
+                        file.filename
+                    ),
                 }
                 saved_files.append(file_info)
                 current_app.logger.info(
                     f"Файл {file.filename} сохранен для тикета {ticket_id}"
                 )
             else:
-                current_app.logger.error(f"Ошибка сохранения файла {file.filename}")
+                current_app.logger.error(
+                    f"Ошибка сохранения файла {file.filename}"
+                )
 
         return saved_files

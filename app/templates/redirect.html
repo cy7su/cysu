@@ -958,7 +958,7 @@ IP адрес: ${ipAddress}
                 textArea.value = sessionInfo;
                 document.body.appendChild(textArea);
                 textArea.select();
-                document.execCommand('copy');
+                document.executeCommand('copy');
                 document.body.removeChild(textArea);
                 showCopyNotification();
             });

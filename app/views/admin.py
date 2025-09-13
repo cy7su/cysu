@@ -1,8 +1,7 @@
-
-import random
+import secrets
 import string
 from datetime import datetime, timedelta
-from typing import Any, Dict, Union
+from typing import Union
 
 from flask import (
     Blueprint,
@@ -23,16 +22,13 @@ from .. import db
 from ..forms import (
     AdminUserForm,
     GroupForm,
-    MaterialForm,
     SiteSettingsForm,
-    SubjectForm,
     SubjectGroupForm,
 )
 from ..models import (
     ChatMessage,
     EmailVerification,
     Group,
-    Material,
     Notification,
     Payment,
     SiteSettings,
@@ -40,13 +36,13 @@ from ..models import (
     SubjectGroup,
     Submission,
     Ticket,
-    TicketFile,
     TicketMessage,
     User,
 )
 from ..utils.file_storage import FileStorageManager
 
 admin_bp = Blueprint("admin", __name__)
+
 
 @admin_bp.route("/admin/users", methods=["GET", "POST"])
 @login_required
@@ -77,7 +73,10 @@ def admin_users():
                 f"Кнопка не найдена. Доступные поля: {list(request.form.keys())}"
             )
 
-    if request.method == "POST" and request.form.get("submit") == "Зарегистрироваться":
+    if (
+        request.method == "POST"
+        and request.form.get("submit") == "Зарегистрироваться"
+    ):
         current_app.logger.info("Обрабатываем форму создания пользователя")
         current_app.logger.info("Проверяем валидацию формы")
         current_app.logger.info(f"Ошибки формы: {form.errors}")
@@ -120,7 +119,9 @@ def admin_users():
                         is_admin=form.is_admin.data,
                         is_moderator=form.is_moderator.data,
                         is_subscribed=False,
-                        group_id=form.group_id.data if form.group_id.data else None,
+                        group_id=(
+                            form.group_id.data if form.group_id.data else None
+                        ),
                     )
                     db.session.add(user)
                     db.session.commit()
@@ -131,17 +132,25 @@ def admin_users():
                     flash(f"Пользователь {user.username} успешно создан")
 
             except Exception as e:
-                current_app.logger.error(f"Ошибка создания пользователя: {str(e)}")
+                current_app.logger.error(
+                    f"Ошибка создания пользователя: {str(e)}"
+                )
                 import traceback
 
-                current_app.logger.error(f"Traceback: {traceback.format_exc()}")
+                current_app.logger.error(
+                    f"Traceback: {traceback.format_exc()}"
+                )
                 db.session.rollback()
                 flash("Ошибка при создании пользователя", "error")
         else:
-            current_app.logger.warning(f"Форма админки не валидна: {form.errors}")
+            current_app.logger.warning(
+                f"Форма админки не валидна: {form.errors}"
+            )
             for field, errors in form.errors.items():
                 for error in errors:
-                    current_app.logger.warning(f"Ошибка в поле {field}: {error}")
+                    current_app.logger.warning(
+                        f"Ошибка в поле {field}: {error}"
+                    )
 
     if request.method == "POST" and request.form.get("reset_user_id"):
         try:
@@ -149,9 +158,10 @@ def admin_users():
             user = User.query.get(user_id)
             if user:
                 new_password = "".join(
-                    random.choices(
-                        string.ascii_letters + string.digits + "!@#$%^&*", k=10
+                    secrets.choice(
+                        string.ascii_letters + string.digits + "!@#$%^&*"
                     )
+                    for _ in range(10)
                 )
                 user.password = generate_password_hash(new_password)
                 db.session.commit()
@@ -167,7 +177,9 @@ def admin_users():
     if request.method == "POST" and request.form.get("delete_user_id"):
         try:
             user_id = int(request.form.get("delete_user_id"))
-            current_app.logger.info(f"Попытка удаления пользователя с ID: {user_id}")
+            current_app.logger.info(
+                f"Попытка удаления пользователя с ID: {user_id}"
+            )
             user = User.query.get(user_id)
             if user:
                 current_app.logger.info(
@@ -200,14 +212,22 @@ def admin_users():
                             f"Удалено сообщений тикетов: {ticket_messages_count}"
                         )
 
-                        tickets_count = Ticket.query.filter_by(user_id=user.id).count()
-                        Ticket.query.filter_by(user_id=user.id).delete()
-                        current_app.logger.info(f"Удалено тикетов: {tickets_count}")
-
-                        email_verifications_count = EmailVerification.query.filter_by(
+                        tickets_count = Ticket.query.filter_by(
                             user_id=user.id
                         ).count()
-                        EmailVerification.query.filter_by(user_id=user.id).delete()
+                        Ticket.query.filter_by(user_id=user.id).delete()
+                        current_app.logger.info(
+                            f"Удалено тикетов: {tickets_count}"
+                        )
+
+                        email_verifications_count = (
+                            EmailVerification.query.filter_by(
+                                user_id=user.id
+                            ).count()
+                        )
+                        EmailVerification.query.filter_by(
+                            user_id=user.id
+                        ).delete()
                         current_app.logger.info(
                             f"Удалено кодов подтверждения email: {email_verifications_count}"
                         )
@@ -216,13 +236,21 @@ def admin_users():
                             user_id=user.id
                         ).count()
                         Payment.query.filter_by(user_id=user.id).delete()
-                        current_app.logger.info(f"Удалено платежей: {payments_count}")
+                        current_app.logger.info(
+                            f"Удалено платежей: {payments_count}"
+                        )
 
-                        submissions_count = db.session.query(Submission).filter_by(
+                        submissions_count = (
+                            db.session.query(Submission)
+                            .filter_by(user_id=user.id)
+                            .count()
+                        )
+                        db.session.query(Submission).filter_by(
                             user_id=user.id
-                        ).count()
-                        db.session.query(Submission).filter_by(user_id=user.id).delete()
-                        current_app.logger.info(f"Удалено решений: {submissions_count}")
+                        ).delete()
+                        current_app.logger.info(
+                            f"Удалено решений: {submissions_count}"
+                        )
 
                         chat_messages_count = ChatMessage.query.filter_by(
                             user_id=user.id
@@ -241,8 +269,12 @@ def admin_users():
                                 f"Ошибка при удалении файлов пользователя {user.id}"
                             )
 
-                        for ticket in Ticket.query.filter_by(user_id=user.id).all():
-                            if FileStorageManager.delete_ticket_files(ticket.id):
+                        for ticket in Ticket.query.filter_by(
+                            user_id=user.id
+                        ).all():
+                            if FileStorageManager.delete_ticket_files(
+                                ticket.id
+                            ):
                                 current_app.logger.info(
                                     f"Файлы тикета {ticket.id} успешно удалены"
                                 )
@@ -264,9 +296,14 @@ def admin_users():
                         )
                         import traceback
 
-                        current_app.logger.error(f"Traceback: {traceback.format_exc()}")
+                        current_app.logger.error(
+                            f"Traceback: {traceback.format_exc()}"
+                        )
                         db.session.rollback()
-                        flash(f"Ошибка при удалении пользователя {username}", "error")
+                        flash(
+                            f"Ошибка при удалении пользователя {username}",
+                            "error",
+                        )
                         return redirect(url_for("admin.admin_users"))
             else:
                 flash("Пользователь не найден", "error")
@@ -282,7 +319,8 @@ def admin_users():
             if user:
                 if user.id == current_user.id:
                     flash(
-                        "Нельзя изменить статус администратора для самого себя", "error"
+                        "Нельзя изменить статус администратора для самого себя",
+                        "error",
                     )
                 else:
                     user.is_admin = not user.is_admin
@@ -313,7 +351,9 @@ def admin_users():
                     group = Group.query.get(int(new_group_id))
                     if group:
                         user.group_id = group.id
-                        flash(f"Пользователь {user.username} перемещен в группу '{group.name}'")
+                        flash(
+                            f"Пользователь {user.username} перемещен в группу '{group.name}'"
+                        )
                     else:
                         flash("Группа не найдена", "error")
                         return redirect(url_for("admin.admin_users"))
@@ -325,7 +365,9 @@ def admin_users():
             else:
                 flash("Пользователь не найден", "error")
         except Exception as e:
-            current_app.logger.error(f"Ошибка изменения группы пользователя: {str(e)}")
+            current_app.logger.error(
+                f"Ошибка изменения группы пользователя: {str(e)}"
+            )
             db.session.rollback()
             flash("Ошибка при изменении группы пользователя", "error")
 
@@ -345,18 +387,24 @@ def admin_users():
                     user.is_admin = True
                     user.admin_mode_enabled = admin_mode_enabled
                     mode = "админ" if admin_mode_enabled else "пользователь"
-                    flash(f"Пользователь {user.username} назначен администратором в режиме {mode}")
+                    flash(
+                        f"Пользователь {user.username} назначен администратором в режиме {mode}"
+                    )
                 elif new_role == "moderator":
                     user.is_moderator = True
                     flash(f"Пользователь {user.username} назначен модератором")
                 else:  # user
-                    flash(f"Пользователь {user.username} назначен обычным пользователем")
+                    flash(
+                        f"Пользователь {user.username} назначен обычным пользователем"
+                    )
 
                 db.session.commit()
             else:
                 flash("Пользователь не найден", "error")
         except Exception as e:
-            current_app.logger.error(f"Ошибка изменения статуса пользователя: {str(e)}")
+            current_app.logger.error(
+                f"Ошибка изменения статуса пользователя: {str(e)}"
+            )
             db.session.rollback()
             flash("Ошибка при изменении статуса пользователя", "error")
 
@@ -382,12 +430,16 @@ def admin_users():
                     )
                     status = "отозвана"
                 else:
-                    trial_days = int(SiteSettings.get_setting('trial_subscription_days', 14))
+                    trial_days = int(
+                        SiteSettings.get_setting("trial_subscription_days", 14)
+                    )
                     current_app.logger.info(
                         f"Выдаем подписку пользователю {user.username} на {trial_days} дней"
                     )
                     user.is_subscribed = True
-                    user.subscription_expires = datetime.utcnow() + timedelta(days=trial_days)
+                    user.subscription_expires = datetime.utcnow() + timedelta(
+                        days=trial_days
+                    )
                     user.is_manual_subscription = (
                         True  # Устанавливаем флаг ручной подписки
                     )
@@ -399,7 +451,9 @@ def admin_users():
                 )
                 flash(f"Подписка для пользователя {user.username} {status}")
             else:
-                current_app.logger.error(f"Пользователь с ID {user_id} не найден")
+                current_app.logger.error(
+                    f"Пользователь с ID {user_id} не найден"
+                )
                 flash("Пользователь не найден", "error")
         except Exception as e:
             current_app.logger.error(f"Ошибка изменения подписки: {str(e)}")
@@ -408,7 +462,6 @@ def admin_users():
             current_app.logger.error(f"Traceback: {traceback.format_exc()}")
             db.session.rollback()  # Откатываем транзакцию при ошибке
             flash("Ошибка при изменении подписки", "error")
-
 
     try:
         users = User.query.all()
@@ -426,6 +479,7 @@ def admin_users():
         groups=Group.query.all(),  # Добавляем группы для модальных окон
     )
 
+
 @admin_bp.route("/admin/groups", methods=["GET", "POST"])
 @login_required
 def admin_groups():
@@ -435,9 +489,11 @@ def admin_groups():
 
     if request.method == "POST":
         current_app.logger.info(f"POST запрос в admin_groups: {request.form}")
-        current_app.logger.info(f"CSRF токен в запросе: {request.form.get('csrf_token', 'НЕ НАЙДЕН')}")
+        current_app.logger.info(
+            f"CSRF токен в запросе: {request.form.get('csrf_token', 'НЕ НАЙДЕН')}"
+        )
 
-        if not request.form.get('csrf_token'):
+        if not request.form.get("csrf_token"):
             current_app.logger.error("CSRF токен отсутствует в запросе")
             flash("Ошибка безопасности: отсутствует CSRF токен", "error")
             return redirect(url_for("admin.admin_groups"))
@@ -449,14 +505,19 @@ def admin_groups():
         if request.form.get("submit") == "Сохранить":
             if form.validate_on_submit():
                 try:
-                    existing_group = Group.query.filter_by(name=form.name.data).first()
+                    existing_group = Group.query.filter_by(
+                        name=form.name.data
+                    ).first()
                     if existing_group:
-                        flash(f'Группа с названием "{form.name.data}" уже существует', "error")
+                        flash(
+                            f'Группа с названием "{form.name.data}" уже существует',
+                            "error",
+                        )
                     else:
                         group = Group(
                             name=form.name.data,
                             description=form.description.data,
-                            is_active=form.is_active.data
+                            is_active=form.is_active.data,
                         )
                         db.session.add(group)
                         db.session.commit()
@@ -465,18 +526,26 @@ def admin_groups():
                         form.description.data = ""
                         form.is_active.data = True
                 except Exception as e:
-                    current_app.logger.error(f"Ошибка создания группы: {str(e)}")
+                    current_app.logger.error(
+                        f"Ошибка создания группы: {str(e)}"
+                    )
                     db.session.rollback()
                     flash("Ошибка при создании группы", "error")
 
         elif request.form.get("action") == "edit":
             try:
-                current_app.logger.info(f"Редактирование группы: {request.form}")
+                current_app.logger.info(
+                    f"Редактирование группы: {request.form}"
+                )
                 group_id = int(request.form.get("group_id"))
                 group = Group.query.get(group_id)
                 if group:
-                    current_app.logger.info(f"Обновляем группу: {group.name} (ID: {group_id})")
-                    current_app.logger.info(f"Новые данные: name='{request.form.get('name')}', description='{request.form.get('description')}', is_active='{request.form.get('is_active')}'")
+                    current_app.logger.info(
+                        f"Обновляем группу: {group.name} (ID: {group_id})"
+                    )
+                    current_app.logger.info(
+                        f"Новые данные: name='{request.form.get('name')}', description='{request.form.get('description')}', is_active='{request.form.get('is_active')}'"
+                    )
 
                     group.name = request.form.get("name")
                     group.description = request.form.get("description")
@@ -484,84 +553,132 @@ def admin_groups():
                     is_active_value = request.form.get("is_active")
                     if is_active_value is not None:
                         group.is_active = bool(int(is_active_value))
-                        current_app.logger.info(f"Статус активности обновлен: {group.is_active}")
+                        current_app.logger.info(
+                            f"Статус активности обновлен: {group.is_active}"
+                        )
 
                     db.session.commit()
 
-                    if request.headers.get('Accept') == 'application/json':
-                        return jsonify({
-                            'success': True,
-                            'message': f"Группа '{group.name}' успешно обновлена"
-                        })
+                    if request.headers.get("Accept") == "application/json":
+                        return jsonify(
+                            {
+                                "success": True,
+                                "message": f"Группа '{group.name}' успешно обновлена",
+                            }
+                        )
                     else:
                         flash(f"Группа '{group.name}' успешно обновлена")
                 else:
-                    if request.headers.get('Accept') == 'application/json':
-                        return jsonify({
-                            'success': False,
-                            'error': 'Группа не найдена'
-                        }), 404
+                    if request.headers.get("Accept") == "application/json":
+                        return (
+                            jsonify(
+                                {
+                                    "success": False,
+                                    "error": "Группа не найдена",
+                                }
+                            ),
+                            404,
+                        )
                     else:
                         flash("Группа не найдена", "error")
             except Exception as e:
-                current_app.logger.error(f"Ошибка редактирования группы: {str(e)}")
+                current_app.logger.error(
+                    f"Ошибка редактирования группы: {str(e)}"
+                )
                 db.session.rollback()
-                if request.headers.get('Accept') == 'application/json':
-                    return jsonify({
-                        'success': False,
-                        'error': f'Ошибка при редактировании группы: {str(e)}'
-                    }), 500
+                if request.headers.get("Accept") == "application/json":
+                    return (
+                        jsonify(
+                            {
+                                "success": False,
+                                "error": f"Ошибка при редактировании группы: {str(e)}",
+                            }
+                        ),
+                        500,
+                    )
                 else:
                     flash("Ошибка при редактировании группы", "error")
 
         elif request.form.get("action") == "delete":
-            current_app.logger.info(f"Получен запрос на удаление группы: {request.form}")
+            current_app.logger.info(
+                f"Получен запрос на удаление группы: {request.form}"
+            )
             try:
                 group_id = int(request.form.get("group_id"))
-                current_app.logger.info(f"Попытка удаления группы с ID: {group_id}")
+                current_app.logger.info(
+                    f"Попытка удаления группы с ID: {group_id}"
+                )
 
                 group = Group.query.get(group_id)
                 if group:
                     current_app.logger.info(f"Группа найдена: {group.name}")
                     if group.users:
-                        current_app.logger.warning(f"Попытка удаления группы '{group.name}' с пользователями: {len(group.users)}")
-                        if request.headers.get('Accept') == 'application/json':
-                            return jsonify({
-                                'success': False,
-                                'error': f"Нельзя удалить группу '{group.name}' - в ней есть пользователи"
-                            }), 400
+                        current_app.logger.warning(
+                            f"Попытка удаления группы '{group.name}' с пользователями: {len(group.users)}"
+                        )
+                        if request.headers.get("Accept") == "application/json":
+                            return (
+                                jsonify(
+                                    {
+                                        "success": False,
+                                        "error": f"Нельзя удалить группу '{group.name}' - в ней есть пользователи",
+                                    }
+                                ),
+                                400,
+                            )
                         else:
-                            flash(f"Нельзя удалить группу '{group.name}' - в ней есть пользователи", "error")
+                            flash(
+                                f"Нельзя удалить группу '{group.name}' - в ней есть пользователи",
+                                "error",
+                            )
                     else:
-                        current_app.logger.info(f"Удаляем группу '{group.name}' (ID: {group_id})")
+                        current_app.logger.info(
+                            f"Удаляем группу '{group.name}' (ID: {group_id})"
+                        )
                         db.session.delete(group)
                         db.session.commit()
-                        current_app.logger.info(f"Группа '{group.name}' успешно удалена")
-                        if request.headers.get('Accept') == 'application/json':
-                            return jsonify({
-                                'success': True,
-                                'message': f"Группа '{group.name}' успешно удалена"
-                            })
+                        current_app.logger.info(
+                            f"Группа '{group.name}' успешно удалена"
+                        )
+                        if request.headers.get("Accept") == "application/json":
+                            return jsonify(
+                                {
+                                    "success": True,
+                                    "message": f"Группа '{group.name}' успешно удалена",
+                                }
+                            )
                         else:
                             flash(f"Группа '{group.name}' успешно удалена")
                 else:
-                    current_app.logger.error(f"Группа с ID {group_id} не найдена")
-                    if request.headers.get('Accept') == 'application/json':
-                        return jsonify({
-                            'success': False,
-                            'error': 'Группа не найдена'
-                        }), 404
+                    current_app.logger.error(
+                        f"Группа с ID {group_id} не найдена"
+                    )
+                    if request.headers.get("Accept") == "application/json":
+                        return (
+                            jsonify(
+                                {
+                                    "success": False,
+                                    "error": "Группа не найдена",
+                                }
+                            ),
+                            404,
+                        )
                     else:
                         flash("Группа не найдена", "error")
             except Exception as e:
                 current_app.logger.error(f"Ошибка удаления группы: {str(e)}")
                 current_app.logger.error(f"Traceback: {e.__traceback__}")
                 db.session.rollback()
-                if request.headers.get('Accept') == 'application/json':
-                    return jsonify({
-                        'success': False,
-                        'error': f'Ошибка при удалении группы: {str(e)}'
-                    }), 500
+                if request.headers.get("Accept") == "application/json":
+                    return (
+                        jsonify(
+                            {
+                                "success": False,
+                                "error": f"Ошибка при удалении группы: {str(e)}",
+                            }
+                        ),
+                        500,
+                    )
                 else:
                     flash("Ошибка при удалении группы", "error")
 
@@ -579,6 +696,7 @@ def admin_groups():
         message=message,
     )
 
+
 @admin_bp.route("/admin/subject-groups", methods=["GET", "POST"])
 @login_required
 def admin_subject_groups() -> Union[str, Response]:
@@ -587,8 +705,14 @@ def admin_subject_groups() -> Union[str, Response]:
         return redirect(url_for("main.index"))
 
     try:
-        subjects = Subject.query.options(joinedload(Subject.groups)).order_by(Subject.title).all()
-        groups = Group.query.filter_by(is_active=True).order_by(Group.name).all()
+        subjects = (
+            Subject.query.options(joinedload(Subject.groups))
+            .order_by(Subject.title)
+            .all()
+        )
+        groups = (
+            Group.query.filter_by(is_active=True).order_by(Group.name).all()
+        )
     except Exception as e:
         current_app.logger.error(f"Error loading subjects or groups: {e}")
         subjects = []
@@ -606,22 +730,25 @@ def admin_subject_groups() -> Union[str, Response]:
                     subject_id = form.subject_id.data
                     group_ids = form.group_ids.data
 
-                    SubjectGroup.query.filter_by(subject_id=subject_id).delete()
+                    SubjectGroup.query.filter_by(
+                        subject_id=subject_id
+                    ).delete()
 
                     for group_id in group_ids:
                         subject_group = SubjectGroup(
-                            subject_id=subject_id,
-                            group_id=group_id
+                            subject_id=subject_id, group_id=group_id
                         )
                         db.session.add(subject_group)
 
                     db.session.commit()
-                    flash(f"Предмет успешно назначен группам")
+                    flash("Предмет успешно назначен группам")
 
                     form.subject_id.data = 0
                     form.group_ids.data = []
                 except Exception as e:
-                    current_app.logger.error(f"Ошибка назначения предмета группам: {str(e)}")
+                    current_app.logger.error(
+                        f"Ошибка назначения предмета группам: {str(e)}"
+                    )
                     db.session.rollback()
                     flash("Ошибка при назначении предмета группам", "error")
 
@@ -635,15 +762,16 @@ def admin_subject_groups() -> Union[str, Response]:
                 for group_id in group_ids:
                     if group_id:  # Проверяем, что group_id не пустой
                         subject_group = SubjectGroup(
-                            subject_id=subject_id,
-                            group_id=int(group_id)
+                            subject_id=subject_id, group_id=int(group_id)
                         )
                         db.session.add(subject_group)
 
                 db.session.commit()
-                flash(f"Группы предмета успешно обновлены")
+                flash("Группы предмета успешно обновлены")
             except Exception as e:
-                current_app.logger.error(f"Ошибка обновления групп предмета: {str(e)}")
+                current_app.logger.error(
+                    f"Ошибка обновления групп предмета: {str(e)}"
+                )
                 db.session.rollback()
                 flash("Ошибка при обновлении групп предмета", "error")
 
@@ -658,23 +786,31 @@ def admin_subject_groups() -> Union[str, Response]:
                     for subject_id in subject_ids:
                         subject_id = int(subject_id)
 
-                        SubjectGroup.query.filter_by(subject_id=subject_id).delete()
+                        SubjectGroup.query.filter_by(
+                            subject_id=subject_id
+                        ).delete()
 
                         for group_id in group_ids:
                             if group_id:  # Проверяем, что group_id не пустой
                                 subject_group = SubjectGroup(
                                     subject_id=subject_id,
-                                    group_id=int(group_id)
+                                    group_id=int(group_id),
                                 )
                                 db.session.add(subject_group)
 
                     db.session.commit()
-                    flash(f"Успешно назначено {len(subject_ids)} предметов группам")
+                    flash(
+                        f"Успешно назначено {len(subject_ids)} предметов группам"
+                    )
 
             except Exception as e:
-                current_app.logger.error(f"Ошибка массового назначения предметов группам: {str(e)}")
+                current_app.logger.error(
+                    f"Ошибка массового назначения предметов группам: {str(e)}"
+                )
                 db.session.rollback()
-                flash("Ошибка при массовом назначении предметов группам", "error")
+                flash(
+                    "Ошибка при массовом назначении предметов группам", "error"
+                )
 
         elif request.form.get("action") == "mass_remove":
             try:
@@ -685,30 +821,44 @@ def admin_subject_groups() -> Union[str, Response]:
                 else:
                     for subject_id in subject_ids:
                         subject_id = int(subject_id)
-                        SubjectGroup.query.filter_by(subject_id=subject_id).delete()
+                        SubjectGroup.query.filter_by(
+                            subject_id=subject_id
+                        ).delete()
 
                     db.session.commit()
-                    flash(f"Успешно убрано {len(subject_ids)} предметов из всех групп")
+                    flash(
+                        f"Успешно убрано {len(subject_ids)} предметов из всех групп"
+                    )
 
             except Exception as e:
-                current_app.logger.error(f"Ошибка массового удаления предметов из групп: {str(e)}")
+                current_app.logger.error(
+                    f"Ошибка массового удаления предметов из групп: {str(e)}"
+                )
                 db.session.rollback()
-                flash("Ошибка при массовом удалении предметов из групп", "error")
+                flash(
+                    "Ошибка при массовом удалении предметов из групп", "error"
+                )
 
         elif request.form.get("remove_all_groups"):
             try:
                 subject_id = int(request.form.get("remove_all_groups"))
                 subject = Subject.query.get(subject_id)
                 if subject:
-                    SubjectGroup.query.filter_by(subject_id=subject_id).delete()
+                    SubjectGroup.query.filter_by(
+                        subject_id=subject_id
+                    ).delete()
                     db.session.commit()
                     flash(f"Предмет '{subject.title}' убран из всех групп")
                 else:
                     flash("Предмет не найден", "error")
             except Exception as e:
-                current_app.logger.error(f"Ошибка удаления связей предмета с группами: {str(e)}")
+                current_app.logger.error(
+                    f"Ошибка удаления связей предмета с группами: {str(e)}"
+                )
                 db.session.rollback()
-                flash("Ошибка при удалении связей предмета с группами", "error")
+                flash(
+                    "Ошибка при удалении связей предмета с группами", "error"
+                )
 
     return render_template(
         "admin/subject_groups.html",
@@ -717,6 +867,7 @@ def admin_subject_groups() -> Union[str, Response]:
         form=form,
         message=message,
     )
+
 
 @admin_bp.route("/admin/settings", methods=["GET", "POST"])
 @login_required
@@ -728,22 +879,46 @@ def admin_settings() -> Union[str, Response]:
     form = SiteSettingsForm()
 
     if request.method == "GET":
-        form.maintenance_mode.data = SiteSettings.get_setting('maintenance_mode', False)
-        form.trial_subscription_enabled.data = SiteSettings.get_setting('trial_subscription_enabled', True)
-        form.trial_subscription_days.data = SiteSettings.get_setting('trial_subscription_days', 14)
-        form.pattern_generation_enabled.data = SiteSettings.get_setting('pattern_generation_enabled', True)
+        form.maintenance_mode.data = SiteSettings.get_setting(
+            "maintenance_mode", False
+        )
+        form.trial_subscription_enabled.data = SiteSettings.get_setting(
+            "trial_subscription_enabled", True
+        )
+        form.trial_subscription_days.data = SiteSettings.get_setting(
+            "trial_subscription_days", 14
+        )
+        form.pattern_generation_enabled.data = SiteSettings.get_setting(
+            "pattern_generation_enabled", True
+        )
 
     if request.method == "POST" and form.validate_on_submit():
         try:
-            SiteSettings.set_setting('maintenance_mode', form.maintenance_mode.data, 'Включить/выключить режим технических работ')
-            SiteSettings.set_setting('trial_subscription_enabled', form.trial_subscription_enabled.data, 'Включить/выключить пробную подписку для новых аккаунтов')
-            SiteSettings.set_setting('trial_subscription_days', form.trial_subscription_days.data, 'Количество дней пробной подписки')
-            SiteSettings.set_setting('pattern_generation_enabled', form.pattern_generation_enabled.data, 'Включить/выключить кнопку генерации паттернов')
+            SiteSettings.set_setting(
+                "maintenance_mode",
+                form.maintenance_mode.data,
+                "Включить/выключить режим технических работ",
+            )
+            SiteSettings.set_setting(
+                "trial_subscription_enabled",
+                form.trial_subscription_enabled.data,
+                "Включить/выключить пробную подписку для новых аккаунтов",
+            )
+            SiteSettings.set_setting(
+                "trial_subscription_days",
+                form.trial_subscription_days.data,
+                "Количество дней пробной подписки",
+            )
+            SiteSettings.set_setting(
+                "pattern_generation_enabled",
+                form.pattern_generation_enabled.data,
+                "Включить/выключить кнопку генерации паттернов",
+            )
 
-            flash('Настройки успешно сохранены', 'success')
-            return redirect(url_for('admin.admin_settings'))
+            flash("Настройки успешно сохранены", "success")
+            return redirect(url_for("admin.admin_settings"))
         except Exception as e:
             current_app.logger.error(f"Ошибка сохранения настроек: {str(e)}")
-            flash('Ошибка при сохранении настроек', 'error')
+            flash("Ошибка при сохранении настроек", "error")
 
     return render_template("admin/settings.html", form=form)

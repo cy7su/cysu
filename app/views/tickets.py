@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from typing import Any, Dict, Union
 
@@ -108,39 +107,46 @@ def close_ticket(ticket_id: int) -> Union[Response, Dict[str, Any]]:
 @login_required
 def create_ticket() -> Dict[str, Any]:
     try:
-        subject = request.form.get('subject', '').strip()
-        message = request.form.get('message', '').strip()
-        
+        subject = request.form.get("subject", "").strip()
+        message = request.form.get("message", "").strip()
+
         if not subject or not message:
-            return jsonify({"success": False, "error": "Тема и сообщение обязательны"})
-        
+            return jsonify(
+                {"success": False, "error": "Тема и сообщение обязательны"}
+            )
+
         ticket = Ticket(
             subject=subject,
             message=message,
             user_id=current_user.id,
             status="pending",
             created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow()
+            updated_at=datetime.utcnow(),
         )
-        
+
         db.session.add(ticket)
         db.session.commit()
-        
-        if 'files' in request.files:
-            files = request.files.getlist('files')
+
+        if "files" in request.files:
+            files = request.files.getlist("files")
             for file in files:
                 if file and file.filename:
                     pass
-        
-        return jsonify({"success": True, "message": "Тикет успешно создан", "ticket_id": ticket.id})
-        
+
+        return jsonify(
+            {
+                "success": True,
+                "message": "Тикет успешно создан",
+                "ticket_id": ticket.id,
+            }
+        )
+
     except Exception as e:
         current_app.logger.error(f"Ошибка создания тикета: {str(e)}")
         db.session.rollback()
-        return jsonify({"success": False, "error": "Внутренняя ошибка сервера"})
-
-
-
+        return jsonify(
+            {"success": False, "error": "Внутренняя ошибка сервера"}
+        )
 
 
 @tickets_bp.route("/tickets/<int:ticket_id>/upload_file", methods=["POST"])
@@ -154,7 +160,10 @@ def upload_ticket_file(ticket_id: int) -> Dict[str, Any]:
 
         if ticket.status == "closed":
             return jsonify(
-                {"success": False, "error": "Нельзя загружать файлы в закрытый тикет"}
+                {
+                    "success": False,
+                    "error": "Нельзя загружать файлы в закрытый тикет",
+                }
             )
 
         file = request.files.get("file")
@@ -163,11 +172,16 @@ def upload_ticket_file(ticket_id: int) -> Dict[str, Any]:
 
         if not FileStorageManager.validate_file_size(file):
             return jsonify(
-                {"success": False, "error": "Файл слишком большой (максимум 200MB)"}
+                {
+                    "success": False,
+                    "error": "Файл слишком большой (максимум 200MB)",
+                }
             )
 
         if not FileStorageManager.is_allowed_file(file.filename):
-            return jsonify({"success": False, "error": "Неподдерживаемый тип файла"})
+            return jsonify(
+                {"success": False, "error": "Неподдерживаемый тип файла"}
+            )
 
         full_path, relative_path = FileStorageManager.get_ticket_file_path(
             ticket_id, file.filename
@@ -200,14 +214,18 @@ def upload_ticket_file(ticket_id: int) -> Dict[str, Any]:
                 }
             )
         else:
-            return jsonify({"success": False, "error": "Ошибка сохранения файла"})
+            return jsonify(
+                {"success": False, "error": "Ошибка сохранения файла"}
+            )
 
     except Exception as e:
         current_app.logger.error(f"Ошибка загрузки файла тикета: {str(e)}")
         return jsonify({"success": False, "error": "Ошибка загрузки файла"})
 
 
-@tickets_bp.route("/tickets/<int:ticket_id>/delete_file/<int:file_id>", methods=["POST"])
+@tickets_bp.route(
+    "/tickets/<int:ticket_id>/delete_file/<int:file_id>", methods=["POST"]
+)
 @login_required
 def delete_ticket_file(ticket_id: int, file_id: int) -> Dict[str, Any]:
     try:
@@ -222,7 +240,10 @@ def delete_ticket_file(ticket_id: int, file_id: int) -> Dict[str, Any]:
 
         if ticket.status == "closed":
             return jsonify(
-                {"success": False, "error": "Нельзя удалять файлы из закрытого тикета"}
+                {
+                    "success": False,
+                    "error": "Нельзя удалять файлы из закрытого тикета",
+                }
             )
 
         if FileStorageManager.delete_file(ticket_file.file_path):
@@ -231,7 +252,9 @@ def delete_ticket_file(ticket_id: int, file_id: int) -> Dict[str, Any]:
 
             return jsonify({"success": True, "message": "Файл успешно удален"})
         else:
-            return jsonify({"success": False, "error": "Ошибка удаления файла"})
+            return jsonify(
+                {"success": False, "error": "Ошибка удаления файла"}
+            )
 
     except Exception as e:
         current_app.logger.error(f"Ошибка удаления файла тикета: {str(e)}")
@@ -253,9 +276,13 @@ def get_ticket_files(ticket_id: int) -> Dict[str, Any]:
                 {
                     "id": ticket_file.id,
                     "name": ticket_file.file_name,
-                    "size": FileStorageManager.format_file_size(ticket_file.file_size),
+                    "size": FileStorageManager.format_file_size(
+                        ticket_file.file_size
+                    ),
                     "type": ticket_file.file_type,
-                    "uploaded_at": ticket_file.uploaded_at.strftime("%d.%m.%Y %H:%M"),
+                    "uploaded_at": ticket_file.uploaded_at.strftime(
+                        "%d.%m.%Y %H:%M"
+                    ),
                     "path": ticket_file.file_path,
                 }
             )
@@ -267,26 +294,28 @@ def get_ticket_files(ticket_id: int) -> Dict[str, Any]:
         return jsonify({"success": False, "error": "Ошибка получения файлов"})
 
 
-
-
-
 @tickets_bp.route("/api/ticket/response", methods=["POST"])
 @login_required
 def ticket_response() -> Dict[str, Any]:
     try:
-        csrf_token = request.headers.get('X-CSRFToken')
+        csrf_token = request.headers.get("X-CSRFToken")
         if not csrf_token:
-            return jsonify({"success": False, "error": "Отсутствует CSRF токен"}), 400
-        
+            return (
+                jsonify({"success": False, "error": "Отсутствует CSRF токен"}),
+                400,
+            )
+
         ticket_id = request.form.get("ticket_id")
         message = request.form.get("message", "").strip()
         files = request.files.getlist("files")
-        
-        current_app.logger.info(f"Ответ на тикет: ticket_id={ticket_id}, message_length={len(message)}, user={current_user.username}")
+
+        current_app.logger.info(
+            f"Ответ на тикет: ticket_id={ticket_id}, message_length={len(message)}, user={current_user.username}"
+        )
 
         if not ticket_id:
             return jsonify({"success": False, "error": "ID тикета не указан"})
-            
+
         if not message or len(message) < 1:
             return jsonify(
                 {
@@ -319,7 +348,7 @@ def ticket_response() -> Dict[str, Any]:
         else:
             ticket.user_response = message
             ticket.user_response_at = datetime.utcnow()
-        
+
         ticket.updated_at = datetime.utcnow()
 
         if is_admin_message:
@@ -343,24 +372,36 @@ def ticket_response() -> Dict[str, Any]:
                         continue
 
                     allowed_extensions = {
-                        "png", "jpg", "jpeg", "gif", "pdf", 
-                        "doc", "docx", "txt", "zip", "rar"
+                        "png",
+                        "jpg",
+                        "jpeg",
+                        "gif",
+                        "pdf",
+                        "doc",
+                        "docx",
+                        "txt",
+                        "zip",
+                        "rar",
                     }
                     file_extension = (
                         file.filename.rsplit(".", 1)[1].lower()
-                        if "." in file.filename else ""
+                        if "." in file.filename
+                        else ""
                     )
 
                     if file_extension not in allowed_extensions:
                         continue
 
                     from werkzeug.utils import secure_filename
+
                     filename = secure_filename(file.filename)
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                     unique_filename = f"{ticket.id}_{'admin' if is_admin_message else 'user'}_response_{timestamp}_{filename}"
 
-                    full_path, relative_path = FileStorageManager.get_ticket_file_path(
-                        ticket.id, unique_filename
+                    full_path, relative_path = (
+                        FileStorageManager.get_ticket_file_path(
+                            ticket.id, unique_filename
+                        )
                     )
 
                     if FileStorageManager.save_file(file, full_path):
@@ -380,8 +421,12 @@ def ticket_response() -> Dict[str, Any]:
         return jsonify({"success": True, "message": "Ответ отправлен"})
 
     except Exception as e:
-        current_app.logger.error(f"Ошибка отправки ответа: {str(e)}", exc_info=True)
-        return jsonify({"success": False, "error": f"Ошибка отправки ответа: {str(e)}"})
+        current_app.logger.error(
+            f"Ошибка отправки ответа: {str(e)}", exc_info=True
+        )
+        return jsonify(
+            {"success": False, "error": f"Ошибка отправки ответа: {str(e)}"}
+        )
 
 
 @tickets_bp.route("/api/delete_all_closed_tickets", methods=["POST"])
@@ -390,40 +435,48 @@ def delete_all_closed_tickets():
     try:
         if not current_user.is_admin or not current_user.admin_mode_enabled:
             return jsonify({"success": False, "error": "Недостаточно прав"})
-        
+
         closed_tickets = Ticket.query.filter(
-            Ticket.status.in_(['closed', 'rejected'])
+            Ticket.status.in_(["closed", "rejected"])
         ).all()
-        
+
         deleted_count = 0
-        
+
         for ticket in closed_tickets:
             for ticket_file in ticket.files:
                 try:
                     file_storage = FileStorageManager()
                     file_storage.delete_file(ticket_file.file_path)
                 except Exception as e:
-                    current_app.logger.warning(f"Не удалось удалить файл {ticket_file.file_path}: {str(e)}")
-            
+                    current_app.logger.warning(
+                        f"Не удалось удалить файл {ticket_file.file_path}: {str(e)}"
+                    )
+
             TicketMessage.query.filter_by(ticket_id=ticket.id).delete()
-            
+
             ticket_link = url_for("tickets.ticket_detail", ticket_id=ticket.id)
             Notification.query.filter_by(link=ticket_link).delete()
-            
+
             db.session.delete(ticket)
             deleted_count += 1
-        
+
         db.session.commit()
-        
-        current_app.logger.info(f"Администратор {current_user.username} удалил {deleted_count} закрытых тикетов")
-        
-        return jsonify({
-            "success": True, 
-            "deleted_count": deleted_count,
-            "message": f"Удалено {deleted_count} тикетов"
-        })
-        
+
+        current_app.logger.info(
+            f"Администратор {current_user.username} удалил {deleted_count} закрытых тикетов"
+        )
+
+        return jsonify(
+            {
+                "success": True,
+                "deleted_count": deleted_count,
+                "message": f"Удалено {deleted_count} тикетов",
+            }
+        )
+
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Ошибка удаления тикетов: {str(e)}")
-        return jsonify({"success": False, "error": "Ошибка при удалении тикетов"})
+        return jsonify(
+            {"success": False, "error": "Ошибка при удалении тикетов"}
+        )

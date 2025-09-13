@@ -1,7 +1,7 @@
 
 import os
 import shutil
-from typing import Any, Dict, Union
+from typing import Union
 
 from flask import (
     Blueprint,
@@ -12,15 +12,17 @@ from flask import (
     render_template,
     request,
     url_for,
-    escape,
+    jsonify,
+    session
 )
+from markupsafe import escape
 from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 
 from .. import db
 from ..forms import MaterialForm
-from ..models import Material, SiteSettings, Subject, SubjectGroup, User
+from ..models import Material, SiteSettings, Subject, SubjectGroup
 from ..utils.file_storage import FileStorageManager, safe_path_join
 from ..utils.payment_service import YooKassaService
 from ..utils.transliteration import get_safe_filename
@@ -40,11 +42,12 @@ main_bp.app_context_processor(inject_moment)
 main_bp.app_context_processor(inject_admin_users)
 main_bp.app_context_processor(inject_subscription_status)
 
+
 def generate_svg_pattern(pattern_type: str) -> str:
 
     fallback_patterns = {
         'dots': 'default_dots',
-        'circles': 'default_circles', 
+        'circles': 'default_circles',
         'triangles': 'default_triangles',
         'hexagons': 'default_hexagons',
         'waves': 'default_waves',
@@ -53,6 +56,7 @@ def generate_svg_pattern(pattern_type: str) -> str:
     }
 
     return fallback_patterns.get(pattern_type, fallback_patterns['dots'])
+
 
 @main_bp.route("/", methods=["GET", "POST"])
 def index() -> Union[str, Response]:
@@ -131,6 +135,7 @@ def index() -> Union[str, Response]:
         pattern_generation_enabled=pattern_generation_enabled
     )
 
+
 @main_bp.route("/profile")
 @login_required
 def profile() -> str:
@@ -163,6 +168,7 @@ def profile() -> str:
         subscription_expires=subscription_expires
     )
 
+
 @main_bp.route("/subject/<int:subject_id>", methods=["GET", "POST"])
 def subject_detail(subject_id: int) -> Union[str, Response]:
     if request.method == "POST":
@@ -180,6 +186,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                         current_app.logger.info(f"Размер файла {key}: {file_size} байт ({file_size / (1024*1024):.2f} MB)")
                     else:
                         current_app.logger.info(f"Размер файла {key}: неизвестен")
+
     try:
         subject = Subject.query.get_or_404(subject_id)
     except Exception as e:
@@ -367,6 +374,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         can_manage_materials=can_manage_materials,
     )
 
+
 @main_bp.route("/subject/<int:subject_id>/edit", methods=["POST"])
 @login_required
 def edit_subject(subject_id: int) -> Response:
@@ -406,6 +414,7 @@ def edit_subject(subject_id: int) -> Response:
 
     return redirect(url_for("main.subject_detail", subject_id=subject_id))
 
+
 @main_bp.route("/subject/<int:subject_id>/delete", methods=["POST"])
 @login_required
 def delete_subject(subject_id: int) -> Response:
@@ -433,6 +442,7 @@ def delete_subject(subject_id: int) -> Response:
     flash("Предмет удалён")
     return redirect(url_for("main.index"))
 
+
 @main_bp.route("/material/<int:material_id>")
 @login_required
 def material_detail(material_id: int) -> Union[str, Response]:
@@ -454,6 +464,7 @@ def material_detail(material_id: int) -> Union[str, Response]:
             user_submissions[material_id] = submission
 
     return render_template("subjects/material_detail.html", material=material, user_submissions=user_submissions)
+
 
 @main_bp.route("/submission/<int:submission_id>/delete", methods=["POST"])
 @login_required
@@ -478,6 +489,7 @@ def delete_solution(submission_id: int) -> Response:
 
     flash("Решение удалено", "success")
     return redirect(url_for("main.material_detail", material_id=submission.material_id))
+
 
 @main_bp.route("/material/<int:material_id>/add_solution", methods=["POST"])
 @login_required
@@ -543,6 +555,7 @@ def add_solution_file(material_id: int) -> Response:
             flash(f"Ошибка при сохранении файла: {str(e)}", "error")
 
     return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
+
 
 @main_bp.route("/material/<int:material_id>/submit_solution", methods=["POST"])
 @login_required
@@ -619,6 +632,7 @@ def submit_solution(material_id: int) -> Response:
 
     return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
 
+
 @main_bp.route("/toggle-admin-mode", methods=["POST"])
 @login_required
 def toggle_admin_mode() -> Response:
@@ -633,6 +647,7 @@ def toggle_admin_mode() -> Response:
     flash(f"Переключен в режим {mode}")
 
     return redirect(request.referrer or url_for("main.index"))
+
 
 @main_bp.route("/material/<int:material_id>/edit", methods=["POST"])
 @login_required
@@ -679,6 +694,7 @@ def edit_material(material_id: int) -> Response:
 
     return redirect(url_for("main.material_detail", material_id=material.id))
 
+
 @main_bp.route("/material/<int:material_id>/delete", methods=["POST"])
 @login_required
 def delete_material(material_id: int) -> Response:
@@ -720,17 +736,21 @@ def delete_material(material_id: int) -> Response:
     flash("Материал удалён")
     return redirect(url_for("main.subject_detail", subject_id=subject_id))
 
+
 @main_bp.route("/privacy")
 def privacy() -> str:
     return render_template("static/privacy.html")
+
 
 @main_bp.route("/terms")
 def terms() -> str:
     return render_template("static/terms.html")
 
+
 @main_bp.route("/security-policy")
 def security_policy() -> str:
     return render_template("static/security_policy.html")
+
 
 @main_bp.route("/.well-known/security.txt")
 def security_txt() -> Response:
@@ -747,6 +767,7 @@ Policy: https://cysu.ru/security-policy
 # We appreciate responsible disclosure of security vulnerabilities""",
         mimetype="text/plain"
     )
+
 
 @main_bp.route("/.well-known/humans.txt")
 def humans_txt() -> Response:
@@ -785,6 +806,7 @@ def humans_txt() -> Response:
         mimetype="text/plain"
     )
 
+
 @main_bp.route("/.well-known/robots.txt")
 def robots_txt() -> Response:
     """Возвращает файл robots.txt для поисковых роботов"""
@@ -820,16 +842,18 @@ Allow: /terms/""",
         mimetype="text/plain"
     )
 
+
 @main_bp.route("/robots.txt")
 def robots_txt_redirect() -> Response:
     """Редирект с /robots.txt на /.well-known/robots.txt"""
     return redirect(url_for('main.robots_txt'), code=301)
 
+
 @main_bp.route("/error/<int:error_code>")
 def error_page(error_code: int) -> tuple:
     """Универсальная страница ошибок"""
     from datetime import datetime
-    
+
     # Определяем информацию об ошибке по коду
     error_info = {
         400: {
@@ -909,13 +933,13 @@ def error_page(error_code: int) -> tuple:
             "description": "Сервер не поддерживает версию HTTP-протокола, используемую в запросе."
         }
     }
-    
+
     # Получаем информацию об ошибке или используем значения по умолчанию
     error_data = error_info.get(error_code, {
         "title": f"Ошибка {error_code}",
         "description": "Произошла неизвестная ошибка."
     })
-    
+
     # Дополнительная информация для отладки
     error_details = {
         "error_code": escape(str(error_code)),
@@ -924,61 +948,72 @@ def error_page(error_code: int) -> tuple:
         "error_time": escape(datetime.now().strftime("%d.%m.%Y %H:%M:%S")),
         "error_traceback": None  # Можно добавить traceback в production
     }
-    
+
     return render_template("error.html", **error_details), error_code
+
 
 @main_bp.route("/404")
 def not_found() -> tuple:
     return error_page(404)
 
+
 @main_bp.app_errorhandler(400)
 def handle_400(error) -> Response:
     return redirect(url_for('main.error_page', error_code=400))
+
 
 @main_bp.app_errorhandler(401)
 def handle_401(error) -> Response:
     return redirect(url_for('main.error_page', error_code=401))
 
+
 @main_bp.app_errorhandler(403)
 def handle_403(error) -> Response:
     return redirect(url_for('main.error_page', error_code=403))
+
 
 @main_bp.app_errorhandler(404)
 def handle_404(error) -> Response:
     return redirect(url_for('main.error_page', error_code=404))
 
+
 @main_bp.app_errorhandler(405)
 def handle_405(error) -> Response:
     return redirect(url_for('main.error_page', error_code=405))
+
 
 @main_bp.app_errorhandler(500)
 def handle_500(error) -> Response:
     return redirect(url_for('main.error_page', error_code=500))
 
+
 @main_bp.app_errorhandler(502)
 def handle_502(error) -> Response:
     return redirect(url_for('main.error_page', error_code=502))
+
 
 @main_bp.app_errorhandler(503)
 def handle_503(error) -> Response:
     return redirect(url_for('main.error_page', error_code=503))
 
+
 @main_bp.route("/maintenance")
 def maintenance() -> str:
     return render_template("maintenance.html")
+
 
 @main_bp.route("/static/<path:filename>")
 def static_files(filename: str) -> Response:
     """Обработчик статических файлов с кэшированием"""
     from flask import send_from_directory, make_response
     import os
-    
+
     # Путь к статическим файлам
     static_dir = os.path.join(current_app.root_path, 'static')
-    
+
     # Отправляем файл
     response = make_response(send_from_directory(static_dir, filename))
-    
+
     # Добавляем заголовки кэширования
     if filename.endswith(('.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot')):
         # Статические ресурсы кэшируем на 1 год
@@ -993,24 +1028,29 @@ def static_files(filename: str) -> Response:
     else:
         # Остальные файлы кэшируем на 1 день
         response.headers['Cache-Control'] = 'public, max-age=86400'
-    
+
     return response
+
 
 @main_bp.route("/wiki")
 def wiki() -> str:
     return render_template("static/wiki.html")
 
+
 @main_bp.route("/macro/time")
 def macro_time() -> str:
     return render_template("for_my_love/time.html")
+
 
 @main_bp.route("/macro")
 def macro() -> str:
     return render_template("for_my_love/macro.html")
 
+
 @main_bp.route("/redirect")
 def redirect_page() -> str:
     return render_template("redirect.html")
+
 
 @main_bp.route("/redirect/download")
 def download_redirect() -> Response:
@@ -1041,6 +1081,7 @@ def download_redirect() -> Response:
 
     return response
 
+
 @main_bp.route('/files/<int:subject_id>/<path:filename>', methods=['GET', 'HEAD'])
 def serve_file(subject_id: int, filename: str) -> Response:
     import os
@@ -1055,20 +1096,20 @@ def serve_file(subject_id: int, filename: str) -> Response:
     # Безопасное создание возможных путей
     upload_folder = current_app.config['UPLOAD_FOLDER']
     safe_filename = secure_filename(filename)
-    
+
     possible_paths = []
     try:
         # Базовый путь
         possible_paths.append(safe_path_join(upload_folder, safe_filename))
     except ValueError:
         pass
-    
+
     try:
         # Путь с subject_id
         possible_paths.append(safe_path_join(upload_folder, str(subject_id), safe_filename))
     except ValueError:
         pass
-    
+
     try:
         # Путь с basename
         possible_paths.append(safe_path_join(upload_folder, str(subject_id), os.path.basename(safe_filename)))
@@ -1161,6 +1202,7 @@ def serve_file(subject_id: int, filename: str) -> Response:
         current_app.logger.error(f"Ошибка обработки файла {file_path}: {e}")
         abort(500)
 
+
 def _handle_range_request(file_path: str, file_size: int, mimetype: str, filename: str) -> Response:
     import re
 
@@ -1216,4 +1258,3 @@ def _handle_range_request(file_path: str, file_size: int, mimetype: str, filenam
         response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
 
     return response
-
