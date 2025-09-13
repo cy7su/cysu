@@ -12,6 +12,7 @@ from flask import (
     render_template,
     request,
     url_for,
+    escape,
 )
 from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
@@ -917,10 +918,10 @@ def error_page(error_code: int) -> tuple:
     
     # Дополнительная информация для отладки
     error_details = {
-        "error_code": error_code,
-        "error_title": error_data["title"],
-        "error_description": error_data["description"],
-        "error_time": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
+        "error_code": escape(str(error_code)),
+        "error_title": escape(str(error_data["title"])),
+        "error_description": escape(str(error_data["description"])),
+        "error_time": escape(datetime.now().strftime("%d.%m.%Y %H:%M:%S")),
         "error_traceback": None  # Можно добавить traceback в production
     }
     

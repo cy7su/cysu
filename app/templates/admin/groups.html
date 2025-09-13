@@ -707,6 +707,17 @@ function enableEditMode(groupId, currentName, currentDescription) {
     });
 }
 
+// Функция для экранирования HTML
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/\//g, '&#x2F;');
+}
+
 // Функция для восстановления строки в обычном режиме
 function restoreRow(row, name, description) {
     const nameCell = row.querySelector('td:nth-child(2)');
@@ -717,17 +728,21 @@ function restoreRow(row, name, description) {
     
     const groupId = row.dataset.groupId;
     
+    // Экранируем данные
+    const escapedName = escapeHtml(name);
+    const escapedDescription = escapeHtml(description || 'Нет описания');
+    
     // Восстанавливаем название
     nameCell.innerHTML = `
         <div class="admin-table-cell-content">
-          <strong class="admin-table-cell-title">${name}</strong>
+          <strong class="admin-table-cell-title">${escapedName}</strong>
         </div>
     `;
     
     // Восстанавливаем описание
     descriptionCell.innerHTML = `
         <div class="admin-table-cell-content">
-          <span class="admin-table-cell-description">${description || 'Нет описания'}</span>
+          <span class="admin-table-cell-description">${escapedDescription}</span>
         </div>
     `;
     
@@ -735,7 +750,7 @@ function restoreRow(row, name, description) {
     actionsCell.innerHTML = `
         <div class="admin-table-actions">
             <button type="button" class="btn btn-sm btn-outline-primary admin-btn-action" 
-                    onclick="enableEditMode(${groupId}, '${name}', '${description || 'Нет описания'}')"
+                    onclick="enableEditMode(${groupId}, '${escapedName}', '${escapedDescription}')"
                     title="Редактировать">
                 <i class="fas fa-edit"></i>
             </button>
@@ -744,7 +759,7 @@ function restoreRow(row, name, description) {
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="group_id" value="${groupId}">
                 <button type="submit" class="btn btn-sm btn-outline-danger admin-btn-action" 
-                        onclick="return confirm('Вы уверены, что хотите удалить группу &quot;${name}&quot;?')"
+                        onclick="return confirm('Вы уверены, что хотите удалить группу &quot;${escapedName}&quot;?')"
                         title="Удалить">
                     <i class="fas fa-trash"></i>
                 </button>
