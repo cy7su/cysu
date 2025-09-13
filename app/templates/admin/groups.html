@@ -8,114 +8,151 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid admin-groups">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Управление группами</h2>
-    <span class="badge bg-primary fs-6">{{ groups|length }} групп</span>
-  </div>
+<div class="admin-page">
+  <div class="admin-content">
+    <div class="admin-layout">
+      <!-- Боковая панель для создания -->
+      <div class="admin-sidebar">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">
+              <i class="fas fa-plus-circle"></i>
+              Создать группу
+            </h3>
+          </div>
+          <div class="admin-card-body">
+            <form method="post" class="admin-form">
+              {{ form.hidden_tag() }}
+              
+              <div class="form-group">
+                <label for="{{ form.name.id }}" class="form-label">
+                  <i class="fas fa-tag"></i>
+                  Название группы
+                </label>
+                {{ form.name(class_='form-control admin-input', placeholder='Введите название группы') }}
+                {% if form.name.errors %}
+                  <div class="form-error">
+                    {% for error in form.name.errors %}
+                      <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
 
-  <div class="row g-4">
-    <div class="col-lg-3">
-      <div class="card shadow-sm border-0" style="background: var(--dp-02); height: fit-content;">
-        <div class="card-body">
-          <h5 class="card-title mb-3">
-            <i class="fas fa-layer-group me-2 text-primary"></i>Создать группу
-          </h5>
-          <form method="post">
-            {{ form.hidden_tag() }}
-            <div class="mb-3">
-              <label for="{{ form.name.id }}" class="form-label">Название группы</label>
-              {{ form.name(class_='form-control', placeholder='Введите название группы') }}
-              {% if form.name.errors %}
-                <div class="text-danger small">
-                  {% for error in form.name.errors %}
-                    {{ error }}
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-            <div class="mb-3">
-              <label for="{{ form.description.id }}" class="form-label">Описание</label>
-              {{ form.description(class_='form-control', placeholder='Описание группы (необязательно)', rows=3) }}
-              {% if form.description.errors %}
-                <div class="text-danger small">
-                  {% for error in form.description.errors %}
-                    {{ error }}
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
+              <div class="form-group">
+                <label for="{{ form.description.id }}" class="form-label">
+                  <i class="fas fa-align-left"></i>
+                  Описание
+                </label>
+                {{ form.description(class_='form-control admin-textarea', placeholder='Описание группы (необязательно)', rows=3) }}
+                {% if form.description.errors %}
+                  <div class="form-error">
+                    {% for error in form.description.errors %}
+                      <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
 
-            <button type="submit" name="submit" value="Сохранить" class="btn btn-primary w-100">
-              <i class="fas fa-plus me-2"></i>Создать группу
-            </button>
-          </form>
+              <button type="submit" name="submit" value="Сохранить" class="btn btn-primary admin-btn-primary">
+                <i class="fas fa-plus"></i>
+                Создать группу
+              </button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="col-lg-9">
-      <div class="card shadow-sm border-0" style="background: var(--dp-02);">
-        <div class="card-body p-0">
-          <div class="table-responsive" style="border-radius: 14px;">
-            <table class="table mb-0" style="background: var(--dp-02); color: var(--text-primary); font-size: 0.9em;">
-              <thead style="background: var(--dp-03);">
-                <tr>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">ID</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Название</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Описание</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Пользователей</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Предметов</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Действия</th>
-                </tr>
-              </thead>
-              <tbody style="background: var(--dp-02);">
-                {% if groups %}
-                  {% for group in groups %}
-                  <tr style="border-color: var(--border-secondary); background: var(--dp-02); color: var(--text-primary);" data-group-id="{{ group.id }}">
-                    <td style="color: var(--text-primary);"><span class="badge bg-secondary">{{ group.id }}</span></td>
-                    <td style="color: var(--text-primary);">
-                      <strong>{{ group.name }}</strong>
-                    </td>
-                    <td style="color: var(--text-primary);">
-                      <small class="text-muted">{{ group.description or 'Нет описания' }}</small>
-                    </td>
-                    <td style="color: var(--text-primary);">
-                      <span class="badge bg-primary">{{ group.users|length }}</span>
-                    </td>
-                    <td style="color: var(--text-primary);">
-                      <span class="badge bg-secondary">{{ group.subjects|length }}</span>
-                    </td>
-                    <td style="color: var(--text-primary);">
-                      <div class="d-flex gap-1">
-                        <button type="button" class="btn btn-sm btn-outline-primary" 
-                                onclick="enableEditMode({{ group.id }}, '{{ group.name }}', '{{ group.description or 'Нет описания' }}', 1)">
-                          <i class="fas fa-edit"></i>
-                        </button>
-                        
-                        <form method="post" style="display: inline;">
-                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                          <input type="hidden" name="action" value="delete">
-                          <input type="hidden" name="group_id" value="{{ group.id }}">
-                          <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                  onclick="return confirm('Вы уверены, что хотите удалить группу &quot;{{ group.name }}&quot;?')">
-                            <i class="fas fa-trash"></i>
+      <!-- Основной контент -->
+      <div class="admin-main">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">
+              <i class="fas fa-list"></i>
+              Список групп
+            </h3>
+            <div class="admin-card-actions">
+              <button class="btn btn-outline-secondary btn-sm" onclick="refreshTable()">
+                <i class="fas fa-sync-alt"></i>
+                Обновить
+              </button>
+            </div>
+          </div>
+          
+          <div class="admin-card-body p-0">
+            {% if groups %}
+              <div class="admin-table-container">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px; text-align: center;">ID</th>
+                      <th style="width: 150px; text-align: center;">Название</th>
+                      <th style="text-align: center;">Описание</th>
+                      <th style="width: 100px; text-align: center;">Пользователей</th>
+                      <th style="width: 100px; text-align: center;">Предметов</th>
+                      <th style="width: 120px; text-align: center;">Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for group in groups %}
+                    <tr class="admin-table-row" data-group-id="{{ group.id }}">
+                      <td class="admin-table-td" style="text-align: center; vertical-align: middle;">
+                        <span class="admin-badge admin-badge-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 24px; text-align: center; display: inline-block;">{{ group.id }}</span>
+                      </td>
+                      <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
+                          <strong style="font-size: 0.8rem; color: var(--text-primary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ group.name }}</strong>
+                        </div>
+                      </td>
+                      <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
+                          <span style="font-size: 0.8rem; color: var(--text-primary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ group.description or 'Нет описания' }}
+                          </span>
+                        </div>
+                      </td>
+                      <td class="admin-table-td" style="text-align: center; vertical-align: middle;">
+                        <span class="admin-badge admin-badge-primary" style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 24px; text-align: center; display: inline-block;">{{ group.users|length }}</span>
+                      </td>
+                      <td class="admin-table-td" style="text-align: center; vertical-align: middle;">
+                        <span class="admin-badge admin-badge-info" style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 24px; text-align: center; display: inline-block;">{{ group.subjects|length }}</span>
+                      </td>
+                      <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
+                        <div style="display: flex; gap: 0.25rem; flex-wrap: nowrap; justify-content: flex-start;">
+                          <button type="button" class="btn btn-sm btn-outline-primary" 
+                                  onclick="enableEditMode({{ group.id }}, '{{ group.name }}', '{{ group.description or 'Нет описания' }}', 1)"
+                                  title="Редактировать"
+                                  style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-edit" style="font-size: 0.7rem;"></i>
                           </button>
-                        </form>
-                      </div>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                {% else %}
-                  <tr style="background: var(--dp-02); color: var(--text-primary);">
-                    <td colspan="6" class="text-center text-muted py-4" style="color: var(--text-primary);">
-                      <i class="fas fa-layer-group fa-2x mb-3"></i>
-                      <p>Нет групп</p>
-                    </td>
-                  </tr>
-                {% endif %}
-              </tbody>
-            </table>
+                          
+                          <form method="post" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="group_id" value="{{ group.id }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                    onclick="return confirm('Вы уверены, что хотите удалить группу &quot;{{ group.name }}&quot;?')"
+                                    title="Удалить"
+                                    style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                              <i class="fas fa-trash" style="font-size: 0.7rem;"></i>
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="admin-empty-state">
+                <div class="admin-empty-icon">
+                  <i class="fas fa-layer-group"></i>
+                </div>
+                <h3 class="admin-empty-title">Нет групп</h3>
+                <p class="admin-empty-description">Создайте первую группу, используя форму слева</p>
+              </div>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -125,6 +162,406 @@
 {% endblock %}
 
 {% block head %}
+<style>
+/* Стили для админ панели */
+.admin-page {
+  min-height: 100vh;
+}
+
+.admin-header {
+  background: var(--dp-02);
+  border-bottom: 1px solid var(--border-secondary);
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.admin-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.admin-title-section {
+  flex: 1;
+}
+
+.admin-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-title-icon {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+.admin-subtitle {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.admin-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat-card {
+  background: var(--dp-03);
+  border: 1px solid var(--border-secondary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  min-width: 120px;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.admin-sidebar {
+  position: sticky;
+  top: 2rem;
+}
+
+.admin-main {
+  min-height: 600px;
+}
+
+.admin-card {
+  background: var(--dp-02);
+  border: 1px solid var(--border-secondary);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.admin-card-header {
+  background: var(--dp-03);
+  border-bottom: 1px solid var(--border-secondary);
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-card-body {
+  padding: 1.5rem;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.admin-input,
+.admin-textarea {
+  background: var(--dp-01);
+  border: 1px solid var(--border-secondary);
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.admin-input:focus,
+.admin-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.admin-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.admin-btn-primary {
+  background: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.admin-btn-primary:hover {
+  background: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
+  transform: translateY(-1px);
+}
+
+.form-error {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.error-message {
+  color: var(--danger-color);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.admin-table-container {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--dp-02);
+}
+
+.admin-table-th {
+  background: var(--dp-03);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-secondary);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-table-row {
+  border-bottom: 1px solid var(--border-secondary);
+  transition: background-color 0.2s ease;
+}
+
+.admin-table-row:hover {
+  background: var(--dp-03);
+}
+
+.admin-table-td {
+  padding: 1rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  vertical-align: top;
+}
+
+.admin-table-cell-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-table-cell-title {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.admin-table-cell-description {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.admin-table-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.admin-btn-action {
+  padding: 0.5rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  transition: all 0.2s ease;
+}
+
+.admin-btn-action:hover {
+  transform: translateY(-1px);
+}
+
+.admin-form-inline {
+  display: inline;
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-badge-primary {
+  background: rgba(var(--primary-color-rgb), 0.1);
+  color: var(--primary-color);
+  border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+}
+
+.admin-badge-secondary {
+  background: rgba(var(--secondary-color-rgb), 0.1);
+  color: var(--secondary-color);
+  border: 1px solid rgba(var(--secondary-color-rgb), 0.2);
+}
+
+.admin-badge-info {
+  background: rgba(var(--info-color-rgb), 0.1);
+  color: var(--info-color);
+  border: 1px solid rgba(var(--info-color-rgb), 0.2);
+}
+
+.admin-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-secondary);
+}
+
+.admin-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.admin-empty-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.admin-empty-description {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .admin-sidebar {
+    position: static;
+  }
+  
+  .admin-header-content {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  
+  .admin-stats {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-content {
+    padding: 0 0.5rem;
+  }
+  
+  .admin-header {
+    padding: 1.5rem 0;
+  }
+  
+  .admin-title {
+    font-size: 1.5rem;
+  }
+  
+  .admin-card-header {
+    padding: 1rem;
+  }
+  
+  .admin-card-body {
+    padding: 1rem;
+  }
+  
+  .admin-table-th,
+  .admin-table-td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .admin-table-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+</style>
+
 <script>
 // Функция для включения режима редактирования прямо в таблице
 function enableEditMode(groupId, currentName, currentDescription) {
@@ -145,16 +582,16 @@ function enableEditMode(groupId, currentName, currentDescription) {
     // Создаем поля ввода для названия
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
-    nameInput.className = 'form-control form-control-sm';
+    nameInput.className = 'admin-input';
     nameInput.value = currentName;
-    nameInput.style.cssText = 'background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 8px; width: 100%; font-size: 0.9em; padding: 0.2rem 0.4rem;';
+    nameInput.style.cssText = 'width: 100%; font-size: 0.875rem; padding: 0.5rem;';
     
     // Создаем поле для описания
     const descriptionInput = document.createElement('textarea');
-    descriptionInput.className = 'form-control form-control-sm';
+    descriptionInput.className = 'admin-textarea';
     descriptionInput.value = currentDescription === 'Нет описания' ? '' : currentDescription;
     descriptionInput.rows = '2';
-    descriptionInput.style.cssText = 'background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 8px; width: 100%; resize: none; font-size: 0.85em; padding: 0.2rem 0.4rem; line-height: 1.2;';
+    descriptionInput.style.cssText = 'width: 100%; resize: none; font-size: 0.8rem; padding: 0.5rem; min-height: 60px;';
     
     // Заменяем содержимое ячеек
     nameCell.innerHTML = '';
@@ -165,16 +602,14 @@ function enableEditMode(groupId, currentName, currentDescription) {
     
     // Создаем кнопки сохранения/отмены
     const saveBtn = document.createElement('button');
-    saveBtn.className = 'btn btn-success btn-sm me-1';
+    saveBtn.className = 'btn btn-success btn-sm admin-btn-action';
     saveBtn.innerHTML = '<i class="fas fa-check"></i>';
     saveBtn.title = 'Сохранить';
-    saveBtn.style.cssText = 'font-size: 0.65rem; padding: 0.2rem 0.4rem; min-width: 24px; height: 24px;';
     
     const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'btn btn-secondary btn-sm';
+    cancelBtn.className = 'btn btn-secondary btn-sm admin-btn-action';
     cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
     cancelBtn.title = 'Отменить';
-    cancelBtn.style.cssText = 'font-size: 0.65rem; padding: 0.2rem 0.4rem; min-width: 24px; height: 24px;';
     
     // Очищаем ячейку действий и добавляем новые кнопки
     actionsCell.innerHTML = '';
@@ -191,14 +626,14 @@ function enableEditMode(groupId, currentName, currentDescription) {
         const newDescription = descriptionInput.value.trim();
         
         if (!newName) {
-            alert('Название группы не может быть пустым');
+            showNotification('Название группы не может быть пустым', 'error');
             return;
         }
         
         // Получаем CSRF токен
         const csrfToken = document.querySelector('input[name="csrf_token"]');
         if (!csrfToken || !csrfToken.value) {
-            alert('Ошибка: CSRF токен не найден. Обновите страницу и попробуйте снова.');
+            showNotification('Ошибка: CSRF токен не найден. Обновите страницу и попробуйте снова.', 'error');
             return;
         }
         
@@ -208,7 +643,7 @@ function enableEditMode(groupId, currentName, currentDescription) {
         formData.append('group_id', groupId);
         formData.append('name', newName);
         formData.append('description', newDescription);
-        formData.append('is_active', 1); // Все группы активны
+        formData.append('is_active', 1);
         formData.append('csrf_token', csrfToken.value);
         
         fetch(window.location.href, {
@@ -220,25 +655,16 @@ function enableEditMode(groupId, currentName, currentDescription) {
             }
         })
         .then(response => {
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-            
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
-            // Проверяем, что ответ действительно JSON
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
-                // Если сервер вернул HTML вместо JSON, но статус успешный,
-                // значит данные сохранились, просто сервер не вернул JSON
                 if (response.status === 200) {
-                    console.log('Сервер вернул HTML вместо JSON, но статус 200 - данные сохранены');
                     return { success: true, message: 'Данные обновлены' };
                 } else {
-                    // Попробуем прочитать текст ответа для диагностики
                     return response.text().then(text => {
-                        console.log('HTML ответ сервера:', text.substring(0, 200) + '...');
                         throw new Error('Ответ сервера не является JSON');
                     });
                 }
@@ -247,34 +673,17 @@ function enableEditMode(groupId, currentName, currentDescription) {
             return response.json();
         })
         .then(data => {
-            console.log('Response data:', data);
-            
             if (data.success) {
-                // Обновляем отображение
                 restoreRow(row, newName, newDescription);
-                alert('Группа успешно обновлена');
+                showNotification('Группа успешно обновлена', 'success');
             } else {
                 const errorMsg = data.error || 'Неизвестная ошибка';
-                console.error('Server error:', errorMsg);
-                alert('Ошибка при обновлении группы: ' + errorMsg);
+                showNotification('Ошибка при обновлении группы: ' + errorMsg, 'error');
             }
         })
         .catch(error => {
             console.error('Fetch error:', error);
-            
-            // Более информативное сообщение об ошибке
-            let errorMessage = 'Ошибка при обновлении группы';
-            if (error.message.includes('HTTP')) {
-                errorMessage += `: ${error.message}`;
-            } else if (error.message.includes('JSON')) {
-                errorMessage += ': Сервер вернул неверный формат ответа';
-            } else {
-                errorMessage += ': ' + error.message;
-            }
-            
-            alert(errorMessage);
-            
-            // Возвращаем строку в исходное состояние при ошибке
+            showNotification('Ошибка при обновлении группы: ' + error.message, 'error');
             restoreRow(row, originalName, originalDescription);
         });
     });
@@ -309,29 +718,121 @@ function restoreRow(row, name, description) {
     const groupId = row.dataset.groupId;
     
     // Восстанавливаем название
-    nameCell.innerHTML = `<strong>${name}</strong>`;
+    nameCell.innerHTML = `
+        <div class="admin-table-cell-content">
+          <strong class="admin-table-cell-title">${name}</strong>
+        </div>
+    `;
     
     // Восстанавливаем описание
-    descriptionCell.innerHTML = `<small class="text-muted">${description || 'Нет описания'}</small>`;
+    descriptionCell.innerHTML = `
+        <div class="admin-table-cell-content">
+          <span class="admin-table-cell-description">${description || 'Нет описания'}</span>
+        </div>
+    `;
     
     // Восстанавливаем кнопки действий
     actionsCell.innerHTML = `
-        <div class="d-flex gap-1">
-            <button type="button" class="btn btn-sm btn-outline-primary" 
-                    onclick="enableEditMode(${groupId}, '${name}', '${description || 'Нет описания'}')">
+        <div class="admin-table-actions">
+            <button type="button" class="btn btn-sm btn-outline-primary admin-btn-action" 
+                    onclick="enableEditMode(${groupId}, '${name}', '${description || 'Нет описания'}')"
+                    title="Редактировать">
                 <i class="fas fa-edit"></i>
             </button>
-            <form method="post" style="display: inline;">
+            <form method="post" class="admin-form-inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="group_id" value="${groupId}">
-                <button type="submit" class="btn btn-sm btn-outline-danger" 
-                        onclick="return confirm('Вы уверены, что хотите удалить группу &quot;${name}&quot;?')">
+                <button type="submit" class="btn btn-sm btn-outline-danger admin-btn-action" 
+                        onclick="return confirm('Вы уверены, что хотите удалить группу &quot;${name}&quot;?')"
+                        title="Удалить">
                     <i class="fas fa-trash"></i>
                 </button>
             </form>
         </div>
     `;
+}
+
+// Функция для обновления таблицы
+function refreshTable() {
+    window.location.reload();
+}
+
+// Функция для показа уведомлений
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `admin-notification admin-notification-${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    // Добавляем стили для уведомлений
+    if (!document.getElementById('notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            .admin-notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                animation: slideInRight 0.3s ease-out;
+                max-width: 400px;
+            }
+            
+            .admin-notification-success {
+                background: #10b981;
+            }
+            
+            .admin-notification-error {
+                background: #ef4444;
+            }
+            
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Удаляем уведомление через 4 секунды
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 4000);
 }
 </script>
 {% endblock %}

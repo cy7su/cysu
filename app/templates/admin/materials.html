@@ -8,34 +8,137 @@
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h2>Все материалы</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Название</th>
-                <th>Предмет</th>
-                <th>Тип</th>
-                <th>Файл</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for material in materials %}
-            <tr>
-                <td>{{ material.title }}</td>
-                <td>{{ material.subject.title }}</td>
-                <td>{{ material.type }}</td>
-                <td>{% if material.file %}<a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}" target="_blank">Файл</a>{% endif %}</td>
-                <td>
-                    <form method="post" action="{{ url_for('main.delete_material', material_id=material.id) }}" style="display:inline;">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Удалить?')">Удалить</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="admin-page">
+  <!-- Заголовок страницы -->
+  <div class="admin-header">
+    <div class="admin-header-content">
+      <div class="admin-title-section">
+        <h1 class="admin-title">
+          <i class="fas fa-file-alt admin-title-icon"></i>
+          Управление материалами
+        </h1>
+        <p class="admin-subtitle">Просмотр и управление материалами системы</p>
+      </div>
+      <div class="admin-stats">
+        <div class="stat-card">
+          <div class="stat-number">{{ materials|length }}</div>
+          <div class="stat-label">Материалов</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-content">
+    <div class="admin-layout">
+      <!-- Основной контент -->
+      <div class="admin-main" style="grid-column: 1 / -1;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">
+              <i class="fas fa-list"></i>
+              Список материалов
+            </h3>
+            <div class="admin-card-actions">
+              <button class="btn btn-outline-secondary btn-sm" onclick="refreshTable()">
+                <i class="fas fa-sync-alt"></i>
+                Обновить
+              </button>
+            </div>
+          </div>
+          
+          <div class="admin-card-body p-0">
+            {% if materials %}
+              <div class="admin-table-container">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th class="admin-table-th">
+                        <i class="fas fa-tag"></i>
+                        Название
+                      </th>
+                      <th class="admin-table-th">
+                        <i class="fas fa-book"></i>
+                        Предмет
+                      </th>
+                      <th class="admin-table-th">
+                        <i class="fas fa-file"></i>
+                        Тип
+                      </th>
+                      <th class="admin-table-th">
+                        <i class="fas fa-download"></i>
+                        Файл
+                      </th>
+                      <th class="admin-table-th">
+                        <i class="fas fa-cogs"></i>
+                        Действия
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for material in materials %}
+                    <tr class="admin-table-row">
+                      <td class="admin-table-td">
+                        <div class="admin-table-cell-content">
+                          <strong class="admin-table-cell-title">{{ material.title }}</strong>
+                        </div>
+                      </td>
+                      <td class="admin-table-td">
+                        <div class="admin-table-cell-content">
+                          <span class="admin-badge admin-badge-primary">{{ material.subject.title }}</span>
+                        </div>
+                      </td>
+                      <td class="admin-table-td">
+                        <div class="admin-table-cell-content">
+                          <span class="admin-badge admin-badge-info">{{ material.type }}</span>
+                        </div>
+                      </td>
+                      <td class="admin-table-td">
+                        <div class="admin-table-cell-content">
+                          {% if material.file %}
+                            <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}" 
+                               class="admin-link admin-link-primary" 
+                               target="_blank">
+                              <i class="fas fa-download"></i>
+                              <span>Скачать</span>
+                            </a>
+                          {% else %}
+                            <span class="admin-text-muted">Нет файла</span>
+                          {% endif %}
+                        </div>
+                      </td>
+                      <td class="admin-table-td">
+                        <div class="admin-table-actions">
+                          <form method="post" action="{{ url_for('main.delete_material', material_id=material.id) }}" 
+                                class="admin-form-inline" 
+                                onsubmit="return confirm('Удалить материал?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-outline-danger admin-btn-action" 
+                                    title="Удалить">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                    {% else %}
+                      <tr class="admin-table-row">
+                        <td colspan="5" class="admin-empty-state">
+                          <div class="admin-empty-icon">
+                            <i class="fas fa-file-alt"></i>
+                          </div>
+                          <h3 class="admin-empty-title">Нет материалов</h3>
+                          <p class="admin-empty-description">Материалы появятся здесь после загрузки</p>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %} 

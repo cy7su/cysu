@@ -3,267 +3,203 @@
 
 {% block title %}Админка: Управление пользователями{% endblock %}
 
+{% block head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+{% endblock %}
+
 {% block breadcrumbs %}
 {{ admin_breadcrumb("Пользователи") }}
 {% endblock %}
 
 {% block content %}
-<div class="admin-users">
-<div class="container-fluid">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Управление пользователями</h2>
-    <span class="badge bg-primary fs-6">{{ users|length }} пользователей</span>
-  </div>
-
-  <div class="row g-4">
-    <div class="col-lg-3">
-      <div class="card shadow-sm border-0" style="background: var(--dp-02); height: fit-content;">
-        <div class="card-body">
-          <h5 class="card-title mb-3">
-            <i class="fas fa-user-plus me-2 text-primary"></i>Создать пользователя
-          </h5>
-          <form method="post">
-            {{ form.hidden_tag() }}
-            <div class="mb-3">
-              <label for="{{ form.username.id }}" class="form-label">Имя пользователя</label>
-              {{ form.username(class_='form-control', placeholder='Введите имя пользователя') }}
-              {% if form.username.errors %}
-                <div class="text-danger small">
-                  {% for error in form.username.errors %}
-                    {{ error }}
-                  {% endfor %}
-                </div>
-              {% endif %}
+<div class="admin-page">
+  <div class="admin-content">
+    <div class="admin-layout">
+      <!-- Основной контент -->
+      <div class="admin-main" style="grid-column: 1 / -1;">
+        <div class="admin-card">
+          <div class="admin-card-header" style="background: linear-gradient(135deg, var(--dp-02) 0%, var(--dp-03) 100%); border-bottom: 1px solid var(--dp-12);">
+            <h3 class="admin-card-title" style="color: var(--text-primary); font-weight: 600; letter-spacing: 0.5px;">
+              <i class="fas fa-users" style="color: var(--primary-color); margin-right: 0.75rem;"></i>
+              Управление пользователями
+            </h3>
+            <div class="admin-card-actions">
+              <span class="admin-badge admin-badge-primary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">
+                <i class="fas fa-users" style="margin-right: 0.25rem;"></i>
+                {{ users|length }} пользователей
+              </span>
             </div>
-            <div class="mb-3">
-              <label for="{{ form.email.id }}" class="form-label">Email</label>
-              {{ form.email(class_='form-control', placeholder='Введите email') }}
-              {% if form.email.errors %}
-                <div class="text-danger small">
-                  {% for error in form.email.errors %}
-                    {{ error }}
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-            <div class="mb-3">
-              <label for="{{ form.password.id }}" class="form-label">Пароль</label>
-                              {{ form.password(class_='form-control', placeholder='Введите пароль', style='background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px;') }}
-              {% if form.password.errors %}
-                <div class="text-danger small">
-                  {% for error in form.password.errors %}
-                    {{ error }}
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-            <div class="mb-3">
-              <label for="{{ form.confirm_password.id }}" class="form-label">Подтвердите пароль</label>
-                              {{ form.confirm_password(class_='form-control', placeholder='Подтвердите пароль', style='background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px;') }}
-              {% if form.confirm_password.errors %}
-                <div class="text-danger small">
-                  {% for error in form.confirm_password.errors %}
-                    {{ error }}
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-            <div class="mb-3">
-              <label for="{{ form.group_id.id }}" class="form-label">Группа</label>
-                              {{ form.group_id(class_='form-control', style='background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px;') }}
-              {% if form.group_id.errors %}
-                <div class="text-danger small">
-                  {% for error in form.group_id.errors %}
-                    {{ error }}
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Роли</label>
-              <div class="form-check">
-                {{ form.is_admin(class_='form-check-input') }}
-                <label class="form-check-label" for="{{ form.is_admin.id }}">
-                  Администратор
-                </label>
-              </div>
-              <div class="form-check">
-                {{ form.is_moderator(class_='form-check-input') }}
-                <label class="form-check-label" for="{{ form.is_moderator.id }}">
-                  Модератор
-                </label>
-              </div>
-            </div>
-            
-            <button type="submit" name="submit" value="Зарегистрироваться" class="btn btn-primary w-100">
-              <i class="fas fa-plus me-2"></i>Создать пользователя
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-9">
-      <div class="card shadow-sm border-0" style="background: var(--dp-02);">
-        <div class="card-body p-0">
-          <div class="table-responsive" style="border-radius: 14px;">
-            <table class="table mb-0" style="background: var(--dp-02); color: var(--text-primary); font-size: 0.9em;">
-              <thead style="background: var(--dp-03);">
+          </div>
+          <div class="admin-card-body">
+            <div class="admin-table-container">
+              <table class="admin-table">
+              <thead>
                 <tr>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">ID</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Пользователь</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Контакт</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Группа</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Статус</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Подписка</th>
-                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Действия</th>
+                  <th style="width: 60px; text-align: center;">ID</th>
+                  <th style="width: 120px; text-align: center;">Ник</th>
+                  <th style="width: 200px; text-align: center;">Контакт</th>
+                  <th style="width: 100px; text-align: center;">Группа</th>
+                  <th style="width: 120px; text-align: center;">Статус</th>
+                  <th style="width: 80px; text-align: center;">Подписка</th>
+                  <th style="width: 120px; text-align: center;">Действия</th>
                 </tr>
               </thead>
-              <tbody style="background: var(--dp-02);">
+              <tbody>
                 {% for user in users %}
-                <tr style="border-color: var(--border-secondary); background: var(--dp-02); color: var(--text-primary);">
-                  <td><span class="badge bg-secondary">{{ user.id }}</span></td>
-                  <td>
-                    <strong>{{ user.username }}</strong>
-                    {% if user.id == current_user.id %}
-                      <span class="badge bg-warning text-dark ms-1">Вы</span>
-                    {% endif %}
+                <tr class="admin-table-row">
+                  <td class="admin-table-td" style="text-align: center; vertical-align: middle;">
+                    <span class="admin-badge admin-badge-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 24px; text-align: center; display: inline-block;">{{ user.id }}</span>
                   </td>
-                  <td>
-                    {% set contact = user | format_user_contact %}
-                    {% if contact.type == 'telegram' %}
-                      <a href="{{ contact.link }}" class="text-decoration-none" target="_blank">
-                        <i class="{{ contact.icon }} me-1"></i>
-                        <small class="text-primary">{{ contact.display }}</small>
-                      </a>
-                    {% else %}
-                      <a href="{{ contact.link }}" class="text-decoration-none">
-                        <i class="{{ contact.icon }} me-1"></i>
-                        <small class="text-muted">{{ contact.display }}</small>
-                      </a>
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if user.group %}
-                      <span class="badge bg-primary">{{ user.group.name }}</span>
-                      <button type="button" class="btn btn-sm btn-outline-primary ms-1" 
-                              data-bs-toggle="modal" 
-                              data-bs-target="#changeGroupModal{{ user.id }}">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                    {% else %}
-                      <span class="text-muted">Не назначена</span>
-                      <button type="button" class="btn btn-sm btn-outline-warning ms-1" 
-                              data-bs-toggle="modal" 
-                              data-bs-target="#changeGroupModal{{ user.id }}">
-                        <i class="fas fa-plus"></i>
-                      </button>
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if user.is_admin %}
-                      <span class="badge bg-danger">Админ</span>
-                      {% if user.admin_mode_enabled %}
-                        <span class="badge bg-success ms-1">Админ режим</span>
-                      {% else %}
-                        <span class="badge bg-secondary ms-1">Пользователь режим</span>
-                      {% endif %}
-                    {% elif user.is_moderator %}
-                      <span class="badge bg-warning">Модератор</span>
-                    {% else %}
-                      <span class="badge bg-secondary">Пользователь</span>
-                    {% endif %}
-                    
-                    {% if user.id != current_user.id %}
-                      <button type="button" class="btn btn-sm btn-outline-primary ms-1" 
-                              data-bs-toggle="modal" 
-                              data-bs-target="#changeStatusModal{{ user.id }}">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if user.has_active_subscription() %}
-                      {% if user.is_trial_subscription %}
-                        {% if user.trial_subscription_expires %}
-                          <span class="badge bg-info">
-                            <i class="fas fa-clock me-1"></i>
-                            Пробная до {{ user.trial_subscription_expires.strftime('%d.%m.%Y') }}
-                          </span>
-                        {% else %}
-                          <span class="badge bg-info">Пробная активна</span>
-                        {% endif %}
-                      {% elif user.subscription_expires %}
-                        <span class="badge bg-success">
-                          <i class="fas fa-check me-1"></i>
-                          До {{ user.subscription_expires.strftime('%d.%m.%Y') }}
-                        </span>
-                      {% else %}
-                        <span class="badge bg-success">Активна</span>
-                      {% endif %}
-                    {% else %}
-                      <span class="badge bg-warning text-dark">Нет подписки</span>
-                    {% endif %}
-                  </td>
-                <td>
-                    <div class="d-grid">
-                      {% if password_map.get(user.id) %}
-                        <button type="button" class="btn btn-info" 
-                                data-bs-toggle="tooltip" 
-                                title="Новый пароль: {{ password_map.get(user.id) }}. Кликните для копирования." 
-                                onclick="copyPassword('{{ password_map.get(user.id) }}')">
-                          <i class="fas fa-key"></i>
-                        </button>
-                      {% else %}
-                        <form method="post">
-                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                          <input type="hidden" name="reset_user_id" value="{{ user.id }}">
-                          <button type="submit" class="btn btn-warning" data-bs-toggle="tooltip" title="Сбросить пароль">
-                            <i class="fas fa-key"></i>
-                          </button>
-                        </form>
-                      {% endif %}
-                      
-                      {% if user.id != current_user.id %}
-                        <form method="post">
-                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                          <input type="hidden" name="toggle_admin_id" value="{{ user.id }}">
-                          <button type="submit" class="btn {% if user.is_admin %}btn-danger{% else %}btn-primary{% endif %}" 
-                                  data-bs-toggle="tooltip" 
-                                  title="{% if user.is_admin %}Снять админку{% else %}Назначить админом{% endif %}">
-                            <i class="fas fa-user-shield"></i>
-                          </button>
-                        </form>
-                      {% endif %}
-                      
-                      <form method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="toggle_subscription_id" value="{{ user.id }}">
-                        <button type="submit" class="btn {% if user.has_active_subscription() %}btn-warning{% else %}btn-success{% endif %}" 
-                                data-bs-toggle="tooltip" 
-                                title="{% if user.has_active_subscription() %}Отозвать подписку{% else %}Выдать подписку{% endif %}">
-                          <i class="fas fa-crown"></i>
-                        </button>
-                      </form>
-                      
-                      {% if not user.is_admin and user.id != current_user.id %}
-                        <form method="post" onsubmit="return confirm('Удалить пользователя {{ user.username }}?')">
-                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                          <input type="hidden" name="delete_user_id" value="{{ user.id }}">
-                          <button type="submit" class="btn btn-danger" data-bs-toggle="tooltip" title="Удалить пользователя">
-                            <i class="fas fa-trash"></i>
-                          </button>
-                        </form>
+                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
+                    <div class="admin-table-cell-content" style="justify-content: flex-start; align-items: center; gap: 0.5rem;">
+                      <strong class="admin-table-cell-title">{{ user.username }}</strong>
+                      {% if user.id == current_user.id %}
+                        <span class="admin-badge admin-badge-warning" style="font-size: 0.6rem;">Вы</span>
                       {% endif %}
                     </div>
                   </td>
-                </tr>
-                {% else %}
-                  <tr style="background: var(--dp-02); color: var(--text-primary);">
-                    <td colspan="7" class="text-center text-muted py-4" style="color: var(--text-primary);">
-                      <i class="fas fa-users fa-2x mb-3"></i>
-                      <p>Нет пользователей</p>
+                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
+                      {% if user.email %}
+                        {% if user.email.endswith('@telegram.org') %}
+                          {% set telegram_id = user.email.split('@')[0] %}
+                          <span style="font-size: 0.8rem; color: var(--text-primary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@{{ telegram_id }}</span>
+                          <button type="button" class="btn btn-sm btn-outline-info" 
+                                  onclick="copyToClipboard('tg://user?id={{ telegram_id }}')" 
+                                  title="Копировать Telegram ссылку"
+                                  style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fab fa-telegram" style="font-size: 0.6rem;"></i>
+                          </button>
+                        {% else %}
+                          <span style="font-size: 0.8rem; color: var(--text-primary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ user.email }}</span>
+                          <button type="button" class="btn btn-sm btn-outline-primary" 
+                                  onclick="copyToClipboard('{{ user.email }}')" 
+                                  title="Копировать email"
+                                  style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fas fa-copy" style="font-size: 0.6rem;"></i>
+                          </button>
+                        {% endif %}
+                      {% elif user.telegram_id %}
+                        <span style="font-size: 0.8rem; color: var(--text-primary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@{{ user.telegram_id }}</span>
+                        <button type="button" class="btn btn-sm btn-outline-info" 
+                                onclick="copyToClipboard('tg://user?id={{ user.telegram_id }}')" 
+                                title="Копировать Telegram ссылку"
+                                style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                          <i class="fab fa-telegram" style="font-size: 0.6rem;"></i>
+                        </button>
+                    {% else %}
+                        <span style="font-size: 0.8rem; color: var(--text-muted); flex: 1;">Не указан</span>
+                        <span class="btn btn-sm btn-outline-secondary" style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                          <i class="fas fa-question" style="font-size: 0.6rem;"></i>
+                        </span>
+                    {% endif %}
+                    </div>
+                  </td>
+                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
+                    <div class="admin-table-cell-content" style="justify-content: flex-start;">
+                    {% if user.group %}
+                        <button type="button" class="btn btn-sm btn-primary" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#changeGroupModal{{ user.id }}"
+                                title="Изменить группу"
+                                style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 60px;">
+                          {{ user.group.name[:8] }}{% if user.group.name|length > 8 %}...{% endif %}
+                        </button>
+                      {% else %}
+                        <button type="button" class="btn btn-sm btn-outline-warning" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#changeGroupModal{{ user.id }}"
+                                title="Назначить группу"
+                                style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                          <i class="fas fa-plus" style="font-size: 0.7rem;"></i>
+                        </button>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
+                    <div class="admin-table-cell-content" style="justify-content: flex-start;">
+                      {% if user.is_admin %}
+                        <button type="button" class="btn btn-sm btn-danger" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#changeStatusModal{{ user.id }}"
+                                title="Изменить статус"
+                                style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 80px;">
+                          Админ
+                        </button>
+                      {% elif user.is_moderator %}
+                        <button type="button" class="btn btn-sm btn-warning" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#changeStatusModal{{ user.id }}"
+                                title="Изменить статус"
+                                style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 80px;">
+                          Модератор
+                        </button>
+                      {% else %}
+                        <button type="button" class="btn btn-sm btn-secondary" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#changeStatusModal{{ user.id }}"
+                                title="Изменить статус"
+                                style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 80px;">
+                          Пользователь
+                        </button>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
+                    <div class="admin-table-cell-content" style="justify-content: flex-start;">
+                    {% if user.has_active_subscription() %}
+                        <span class="admin-badge admin-badge-success" style="font-size: 0.7rem; padding: 0.2rem 0.4rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                          <i class="fas fa-check"></i>
+                        </span>
+                      {% else %}
+                        <span class="admin-badge admin-badge-danger" style="font-size: 0.7rem; padding: 0.2rem 0.4rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                          <i class="fas fa-times"></i>
+                        </span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
+                    <div class="admin-table-actions" style="display: flex; gap: 0.25rem; flex-wrap: nowrap; justify-content: center; align-items: center;">
+                      <form method="post" style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="reset_user_id" value="{{ user.id }}">
+                        <button type="submit" class="btn btn-warning btn-sm" 
+                                title="Сбросить пароль"
+                                onclick="return confirm('Вы уверены, что хотите сбросить пароль для пользователя {{ user.username }}?')"
+                                style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                          <i class="fas fa-key" style="font-size: 0.7rem;"></i>
+                        </button>
+                      </form>
+                      
+                      <button type="button" class="btn btn-info btn-sm" 
+                              data-bs-toggle="modal" 
+                              data-bs-target="#changeGroupModal{{ user.id }}"
+                              title="Изменить группу"
+                              style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-friends" style="font-size: 0.7rem;"></i>
+                      </button>
+                      
+                      <button type="button" class="btn btn-success btn-sm" 
+                              data-bs-toggle="modal" 
+                              data-bs-target="#changeStatusModal{{ user.id }}"
+                              title="Изменить статус"
+                              style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-crown" style="font-size: 0.7rem;"></i>
+                      </button>
+                      
+                      {% if user.id != current_user.id %}
+                      <form method="post" style="display: inline;">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <input type="hidden" name="delete_user_id" value="{{ user.id }}">
+                        <button type="submit" class="btn btn-danger btn-sm" 
+                                title="Удалить пользователя"
+                                onclick="return confirm('Вы уверены, что хотите удалить пользователя {{ user.username }}?')"
+                                style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                          <i class="fas fa-trash" style="font-size: 0.7rem;"></i>
+                        </button>
+                        </form>
+                      {% endif %}
+                    </div>
                     </td>
                   </tr>
                 {% endfor %}
@@ -274,164 +210,27 @@
       </div>
     </div>
   </div>
+</div>
 
-
-
-
-
-
-<script>
-// Инициализация tooltips
-document.addEventListener('DOMContentLoaded', function() {
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  })
-  
-  // Функциональность коротких ссылок удалена
-});
-
-// Функция для копирования пароля в буфер обмена
-function copyPassword(password) {
-  // Создаем временный элемент input
-  const tempInput = document.createElement('input');
-  tempInput.value = password;
-  document.body.appendChild(tempInput);
-  
-  // Выделяем и копируем текст
-  tempInput.select();
-  tempInput.setSelectionRange(0, 99999); // Для мобильных устройств
-  
-  try {
-    // Пытаемся использовать современный Clipboard API
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(password).then(function() {
-        showCopyNotification('Пароль скопирован!');
-      }).catch(function(err) {
-        // Fallback для старых браузеров
-        fallbackCopyTextToClipboard(password);
-      });
-    } else {
-      // Fallback для старых браузеров
-      fallbackCopyTextToClipboard(password);
-    }
-  } catch (err) {
-    // Fallback для старых браузеров
-    fallbackCopyTextToClipboard(password);
-  }
-  
-  // Удаляем временный элемент
-  document.body.removeChild(tempInput);
-}
-
-// Fallback функция для копирования в старых браузерах
-function fallbackCopyTextToClipboard(text) {
-  const textArea = document.createElement('textarea');
-  textArea.value = text;
-  textArea.style.top = '0';
-  textArea.style.left = '0';
-  textArea.style.position = 'fixed';
-  document.body.appendChild(textArea);
-  textArea.focus();
-  textArea.select();
-  
-  try {
-    const successful = document.execCommand('copy');
-    if (successful) {
-      showCopyNotification('Пароль скопирован!');
-    } else {
-      showCopyNotification('Ошибка копирования', 'error');
-    }
-  } catch (err) {
-    showCopyNotification('Ошибка копирования', 'error');
-  }
-  
-  document.body.removeChild(textArea);
-}
-
-// Функция для показа уведомления о копировании
-function showCopyNotification(message, type = 'success') {
-  // Создаем элемент уведомления
-  const notification = document.createElement('div');
-  notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
-  notification.style.cssText = `
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    min-width: 200px;
-    padding: 10px 15px;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    animation: slideIn 0.3s ease-out;
-  `;
-  notification.innerHTML = `
-    <i class="fas fa-${type === 'success' ? 'check' : 'exclamation-triangle'} me-2"></i>
-    ${message}
-  `;
-  
-  // Добавляем стили для анимации
-  if (!document.getElementById('copy-notification-styles')) {
-    const style = document.createElement('style');
-    style.id = 'copy-notification-styles';
-    style.textContent = `
-      @keyframes slideIn {
-        from {
-          transform: translateX(100%);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-      @keyframes slideOut {
-        from {
-          transform: translateX(0);
-          opacity: 1;
-        }
-        to {
-          transform: translateX(100%);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  
-  // Добавляем уведомление на страницу
-  document.body.appendChild(notification);
-  
-  // Удаляем уведомление через 3 секунды
-  setTimeout(function() {
-    notification.style.animation = 'slideOut 0.3s ease-in';
-    setTimeout(function() {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 300);
-  }, 3000);
-}
-</script>
-
+<!-- Модальные окна для изменения группы -->
 {% for user in users %}
-<div class="modal fade" id="changeGroupModal{{ user.id }}" tabindex="-1">
+<div class="modal fade" id="changeGroupModal{{ user.id }}" tabindex="-1" aria-labelledby="changeGroupModalLabel{{ user.id }}" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Изменить группу пользователя {{ user.username }}</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title" id="changeGroupModalLabel{{ user.id }}">Изменить группу для {{ user.username }}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form method="post">
         <div class="modal-body">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="change_group_user_id" value="{{ user.id }}">
           <div class="mb-3">
-            <label class="form-label">Выберите группу</label>
-            <select name="new_group_id" class="form-control" required>
+            <label for="group_id_{{ user.id }}" class="form-label">Выберите группу</label>
+            <select name="group_id" id="group_id_{{ user.id }}" class="form-control admin-input">
               <option value="">Без группы</option>
               {% for group in groups %}
-                <option value="{{ group.id }}" 
-                        {% if user.group and user.group.id == group.id %}selected{% endif %}>
+                <option value="{{ group.id }}" {% if user.group and user.group.id == group.id %}selected{% endif %}>
                   {{ group.name }}
                 </option>
               {% endfor %}
@@ -447,50 +246,37 @@ function showCopyNotification(message, type = 'success') {
   </div>
 </div>
 
-<div class="modal fade" id="changeStatusModal{{ user.id }}" tabindex="-1">
+<!-- Модальные окна для изменения статуса -->
+<div class="modal fade" id="changeStatusModal{{ user.id }}" tabindex="-1" aria-labelledby="changeStatusModalLabel{{ user.id }}" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Изменить статус пользователя {{ user.username }}</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title" id="changeStatusModalLabel{{ user.id }}">Изменить статус для {{ user.username }}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form method="post">
         <div class="modal-body">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="change_status_user_id" value="{{ user.id }}">
-          
           <div class="mb-3">
-            <label class="form-label">Выберите роль</label>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="new_role" value="user" id="role_user_{{ user.id }}"
-                     {% if not user.is_admin and not user.is_moderator %}checked{% endif %}>
-              <label class="form-check-label" for="role_user_{{ user.id }}">
-                <span class="badge bg-secondary">Пользователь</span>
+            <label class="form-label">Выберите статус</label>
+            <div class="admin-checkbox-group">
+              <div class="admin-checkbox-item">
+                <input type="radio" name="status" value="admin" id="is_admin_{{ user.id }}" class="admin-checkbox" {% if user.is_admin %}checked{% endif %}>
+                <label class="admin-checkbox-label" for="is_admin_{{ user.id }}">
+                  <span class="admin-badge admin-badge-danger">Администратор</span>
               </label>
             </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="new_role" value="moderator" id="role_moderator_{{ user.id }}"
-                     {% if user.is_moderator %}checked{% endif %}>
-              <label class="form-check-label" for="role_moderator_{{ user.id }}">
-                <span class="badge bg-warning">Модератор</span>
+              <div class="admin-checkbox-item">
+                <input type="radio" name="status" value="moderator" id="is_moderator_{{ user.id }}" class="admin-checkbox" {% if user.is_moderator %}checked{% endif %}>
+                <label class="admin-checkbox-label" for="is_moderator_{{ user.id }}">
+                  <span class="admin-badge admin-badge-warning">Модератор</span>
               </label>
             </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="new_role" value="admin" id="role_admin_{{ user.id }}"
-                     {% if user.is_admin %}checked{% endif %}>
-              <label class="form-check-label" for="role_admin_{{ user.id }}">
-                <span class="badge bg-danger">Администратор</span>
-              </label>
-            </div>
-          </div>
-          
-          <div id="admin_settings_{{ user.id }}" style="display: none;">
-            <div class="mb-3">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="admin_mode_enabled" id="admin_mode_{{ user.id }}"
-                       {% if user.admin_mode_enabled %}checked{% endif %}>
-                <label class="form-check-label" for="admin_mode_{{ user.id }}">
-                  Включить админ режим
+              <div class="admin-checkbox-item">
+                <input type="radio" name="status" value="user" id="is_user_{{ user.id }}" class="admin-checkbox" {% if not user.is_admin and not user.is_moderator %}checked{% endif %}>
+                <label class="admin-checkbox-label" for="is_user_{{ user.id }}">
+                  <span class="admin-badge admin-badge-secondary">Пользователь</span>
                 </label>
               </div>
             </div>
@@ -507,31 +293,356 @@ function showCopyNotification(message, type = 'success') {
 {% endfor %}
 
 <script>
-// Показываем/скрываем настройки Админа в зависимости от выбранной роли
-document.addEventListener('DOMContentLoaded', function() {
-  {% for user in users %}
-  const adminRadio{{ user.id }} = document.getElementById('role_admin_{{ user.id }}');
-  const adminSettings{{ user.id }} = document.getElementById('admin_settings_{{ user.id }}');
+function refreshTable() {
+  location.reload();
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    // Показываем уведомление об успешном копировании
+    showNotification('Скопировано: ' + text, 'success');
+  }).catch(function(err) {
+    // Fallback для старых браузеров
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      showNotification('Скопировано: ' + text, 'success');
+    } catch (err) {
+      showNotification('Ошибка копирования', 'error');
+    }
+    document.body.removeChild(textArea);
+  });
+}
+
+function showNotification(message, type = 'info') {
+  // Создаем уведомление
+  const notification = document.createElement('div');
+  notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show`;
+  notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+  notification.innerHTML = `
+    ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  `;
   
-  function toggleAdminSettings{{ user.id }}() {
-    if (adminRadio{{ user.id }}.checked) {
-      adminSettings{{ user.id }}.style.display = 'block';
+  document.body.appendChild(notification);
+  
+  // Автоматически скрываем через 3 секунды
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 3000);
+}
+
+function toggleAdminSettings(userId) {
+  const adminModeCheckbox = document.getElementById('admin_mode_enabled_' + userId);
+  const adminModeLabel = document.getElementById('admin_mode_label_' + userId);
+  
+  if (adminModeCheckbox && adminModeLabel) {
+    if (adminModeCheckbox.checked) {
+      adminModeLabel.textContent = 'Админ режим';
+      adminModeLabel.className = 'admin-badge admin-badge-success';
     } else {
-      adminSettings{{ user.id }}.style.display = 'none';
+      adminModeLabel.textContent = 'Пользователь режим';
+      adminModeLabel.className = 'admin-badge admin-badge-secondary';
     }
   }
+}
+
+// Мобильная оптимизация
+document.addEventListener('DOMContentLoaded', function() {
+  // Определяем мобильное устройство
+  const isMobile = window.innerWidth <= 768;
   
-  // Инициализация
-  toggleAdminSettings{{ user.id }}();
+  if (isMobile) {
+    // Добавляем класс для мобильной версии
+    document.body.classList.add('mobile-device');
+    
+    // Улучшаем touch события для кнопок
+    const buttons = document.querySelectorAll('.admin-table-actions button, .admin-table-td button');
+    buttons.forEach(button => {
+      button.addEventListener('touchstart', function(e) {
+        this.style.transform = 'scale(0.95)';
+      });
+      
+      button.addEventListener('touchend', function(e) {
+        this.style.transform = 'scale(1)';
+      });
+    });
+    
+    // Улучшаем скролл таблицы
+    const tableContainer = document.querySelector('.admin-table-container');
+    if (tableContainer) {
+      tableContainer.style.webkitOverflowScrolling = 'touch';
+      tableContainer.style.overflowX = 'auto';
+    }
+    
+    // Добавляем индикатор горизонтального скролла
+    const scrollIndicator = document.createElement('div');
+    scrollIndicator.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(181, 149, 255, 0.8);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    `;
+    scrollIndicator.innerHTML = '<i class="fas fa-arrows-alt-h"></i> Свайп для прокрутки';
+    document.body.appendChild(scrollIndicator);
+    
+    // Показываем индикатор при необходимости скролла
+    function checkScroll() {
+      if (tableContainer.scrollWidth > tableContainer.clientWidth) {
+        scrollIndicator.style.opacity = '1';
+        setTimeout(() => {
+          scrollIndicator.style.opacity = '0';
+        }, 3000);
+      }
+    }
+    
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+  }
   
-  // Обработчик изменения
-  adminRadio{{ user.id }}.addEventListener('change', toggleAdminSettings{{ user.id }});
-  
-  // Обработчики для других ролей
-  document.getElementById('role_user_{{ user.id }}').addEventListener('change', toggleAdminSettings{{ user.id }});
-  document.getElementById('role_moderator_{{ user.id }}').addEventListener('change', toggleAdminSettings{{ user.id }});
-  {% endfor %}
+  // Улучшаем модальные окна для мобильных
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modal => {
+    modal.addEventListener('shown.bs.modal', function() {
+      if (isMobile) {
+        // Добавляем класс для мобильного модального окна
+        this.classList.add('mobile-modal');
+      }
+    });
+  });
 });
 </script>
+
+<style>
+/* Мобильная оптимизация */
+@media (max-width: 768px) {
+  .admin-page {
+    padding: 0.5rem;
+  }
+  
+  .admin-card {
+    margin: 0;
+    border-radius: 8px;
+  }
+  
+  .admin-card-header {
+    padding: 1rem 0.75rem;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .admin-card-title {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  
+  .admin-card-actions {
+    margin-top: 0.5rem;
+  }
+  
+  .admin-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+  }
+  
+  .admin-table {
+    min-width: 800px;
+    font-size: 0.8rem;
+  }
+  
+  .admin-table th {
+    padding: 0.75rem 0.25rem !important;
+    font-size: 0.7rem;
+  }
+  
+  .admin-table td {
+    padding: 0.75rem 0.25rem !important;
+  }
+  
+  /* Компактные кнопки */
+  .admin-table-actions {
+    gap: 0.25rem !important;
+  }
+  
+  .admin-table-actions button {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 0.6rem !important;
+  }
+  
+  .admin-table-actions button i {
+    font-size: 0.6rem !important;
+  }
+  
+  /* Компактные статусные кнопки */
+  .admin-table-td button[title="Изменить статус"] {
+    min-width: 60px !important;
+    font-size: 0.6rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+  
+  .admin-table-td button[title="Изменить группу"] {
+    min-width: 50px !important;
+    font-size: 0.6rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+  
+  /* Компактные контактные кнопки */
+  .admin-table-td button[title*="Копировать"] {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  /* Компактные индикаторы подписки */
+  .admin-table-td .admin-badge[style*="width: 24px"] {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 0.6rem !important;
+  }
+  
+  /* Скрытие длинного текста */
+  .admin-table-td span[style*="text-overflow: ellipsis"] {
+    max-width: 120px !important;
+  }
+  
+  /* Улучшенные модальные окна */
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+  }
+  
+  .modal-content {
+    border-radius: 8px;
+  }
+  
+  .modal-header {
+    padding: 1rem 0.75rem;
+  }
+  
+  .modal-body {
+    padding: 1rem 0.75rem;
+  }
+  
+  .modal-footer {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-page {
+    padding: 0.25rem;
+  }
+  
+  .admin-card-header {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .admin-card-title {
+    font-size: 1rem;
+  }
+  
+  .admin-table {
+    min-width: 700px;
+    font-size: 0.75rem;
+  }
+  
+  .admin-table th {
+    padding: 0.5rem 0.125rem !important;
+    font-size: 0.65rem;
+  }
+  
+  .admin-table td {
+    padding: 0.5rem 0.125rem !important;
+  }
+  
+  .admin-table-actions button {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .admin-table-td button[title="Изменить статус"] {
+    min-width: 50px !important;
+    font-size: 0.55rem !important;
+    padding: 0.2rem 0.4rem !important;
+  }
+  
+  .admin-table-td button[title="Изменить группу"] {
+    min-width: 40px !important;
+    font-size: 0.55rem !important;
+    padding: 0.2rem 0.4rem !important;
+  }
+  
+  .admin-table-td .admin-badge[style*="width: 24px"] {
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 0.55rem !important;
+  }
+  
+  .admin-table-td span[style*="text-overflow: ellipsis"] {
+    max-width: 80px !important;
+  }
+}
+
+/* Дополнительные стили для мобильных устройств */
+.mobile-device .admin-table-container {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.mobile-device .admin-table-actions button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-device .admin-table-td button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Мобильные модальные окна */
+.mobile-modal .modal-dialog {
+  margin: 0;
+  max-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-modal .modal-content {
+  height: 100%;
+  border-radius: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-modal .modal-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Улучшенная прокрутка для iOS */
+@supports (-webkit-touch-callout: none) {
+  .admin-table-container {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+</style>
 
 {% endblock %} 
