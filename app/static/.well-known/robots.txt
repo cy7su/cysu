@@ -2,10 +2,13 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://cysu.ru/sitemap.xml
+Sitemap: https://cysu.ru/static/sitemap.xml
 
 # Дополнительные директивы для поисковых систем
 Crawl-delay: 1
+
+# Контактная информация
+# Host: cysu.ru
 
 # Разрешаем индексацию всех страниц
 Disallow: /admin/

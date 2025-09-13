@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% from 'macros/breadcrumbs.html' import profile_breadcrumb %}
 
 {% block title %}Профиль - {{ user.username }}{% endblock %}
+
+{% block breadcrumbs %}
+{{ profile_breadcrumb() }}
+{% endblock %}
 
 {% block content %}
 <div class="container py-5">

@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% from 'macros/breadcrumbs.html' import simple_breadcrumb %}
 
 {% block title %}Личный кабинет{% endblock %}
+
+{% block breadcrumbs %}
+{{ simple_breadcrumb("Личный кабинет") }}
+{% endblock %}
 
 {% block content %}
 <div class="container py-5">

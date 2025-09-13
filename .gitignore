@@ -172,3 +172,4 @@ dmypy.json
 *.crt
 *.p12
 *.pfx
+test/

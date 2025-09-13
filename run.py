@@ -1,21 +1,27 @@
 import time
 from multiprocessing import Process
 
+
 def run_website():
     from app import create_app
+
     app = create_app()
-    app.run(host='0.0.0.0', port=8001, debug=False)
+    app.run(host="0.0.0.0", port=8001, debug=False)
+
 
 def run_telegram_bot():
     import logging
-    logging.getLogger('telegram_bot').setLevel(logging.CRITICAL)
-    logging.getLogger('httpx').setLevel(logging.CRITICAL)
-    logging.getLogger('telegram').setLevel(logging.CRITICAL)
-    logging.getLogger('telegram.ext').setLevel(logging.CRITICAL)
+
+    logging.getLogger("telegram_bot").setLevel(logging.CRITICAL)
+    logging.getLogger("httpx").setLevel(logging.CRITICAL)
+    logging.getLogger("telegram").setLevel(logging.CRITICAL)
+    logging.getLogger("telegram.ext").setLevel(logging.CRITICAL)
 
     from app.utils.telegram_bot import TelegramBotManager
+
     bot_manager = TelegramBotManager()
     bot_manager.run_bot()
+
 
 def main():
     website_process = Process(target=run_website)
@@ -38,6 +44,7 @@ def main():
         if bot_process.is_alive():
             bot_process.terminate()
             bot_process.join()
+
 
 if __name__ == "__main__":
     main()

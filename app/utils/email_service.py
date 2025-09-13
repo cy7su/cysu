@@ -1,9 +1,12 @@
-from flask_mail import Message
-from .. import mail
 import logging
+
 from flask import current_app
+from flask_mail import Message
+
+from .. import mail
 
 logger = logging.getLogger(__name__)
+
 
 class EmailService:
     """
@@ -11,7 +14,42 @@ class EmailService:
     """
 
     @staticmethod
-    def send_verification_email(user_email: str, verification_code: str) -> bool:
+    def send_email_with_timeout(msg, timeout=10):
+        """
+        Отправляет email с таймаутом
+
+        Args:
+            msg: Message объект для отправки
+            timeout: Таймаут в секундах (по умолчанию 10)
+
+        Returns:
+            bool: True если email отправлен успешно, False в противном случае
+        """
+        try:
+            # Устанавливаем таймаут для SMTP соединения
+            import socket
+
+            original_timeout = socket.getdefaulttimeout()
+            socket.setdefaulttimeout(timeout)
+
+            try:
+                mail.send(msg)
+                return True
+            finally:
+                # Восстанавливаем оригинальный таймаут
+                socket.setdefaulttimeout(original_timeout)
+
+        except socket.timeout:
+            logger.error(f"Email send timeout after {timeout} seconds")
+            return False
+        except Exception as e:
+            logger.error(f"Error sending email: {str(e)}")
+            return False
+
+    @staticmethod
+    def send_verification_email(
+        user_email: str, verification_code: str
+    ) -> bool:
         """
         Отправляет email с кодом подтверждения
 
@@ -24,13 +62,18 @@ class EmailService:
         """
         try:
             subject = "Добро пожаловать в cysu! Подтвердите ваш email"
-            current_app.logger.info(f"Sending verification email to {user_email} with code: '{verification_code}' (type: {type(verification_code)}, length: {len(verification_code)})")
+            current_app.logger.info(
+                f"Sending verification email to {user_email} with code: "
+                f"'{verification_code}' (type: {type(verification_code)}, "
+                f"length: {len(verification_code)})"
+            )
             html_body = f"""
             <!DOCTYPE html>
             <html lang="ru">
             <head>
                 <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta name="viewport"
+                      content="width=device-width, initial-scale=1.0">
                 <title>Подтверждение регистрации - cysu</title>
                 <style>
                     body {{
@@ -194,19 +237,34 @@ class EmailService:
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
-                subject=subject, recipients=[user_email], html=html_body, body=text_body
+                subject=subject,
+                recipients=[user_email],
+                html=html_body,
+                body=text_body,
             )
-            mail.send(msg)
-            logger.info(
-                f"Verification email sent successfully to {user_email} with code: {verification_code}"
-            )
-            return True
+
+            # Используем метод с таймаутом
+            success = EmailService.send_email_with_timeout(msg, timeout=10)
+            if success:
+                logger.info(
+                    f"Verification email sent successfully to {user_email} with code: {verification_code}"
+                )
+                return True
+            else:
+                logger.error(
+                    f"Failed to send verification email to {user_email} - timeout or error"
+                )
+                return False
         except Exception as e:
-            logger.error(f"Failed to send verification email to {user_email}: {str(e)}")
+            logger.error(
+                f"Failed to send verification email to {user_email}: {str(e)}"
+            )
             return False
 
     @staticmethod
-    def send_resend_verification_email(user_email: str, verification_code: str) -> bool:
+    def send_resend_verification_email(
+        user_email: str, verification_code: str
+    ) -> bool:
         """
         Отправляет повторный email с кодом подтверждения
 
@@ -219,7 +277,9 @@ class EmailService:
         """
         try:
             subject = "Новый код подтверждения - cysu"
-            current_app.logger.info(f"Sending resend verification email to {user_email} with code: '{verification_code}' (type: {type(verification_code)}, length: {len(verification_code)})")
+            current_app.logger.info(
+                f"Sending resend verification email to {user_email} with code: '{verification_code}' (type: {type(verification_code)}, length: {len(verification_code)})"
+            )
             html_body = f"""
             <!DOCTYPE html>
             <html lang="ru">
@@ -389,13 +449,24 @@ class EmailService:
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
-                subject=subject, recipients=[user_email], html=html_body, body=text_body
+                subject=subject,
+                recipients=[user_email],
+                html=html_body,
+                body=text_body,
             )
-            mail.send(msg)
-            logger.info(
-                f"Resend verification email sent successfully to {user_email} with code: {verification_code}"
-            )
-            return True
+
+            # Используем метод с таймаутом
+            success = EmailService.send_email_with_timeout(msg, timeout=10)
+            if success:
+                logger.info(
+                    f"Resend verification email sent successfully to {user_email} with code: {verification_code}"
+                )
+                return True
+            else:
+                logger.error(
+                    f"Failed to send resend verification email to {user_email} - timeout or error"
+                )
+                return False
         except Exception as e:
             logger.error(
                 f"Failed to send resend verification email to {user_email}: {str(e)}"
@@ -416,7 +487,9 @@ class EmailService:
         """
         try:
             subject = "Восстановление пароля - cysu"
-            current_app.logger.info(f"Sending password reset email to {user_email} with code: '{reset_code}' (type: {type(reset_code)}, length: {len(reset_code)})")
+            current_app.logger.info(
+                f"Sending password reset email to {user_email} with code: '{reset_code}' (type: {type(reset_code)}, length: {len(reset_code)})"
+            )
 
             html_body = f"""
             <!DOCTYPE html>
@@ -586,13 +659,24 @@ class EmailService:
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
-                subject=subject, recipients=[user_email], html=html_body, body=text_body
+                subject=subject,
+                recipients=[user_email],
+                html=html_body,
+                body=text_body,
             )
-            mail.send(msg)
-            logger.info(
-                f"Password reset email sent successfully to {user_email} with code: {reset_code}"
-            )
-            return True
+
+            # Используем метод с таймаутом
+            success = EmailService.send_email_with_timeout(msg, timeout=10)
+            if success:
+                logger.info(
+                    f"Password reset email sent successfully to {user_email} with code: {reset_code}"
+                )
+                return True
+            else:
+                logger.error(
+                    f"Failed to send password reset email to {user_email} - timeout or error"
+                )
+                return False
         except Exception as e:
             logger.error(
                 f"Failed to send password reset email to {user_email}: {str(e)}"

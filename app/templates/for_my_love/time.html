@@ -798,7 +798,7 @@
             textArea.select();
             
             try {
-                document.execCommand('copy');
+                document.executeCommand('copy');
                 showTimeCopySuccess();
             } catch (err) {
                 console.error('Ошибка копирования времени:', err);

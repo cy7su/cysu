@@ -1,4 +1,3 @@
-
 from typing import Any, Dict
 
 from flask import Blueprint, current_app, jsonify, request
@@ -9,6 +8,7 @@ from wtforms import ValidationError
 from ..models import Notification, Subject
 
 api_bp = Blueprint("api", __name__)
+
 
 @api_bp.route("/api/notifications")
 @login_required
@@ -36,7 +36,10 @@ def get_notifications() -> Dict[str, Any]:
         }
     )
 
-@api_bp.route("/api/notifications/<int:notification_id>/read", methods=["POST"])
+
+@api_bp.route(
+    "/api/notifications/<int:notification_id>/read", methods=["POST"]
+)
 @login_required
 def mark_notification_read(notification_id: int) -> Dict[str, Any]:
     from .. import db
@@ -51,15 +54,19 @@ def mark_notification_read(notification_id: int) -> Dict[str, Any]:
 
     return jsonify({"success": True})
 
+
 @api_bp.route("/api/subject/<int:subject_id>/pattern", methods=["POST"])
 @login_required
 def update_subject_pattern(subject_id: int) -> Dict[str, Any]:
     from .. import db
 
     try:
-        csrf_token = request.headers.get('X-CSRFToken')
+        csrf_token = request.headers.get("X-CSRFToken")
         if not csrf_token:
-            return jsonify({"success": False, "error": "Отсутствует CSRF токен"}), 400
+            return (
+                jsonify({"success": False, "error": "Отсутствует CSRF токен"}),
+                400,
+            )
 
         validate_csrf(csrf_token)
     except ValidationError:
@@ -71,23 +78,27 @@ def update_subject_pattern(subject_id: int) -> Dict[str, Any]:
     subject = Subject.query.get_or_404(subject_id)
 
     data = request.get_json()
-    if not data or 'pattern_svg' not in data:
-        return jsonify({"success": False, "error": "Отсутствуют данные паттерна"})
+    if not data or "pattern_svg" not in data:
+        return jsonify(
+            {"success": False, "error": "Отсутствуют данные паттерна"}
+        )
 
     try:
-        subject.pattern_svg = data['pattern_svg']
-        subject.pattern_type = data.get('pattern_type', 'random')
+        subject.pattern_svg = data["pattern_svg"]
+        subject.pattern_type = data.get("pattern_type", "random")
 
         db.session.commit()
 
-        return jsonify({
-            "success": True
-        })
+        return jsonify({"success": True})
 
     except Exception as e:
         current_app.logger.error(f"Ошибка обновления паттерна: {e}")
         db.session.rollback()
-        return jsonify({"success": False, "error": "Ошибка сохранения паттерна"}), 500
+        return (
+            jsonify({"success": False, "error": "Ошибка сохранения паттерна"}),
+            500,
+        )
+
 
 @api_bp.errorhandler(400)
 def bad_request(error) -> Dict[str, Any]:
