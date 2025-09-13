@@ -112,35 +112,46 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-  $(document).ready(function() {
+  document.addEventListener('DOMContentLoaded', function() {
     function toggleSolutionFile() {
       // Убираем показ поля готового решения для заданий
-      $('#solution-file-group').hide();
+      const solutionFileGroup = document.getElementById('solution-file-group');
+      if (solutionFileGroup) {
+        solutionFileGroup.style.display = 'none';
+      }
     }
-    $('#type-select').on('change', toggleSolutionFile);
+    const typeSelect = document.getElementById('type-select');
+    if (typeSelect) {
+      typeSelect.addEventListener('change', toggleSolutionFile);
+    }
     toggleSolutionFile();
     
     // Подсчет символов в поле описания
     function updateCharCount() {
-      const textarea = $('#description-field');
-      const charCount = $('#char-count');
-      const currentLength = textarea.val().length;
+      const textarea = document.getElementById('description-field');
+      const charCount = document.getElementById('char-count');
+      if (!textarea || !charCount) return;
+      
+      const currentLength = textarea.value.length;
       const maxLength = 300;
       
-      charCount.text(currentLength);
+      charCount.textContent = currentLength;
       
       // Меняем цвет в зависимости от количества символов
       if (currentLength > maxLength * 0.9) {
-        charCount.css('color', '#dc3545'); // Красный
+        charCount.style.color = '#dc3545'; // Красный
       } else if (currentLength > maxLength * 0.7) {
-        charCount.css('color', '#ffc107'); // Желтый
+        charCount.style.color = '#ffc107'; // Желтый
       } else {
-        charCount.css('color', '#6c757d'); // Серый
+        charCount.style.color = '#6c757d'; // Серый
       }
     }
     
     // Обновляем счетчик при вводе
-    $('#description-field').on('input', updateCharCount);
+    const descriptionField = document.getElementById('description-field');
+    if (descriptionField) {
+      descriptionField.addEventListener('input', updateCharCount);
+    }
     
     // Инициализируем счетчик
     updateCharCount();

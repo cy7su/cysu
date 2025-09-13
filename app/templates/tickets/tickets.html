@@ -6,7 +6,7 @@
 {% block breadcrumbs %}
 {{ render_breadcrumbs([
     {"title": "Главная", "url": url_for('main.index'), "icon": "fas fa-home"},
-    {"title": "Поддержка", "url": url_for('main.support'), "icon": "fas fa-life-ring"},
+    {"title": "Поддержка", "url": url_for('main.index'), "icon": "fas fa-life-ring"},
     {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-alt"}
 ]) }}
 {% endblock %}

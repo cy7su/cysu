@@ -4,7 +4,7 @@
 {% block title %}{{ material.title }}{% endblock %}
 
 {% block breadcrumbs %}
-{{ material_breadcrumb(material.subject.title, url_for('subjects.subject_detail', id=material.subject.id), material.title) }}
+{{ material_breadcrumb(material.subject.title, url_for('main.subject_detail', subject_id=material.subject.id), material.title) }}
 {% endblock %}
 
 {% block content %}

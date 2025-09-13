@@ -1,5 +1,6 @@
 import logging
 import os
+from datetime import datetime
 
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, url_for
@@ -257,6 +258,12 @@ def create_app():
         app.logger.warning(f"Endpoint: {request.endpoint}")
         app.logger.warning(f"Method: {request.method}")
         app.logger.warning(f"Path: {request.path}")
-        return render_template("404.html"), 404
+        return render_template("error.html", 
+            error_code=404,
+            error_title="Страница не найдена",
+            error_description="К сожалению, запрашиваемая страница не существует или была перемещена.",
+            error_time=datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
+            error_traceback=None
+        ), 404
 
     return app

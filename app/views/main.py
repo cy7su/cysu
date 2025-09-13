@@ -727,17 +727,273 @@ def privacy() -> str:
 def terms() -> str:
     return render_template("static/terms.html")
 
+@main_bp.route("/security-policy")
+def security_policy() -> str:
+    return render_template("static/security_policy.html")
+
+@main_bp.route("/.well-known/security.txt")
+def security_txt() -> Response:
+    """Возвращает файл security.txt для исследователей безопасности"""
+    return Response(
+        """Contact: mailto:support@cysu.ru
+Expires: 2026-01-15T00:00:00.000Z
+Preferred-Languages: ru, en
+Canonical: https://cysu.ru/.well-known/security.txt
+Policy: https://cysu.ru/security-policy
+
+# Политика безопасности
+# Если вы нашли уязвимость, пожалуйста, сообщите нам
+# We appreciate responsible disclosure of security vulnerabilities""",
+        mimetype="text/plain"
+    )
+
+@main_bp.route("/.well-known/humans.txt")
+def humans_txt() -> Response:
+    """Возвращает файл humans.txt с информацией о команде разработки"""
+    return Response(
+        """# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Developer: cy7su
+    Contact: cysu.ru
+    From: Russia
+
+# THANKS
+
+    Font Awesome: https://fontawesome.com/
+    Bootstrap: https://getbootstrap.com/
+    Flask: https://flask.palletsprojects.com/
+
+# TECHNOLOGY COLOPHON
+
+    HTML5, CSS3, JavaScript
+    Python, Flask
+    Bootstrap 5
+    Font Awesome 6
+    SQLite
+    Linux, Nginx
+
+# SITE
+
+    Last update: 2025/09/13
+    Language: Russian
+    Doctype: HTML5
+    IDE: VS Code""",
+        mimetype="text/plain"
+    )
+
+@main_bp.route("/.well-known/robots.txt")
+def robots_txt() -> Response:
+    """Возвращает файл robots.txt для поисковых роботов"""
+    return Response(
+        """User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://cysu.ru/sitemap.xml
+
+# Дополнительные директивы для поисковых систем
+Crawl-delay: 1
+
+# Контактная информация
+# Host: cysu.ru
+
+# Разрешаем индексацию всех страниц
+Disallow: /admin/
+Disallow: /api/
+Disallow: /static/logs/
+Disallow: /static/temp/
+
+# Разрешаем индексацию основных страниц
+Allow: /
+Allow: /subjects/
+Allow: /materials/
+Allow: /profile/
+Allow: /about/
+Allow: /contact/
+Allow: /wiki/
+Allow: /privacy/
+Allow: /terms/""",
+        mimetype="text/plain"
+    )
+
+@main_bp.route("/robots.txt")
+def robots_txt_redirect() -> Response:
+    """Редирект с /robots.txt на /.well-known/robots.txt"""
+    return redirect(url_for('main.robots_txt'), code=301)
+
+@main_bp.route("/error/<int:error_code>")
+def error_page(error_code: int) -> tuple:
+    """Универсальная страница ошибок"""
+    from datetime import datetime
+    
+    # Определяем информацию об ошибке по коду
+    error_info = {
+        400: {
+            "title": "Неверный запрос",
+            "description": "Сервер не может обработать запрос из-за неверного синтаксиса."
+        },
+        401: {
+            "title": "Не авторизован",
+            "description": "Для доступа к этой странице необходимо войти в систему."
+        },
+        403: {
+            "title": "Доступ запрещен",
+            "description": "У вас нет прав для доступа к этой странице."
+        },
+        404: {
+            "title": "Страница не найдена",
+            "description": "К сожалению, запрашиваемая страница не существует или была перемещена."
+        },
+        405: {
+            "title": "Метод не разрешен",
+            "description": "Используемый HTTP-метод не поддерживается для этого ресурса."
+        },
+        408: {
+            "title": "Время ожидания истекло",
+            "description": "Сервер не получил полный запрос в течение установленного времени."
+        },
+        409: {
+            "title": "Конфликт",
+            "description": "Запрос конфликтует с текущим состоянием сервера."
+        },
+        410: {
+            "title": "Ресурс недоступен",
+            "description": "Запрашиваемый ресурс больше не доступен на сервере."
+        },
+        413: {
+            "title": "Слишком большой запрос",
+            "description": "Размер запроса превышает максимально допустимый."
+        },
+        414: {
+            "title": "Слишком длинный URL",
+            "description": "URL запроса слишком длинный для обработки сервером."
+        },
+        415: {
+            "title": "Неподдерживаемый тип медиа",
+            "description": "Формат данных в запросе не поддерживается сервером."
+        },
+        422: {
+            "title": "Необрабатываемая сущность",
+            "description": "Сервер понимает тип содержимого, но не может обработать инструкции."
+        },
+        429: {
+            "title": "Слишком много запросов",
+            "description": "Превышено количество запросов. Попробуйте позже."
+        },
+        500: {
+            "title": "Внутренняя ошибка сервера",
+            "description": "Произошла внутренняя ошибка сервера. Мы работаем над исправлением."
+        },
+        501: {
+            "title": "Не реализовано",
+            "description": "Сервер не поддерживает функциональность, необходимую для выполнения запроса."
+        },
+        502: {
+            "title": "Плохой шлюз",
+            "description": "Сервер получил неверный ответ от вышестоящего сервера."
+        },
+        503: {
+            "title": "Сервис недоступен",
+            "description": "Сервер временно недоступен из-за технических работ или перегрузки."
+        },
+        504: {
+            "title": "Время ожидания шлюза",
+            "description": "Сервер не получил ответ от вышестоящего сервера в установленное время."
+        },
+        505: {
+            "title": "Неподдерживаемая версия HTTP",
+            "description": "Сервер не поддерживает версию HTTP-протокола, используемую в запросе."
+        }
+    }
+    
+    # Получаем информацию об ошибке или используем значения по умолчанию
+    error_data = error_info.get(error_code, {
+        "title": f"Ошибка {error_code}",
+        "description": "Произошла неизвестная ошибка."
+    })
+    
+    # Дополнительная информация для отладки
+    error_details = {
+        "error_code": error_code,
+        "error_title": error_data["title"],
+        "error_description": error_data["description"],
+        "error_time": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
+        "error_traceback": None  # Можно добавить traceback в production
+    }
+    
+    return render_template("error.html", **error_details), error_code
+
 @main_bp.route("/404")
 def not_found() -> tuple:
-    return render_template("static/404.html"), 404
+    return error_page(404)
+
+@main_bp.app_errorhandler(400)
+def handle_400(error) -> Response:
+    return redirect(url_for('main.error_page', error_code=400))
+
+@main_bp.app_errorhandler(401)
+def handle_401(error) -> Response:
+    return redirect(url_for('main.error_page', error_code=401))
+
+@main_bp.app_errorhandler(403)
+def handle_403(error) -> Response:
+    return redirect(url_for('main.error_page', error_code=403))
 
 @main_bp.app_errorhandler(404)
 def handle_404(error) -> Response:
-    return redirect(url_for('main.not_found'))
+    return redirect(url_for('main.error_page', error_code=404))
+
+@main_bp.app_errorhandler(405)
+def handle_405(error) -> Response:
+    return redirect(url_for('main.error_page', error_code=405))
+
+@main_bp.app_errorhandler(500)
+def handle_500(error) -> Response:
+    return redirect(url_for('main.error_page', error_code=500))
+
+@main_bp.app_errorhandler(502)
+def handle_502(error) -> Response:
+    return redirect(url_for('main.error_page', error_code=502))
+
+@main_bp.app_errorhandler(503)
+def handle_503(error) -> Response:
+    return redirect(url_for('main.error_page', error_code=503))
 
 @main_bp.route("/maintenance")
 def maintenance() -> str:
     return render_template("maintenance.html")
+
+@main_bp.route("/static/<path:filename>")
+def static_files(filename: str) -> Response:
+    """Обработчик статических файлов с кэшированием"""
+    from flask import send_from_directory, make_response
+    import os
+    
+    # Путь к статическим файлам
+    static_dir = os.path.join(current_app.root_path, 'static')
+    
+    # Отправляем файл
+    response = make_response(send_from_directory(static_dir, filename))
+    
+    # Добавляем заголовки кэширования
+    if filename.endswith(('.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot')):
+        # Статические ресурсы кэшируем на 1 год
+        response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+        response.headers['Expires'] = 'Thu, 31 Dec 2025 23:59:59 GMT'
+    elif filename == 'sw.js':
+        # Service Worker кэшируем на 1 час
+        response.headers['Cache-Control'] = 'public, max-age=3600'
+    elif filename.endswith(('.html', '.xml', '.txt')):
+        # HTML и текстовые файлы кэшируем на 1 час
+        response.headers['Cache-Control'] = 'public, max-age=3600'
+    else:
+        # Остальные файлы кэшируем на 1 день
+        response.headers['Cache-Control'] = 'public, max-age=86400'
+    
+    return response
 
 @main_bp.route("/wiki")
 def wiki() -> str:

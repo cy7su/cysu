@@ -1,7 +1,7 @@
 {
     "name": "cysu - Образовательная платформа",
     "short_name": "cysu",
-    "description": "cysu - современная образовательная платформа для изучения программирования и IT. Замена EIOS, Moodle.",
+    "description": "cysu - современная образовательная платформа для изучения программирования и IT.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0e0e0f",

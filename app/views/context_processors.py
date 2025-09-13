@@ -22,7 +22,9 @@ def inject_json_parser() -> Dict[str, Any]:
     return dict(parse_json=parse_json)
 
 def inject_timestamp() -> Dict[str, int]:
-    return dict(timestamp=int(time()))
+    # Используем фиксированную версию для статических файлов
+    # Это позволит браузеру кэшировать файлы
+    return dict(timestamp=4)  # Версия 4 для текущих статических файлов
 
 def inject_moment() -> Dict[str, Any]:
     try:

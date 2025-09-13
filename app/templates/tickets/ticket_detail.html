@@ -6,8 +6,8 @@
 {% block breadcrumbs %}
 {{ render_breadcrumbs([
     {"title": "Главная", "url": url_for('main.index'), "icon": "fas fa-home"},
-    {"title": "Поддержка", "url": url_for('main.support'), "icon": "fas fa-life-ring"},
-    {"title": "Тикеты", "url": url_for('tickets.list'), "icon": "fas fa-ticket-alt"},
+    {"title": "Поддержка", "url": url_for('main.index'), "icon": "fas fa-life-ring"},
+    {"title": "Тикеты", "url": url_for('tickets.tickets'), "icon": "fas fa-ticket-alt"},
     {"title": "Тикет #" + ticket.id|string, "url": None, "icon": "fas fa-file-alt"}
 ]) }}
 {% endblock %}
