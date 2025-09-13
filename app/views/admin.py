@@ -50,7 +50,7 @@ admin_bp = Blueprint("admin", __name__)
 
 @admin_bp.route("/admin/users", methods=["GET", "POST"])
 @login_required
-def admin_users() -> Union[str, Response]:
+def admin_users():
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
@@ -428,7 +428,7 @@ def admin_users() -> Union[str, Response]:
 
 @admin_bp.route("/admin/groups", methods=["GET", "POST"])
 @login_required
-def admin_groups() -> Union[str, Response]:
+def admin_groups():
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
