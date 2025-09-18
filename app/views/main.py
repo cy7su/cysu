@@ -1116,6 +1116,23 @@ def serve_file(subject_id: int, filename: str) -> Response:
     except ValueError:
         pass
 
+    # Добавляем пути для файлов решений пользователей
+    try:
+        # Путь для файлов решений: uploads/subject_id/users/user_id/filename
+        for user_folder in os.listdir(os.path.join(upload_folder, str(subject_id), "users")):
+            if os.path.isdir(os.path.join(upload_folder, str(subject_id), "users", user_folder)):
+                possible_paths.append(safe_path_join(upload_folder, str(subject_id), "users", user_folder, safe_filename))
+    except (ValueError, OSError):
+        pass
+
+    # Добавляем пути для файлов решений с оригинальным именем
+    try:
+        for user_folder in os.listdir(os.path.join(upload_folder, str(subject_id), "users")):
+            if os.path.isdir(os.path.join(upload_folder, str(subject_id), "users", user_folder)):
+                possible_paths.append(safe_path_join(upload_folder, str(subject_id), "users", user_folder, os.path.basename(safe_filename)))
+    except (ValueError, OSError):
+        pass
+
     file_path = None
     for i, path in enumerate(possible_paths):
         current_app.logger.info(f"Проверяем путь {i+1}: {path}")
@@ -1136,6 +1153,14 @@ def serve_file(subject_id: int, filename: str) -> Response:
         mimetype = 'image/jpeg'
     elif filename.lower().endswith('.png'):
         mimetype = 'image/png'
+    elif filename.lower().endswith('.docx'):
+        mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    elif filename.lower().endswith('.doc'):
+        mimetype = 'application/msword'
+    elif filename.lower().endswith('.txt'):
+        mimetype = 'text/plain'
+    elif filename.lower().endswith('.zip'):
+        mimetype = 'application/zip'
     else:
         mimetype = 'application/octet-stream'
 
@@ -1161,8 +1186,8 @@ def serve_file(subject_id: int, filename: str) -> Response:
                 }
             )
 
-            if filename.lower().endswith('.pdf'):
-                response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
+            # Добавляем заголовок для скачивания файлов
+            response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
 
             return response
 
@@ -1190,8 +1215,8 @@ def serve_file(subject_id: int, filename: str) -> Response:
             }
         )
 
-        if filename.lower().endswith('.pdf'):
-            response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
+        # Добавляем заголовок для скачивания файлов
+        response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
 
         execution_time = time.time() - start_time
         current_app.logger.info(f"Файл {filename} обработан за {execution_time:.3f} секунд")
@@ -1254,7 +1279,80 @@ def _handle_range_request(file_path: str, file_size: int, mimetype: str, filenam
         }
     )
 
-    if filename.lower().endswith('.pdf'):
-        response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
+    # Добавляем заголовок для скачивания файлов
+    response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
 
     return response
+
+
+@main_bp.route('/files/<int:subject_id>/users/<int:user_id>/<path:filename>', methods=['GET', 'HEAD'])
+def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
+    """Специальный маршрут для файлов решений пользователей"""
+    import os
+    import time
+    from flask import Response, abort, request
+    from werkzeug.utils import secure_filename
+
+    current_app.logger.info(f"serve_user_file вызвана: subject_id={subject_id}, user_id={user_id}, filename={filename}")
+    
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    safe_filename = secure_filename(filename)
+    
+    # Строим путь к файлу пользователя
+    file_path = safe_path_join(upload_folder, str(subject_id), "users", str(user_id), safe_filename)
+    
+    if not os.path.exists(file_path):
+        current_app.logger.error(f"Файл пользователя не найден: {file_path}")
+        abort(404)
+    
+    # Определяем MIME тип
+    if filename.lower().endswith('.pdf'):
+        mimetype = 'application/pdf'
+    elif filename.lower().endswith(('.jpg', '.jpeg')):
+        mimetype = 'image/jpeg'
+    elif filename.lower().endswith('.png'):
+        mimetype = 'image/png'
+    elif filename.lower().endswith('.docx'):
+        mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    elif filename.lower().endswith('.doc'):
+        mimetype = 'application/msword'
+    elif filename.lower().endswith('.txt'):
+        mimetype = 'text/plain'
+    elif filename.lower().endswith('.zip'):
+        mimetype = 'application/zip'
+    else:
+        mimetype = 'application/octet-stream'
+    
+    try:
+        file_size = os.path.getsize(file_path)
+        
+        def generate_file():
+            try:
+                with open(file_path, 'rb') as f:
+                    while True:
+                        chunk = f.read(65536)
+                        if not chunk:
+                            break
+                        yield chunk
+            except Exception as e:
+                current_app.logger.error(f"Ошибка чтения файла {file_path}: {e}")
+                return
+        
+        response = Response(
+            generate_file(),
+            mimetype=mimetype,
+            headers={
+                'Content-Length': str(file_size),
+                'Accept-Ranges': 'bytes',
+                'Cache-Control': 'public, max-age=3600',
+                'X-Content-Type-Options': 'nosniff',
+                'X-Frame-Options': 'SAMEORIGIN',
+                'Content-Disposition': f'attachment; filename="{os.path.basename(filename)}"'
+            }
+        )
+        
+        return response
+        
+    except Exception as e:
+        current_app.logger.error(f"Ошибка обработки файла {file_path}: {e}")
+        abort(500)

@@ -1,208 +1,197 @@
 {% extends 'base.html' %}
-{% from 'macros/breadcrumbs.html' import admin_breadcrumb %}
-
 {% block title %}Админка: Управление пользователями{% endblock %}
 
-{% block head %}
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-{% endblock %}
-
-{% block breadcrumbs %}
-{{ admin_breadcrumb("Пользователи") }}
-{% endblock %}
-
 {% block content %}
-<div class="admin-page">
-  <div class="admin-content">
-    <div class="admin-layout">
-      <!-- Основной контент -->
-      <div class="admin-main" style="grid-column: 1 / -1;">
-        <div class="admin-card">
-          <div class="admin-card-header" style="background: linear-gradient(135deg, var(--dp-02) 0%, var(--dp-03) 100%); border-bottom: 1px solid var(--dp-12);">
-            <h3 class="admin-card-title" style="color: var(--text-primary); font-weight: 600; letter-spacing: 0.5px;">
-              <i class="fas fa-users" style="color: var(--primary-color); margin-right: 0.75rem;"></i>
-              Управление пользователями
-            </h3>
-            <div class="admin-card-actions">
-              <span class="admin-badge admin-badge-primary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">
-                <i class="fas fa-users" style="margin-right: 0.25rem;"></i>
-                {{ users|length }} пользователей
-              </span>
+<div class="container-fluid admin-users">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Управление пользователями</h2>
+    <span class="badge bg-primary fs-6">{{ users|length }} пользователей</span>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card shadow-sm border-0" style="background: none;">
+        <div class="card-body p-0">
+          <div class="d-flex justify-content-between align-items-center mb-3 p-3" style="background: var(--dp-01); border-radius: 8px;">
+            <div class="d-flex align-items-center gap-3">
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllUsers()">
+                <i class="fas fa-check-square me-1"></i>Выбрать все
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAllUsers()">
+                <i class="fas fa-square me-1"></i>Снять выбор
+              </button>
+              <span class="text-muted" id="selected-count">Выбрано: 0</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-success" onclick="showMassGroupModal()" disabled id="mass-group-btn">
+                <i class="fas fa-users me-1"></i>Назначить группу
+              </button>
+              <button type="button" class="btn btn-sm btn-warning" onclick="showMassStatusModal()" disabled id="mass-status-btn">
+                <i class="fas fa-crown me-1"></i>Изменить статус
+              </button>
+              <button type="button" class="btn btn-sm btn-danger" onclick="deleteSelectedUsers()" disabled id="mass-delete-btn">
+                <i class="fas fa-trash me-1"></i>Удалить
+              </button>
             </div>
           </div>
-          <div class="admin-card-body">
-            <div class="admin-table-container">
-              <table class="admin-table">
-              <thead>
+
+          <div class="table-responsive" style="border-radius: 14px;">
+            <table class="table mb-0" style="background: var(--dp-02); color: var(--text-primary); font-size: 0.9em;">
+              <thead style="background: var(--dp-03);">
                 <tr>
-                  <th style="width: 60px; text-align: center;">ID</th>
-                  <th style="width: 120px; text-align: center;">Ник</th>
-                  <th style="width: 200px; text-align: center;">Контакт</th>
-                  <th style="width: 100px; text-align: center;">Группа</th>
-                  <th style="width: 120px; text-align: center;">Статус</th>
-                  <th style="width: 80px; text-align: center;">Подписка</th>
-                  <th style="width: 120px; text-align: center;">Действия</th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem; width: 40px;">
+                    <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()">
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">
+                    <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('id')" style="color: var(--text-primary);">
+                      ID <i class="fas fa-sort ms-1"></i>
+                    </button>
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">
+                    <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('username')" style="color: var(--text-primary);">
+                      Пользователь <i class="fas fa-sort ms-1"></i>
+                    </button>
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">
+                    <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('contact')" style="color: var(--text-primary);">
+                      Контакт <i class="fas fa-sort ms-1"></i>
+                    </button>
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">
+                    <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('group')" style="color: var(--text-primary);">
+                      Группа <i class="fas fa-sort ms-1"></i>
+                    </button>
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">
+                    <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('status')" style="color: var(--text-primary);">
+                      Статус <i class="fas fa-sort ms-1"></i>
+                    </button>
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">
+                    <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('subscription')" style="color: var(--text-primary);">
+                      Подписка <i class="fas fa-sort ms-1"></i>
+                    </button>
+                  </th>
+                  <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem;">Действия</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody style="background: var(--dp-02);" id="users-table-body">
+                {% if users %}
                 {% for user in users %}
-                <tr class="admin-table-row">
-                  <td class="admin-table-td" style="text-align: center; vertical-align: middle;">
-                    <span class="admin-badge admin-badge-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 24px; text-align: center; display: inline-block;">{{ user.id }}</span>
+                  <tr style="border-color: var(--border-secondary); background: var(--dp-02); color: var(--text-primary);" data-user-id="{{ user.id }}">
+                    <td style="color: var(--text-primary);">
+                      <input type="checkbox" class="user-checkbox" value="{{ user.id }}" onchange="updateSelectedCount()">
+                    </td>
+                    <td style="color: var(--text-primary);">
+                      <span class="badge bg-secondary">{{ user.id }}</span>
                   </td>
-                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
-                    <div class="admin-table-cell-content" style="justify-content: flex-start; align-items: center; gap: 0.5rem;">
-                      <strong class="admin-table-cell-title">{{ user.username }}</strong>
+                    <td style="color: var(--text-primary);">
+                      <div class="d-flex align-items-center gap-2">
+                        <strong>{{ user.username }}</strong>
                       {% if user.id == current_user.id %}
-                        <span class="admin-badge admin-badge-warning" style="font-size: 0.6rem;">Вы</span>
+                          <span class="badge bg-warning" style="font-size: 0.6rem;">Вы</span>
                       {% endif %}
                     </div>
                   </td>
-                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
+                    <td style="color: var(--text-primary);">
+                      <div class="d-flex align-items-center gap-2">
                       {% if user.email %}
                         {% if user.email.endswith('@telegram.org') %}
                           {% set telegram_id = user.email.split('@')[0] %}
-                          <span style="font-size: 0.8rem; color: var(--text-primary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@{{ telegram_id }}</span>
+                            <span class="text-truncate" style="max-width: 150px;">@{{ telegram_id }}</span>
                           <button type="button" class="btn btn-sm btn-outline-info" 
                                   onclick="copyToClipboard('tg://user?id={{ telegram_id }}')" 
                                   title="Копировать Telegram ссылку"
-                                  style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center;">
                             <i class="fab fa-telegram" style="font-size: 0.6rem;"></i>
                           </button>
                         {% else %}
-                          <span style="font-size: 0.8rem; color: var(--text-primary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ user.email }}</span>
+                            <span class="text-truncate" style="max-width: 150px;">{{ user.email }}</span>
                           <button type="button" class="btn btn-sm btn-outline-primary" 
                                   onclick="copyToClipboard('{{ user.email }}')" 
                                   title="Копировать email"
-                                  style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-copy" style="font-size: 0.6rem;"></i>
                           </button>
                         {% endif %}
-                      {% elif user.telegram_id %}
-                        <span style="font-size: 0.8rem; color: var(--text-primary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@{{ user.telegram_id }}</span>
-                        <button type="button" class="btn btn-sm btn-outline-info" 
-                                onclick="copyToClipboard('tg://user?id={{ user.telegram_id }}')" 
-                                title="Копировать Telegram ссылку"
-                                style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                          <i class="fab fa-telegram" style="font-size: 0.6rem;"></i>
-                        </button>
                     {% else %}
-                        <span style="font-size: 0.8rem; color: var(--text-muted); flex: 1;">Не указан</span>
-                        <span class="btn btn-sm btn-outline-secondary" style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                          <i class="fas fa-question" style="font-size: 0.6rem;"></i>
-                        </span>
+                          <span class="text-muted">Не указан</span>
                     {% endif %}
                     </div>
                   </td>
-                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
-                    <div class="admin-table-cell-content" style="justify-content: flex-start;">
+                    <td style="color: var(--text-primary);">
                     {% if user.group %}
-                        <button type="button" class="btn btn-sm btn-primary" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#changeGroupModal{{ user.id }}"
-                                title="Изменить группу"
-                                style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 60px;">
-                          {{ user.group.name[:8] }}{% if user.group.name|length > 8 %}...{% endif %}
-                        </button>
+                        <span class="badge bg-primary">{{ user.group.name }}</span>
                       {% else %}
-                        <button type="button" class="btn btn-sm btn-outline-warning" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#changeGroupModal{{ user.id }}"
-                                title="Назначить группу"
-                                style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                          <i class="fas fa-plus" style="font-size: 0.7rem;"></i>
-                        </button>
+                        <span class="text-muted">Без группы</span>
                       {% endif %}
-                    </div>
                   </td>
-                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
-                    <div class="admin-table-cell-content" style="justify-content: flex-start;">
+                    <td style="color: var(--text-primary);">
                       {% if user.is_admin %}
-                        <button type="button" class="btn btn-sm btn-danger" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#changeStatusModal{{ user.id }}"
-                                title="Изменить статус"
-                                style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 80px;">
-                          Админ
-                        </button>
+                        <span class="badge bg-danger">Админ</span>
                       {% elif user.is_moderator %}
-                        <button type="button" class="btn btn-sm btn-warning" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#changeStatusModal{{ user.id }}"
-                                title="Изменить статус"
-                                style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 80px;">
-                          Модератор
-                        </button>
+                        <span class="badge bg-warning">Модератор</span>
                       {% else %}
-                        <button type="button" class="btn btn-sm btn-secondary" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#changeStatusModal{{ user.id }}"
-                                title="Изменить статус"
-                                style="font-size: 0.7rem; padding: 0.2rem 0.4rem; min-width: 80px;">
-                          Пользователь
-                        </button>
+                        <span class="badge bg-secondary">Пользователь</span>
                       {% endif %}
-                    </div>
                   </td>
-                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
-                    <div class="admin-table-cell-content" style="justify-content: flex-start;">
+                    <td style="color: var(--text-primary);">
                     {% if user.has_active_subscription() %}
-                        <span class="admin-badge admin-badge-success" style="font-size: 0.7rem; padding: 0.2rem 0.4rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                        <span class="badge bg-success">
                           <i class="fas fa-check"></i>
                         </span>
                       {% else %}
-                        <span class="admin-badge admin-badge-danger" style="font-size: 0.7rem; padding: 0.2rem 0.4rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                        <span class="badge bg-danger">
                           <i class="fas fa-times"></i>
                         </span>
                       {% endif %}
-                    </div>
                   </td>
-                  <td class="admin-table-td" style="text-align: left; vertical-align: middle;">
-                    <div class="admin-table-actions" style="display: flex; gap: 0.25rem; flex-wrap: nowrap; justify-content: center; align-items: center;">
-                      <form method="post" style="display: inline;">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="reset_user_id" value="{{ user.id }}">
-                        <button type="submit" class="btn btn-warning btn-sm" 
-                                title="Сбросить пароль"
-                                onclick="return confirm('Вы уверены, что хотите сбросить пароль для пользователя {{ user.username }}?')"
-                                style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                          <i class="fas fa-key" style="font-size: 0.7rem;"></i>
+                    <td style="color: var(--text-primary);">
+                      <div class="d-flex gap-1">
+                        <button type="button" class="btn btn-warning btn-sm reset-password-btn" 
+                                data-user-id="{{ user.id }}" data-username="{{ user.username|e }}"
+                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem;" title="Сбросить пароль">
+                          <i class="fas fa-key"></i>
                         </button>
-                      </form>
-                      
-                      <button type="button" class="btn btn-info btn-sm" 
-                              data-bs-toggle="modal" 
-                              data-bs-target="#changeGroupModal{{ user.id }}"
-                              title="Изменить группу"
-                              style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-user-friends" style="font-size: 0.7rem;"></i>
-                      </button>
-                      
-                      <button type="button" class="btn btn-success btn-sm" 
-                              data-bs-toggle="modal" 
-                              data-bs-target="#changeStatusModal{{ user.id }}"
-                              title="Изменить статус"
-                              style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-crown" style="font-size: 0.7rem;"></i>
-                      </button>
-                      
-                      {% if user.id != current_user.id %}
-                      <form method="post" style="display: inline;">
-                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                          <input type="hidden" name="delete_user_id" value="{{ user.id }}">
-                        <button type="submit" class="btn btn-danger btn-sm" 
-                                title="Удалить пользователя"
-                                onclick="return confirm('Вы уверены, что хотите удалить пользователя {{ user.username }}?')"
-                                style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                          <i class="fas fa-trash" style="font-size: 0.7rem;"></i>
+                        <button type="button" class="btn btn-info btn-sm change-group-btn" 
+                                data-user-id="{{ user.id }}" data-current-group="{{ (user.group.name if user.group else '')|e }}"
+                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem;" title="Изменить группу">
+                          <i class="fas fa-user-friends"></i>
                         </button>
-                        </form>
-                      {% endif %}
+                        <button type="button" class="btn btn-success btn-sm change-status-btn" 
+                                data-user-id="{{ user.id }}" data-current-status="{{ ('admin' if user.is_admin else 'moderator' if user.is_moderator else 'user')|e }}"
+                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem;" title="Изменить статус">
+                          <i class="fas fa-crown"></i>
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm toggle-subscription-btn" 
+                                data-user-id="{{ user.id }}" data-username="{{ user.username|e }}" data-has-subscription="{{ user.has_active_subscription()|lower }}"
+                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem;" title="{% if user.has_active_subscription() %}Отозвать подписку{% else %}Выдать подписку{% endif %}">
+                          <i class="fas {% if user.has_active_subscription() %}fa-times{% else %}fa-check{% endif %}"></i>
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm edit-user-btn" 
+                                data-user-id="{{ user.id }}" data-username="{{ user.username|e }}" data-email="{{ user.email|e }}"
+                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem;" title="Редактировать данные">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        {% if user.id != current_user.id %}
+                        <button type="button" class="btn btn-danger btn-sm delete-user-btn" 
+                                data-user-id="{{ user.id }}" data-username="{{ user.username|e }}"
+                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem;" title="Удалить пользователя">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                        {% endif %}
                     </div>
                     </td>
                   </tr>
                 {% endfor %}
+                {% else %}
+                  <tr style="background: var(--dp-02); color: var(--text-primary);">
+                    <td colspan="8" class="text-center text-muted py-4" style="color: var(--text-primary);">
+                      <i class="fas fa-users fa-2x mb-3"></i>
+                      <p>Нет пользователей</p>
+                    </td>
+                  </tr>
+                {% endif %}
               </tbody>
             </table>
           </div>
@@ -212,27 +201,104 @@
   </div>
 </div>
 
-<!-- Модальные окна для изменения группы -->
-{% for user in users %}
-<div class="modal fade" id="changeGroupModal{{ user.id }}" tabindex="-1" aria-labelledby="changeGroupModalLabel{{ user.id }}" aria-hidden="true">
+<!-- Модальное окно для массового назначения группы -->
+<div class="modal fade" id="massGroupModal" tabindex="-1" aria-labelledby="massGroupModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="changeGroupModalLabel{{ user.id }}">Изменить группу для {{ user.username }}</h5>
+        <h5 class="modal-title" id="massGroupModalLabel">Назначить группу пользователям</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form method="post">
+      <form method="post" id="mass-group-form">
         <div class="modal-body">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <input type="hidden" name="change_group_user_id" value="{{ user.id }}">
+          <input type="hidden" name="action" value="mass_group">
+          <div id="selected-users-inputs"></div>
+          
           <div class="mb-3">
-            <label for="group_id_{{ user.id }}" class="form-label">Выберите группу</label>
-            <select name="group_id" id="group_id_{{ user.id }}" class="form-control admin-input">
+            <label class="form-label">Выберите группу</label>
+            <select name="group_id" class="form-control" required style="background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px;">
               <option value="">Без группы</option>
               {% for group in groups %}
-                <option value="{{ group.id }}" {% if user.group and user.group.id == group.id %}selected{% endif %}>
-                  {{ group.name }}
-                </option>
+                <option value="{{ group.id }}">{{ group.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Назначить группу</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно для массового изменения статуса -->
+<div class="modal fade" id="massStatusModal" tabindex="-1" aria-labelledby="massStatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="massStatusModalLabel">Изменить статус пользователей</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" id="mass-status-form">
+        <div class="modal-body">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="mass_status">
+          <div id="selected-users-status-inputs"></div>
+          
+          <div class="mb-3">
+            <label class="form-label">Выберите статус</label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="status" value="admin" id="status_admin">
+                <label class="form-check-label" for="status_admin">
+                  <span class="badge bg-danger">Администратор</span>
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="status" value="moderator" id="status_moderator">
+                <label class="form-check-label" for="status_moderator">
+                  <span class="badge bg-warning">Модератор</span>
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="status" value="user" id="status_user" checked>
+                <label class="form-check-label" for="status_user">
+                  <span class="badge bg-secondary">Пользователь</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Изменить статус</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно для изменения группы отдельного пользователя -->
+<div class="modal fade" id="changeGroupModal" tabindex="-1" aria-labelledby="changeGroupModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changeGroupModalLabel">Изменить группу</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" id="change-group-form">
+        <div class="modal-body">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="change_group_user_id" id="change_group_user_id">
+          <div class="mb-3">
+            <label class="form-label">Выберите группу</label>
+            <select name="new_group_id" class="form-control" style="background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px;">
+              <option value="">Без группы</option>
+              {% for group in groups %}
+                <option value="{{ group.id }}">{{ group.name }}</option>
               {% endfor %}
             </select>
           </div>
@@ -246,37 +312,37 @@
   </div>
 </div>
 
-<!-- Модальные окна для изменения статуса -->
-<div class="modal fade" id="changeStatusModal{{ user.id }}" tabindex="-1" aria-labelledby="changeStatusModalLabel{{ user.id }}" aria-hidden="true">
+<!-- Модальное окно для изменения статуса отдельного пользователя -->
+<div class="modal fade" id="changeStatusModal" tabindex="-1" aria-labelledby="changeStatusModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="changeStatusModalLabel{{ user.id }}">Изменить статус для {{ user.username }}</h5>
+        <h5 class="modal-title" id="changeStatusModalLabel">Изменить статус</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form method="post">
+      <form method="post" id="change-status-form">
         <div class="modal-body">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <input type="hidden" name="change_status_user_id" value="{{ user.id }}">
+          <input type="hidden" name="change_status_user_id" id="change_status_user_id">
           <div class="mb-3">
             <label class="form-label">Выберите статус</label>
-            <div class="admin-checkbox-group">
-              <div class="admin-checkbox-item">
-                <input type="radio" name="status" value="admin" id="is_admin_{{ user.id }}" class="admin-checkbox" {% if user.is_admin %}checked{% endif %}>
-                <label class="admin-checkbox-label" for="is_admin_{{ user.id }}">
-                  <span class="admin-badge admin-badge-danger">Администратор</span>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="new_role" value="admin" id="new_role_admin">
+                <label class="form-check-label" for="new_role_admin">
+                  <span class="badge bg-danger">Администратор</span>
               </label>
             </div>
-              <div class="admin-checkbox-item">
-                <input type="radio" name="status" value="moderator" id="is_moderator_{{ user.id }}" class="admin-checkbox" {% if user.is_moderator %}checked{% endif %}>
-                <label class="admin-checkbox-label" for="is_moderator_{{ user.id }}">
-                  <span class="admin-badge admin-badge-warning">Модератор</span>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="new_role" value="moderator" id="new_role_moderator">
+                <label class="form-check-label" for="new_role_moderator">
+                  <span class="badge bg-warning">Модератор</span>
               </label>
             </div>
-              <div class="admin-checkbox-item">
-                <input type="radio" name="status" value="user" id="is_user_{{ user.id }}" class="admin-checkbox" {% if not user.is_admin and not user.is_moderator %}checked{% endif %}>
-                <label class="admin-checkbox-label" for="is_user_{{ user.id }}">
-                  <span class="admin-badge admin-badge-secondary">Пользователь</span>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="new_role" value="user" id="new_role_user" checked>
+                <label class="form-check-label" for="new_role_user">
+                  <span class="badge bg-secondary">Пользователь</span>
                 </label>
               </div>
             </div>
@@ -290,25 +356,467 @@
     </div>
   </div>
 </div>
-{% endfor %}
 
+<!-- Модальное окно для редактирования данных пользователя -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editUserModalLabel">Редактировать данные пользователя</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" id="edit-user-form">
+        <div class="modal-body">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="edit_user_id" id="edit_user_id">
+          
+          <div class="mb-3">
+            <label class="form-label">ID пользователя</label>
+            <input type="text" class="form-control" id="edit_user_id_display" readonly 
+                   style="background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px;">
+            <small class="text-muted">ID нельзя изменить</small>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Имя пользователя</label>
+            <input type="text" name="new_username" id="edit_username" class="form-control" required
+                   style="background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px;">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Контакт (Email или Telegram ID)</label>
+            <input type="text" name="new_email" id="edit_email" class="form-control"
+                   style="background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px;">
+            <small class="text-muted">Для Telegram укажите ID в формате: 123456789@telegram.org</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block head %}
+<style>
+/* Стили для input элементов на странице users */
+.admin-users input {
+    margin-left: 15px;
+}
+</style>
 <script>
-function refreshTable() {
-  location.reload();
+let currentSortColumn = null;
+let currentSortDirection = 'asc';
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Улучшение работы с select элементами
+    const selects = document.querySelectorAll('select');
+    
+    selects.forEach(select => {
+        select.style.cssText = 'background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 20px;';
+    });
+    
+    // Улучшение UX для модальных окон
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('shown.bs.modal', function() {
+            const firstInput = this.querySelector('input, select');
+            if (firstInput) {
+                firstInput.focus();
+            }
+        });
+    });
+    
+    // Обработчики для кнопок действий
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.reset-password-btn')) {
+            const btn = e.target.closest('.reset-password-btn');
+            const userId = btn.dataset.userId;
+            const username = btn.dataset.username;
+            resetPassword(userId, username);
+        } else if (e.target.closest('.change-group-btn')) {
+            const btn = e.target.closest('.change-group-btn');
+            const userId = btn.dataset.userId;
+            const currentGroup = btn.dataset.currentGroup;
+            changeUserGroup(userId, currentGroup);
+        } else if (e.target.closest('.change-status-btn')) {
+            const btn = e.target.closest('.change-status-btn');
+            const userId = btn.dataset.userId;
+            const currentStatus = btn.dataset.currentStatus;
+            changeUserStatus(userId, currentStatus);
+        } else if (e.target.closest('.toggle-subscription-btn')) {
+            const btn = e.target.closest('.toggle-subscription-btn');
+            const userId = btn.dataset.userId;
+            const username = btn.dataset.username;
+            const hasSubscription = btn.dataset.hasSubscription === 'true';
+            toggleSubscription(userId, username, hasSubscription);
+        } else if (e.target.closest('.edit-user-btn')) {
+            const btn = e.target.closest('.edit-user-btn');
+            const userId = btn.dataset.userId;
+            const username = btn.dataset.username;
+            const email = btn.dataset.email;
+            editUser(userId, username, email);
+        } else if (e.target.closest('.delete-user-btn')) {
+            const btn = e.target.closest('.delete-user-btn');
+            const userId = btn.dataset.userId;
+            const username = btn.dataset.username;
+            deleteUser(userId, username);
+        }
+    });
+});
+
+// Функции для массовых операций
+function selectAllUsers() {
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    checkboxes.forEach(checkbox => checkbox.checked = true);
+    updateSelectedCount();
 }
 
+function deselectAllUsers() {
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    checkboxes.forEach(checkbox => checkbox.checked = false);
+    updateSelectedCount();
+}
+
+function toggleSelectAll() {
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('.user-checkbox:checked');
+    const count = checkboxes.length;
+    const countElement = document.getElementById('selected-count');
+    const massGroupBtn = document.getElementById('mass-group-btn');
+    const massStatusBtn = document.getElementById('mass-status-btn');
+    const massDeleteBtn = document.getElementById('mass-delete-btn');
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    
+    countElement.textContent = `Выбрано: ${count}`;
+    
+    // Включаем/выключаем кнопки массовых операций
+    massGroupBtn.disabled = count === 0;
+    massStatusBtn.disabled = count === 0;
+    massDeleteBtn.disabled = count === 0;
+    
+    // Обновляем состояние главного чекбокса
+    const allCheckboxes = document.querySelectorAll('.user-checkbox');
+    if (count === 0) {
+        selectAllCheckbox.indeterminate = false;
+        selectAllCheckbox.checked = false;
+    } else if (count === allCheckboxes.length) {
+        selectAllCheckbox.indeterminate = false;
+        selectAllCheckbox.checked = true;
+    } else {
+        selectAllCheckbox.indeterminate = true;
+    }
+}
+
+function showMassGroupModal() {
+    const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
+    if (selectedCheckboxes.length === 0) {
+        alert('Выберите пользователей для назначения группы');
+        return;
+    }
+    
+    // Заполняем скрытые поля с выбранными пользователями
+    const inputsContainer = document.getElementById('selected-users-inputs');
+    inputsContainer.innerHTML = '';
+    
+    selectedCheckboxes.forEach(checkbox => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'user_ids';
+        input.value = checkbox.value;
+        inputsContainer.appendChild(input);
+    });
+    
+    // Показываем модальное окно
+    const modal = new bootstrap.Modal(document.getElementById('massGroupModal'));
+    modal.show();
+}
+
+function showMassStatusModal() {
+    const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
+    if (selectedCheckboxes.length === 0) {
+        alert('Выберите пользователей для изменения статуса');
+        return;
+    }
+    
+    // Заполняем скрытые поля с выбранными пользователями
+    const inputsContainer = document.getElementById('selected-users-status-inputs');
+    inputsContainer.innerHTML = '';
+    
+    selectedCheckboxes.forEach(checkbox => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'user_ids';
+        input.value = checkbox.value;
+        inputsContainer.appendChild(input);
+    });
+    
+    // Показываем модальное окно
+    const modal = new bootstrap.Modal(document.getElementById('massStatusModal'));
+    modal.show();
+}
+
+function deleteSelectedUsers() {
+    const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
+    if (selectedCheckboxes.length === 0) {
+        alert('Выберите пользователей для удаления');
+        return;
+    }
+    
+    if (!confirm(`Удалить ${selectedCheckboxes.length} пользователей? Это действие нельзя отменить!`)) {
+        return;
+    }
+    
+    // Создаем форму для массового удаления
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.style.display = 'none';
+    
+    // Добавляем CSRF токен
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = document.querySelector('input[name="csrf_token"]').value;
+    form.appendChild(csrfInput);
+    
+    // Добавляем действие
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = 'action';
+    actionInput.value = 'mass_delete';
+    form.appendChild(actionInput);
+    
+    // Добавляем выбранных пользователей
+    selectedCheckboxes.forEach(checkbox => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'user_ids';
+        input.value = checkbox.value;
+        form.appendChild(input);
+    });
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Функции для отдельных пользователей
+function resetPassword(userId, username) {
+    if (!confirm(`Сбросить пароль для пользователя ${username}?`)) {
+        return;
+    }
+    
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.style.display = 'none';
+    
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = document.querySelector('input[name="csrf_token"]').value;
+    form.appendChild(csrfInput);
+    
+    const userIdInput = document.createElement('input');
+    userIdInput.type = 'hidden';
+    userIdInput.name = 'reset_user_id';
+    userIdInput.value = userId;
+    form.appendChild(userIdInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function changeUserGroup(userId, currentGroup) {
+    document.getElementById('change_group_user_id').value = userId;
+    
+    // Устанавливаем текущую группу
+    const select = document.querySelector('#changeGroupModal select');
+    const options = select.querySelectorAll('option');
+    options.forEach(option => {
+        option.selected = option.textContent === currentGroup;
+    });
+    
+    const modal = new bootstrap.Modal(document.getElementById('changeGroupModal'));
+    modal.show();
+}
+
+function changeUserStatus(userId, currentStatus) {
+    document.getElementById('change_status_user_id').value = userId;
+    
+    // Устанавливаем текущий статус
+    const radios = document.querySelectorAll('#changeStatusModal input[name="new_role"]');
+    radios.forEach(radio => {
+        radio.checked = radio.value === currentStatus;
+    });
+    
+    const modal = new bootstrap.Modal(document.getElementById('changeStatusModal'));
+    modal.show();
+}
+
+function toggleSubscription(userId, username, hasSubscription) {
+    const action = hasSubscription ? 'отозвать' : 'выдать';
+    if (!confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} подписку пользователю ${username}?`)) {
+        return;
+    }
+    
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.style.display = 'none';
+    
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = document.querySelector('input[name="csrf_token"]').value;
+    form.appendChild(csrfInput);
+    
+    const userIdInput = document.createElement('input');
+    userIdInput.type = 'hidden';
+    userIdInput.name = 'toggle_subscription_id';
+    userIdInput.value = userId;
+    form.appendChild(userIdInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function editUser(userId, username, email) {
+    document.getElementById('edit_user_id').value = userId;
+    document.getElementById('edit_user_id_display').value = userId;
+    document.getElementById('edit_username').value = username;
+    document.getElementById('edit_email').value = email;
+    
+    const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+    modal.show();
+}
+
+function deleteUser(userId, username) {
+    if (!confirm(`Удалить пользователя ${username}? Это действие нельзя отменить!`)) {
+        return;
+    }
+    
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.style.display = 'none';
+    
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = document.querySelector('input[name="csrf_token"]').value;
+    form.appendChild(csrfInput);
+    
+    const userIdInput = document.createElement('input');
+    userIdInput.type = 'hidden';
+    userIdInput.name = 'delete_user_id';
+    userIdInput.value = userId;
+    form.appendChild(userIdInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Функции сортировки
+function sortTable(column) {
+    const tbody = document.getElementById('users-table-body');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Определяем направление сортировки
+    if (currentSortColumn === column) {
+        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSortDirection = 'asc';
+        currentSortColumn = column;
+    }
+    
+    // Сортируем строки
+    rows.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch (column) {
+            case 'id':
+                aValue = parseInt(a.querySelector('td:nth-child(2) .badge').textContent);
+                bValue = parseInt(b.querySelector('td:nth-child(2) .badge').textContent);
+                break;
+            case 'username':
+                aValue = a.querySelector('td:nth-child(3) strong').textContent.toLowerCase();
+                bValue = b.querySelector('td:nth-child(3) strong').textContent.toLowerCase();
+                break;
+            case 'contact':
+                const aContact = a.querySelector('td:nth-child(4) span').textContent.toLowerCase();
+                const bContact = b.querySelector('td:nth-child(4) span').textContent.toLowerCase();
+                aValue = aContact.includes('не указан') ? 'zzz' : aContact;
+                bValue = bContact.includes('не указан') ? 'zzz' : bContact;
+                break;
+            case 'group':
+                const aGroup = a.querySelector('td:nth-child(5)').textContent.toLowerCase();
+                const bGroup = b.querySelector('td:nth-child(5)').textContent.toLowerCase();
+                aValue = aGroup.includes('без группы') ? 'zzz' : aGroup;
+                bValue = bGroup.includes('без группы') ? 'zzz' : bGroup;
+                break;
+            case 'status':
+                const aStatus = a.querySelector('td:nth-child(6) .badge').textContent.toLowerCase();
+                const bStatus = b.querySelector('td:nth-child(6) .badge').textContent.toLowerCase();
+                const statusOrder = {'админ': 0, 'модератор': 1, 'пользователь': 2};
+                aValue = statusOrder[aStatus] || 3;
+                bValue = statusOrder[bStatus] || 3;
+                break;
+            case 'subscription':
+                const aSub = a.querySelector('td:nth-child(7) .badge').classList.contains('bg-success');
+                const bSub = b.querySelector('td:nth-child(7) .badge').classList.contains('bg-success');
+                aValue = aSub ? 0 : 1;
+                bValue = bSub ? 0 : 1;
+                break;
+            default:
+                return 0;
+        }
+        
+        if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    // Очищаем tbody и добавляем отсортированные строки
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+    
+    // Обновляем иконки сортировки
+    updateSortIcons(column);
+}
+
+function updateSortIcons(activeColumn) {
+    // Сбрасываем все иконки
+    document.querySelectorAll('th button i').forEach(icon => {
+        icon.className = 'fas fa-sort ms-1';
+    });
+    
+    // Устанавливаем иконку для активной колонки
+    const activeButton = document.querySelector(`button[onclick="sortTable('${activeColumn}')"]`);
+    if (activeButton) {
+        const icon = activeButton.querySelector('i');
+        icon.className = currentSortDirection === 'asc' ? 'fas fa-sort-up ms-1' : 'fas fa-sort-down ms-1';
+    }
+}
+
+// Функция копирования в буфер обмена
 function copyToClipboard(text) {
-  // Используем современный Clipboard API
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text).then(function() {
       showNotification('Скопировано: ' + text, 'success');
     }).catch(function(err) {
       console.error('Ошибка копирования через Clipboard API:', err);
-      // Fallback для случаев, когда Clipboard API недоступен
       fallbackCopyToClipboard(text);
     });
   } else {
-    // Fallback для старых браузеров или небезопасного контекста
     fallbackCopyToClipboard(text);
   }
 }
@@ -324,7 +832,7 @@ function fallbackCopyToClipboard(text) {
   textArea.select();
   
   try {
-    const successful = document.executeCommand('copy');
+        const successful = document.execCommand('copy');
     if (successful) {
       showNotification('Скопировано: ' + text, 'success');
     } else {
@@ -339,7 +847,6 @@ function fallbackCopyToClipboard(text) {
 }
 
 function showNotification(message, type = 'info') {
-  // Создаем уведомление
   const notification = document.createElement('div');
   notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show`;
   notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
@@ -350,320 +857,11 @@ function showNotification(message, type = 'info') {
   
   document.body.appendChild(notification);
   
-  // Автоматически скрываем через 3 секунды
   setTimeout(() => {
     if (notification.parentNode) {
       notification.remove();
     }
   }, 3000);
 }
-
-function toggleAdminSettings(userId) {
-  const adminModeCheckbox = document.getElementById('admin_mode_enabled_' + userId);
-  const adminModeLabel = document.getElementById('admin_mode_label_' + userId);
-  
-  if (adminModeCheckbox && adminModeLabel) {
-    if (adminModeCheckbox.checked) {
-      adminModeLabel.textContent = 'Админ режим';
-      adminModeLabel.className = 'admin-badge admin-badge-success';
-    } else {
-      adminModeLabel.textContent = 'Пользователь режим';
-      adminModeLabel.className = 'admin-badge admin-badge-secondary';
-    }
-  }
-}
-
-// Мобильная оптимизация
-document.addEventListener('DOMContentLoaded', function() {
-  // Определяем мобильное устройство
-  const isMobile = window.innerWidth <= 768;
-  
-  if (isMobile) {
-    // Добавляем класс для мобильной версии
-    document.body.classList.add('mobile-device');
-    
-    // Улучшаем touch события для кнопок
-    const buttons = document.querySelectorAll('.admin-table-actions button, .admin-table-td button');
-    buttons.forEach(button => {
-      button.addEventListener('touchstart', function(e) {
-        this.style.transform = 'scale(0.95)';
-      });
-      
-      button.addEventListener('touchend', function(e) {
-        this.style.transform = 'scale(1)';
-      });
-    });
-    
-    // Улучшаем скролл таблицы
-    const tableContainer = document.querySelector('.admin-table-container');
-    if (tableContainer) {
-      tableContainer.style.webkitOverflowScrolling = 'touch';
-      tableContainer.style.overflowX = 'auto';
-    }
-    
-    // Добавляем индикатор горизонтального скролла
-    const scrollIndicator = document.createElement('div');
-    scrollIndicator.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(181, 149, 255, 0.8);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    `;
-    scrollIndicator.innerHTML = '<i class="fas fa-arrows-alt-h"></i> Свайп для прокрутки';
-    document.body.appendChild(scrollIndicator);
-    
-    // Показываем индикатор при необходимости скролла
-    function checkScroll() {
-      if (tableContainer.scrollWidth > tableContainer.clientWidth) {
-        scrollIndicator.style.opacity = '1';
-        setTimeout(() => {
-          scrollIndicator.style.opacity = '0';
-        }, 3000);
-      }
-    }
-    
-    checkScroll();
-    window.addEventListener('resize', checkScroll);
-  }
-  
-  // Улучшаем модальные окна для мобильных
-  const modals = document.querySelectorAll('.modal');
-  modals.forEach(modal => {
-    modal.addEventListener('shown.bs.modal', function() {
-      if (isMobile) {
-        // Добавляем класс для мобильного модального окна
-        this.classList.add('mobile-modal');
-      }
-    });
-  });
-});
 </script>
-
-<style>
-/* Мобильная оптимизация */
-@media (max-width: 768px) {
-  .admin-page {
-    padding: 0.5rem;
-  }
-  
-  .admin-card {
-    margin: 0;
-    border-radius: 8px;
-  }
-  
-  .admin-card-header {
-    padding: 1rem 0.75rem;
-    flex-direction: column;
-    gap: 0.75rem;
-    text-align: center;
-  }
-  
-  .admin-card-title {
-    font-size: 1.1rem;
-    margin: 0;
-  }
-  
-  .admin-card-actions {
-    margin-top: 0.5rem;
-  }
-  
-  .admin-table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 8px;
-  }
-  
-  .admin-table {
-    min-width: 800px;
-    font-size: 0.8rem;
-  }
-  
-  .admin-table th {
-    padding: 0.75rem 0.25rem !important;
-    font-size: 0.7rem;
-  }
-  
-  .admin-table td {
-    padding: 0.75rem 0.25rem !important;
-  }
-  
-  /* Компактные кнопки */
-  .admin-table-actions {
-    gap: 0.25rem !important;
-  }
-  
-  .admin-table-actions button {
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 0.6rem !important;
-  }
-  
-  .admin-table-actions button i {
-    font-size: 0.6rem !important;
-  }
-  
-  /* Компактные статусные кнопки */
-  .admin-table-td button[title="Изменить статус"] {
-    min-width: 60px !important;
-    font-size: 0.6rem !important;
-    padding: 0.25rem 0.5rem !important;
-  }
-  
-  .admin-table-td button[title="Изменить группу"] {
-    min-width: 50px !important;
-    font-size: 0.6rem !important;
-    padding: 0.25rem 0.5rem !important;
-  }
-  
-  /* Компактные контактные кнопки */
-  .admin-table-td button[title*="Копировать"] {
-    width: 20px !important;
-    height: 20px !important;
-  }
-  
-  /* Компактные индикаторы подписки */
-  .admin-table-td .admin-badge[style*="width: 24px"] {
-    width: 20px !important;
-    height: 20px !important;
-    font-size: 0.6rem !important;
-  }
-  
-  /* Скрытие длинного текста */
-  .admin-table-td span[style*="text-overflow: ellipsis"] {
-    max-width: 120px !important;
-  }
-  
-  /* Улучшенные модальные окна */
-  .modal-dialog {
-    margin: 0.5rem;
-    max-width: calc(100% - 1rem);
-  }
-  
-  .modal-content {
-    border-radius: 8px;
-  }
-  
-  .modal-header {
-    padding: 1rem 0.75rem;
-  }
-  
-  .modal-body {
-    padding: 1rem 0.75rem;
-  }
-  
-  .modal-footer {
-    padding: 0.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .admin-page {
-    padding: 0.25rem;
-  }
-  
-  .admin-card-header {
-    padding: 0.75rem 0.5rem;
-  }
-  
-  .admin-card-title {
-    font-size: 1rem;
-  }
-  
-  .admin-table {
-    min-width: 700px;
-    font-size: 0.75rem;
-  }
-  
-  .admin-table th {
-    padding: 0.5rem 0.125rem !important;
-    font-size: 0.65rem;
-  }
-  
-  .admin-table td {
-    padding: 0.5rem 0.125rem !important;
-  }
-  
-  .admin-table-actions button {
-    width: 20px !important;
-    height: 20px !important;
-  }
-  
-  .admin-table-td button[title="Изменить статус"] {
-    min-width: 50px !important;
-    font-size: 0.55rem !important;
-    padding: 0.2rem 0.4rem !important;
-  }
-  
-  .admin-table-td button[title="Изменить группу"] {
-    min-width: 40px !important;
-    font-size: 0.55rem !important;
-    padding: 0.2rem 0.4rem !important;
-  }
-  
-  .admin-table-td .admin-badge[style*="width: 24px"] {
-    width: 18px !important;
-    height: 18px !important;
-    font-size: 0.55rem !important;
-  }
-  
-  .admin-table-td span[style*="text-overflow: ellipsis"] {
-    max-width: 80px !important;
-  }
-}
-
-/* Дополнительные стили для мобильных устройств */
-.mobile-device .admin-table-container {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-
-.mobile-device .admin-table-actions button {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.mobile-device .admin-table-td button {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Мобильные модальные окна */
-.mobile-modal .modal-dialog {
-  margin: 0;
-  max-height: 100vh;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.mobile-modal .modal-content {
-  height: 100%;
-  border-radius: 0;
-  border: none;
-  display: flex;
-  flex-direction: column;
-}
-
-.mobile-modal .modal-body {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Улучшенная прокрутка для iOS */
-@supports (-webkit-touch-callout: none) {
-  .admin-table-container {
-    -webkit-overflow-scrolling: touch;
-  }
-}
-</style>
-
-{% endblock %} 
+{% endblock %}

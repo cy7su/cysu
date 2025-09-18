@@ -99,6 +99,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="ticketForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="ticketSubject" class="form-label">Тема</label>
@@ -172,20 +173,50 @@ function createTicket() {
     // Отправляем запрос
     fetch('/api/ticket/create', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+        }
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
-            alert('Тикет успешно создан!');
-            location.reload();
+            // Закрываем модальное окно если оно открыто
+            const modalElement = document.getElementById('createTicketModal');
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                modal.hide();
+            }
+            // Очищаем форму
+            document.getElementById('ticketForm').reset();
+            document.getElementById('fileList').innerHTML = '';
+            
+            // Показываем уведомление об успехе
+            showSuccess('Тикет успешно создан!');
+            
+            // Переходим на страницу тикета
+            setTimeout(() => {
+                window.location.href = '/tickets/' + data.ticket_id;
+            }, 1500);
         } else {
-            alert('Ошибка при создании тикета: ' + data.error);
+            showError('Ошибка при создании тикета: ' + (data.error || 'Неизвестная ошибка'));
         }
     })
     .catch(error => {
         console.error('Ошибка:', error);
-        alert('Произошла ошибка при создании тикета');
+        if (error.message.includes('413')) {
+            showError('Файл слишком большой. Максимальный размер: 200 МБ на файл');
+        } else {
+            showError('Ошибка сети при создании тикета: ' + error.message);
+        }
     });
 }
 
@@ -226,6 +257,45 @@ function deleteAllClosedTickets() {
         button.innerHTML = originalText;
         button.disabled = false;
     });
+}
+
+// Функции для показа уведомлений
+function showSuccess(message) {
+    const notification = document.createElement('div');
+    notification.className = 'alert alert-success alert-dismissible fade show';
+    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Автоматически скрываем через 3 секунды
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 3000);
+}
+
+function showError(message) {
+    const notification = document.createElement('div');
+    notification.className = 'alert alert-danger alert-dismissible fade show';
+    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <i class="fas fa-exclamation-circle me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Автоматически скрываем через 5 секунд
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
 }
 </script>
 {% endblock %}

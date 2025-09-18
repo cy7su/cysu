@@ -131,22 +131,45 @@ def create_ticket() -> Dict[str, Any]:
             files = request.files.getlist("files")
             for file in files:
                 if file and file.filename:
-                    pass
+                    try:
+                        full_path, relative_path = FileStorageManager.get_ticket_file_path(
+                            ticket.id, file.filename
+                        )
+                        
+                        if FileStorageManager.save_file(file, full_path):
+                            ticket_file = TicketFile(
+                                ticket_id=ticket.id,
+                                file_path=relative_path,
+                                file_name=file.filename,
+                                file_size=FileStorageManager.get_file_size(file),
+                                file_type=FileStorageManager.get_file_type(file.filename),
+                            )
+                            db.session.add(ticket_file)
+                    except Exception as e:
+                        current_app.logger.error(f"Ошибка загрузки файла тикета: {str(e)}")
+                        # Продолжаем создание тикета даже если файл не загрузился
 
-        return jsonify(
-            {
-                "success": True,
-                "message": "Тикет успешно создан",
-                "ticket_id": ticket.id,
-            }
-        )
+        # Коммитим файлы тикета если они есть
+        try:
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(f"Ошибка сохранения файлов тикета: {str(e)}")
+            db.session.rollback()
+
+        response_data = {
+            "success": True,
+            "message": "Тикет успешно создан",
+            "ticket_id": ticket.id,
+        }
+        current_app.logger.info(f"Возвращаем успешный ответ: {response_data}")
+        return jsonify(response_data)
 
     except Exception as e:
         current_app.logger.error(f"Ошибка создания тикета: {str(e)}")
         db.session.rollback()
-        return jsonify(
-            {"success": False, "error": "Внутренняя ошибка сервера"}
-        )
+        error_response = {"success": False, "error": "Внутренняя ошибка сервера"}
+        current_app.logger.info(f"Возвращаем ошибку: {error_response}")
+        return jsonify(error_response)
 
 
 @tickets_bp.route("/tickets/<int:ticket_id>/upload_file", methods=["POST"])

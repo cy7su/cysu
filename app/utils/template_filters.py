@@ -184,6 +184,20 @@ def extract_filename(file_path: str) -> str:
     return file_path.split("/")[-1]
 
 
+def extract_user_id_from_path(file_path: str) -> int:
+    """Извлекает user_id из пути файла решения"""
+    if not file_path:
+        return 0
+    
+    parts = file_path.split("/")
+    if len(parts) >= 3 and parts[1] == "users":
+        try:
+            return int(parts[2])
+        except (ValueError, IndexError):
+            return 0
+    return 0
+
+
 def get_cdn_url(file_path: str, subject_id: int) -> str:
     if not file_path:
         return ""

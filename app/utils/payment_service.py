@@ -407,10 +407,14 @@ class YooKassaService:
             return False
 
     def check_user_subscription(self, user: User) -> bool:
+        now = datetime.utcnow()
+        
+        # Проверяем тестовую подписку
+        trial_active = False
         if user.is_trial_subscription:
             if (
                 user.trial_subscription_expires
-                and user.trial_subscription_expires < datetime.utcnow()
+                and user.trial_subscription_expires < now
             ):
                 user.is_trial_subscription = False
                 user.trial_subscription_expires = None
@@ -418,90 +422,169 @@ class YooKassaService:
                 current_app.logger.info(
                     f"Пробная подписка пользователя {user.username} истекла"
                 )
-                return False
-            return True
+            else:
+                trial_active = True
 
-        if not user.is_subscribed:
-            return False
+        # Проверяем обычную подписку
+        regular_active = False
+        if user.is_subscribed:
+            if user.is_manual_subscription:
+                current_app.logger.info(
+                    f"Пользователь {user.username} имеет ручно выданную подписку"
+                )
+                if (
+                    user.subscription_expires
+                    and user.subscription_expires < now
+                ):
+                    user.is_subscribed = False
+                    user.is_manual_subscription = False
+                    db.session.commit()
+                    current_app.logger.info(
+                        f"Ручная подписка пользователя {user.username} истекла"
+                    )
+                else:
+                    regular_active = True
+            else:
+                successful_payment = (
+                    Payment.query.filter_by(user_id=user.id, status="succeeded")
+                    .order_by(Payment.created_at.desc())
+                    .first()
+                )
 
-        if user.is_manual_subscription:
-            current_app.logger.info(
-                f"Пользователь {user.username} имеет ручно выданную подписку"
-            )
-            if (
-                user.subscription_expires
-                and user.subscription_expires < datetime.utcnow()
-            ):
+                if not successful_payment:
+                    user.is_subscribed = False
+                    db.session.commit()
+                    current_app.logger.warning(
+                        f"Пользователь {user.username} имеет подписку без успешного платежа - сброс"
+                    )
+                elif (
+                    user.subscription_expires
+                    and user.subscription_expires < now
+                ):
+                    user.is_subscribed = False
+                    db.session.commit()
+                else:
+                    regular_active = True
+
+        # Если есть обе подписки, выбираем ту, что истекает позже
+        if trial_active and regular_active:
+            trial_expires = user.trial_subscription_expires or now
+            regular_expires = user.subscription_expires or now
+            
+            if regular_expires > trial_expires:
+                # Обычная подписка истекает позже, отключаем тестовую
+                user.is_trial_subscription = False
+                user.trial_subscription_expires = None
+                db.session.commit()
+                current_app.logger.info(
+                    f"Пользователь {user.username} имеет обычную подписку, отключаем тестовую"
+                )
+                return True
+            else:
+                # Тестовая подписка истекает позже, отключаем обычную
                 user.is_subscribed = False
                 user.is_manual_subscription = False
                 db.session.commit()
                 current_app.logger.info(
-                    f"Ручная подписка пользователя {user.username} истекла"
+                    f"Пользователь {user.username} имеет тестовую подписку, отключаем обычную"
                 )
-                return False
-            return True
+                return True
 
-        successful_payment = (
-            Payment.query.filter_by(user_id=user.id, status="succeeded")
-            .order_by(Payment.created_at.desc())
-            .first()
-        )
-
-        if not successful_payment:
-            user.is_subscribed = False
-            db.session.commit()
-            current_app.logger.warning(
-                f"Пользователь {user.username} имеет подписку без успешного платежа - сброс"
-            )
-            return False
-
-        if (
-            user.subscription_expires
-            and user.subscription_expires < datetime.utcnow()
-        ):
-            user.is_subscribed = False
-            db.session.commit()
-            return False
-
-        return True
+        return trial_active or regular_active
 
     def get_subscription_info(self, user: User) -> dict:
         now = datetime.utcnow()
 
+        # Проверяем тестовую подписку
+        trial_active = False
+        trial_expires = None
         if user.is_trial_subscription:
             if not user.trial_subscription_expires:
-                return {
-                    "is_subscribed": True,
-                    "is_trial": True,
-                    "expires_at": None,
-                    "days_left": None,
-                    "type": "trial",
-                }
-
-            if user.trial_subscription_expires < now:
+                trial_active = True
+                trial_expires = None
+            elif user.trial_subscription_expires < now:
                 user.is_trial_subscription = False
                 user.trial_subscription_expires = None
                 db.session.commit()
-                return {
-                    "is_subscribed": False,
-                    "is_trial": False,
-                    "expires_at": None,
-                    "days_left": 0,
-                    "type": "none",
-                }
+            else:
+                trial_active = True
+                trial_expires = user.trial_subscription_expires
 
-            time_left = user.trial_subscription_expires - now
-            days_left = time_left.days
+        # Проверяем обычную подписку
+        regular_active = False
+        regular_expires = None
+        subscription_type = "none"
+        
+        if user.is_subscribed:
+            if user.is_manual_subscription:
+                if user.subscription_expires and user.subscription_expires < now:
+                    user.is_subscribed = False
+                    user.is_manual_subscription = False
+                    db.session.commit()
+                else:
+                    regular_active = True
+                    regular_expires = user.subscription_expires
+                    subscription_type = "manual"
+            else:
+                successful_payment = (
+                    Payment.query.filter_by(user_id=user.id, status="succeeded")
+                    .order_by(Payment.created_at.desc())
+                    .first()
+                )
 
+                if not successful_payment:
+                    user.is_subscribed = False
+                    db.session.commit()
+                elif user.subscription_expires and user.subscription_expires < now:
+                    user.is_subscribed = False
+                    db.session.commit()
+                else:
+                    regular_active = True
+                    regular_expires = user.subscription_expires
+                    subscription_type = "paid"
+
+        # Если есть обе подписки, выбираем ту, что истекает позже
+        if trial_active and regular_active:
+            trial_expires = trial_expires or now
+            regular_expires = regular_expires or now
+            
+            if regular_expires > trial_expires:
+                # Обычная подписка истекает позже
+                user.is_trial_subscription = False
+                user.trial_subscription_expires = None
+                db.session.commit()
+                trial_active = False
+            else:
+                # Тестовая подписка истекает позже
+                user.is_subscribed = False
+                user.is_manual_subscription = False
+                db.session.commit()
+                regular_active = False
+
+        # Возвращаем информацию о активной подписке
+        if trial_active:
+            time_left = trial_expires - now if trial_expires else None
+            days_left = time_left.days if time_left else None
+            
             return {
                 "is_subscribed": True,
                 "is_trial": True,
-                "expires_at": user.trial_subscription_expires,
+                "expires_at": trial_expires,
                 "days_left": days_left,
                 "type": "trial",
             }
-
-        if not user.is_subscribed:
+        elif regular_active:
+            time_left = regular_expires - now if regular_expires else None
+            days_left = time_left.days if time_left else None
+            
+            return {
+                "is_subscribed": True,
+                "is_trial": False,
+                "expires_at": regular_expires,
+                "days_left": days_left,
+                "type": subscription_type,
+            }
+        else:
             return {
                 "is_subscribed": False,
                 "is_trial": False,
@@ -509,42 +592,6 @@ class YooKassaService:
                 "days_left": 0,
                 "type": "none",
             }
-
-        if user.is_manual_subscription:
-            if user.subscription_expires and user.subscription_expires < now:
-                user.is_subscribed = False
-                user.is_manual_subscription = False
-                db.session.commit()
-                return {
-                    "is_subscribed": False,
-                    "is_trial": False,
-                    "expires_at": None,
-                    "days_left": 0,
-                    "type": "none",
-                }
-
-            time_left = (
-                user.subscription_expires - now
-                if user.subscription_expires
-                else None
-            )
-            days_left = time_left.days if time_left else None
-
-            return {
-                "is_subscribed": True,
-                "is_trial": False,
-                "expires_at": user.subscription_expires,
-                "days_left": days_left,
-                "type": "manual",
-            }
-
-        return {
-            "is_subscribed": False,
-            "is_trial": False,
-            "expires_at": None,
-            "days_left": 0,
-            "type": "none",
-        }
 
     def get_trial_subscription_info(self, user: User) -> dict:
         if not user.is_trial_subscription:

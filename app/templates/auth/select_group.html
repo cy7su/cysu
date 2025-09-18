@@ -257,8 +257,11 @@ document.getElementById('createGroupForm').addEventListener('submit', function(e
     .then(data => {
         if (data.success) {
             // Закрываем модальное окно
-            const modal = bootstrap.Modal.getInstance(document.getElementById('createGroupModal'));
-            modal.hide();
+            const modalElement = document.getElementById('createGroupModal');
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                modal.hide();
+            }
             
             // Показываем уведомление об успехе
             showNotification('Запрос на создание группы отправлен! Администратор рассмотрит его в ближайшее время.', 'success');
