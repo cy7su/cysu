@@ -211,7 +211,7 @@ class PasswordReset(db.Model):
 
         logger = logging.getLogger(__name__)
 
-        code = "".join(secrets.choice("0123456789") for _ in range(8))
+        code = "".join(secrets.choice("0123456789") for _ in range(6))
         logger.info(
             f"Generated password reset code: '{code}' (type: {type(code)}, length: {len(code)})"
         )

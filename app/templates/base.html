@@ -2783,6 +2783,10 @@
 
     <!-- Parallax Effects -->
     <script src="{{ url_for('static', filename='js/parallax.js') }}?v=4" defer></script>
+    
+    <!-- Cookie Consent -->
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}?v=1" defer></script>
+    
     <script>
         // Инициализация dropdown меню админки (только для десктопных устройств)
         document.addEventListener('DOMContentLoaded', function () {
@@ -2888,6 +2892,11 @@
             </div>
         </div>
     </div>
+    {% endif %}
+
+    <!-- Плашка согласия на куки (только на главной странице) -->
+    {% if request.endpoint == 'main.index' %}
+        {% include 'macros/cookie_consent.html' %}
     {% endif %}
 
     {% block scripts %}{% endblock %}

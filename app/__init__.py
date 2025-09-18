@@ -239,6 +239,7 @@ def create_app():
         get_cdn_url_production,
         get_telegram_link,
         make_links_clickable,
+        mask_email,
         smart_truncate,
     )
 
@@ -251,6 +252,7 @@ def create_app():
     app.jinja_env.filters["get_telegram_link"] = get_telegram_link
     app.jinja_env.filters["extract_filename"] = extract_filename
     app.jinja_env.filters["extract_user_id_from_path"] = extract_user_id_from_path
+    app.jinja_env.filters["mask_email"] = mask_email
 
     @app.context_processor
     def inject_maintenance_mode():

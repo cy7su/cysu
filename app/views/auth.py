@@ -166,7 +166,7 @@ def email_verification() -> Union[str, Response]:
 
     form = EmailVerificationForm()
 
-    if form.validate_on_submit():
+    if request.method == "POST" and form.validate():
         verification = EmailVerification.query.filter_by(
             id=verification_id, code=form.code.data, is_used=False
         ).first()
@@ -228,7 +228,14 @@ def email_verification() -> Union[str, Response]:
                 flash("Ошибка при завершении регистрации. Попробуйте еще раз.")
                 return redirect(url_for("auth.register"))
         else:
-            flash("Неверный код или код истек. Попробуйте еще раз.")
+            # Добавляем ошибку к полю формы вместо flash сообщения
+            form.code.errors.append("Неверный код или код истек. Попробуйте еще раз.")
+    elif request.method == "POST":
+        # Если форма не валидна, добавляем ошибку
+        if not form.code.data:
+            form.code.errors.append("Введите код подтверждения.")
+        else:
+            form.code.errors.append("Неверный код или код истек. Попробуйте еще раз.")
 
     return render_template(
         "auth/email_verification.html",

@@ -36,9 +36,6 @@ class RegistrationForm(FlaskForm):
     password = PasswordField(
         "Пароль", validators=[DataRequired(), Length(min=6)]
     )
-    confirm_password = PasswordField(
-        "Подтвердите пароль", validators=[DataRequired(), EqualTo("password")]
-    )
     group_id = SelectField("Группа", validators=[DataRequired()])
     submit = SubmitField("Зарегистрироваться")
 
@@ -107,7 +104,7 @@ class PasswordResetForm(FlaskForm):
         "Код подтверждения",
         validators=[
             DataRequired(message="Введите код подтверждения"),
-            Length(min=8, max=8, message="Код должен содержать 8 символов"),
+            Length(min=6, max=6, message="Код должен содержать 6 символов"),
         ],
     )
     new_password = PasswordField(

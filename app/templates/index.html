@@ -23,35 +23,94 @@
                 </div>
             </div>
             
-            <section class="row g-3 justify-content-center mb-4">
-                <div class="col-md-4">
-                    <div class="quick-feature p-3" style="background: var(--dp-02); border: 1px solid var(--border-secondary); border-radius: 12px;">
-                        <i class="fas fa-book text-primary mb-2"></i>
-                        <h6 class="text-primary mb-1">Материалы</h6>
-                        <small class="text-muted">Выкладываются в удобном формате</small>
+            <!-- Карусель функций -->
+            <section class="features-carousel-container mb-4">
+                <div class="features-carousel-wrapper">
+                    <div class="features-carousel" id="featuresCarousel">
+                        <!-- Первый набор карточек -->
+                        <div class="feature-card">
+                            <div class="quick-feature p-3">
+                                <i class="fas fa-book text-primary mb-2"></i>
+                                <h6 class="text-primary mb-1">Материалы</h6>
+                                <small class="text-muted">Выкладываются в удобном формате</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="quick-feature p-3">
+                                <i class="fas fa-code text-primary mb-2"></i>
+                                <h6 class="text-primary mb-1">Практика</h6>
+                                <small class="text-muted">Загружай решения, быстро и удобно</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="quick-feature p-3">
+                                <i class="fas fa-comments text-primary mb-2"></i>
+                                <h6 class="text-primary mb-1">Поддержка</h6>
+                                <small class="text-muted">Чат и тикеты - решат все твои проблемы</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Второй набор карточек (дубликат для бесконечной прокрутки) -->
+                        <div class="feature-card">
+                            <div class="quick-feature p-3">
+                                <i class="fas fa-graduation-cap text-primary mb-2"></i>
+                                <h6 class="text-primary mb-1">Обучение</h6>
+                                <small class="text-muted">Структурированные курсы и программы</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="quick-feature p-3">
+                                <i class="fas fa-mobile-alt text-primary mb-2"></i>
+                                <h6 class="text-primary mb-1">Мобильность</h6>
+                                <small class="text-muted">Учись в любое время и в любом месте</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="quick-feature p-3">
+                                <i class="fas fa-book text-primary mb-2"></i>
+                                <h6 class="text-primary mb-1">Материалы</h6>
+                                <small class="text-muted">Выкладываются в удобном формате</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Третий набор карточек (дубликат для бесконечной прокрутки) -->
+                        <div class="feature-card">
+                            <div class="quick-feature p-3">
+                                <i class="fas fa-code text-primary mb-2"></i>
+                                <h6 class="text-primary mb-1">Практика</h6>
+                                <small class="text-muted">Загружай решения, быстро и удобно</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="quick-feature p-3">
+                                <i class="fas fa-comments text-primary mb-2"></i>
+                                <h6 class="text-primary mb-1">Поддержка</h6>
+                                <small class="text-muted">Чат и тикеты - решат все твои проблемы</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="quick-feature p-3">
+                                <i class="fas fa-graduation-cap text-primary mb-2"></i>
+                                <h6 class="text-primary mb-1">Обучение</h6>
+                                <small class="text-muted">Структурированные курсы и программы</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="quick-feature p-3" style="background: var(--dp-02); border: 1px solid var(--border-secondary); border-radius: 12px;">
-                        <i class="fas fa-code text-primary mb-2"></i>
-                        <h6 class="text-primary mb-1">Практика</h6>
-                        <small class="text-muted">Загружай решения, быстро и удобно</small>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="quick-feature p-3" style="background: var(--dp-02); border: 1px solid var(--border-secondary); border-radius: 12px;">
-                        <i class="fas fa-comments text-primary mb-2"></i>
-                        <h6 class="text-primary mb-1">Поддержка</h6>
-                        <small class="text-muted">Чат и тикеты - решат все твои проблемы</small>
-                    </div>
-                </div>
+                
             </section>
             
             <nav class="d-flex gap-2 justify-content-center flex-wrap">
-                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm px-3">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary-custom">
                     Регистрация
                 </a>
-                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-sm px-3">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary-custom">
                     Войти
                 </a>
             </nav>
@@ -60,12 +119,78 @@
 </section>
 
 <style>
+/* Стили для быстрых функций (используются в карусели) */
 .quick-feature {
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
+
 .quick-feature:hover {
     border-color: var(--primary-color) !important;
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(181, 149, 255, 0.15);
+}
+
+/* Анимация блеска при наведении */
+.quick-feature::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(181, 149, 255, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.quick-feature:hover::before {
+    left: 100%;
+}
+
+/* Стили для кнопок на главной странице */
+.btn-primary-custom {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+    display: inline-block;
+    min-width: 120px;
+}
+
+.btn-primary-custom:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-secondary-custom {
+    background: var(--dp-03);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+    display: inline-block;
+    min-width: 120px;
+}
+
+.btn-secondary-custom:hover {
+    background: var(--dp-04);
+    transform: translateY(-1px);
+    color: var(--primary-hover);
+    text-decoration: none;
 }
 </style>
 

@@ -1,158 +1,101 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Вход{% endblock %}
+{% block title %}Вход в аккаунт{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
-  <div class="card p-4 mx-3" style="min-width:280px; max-width: 400px; width:100%; border-radius: 12px;">
-    <div class="text-center mb-4">
-      <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
-      <h2 class="mb-0" style="font-size: 1.5rem;">Вход в систему</h2>
-      <small class="text-muted">Введите свои данные для входа</small>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7 col-12">
+            <div class="registration-card">
+                <div class="registration-header">
+                    <div class="registration-logo">
+                        <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Логотип сайта" style="width: 48px; height: 48px;">
+                    </div>
+                    <h1 class="registration-title">Войдите в свой аккаунт</h1>
+                </div>
+
+                <form method="POST" class="registration-form">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-group">
+                        <label class="form-label">Логин или email</label>
+                        {{ form.username(class="form-input", placeholder="Введите логин или E-mail", autocomplete="username") }}
+                        {% if form.username.errors %}
+                            <div class="code-error-message">
+                                {% for error in form.username.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <div class="password-input-wrapper">
+                            {{ form.password(class="form-input", placeholder="Введите пароль", autocomplete="current-password") }}
+                            <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="code-error-message">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="checkbox-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <label class="checkbox-label" style="margin-bottom: 0;">
+                            <input type="checkbox" name="remember_me" checked>
+                            <span class="checkmark"></span>
+                            Запомнить меня
+                        </label>
+                        <a href="{{ url_for('auth.password_reset_request') }}" class="resend-link" style="font-size: 14px;">Забыли пароль?</a>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">
+                            Вход
+                        </button>
+                    </div>
+
+                    <div class="divider">
+                        <span>или</span>
+                    </div>
+
+                    <div class="social-login">
+                        <a href="{{ url_for('telegram_auth.telegram_login') }}" class="social-btn telegram-btn">
+                            <i class="fab fa-telegram"></i>
+                            Telegram
+                        </a>
+                    </div>
+                </form>
+
+                <div class="verification-footer">
+                    <p class="resend-text">Нет аккаунта? <a href="{{ url_for('auth.register') }}" class="resend-link">Регистрация</a></p>
+                </div>
+            </div>
+        </div>
     </div>
-    <form method="post">
-      {{ form.hidden_tag() }}
-      <div class="mb-3">
-        <label class="form-label" style="font-size: 0.9rem; font-weight: 500;">{{ form.username.label }}</label>
-        <div class="input-group">
-                          <span class="input-group-text" style="background: var(--dp-02); border: 1px solid var(--border-secondary); color: var(--text-primary);"><i class="fas fa-user"></i></span>
-                {{ form.username(class_='form-control', style='border-left: none; background: var(--dp-02); border: 1px solid var(--border-secondary); color: var(--text-primary);', placeholder='Введите имя пользователя', autocomplete='username') }}
-        </div>
-      </div>
-      <div class="mb-4">
-        <label class="form-label" style="font-size: 0.9rem; font-weight: 500;">{{ form.password.label }}</label>
-        <div class="input-group">
-                          <span class="input-group-text" style="background: var(--dp-02); border: 1px solid var(--border-secondary); color: var(--text-primary);"><i class="fas fa-lock"></i></span>
-                {{ form.password(class_='form-control', style='border-left: none; background: var(--dp-02); border: 1px solid var(--border-secondary); color: var(--text-primary);', placeholder='Введите пароль', autocomplete='current-password') }}
-        </div>
-      </div>
-      <div class="d-grid">
-        {{ form.submit(class="btn btn-primary", style='padding: 12px 16px; font-size: 0.9rem; border-radius: 8px; min-height: 44px;') }}
-      </div>
-      
-      <div class="text-center my-3">
-        <div id="telegram-widget-container" style="display: flex; justify-content: center; align-items: center;">
-          <script async src="https://telegram.org/js/telegram-widget.js?22" 
-                  data-telegram-login="authcysubot" 
-                  data-size="large" 
-                  data-userpic="false" 
-                  data-auth-url="{{ url_for('telegram_auth.telegram_login') }}" 
-                  data-request-access="write"
-                  data-onauth="onTelegramAuth(user)"></script>
-        </div>
-        
-        <div id="mobile-telegram-fallback" style="display: none;">
-          <div class="alert alert-warning" style="background: var(--dp-03); border: 1px solid var(--border-secondary); color: var(--text-primary); font-size: 0.85rem;">
-            <i class="fab fa-telegram me-2"></i>
-            <strong>Мобильные браузеры</strong><br>
-            Telegram Login Widget может не работать в мобильных браузерах. 
-            <a href="https://t.me/authcysubot" class="fw-bold text-decoration-none" style="color: var(--primary-color);" target="_blank">
-              Перейдите к боту для авторизации
-            </a>
-          </div>
-        </div>
-        
-        <div id="miniapp-telegram-fallback" style="display: none;">
-          <div class="alert alert-info" style="background: var(--dp-03); border: 1px solid var(--border-secondary); color: var(--text-primary); font-size: 0.85rem;">
-            <i class="fab fa-telegram me-2"></i>
-            <strong>Telegram Mini App</strong><br>
-            Для авторизации в Mini App используйте специальную страницу.
-            <a href="{{ url_for('telegram_auth.telegram_miniapp') }}" class="fw-bold text-decoration-none" style="color: var(--primary-color);">
-              Перейти к авторизации
-            </a>
-          </div>
-        </div>
-      </div>
-      
-      <div class="text-center mt-3">
-        <small class="text-muted">
-          Нет аккаунта? <a href="{{ url_for('auth.register') }}" class="text-decoration-none text-primary">Зарегистрироваться</a>
-        </small>
-      </div>
-      <div class="text-center mt-2">
-        <small class="text-muted">
-          <a href="{{ url_for('auth.password_reset_request') }}" class="text-decoration-none text-muted">Забыли пароль?</a>
-        </small>
-      </div>
-        
-        <script>
-        function onTelegramAuth(user) {
-            console.log('Получены данные от Telegram:', user);
-            
-            // Отправляем данные на сервер
-            fetch('{{ url_for("telegram_auth.telegram_login") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(user)
-            })
-            .then(response => {
-                console.log('Ответ сервера:', response.status);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Данные ответа:', data);
-                if (data.success) {
-                    // Успешная авторизация - перенаправляем
-                    window.location.href = data.redirect_url || '{{ url_for("main.index") }}';
-                } else {
-                    // Ошибка авторизации
-                    showError(data.message || 'Ошибка авторизации через Telegram');
-                }
-            })
-            .catch(error => {
-                console.error('Ошибка:', error);
-                showError('Ошибка авторизации через Telegram: ' + error.message);
-            });
-        }
-        
-        function showError(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.innerHTML = `<div class="text-center"><i class="fas fa-exclamation-triangle me-2"></i>${message}</div>`;
-            errorDiv.className = 'alert alert-danger';
-            document.querySelector('.card').appendChild(errorDiv);
-            
-            // Убираем ошибку через 5 секунд
-            setTimeout(() => {
-                if (errorDiv.parentNode) {
-                    errorDiv.remove();
-                }
-            }, 5000);
-        }
-        
-        // Проверяем, находимся ли мы в Telegram Mini App
-        document.addEventListener('DOMContentLoaded', function() {
-            const isTelegramWebApp = window.Telegram && window.Telegram.WebApp;
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const telegramContainer = document.getElementById('telegram-widget-container');
-            const mobileFallback = document.getElementById('mobile-telegram-fallback');
-            const miniappFallback = document.getElementById('miniapp-telegram-fallback');
-            
-            if (isTelegramWebApp) {
-                // В Telegram Mini App - показываем специальную кнопку
-                if (telegramContainer && miniappFallback) {
-                    telegramContainer.style.display = 'none';
-                    miniappFallback.style.display = 'block';
-                }
-            } else if (isMobile && telegramContainer && mobileFallback) {
-                // На мобильном устройстве - ждем загрузки Telegram Widget
-                setTimeout(() => {
-                    const telegramButton = telegramContainer.querySelector('iframe');
-                    if (!telegramButton || telegramButton.offsetHeight === 0) {
-                        // Telegram Widget не загрузился, показываем fallback
-                        telegramContainer.style.display = 'none';
-                        mobileFallback.style.display = 'block';
-                    }
-                }, 3000);
-            }
-        });
-        </script>
-    </form>
-  </div>
 </div>
+
+<script>
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const button = field.nextElementSibling;
+    const icon = button.querySelector('i');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
 {% endblock %} 

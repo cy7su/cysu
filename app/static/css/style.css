@@ -36,6 +36,451 @@
     --accent-blue-hover: var(--primary-hover);
 }
 
+/* Стили для карусели функций */
+.features-carousel-container {
+    position: relative;
+    overflow: hidden;
+    padding: 30px 0 40px 0;
+    transition: all 0.3s ease;
+    opacity: 1;
+}
+
+@keyframes containerFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.features-carousel-container:hover .features-carousel {
+    animation-play-state: paused;
+}
+
+.features-carousel-wrapper {
+    overflow: hidden;
+    position: relative;
+    margin: 0 20px;
+}
+
+.features-carousel-wrapper::before,
+.features-carousel-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.features-carousel-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, var(--dp-00) 0%, var(--dp-00) 70%, transparent 100%);
+}
+
+.features-carousel-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, var(--dp-00) 0%, var(--dp-00) 70%, transparent 100%);
+}
+
+
+
+.features-carousel {
+    display: flex;
+    will-change: transform;
+    animation: continuousScroll 30s linear infinite;
+}
+
+@keyframes continuousScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.feature-card {
+    flex: 0 0 33.333%; /* 3 карточки в ряд */
+    padding: 0 8px;
+    min-width: 0;
+    opacity: 1;
+}
+
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.feature-card .quick-feature {
+    background: var(--dp-02);
+    border: 1px solid var(--border-secondary);
+    border-radius: 12px;
+    height: 100%;
+    transition: border-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    transform: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+.feature-card .quick-feature::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(181, 149, 255, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.feature-card:hover .quick-feature::before {
+    left: 100%;
+}
+
+.feature-card:hover .quick-feature {
+    border-color: var(--primary-color);
+    transform: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    opacity: 1;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.carousel-indicators .indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    background: var(--border-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    opacity: 1;
+}
+
+
+@keyframes indicatorFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.carousel-indicators .indicator.active {
+    background: var(--primary-color);
+    transform: scale(1.2);
+}
+
+.carousel-indicators .indicator:hover {
+    background: var(--primary-hover);
+    transform: scale(1.1);
+}
+
+.carousel-indicators .indicator.active::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: pulse 2s infinite;
+}
+
+.carousel-indicators .indicator.active::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 1px solid var(--primary-color);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: progressRing 4s linear infinite;
+}
+
+@keyframes progressRing {
+    0% {
+        stroke-dasharray: 0 100;
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        stroke-dasharray: 100 0;
+        opacity: 0.6;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+}
+
+/* Адаптивность карусели */
+@media (max-width: 768px) {
+    .feature-card {
+        flex: 0 0 50%;
+        padding: 0 4px;
+    }
+    
+    .features-carousel-container {
+        padding: 25px 0 35px 0;
+    }
+    
+    .features-carousel-wrapper {
+        margin: 0 10px;
+    }
+    
+    .features-carousel-wrapper::before,
+    .features-carousel-wrapper::after {
+        width: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .feature-card {
+        flex: 0 0 100%;
+        padding: 0 2px;
+    }
+    
+    .features-carousel-wrapper {
+        margin: 0 5px;
+    }
+    
+    .features-carousel-wrapper::before,
+    .features-carousel-wrapper::after {
+        width: 20px;
+    }
+    
+    .carousel-indicators .indicator {
+        width: 10px;
+        height: 10px;
+    }
+}
+
+/* Стили для плашки согласия на куки */
+.cookie-consent-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, var(--dp-02) 0%, var(--dp-03) 100%);
+    border-top: 1px solid var(--border-primary);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    backdrop-filter: blur(10px);
+}
+
+.cookie-consent-banner.show {
+    transform: translateY(0);
+}
+
+.cookie-consent-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
+}
+
+.cookie-consent-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.cookie-consent-title {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.cookie-consent-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.cookie-consent-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.cookie-consent-link:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+.cookie-consent-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.cookie-consent-actions .btn {
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.cookie-consent-actions .btn-outline-light {
+    border-color: var(--border-secondary);
+    color: var(--text-secondary);
+}
+
+.cookie-consent-actions .btn-outline-light:hover {
+    background-color: var(--dp-04);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+.cookie-consent-actions .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.cookie-consent-actions .btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Toast уведомления */
+.cookie-consent-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--dp-02);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    backdrop-filter: blur(10px);
+}
+
+.cookie-consent-toast.show {
+    transform: translateX(0);
+}
+
+.cookie-consent-toast .toast-content {
+    display: flex;
+    align-items: center;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.cookie-consent-toast .toast-content i {
+    color: var(--success);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .cookie-consent-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+        padding: 16px;
+    }
+    
+    .cookie-consent-actions {
+        justify-content: center;
+    }
+    
+    .cookie-consent-actions .btn {
+        flex: 1;
+        max-width: 120px;
+    }
+    
+    .cookie-consent-toast {
+        right: 10px;
+        left: 10px;
+        transform: translateY(-100%);
+    }
+    
+    .cookie-consent-toast.show {
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 480px) {
+    .cookie-consent-title {
+        font-size: 15px;
+    }
+    
+    .cookie-consent-description {
+        font-size: 13px;
+    }
+    
+    .cookie-consent-actions .btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}
+
 
 .dropdown-toggle::after {
     margin-left: 0 !important;
@@ -1851,5 +2296,592 @@ body.modal-open {
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 120px;
+    }
+}
+
+/* Стили для страницы верификации email */
+.verification-card {
+    background: var(--dp-02);
+    border: 1px solid var(--border-secondary);
+    border-radius: 16px;
+    padding: 40px 30px;
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.verification-header {
+    margin-bottom: 30px;
+}
+
+.verification-logo {
+    width: 60px;
+    height: 60px;
+    background: var(--primary-color);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.verification-logo i {
+    font-size: 24px;
+    color: white;
+}
+
+.verification-title {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.verification-content {
+    margin-bottom: 30px;
+}
+
+.verification-text {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.email-masked {
+    color: white;
+    font-weight: 500;
+}
+
+.code-input-container {
+    margin-bottom: 30px;
+}
+
+.code-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    display: block;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.code-inputs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.code-input {
+    width: 45px;
+    height: 45px;
+    border: 1px solid var(--border-secondary);
+    border-radius: 8px;
+    background: var(--dp-03);
+    color: white;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    outline: none;
+    caret-color: transparent;
+}
+
+.code-input:focus {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(181, 149, 255, 0.2);
+}
+
+.code-input:not(:focus) {
+    background: var(--dp-03);
+    border-color: var(--border-secondary);
+}
+
+.code-input.error {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+    animation: shake 0.5s ease-in-out;
+}
+
+.code-error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 8px;
+    text-align: center;
+    display: none;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.verification-submit {
+    width: 100%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 20px;
+}
+
+.verification-submit:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.verification-footer {
+    text-align: center;
+}
+
+.resend-text {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.resend-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.resend-link:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* Адаптивность для страницы верификации */
+@media (max-width: 768px) {
+    .verification-card {
+        padding: 30px 20px;
+        margin: 0 15px;
+    }
+    
+    .verification-title {
+        font-size: 20px;
+    }
+    
+    .code-input {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .code-inputs {
+        gap: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .verification-card {
+        padding: 25px 15px;
+    }
+    
+    .verification-title {
+        font-size: 18px;
+    }
+    
+    .code-input {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+    
+    .code-inputs {
+        gap: 4px;
+    }
+}
+
+/* Стили для полей пароля на странице восстановления */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-secondary);
+    border-radius: 6px;
+    background: var(--dp-03);
+    color: white;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.form-input:focus {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(181, 149, 255, 0.2);
+}
+
+.form-input:not(:focus) {
+    background: var(--dp-03);
+    border-color: var(--border-secondary);
+}
+
+.password-input-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: white;
+}
+
+/* Стили для страницы регистрации */
+.registration-card {
+    background: var(--dp-02);
+    border: 1px solid var(--border-secondary);
+    border-radius: 12px;
+    padding: 30px 25px;
+    text-align: center;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.registration-header {
+    margin-bottom: 25px;
+}
+
+.registration-logo {
+    margin-bottom: 15px;
+}
+
+.registration-title {
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.registration-form {
+    text-align: left;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-secondary);
+    border-radius: 6px;
+    background: var(--dp-03);
+    color: white;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.form-input:focus {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(181, 149, 255, 0.2);
+}
+
+.form-input:not(:focus) {
+    background: var(--dp-03);
+    border-color: var(--border-secondary);
+}
+
+.password-input-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: white;
+}
+
+.checkbox-group {
+    margin-bottom: 20px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.checkbox-label input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-secondary);
+    border-radius: 4px;
+    margin-right: 10px;
+    position: relative;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.terms-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.terms-link:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+.button-group {
+    margin-bottom: 12px;
+}
+
+.login-link {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.btn-primary {
+    width: 100%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 1;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-primary.disabled {
+    background: var(--dp-03);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-primary.disabled:hover {
+    background: var(--dp-03);
+    transform: none;
+}
+
+.btn-secondary {
+    width: 100%;
+    background: var(--dp-03);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+    display: block;
+}
+
+.btn-secondary:hover {
+    background: var(--dp-04);
+    transform: translateY(-1px);
+    color: var(--primary-hover);
+}
+
+.divider {
+    position: relative;
+    text-align: center;
+    margin: 25px 0;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-secondary);
+}
+
+.divider span {
+    background: var(--dp-02);
+    color: var(--text-secondary);
+    padding: 0 15px;
+    font-size: 14px;
+    position: relative;
+    z-index: 1;
+}
+
+.social-login {
+    display: flex;
+    gap: 12px;
+}
+
+.social-login .social-btn {
+    flex: 1;
+    width: 100%;
+}
+
+.social-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.telegram-btn {
+    background: #0088cc;
+    color: white;
+}
+
+.telegram-btn:hover {
+    background: #006ba3;
+    transform: translateY(-1px);
+    color: white;
+}
+
+.social-btn i {
+    font-size: 16px;
+}
+
+/* Адаптивность для страницы регистрации */
+@media (max-width: 768px) {
+    .registration-card {
+        padding: 25px 20px;
+        margin: 0 15px;
+    }
+    
+    .registration-title {
+        font-size: 18px;
+    }
+    
+    .button-group {
+        margin-bottom: 10px;
+    }
+    
+    .login-link {
+        margin-bottom: 20px;
+    }
+    
+    .social-login {
+        flex-direction: column;
+    }
+    
+    /* Адаптивность для чекбокса и ссылки "Забыли пароль?" */
+    .checkbox-group {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+    
+    .checkbox-group .resend-link {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .registration-card {
+        padding: 20px 15px;
+    }
+    
+    .registration-title {
+        font-size: 16px;
+    }
+    
+    .form-input {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .btn-primary,
+    .btn-secondary,
+    .social-btn {
+        padding: 10px 14px;
+        font-size: 13px;
     }
 }
