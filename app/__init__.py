@@ -232,6 +232,7 @@ def create_app():
 
     from .utils.template_filters import (
         extract_filename,
+        extract_user_id_from_path,
         format_description,
         format_user_contact,
         get_cdn_url,
@@ -249,6 +250,7 @@ def create_app():
     app.jinja_env.filters["format_user_contact"] = format_user_contact
     app.jinja_env.filters["get_telegram_link"] = get_telegram_link
     app.jinja_env.filters["extract_filename"] = extract_filename
+    app.jinja_env.filters["extract_user_id_from_path"] = extract_user_id_from_path
 
     @app.context_processor
     def inject_maintenance_mode():

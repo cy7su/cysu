@@ -408,6 +408,158 @@ def admin_users():
             db.session.rollback()
             flash("Ошибка при изменении статуса пользователя", "error")
 
+    # Массовые операции
+    if request.method == "POST" and request.form.get("action") == "mass_group":
+        try:
+            user_ids = request.form.getlist("user_ids")
+            group_id = request.form.get("group_id")
+            current_app.logger.info(f"Массовое назначение группы: {user_ids} -> {group_id}")
+            
+            if not user_ids:
+                flash("Не выбраны пользователи", "error")
+            else:
+                group = None
+                if group_id:
+                    group = Group.query.get(int(group_id))
+                    if not group:
+                        flash("Группа не найдена", "error")
+                        return redirect(url_for("admin.admin_users"))
+                
+                updated_count = 0
+                for user_id in user_ids:
+                    user = User.query.get(int(user_id))
+                    if user and user.id != current_user.id:
+                        user.group_id = group.id if group else None
+                        updated_count += 1
+                
+                db.session.commit()
+                group_name = group.name if group else "без группы"
+                flash(f"Группа '{group_name}' назначена {updated_count} пользователям")
+        except Exception as e:
+            current_app.logger.error(f"Ошибка массового назначения группы: {str(e)}")
+            db.session.rollback()
+            flash("Ошибка при массовом назначении группы", "error")
+
+    if request.method == "POST" and request.form.get("action") == "mass_status":
+        try:
+            user_ids = request.form.getlist("user_ids")
+            status = request.form.get("status")
+            current_app.logger.info(f"Массовое изменение статуса: {user_ids} -> {status}")
+            
+            if not user_ids:
+                flash("Не выбраны пользователи", "error")
+            else:
+                updated_count = 0
+                for user_id in user_ids:
+                    user = User.query.get(int(user_id))
+                    if user and user.id != current_user.id:
+                        user.is_admin = False
+                        user.is_moderator = False
+                        user.admin_mode_enabled = False
+                        
+                        if status == "admin":
+                            user.is_admin = True
+                        elif status == "moderator":
+                            user.is_moderator = True
+                        
+                        updated_count += 1
+                
+                db.session.commit()
+                status_names = {"admin": "администратор", "moderator": "модератор", "user": "пользователь"}
+                status_name = status_names.get(status, "пользователь")
+                flash(f"Статус '{status_name}' назначен {updated_count} пользователям")
+        except Exception as e:
+            current_app.logger.error(f"Ошибка массового изменения статуса: {str(e)}")
+            db.session.rollback()
+            flash("Ошибка при массовом изменении статуса", "error")
+
+    if request.method == "POST" and request.form.get("action") == "mass_delete":
+        try:
+            user_ids = request.form.getlist("user_ids")
+            current_app.logger.info(f"Массовое удаление пользователей: {user_ids}")
+            
+            if not user_ids:
+                flash("Не выбраны пользователи", "error")
+            else:
+                deleted_count = 0
+                for user_id in user_ids:
+                    user = User.query.get(int(user_id))
+                    if user and user.id != current_user.id and not user.is_admin:
+                        try:
+                            # Удаляем связанные данные
+                            Notification.query.filter_by(user_id=user.id).delete()
+                            TicketMessage.query.filter_by(user_id=user.id).delete()
+                            Ticket.query.filter_by(user_id=user.id).delete()
+                            EmailVerification.query.filter_by(user_id=user.id).delete()
+                            Payment.query.filter_by(user_id=user.id).delete()
+                            db.session.query(Submission).filter_by(user_id=user.id).delete()
+                            ChatMessage.query.filter_by(user_id=user.id).delete()
+                            
+                            # Удаляем файлы
+                            FileStorageManager.delete_user_files(user.id)
+                            
+                            db.session.delete(user)
+                            deleted_count += 1
+                        except Exception as e:
+                            current_app.logger.error(f"Ошибка удаления пользователя {user.id}: {str(e)}")
+                
+                db.session.commit()
+                flash(f"Удалено {deleted_count} пользователей")
+        except Exception as e:
+            current_app.logger.error(f"Ошибка массового удаления: {str(e)}")
+            db.session.rollback()
+            flash("Ошибка при массовом удалении пользователей", "error")
+
+    if request.method == "POST" and request.form.get("edit_user_id"):
+        try:
+            user_id = int(request.form.get("edit_user_id"))
+            new_username = request.form.get("new_username", "").strip()
+            new_email = request.form.get("new_email", "").strip()
+            
+            current_app.logger.info(f"Редактирование пользователя ID: {user_id}, новое имя: {new_username}, новый email: {new_email}")
+            
+            user = User.query.get(user_id)
+            if not user:
+                flash("Пользователь не найден", "error")
+                return redirect(url_for("admin.admin_users"))
+            
+            if not new_username:
+                flash("Имя пользователя не может быть пустым", "error")
+                return redirect(url_for("admin.admin_users"))
+            
+            # Проверяем уникальность имени пользователя
+            existing_user = User.query.filter(
+                User.username == new_username,
+                User.id != user_id
+            ).first()
+            if existing_user:
+                flash(f'Пользователь с именем "{new_username}" уже существует', "error")
+                return redirect(url_for("admin.admin_users"))
+            
+            # Проверяем уникальность email
+            if new_email:
+                existing_email = User.query.filter(
+                    User.email == new_email,
+                    User.id != user_id
+                ).first()
+                if existing_email:
+                    flash(f'Пользователь с email "{new_email}" уже существует', "error")
+                    return redirect(url_for("admin.admin_users"))
+            
+            # Обновляем данные
+            old_username = user.username
+            user.username = new_username
+            user.email = new_email if new_email else None
+            
+            db.session.commit()
+            current_app.logger.info(f"Данные пользователя {old_username} успешно обновлены")
+            flash(f"Данные пользователя {old_username} успешно обновлены")
+            
+        except Exception as e:
+            current_app.logger.error(f"Ошибка редактирования пользователя: {str(e)}")
+            db.session.rollback()
+            flash("Ошибка при редактировании пользователя", "error")
+
     if request.method == "POST" and request.form.get("toggle_subscription_id"):
         try:
             user_id = int(request.form.get("toggle_subscription_id"))
@@ -681,6 +833,41 @@ def admin_groups():
                     )
                 else:
                     flash("Ошибка при удалении группы", "error")
+
+        elif request.form.get("action") == "mass_delete":
+            try:
+                group_ids = request.form.getlist("group_ids")
+                current_app.logger.info(f"Массовое удаление групп: {group_ids}")
+                
+                if not group_ids:
+                    flash("Не выбраны группы", "error")
+                else:
+                    deleted_count = 0
+                    skipped_count = 0
+                    for group_id in group_ids:
+                        group = Group.query.get(int(group_id))
+                        if group:
+                            if group.users:
+                                current_app.logger.warning(
+                                    f"Пропускаем группу '{group.name}' - в ней есть пользователи"
+                                )
+                                skipped_count += 1
+                            else:
+                                current_app.logger.info(
+                                    f"Удаляем группу '{group.name}' (ID: {group_id})"
+                                )
+                                db.session.delete(group)
+                                deleted_count += 1
+                    
+                    db.session.commit()
+                    if deleted_count > 0:
+                        flash(f"Удалено {deleted_count} групп")
+                    if skipped_count > 0:
+                        flash(f"Пропущено {skipped_count} групп (в них есть пользователи)", "warning")
+            except Exception as e:
+                current_app.logger.error(f"Ошибка массового удаления групп: {str(e)}")
+                db.session.rollback()
+                flash("Ошибка при массовом удалении групп", "error")
 
     try:
         groups = Group.query.order_by(Group.name).all()
