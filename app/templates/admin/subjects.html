@@ -155,11 +155,10 @@
                             <i class="fas fa-eye"></i>
                           </a>
                           <form method="post" action="{{ url_for('main.delete_subject', subject_id=subject.id) }}" 
-                                class="admin-form-inline" 
-                                onsubmit="return confirm('Удалить предмет?')">
+                                class="admin-form-inline" id="deleteSubjectAdminForm{{ subject.id }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-outline-danger admin-btn-action" 
-                                    title="Удалить">
+                            <button type="button" class="btn btn-outline-danger admin-btn-action" 
+                                    title="Удалить" onclick="customConfirm('Удалить предмет?', function() { document.getElementById('deleteSubjectAdminForm{{ subject.id }}').submit(); })">
                               <i class="fas fa-trash"></i>
                             </button>
                           </form>

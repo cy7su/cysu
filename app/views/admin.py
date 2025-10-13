@@ -14,6 +14,8 @@ from flask import (
     request,
     url_for,
 )
+
+from ..utils.notifications import redirect_with_notification
 from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash
@@ -48,8 +50,7 @@ admin_bp = Blueprint("admin", __name__)
 @login_required
 def admin_users():
     if not current_user.is_effective_admin():
-        flash("Доступ запрещён")
-        return redirect(url_for("main.index"))
+        return redirect_with_notification("main.index", "Доступ запрещён", "error")
 
     form = AdminUserForm()
     password_map = {}
@@ -96,18 +97,12 @@ def admin_users():
                         current_app.logger.warning(
                             f"Пользователь с именем {form.username.data} уже существует"
                         )
-                        flash(
-                            f'Пользователь с именем "{form.username.data}" уже существует',
-                            "error",
-                        )
+                        message = f'Пользователь с именем "{form.username.data}" уже существует'
                     else:
                         current_app.logger.warning(
                             f"Пользователь с email {form.email.data} уже существует"
                         )
-                        flash(
-                            f'Пользователь с email "{form.email.data}" уже существует',
-                            "error",
-                        )
+                        message = f'Пользователь с email "{form.email.data}" уже существует'
                 else:
                     current_app.logger.info(
                         f"Создаем нового пользователя: {form.username.data}"
@@ -129,7 +124,7 @@ def admin_users():
                         f"Пользователь успешно создан с ID: {user.id}"
                     )
                     password_map[user.id] = form.password.data
-                    flash(f"Пользователь {user.username} успешно создан")
+                    message = f"Пользователь {user.username} успешно создан"
 
             except Exception as e:
                 current_app.logger.error(
@@ -141,7 +136,7 @@ def admin_users():
                     f"Traceback: {traceback.format_exc()}"
                 )
                 db.session.rollback()
-                flash("Ошибка при создании пользователя", "error")
+                message = "Ошибка при создании пользователя"
         else:
             current_app.logger.warning(
                 f"Форма админки не валидна: {form.errors}"
@@ -166,13 +161,14 @@ def admin_users():
                 user.password = generate_password_hash(new_password)
                 db.session.commit()
                 password_map[user.id] = new_password
-                flash(f"Пароль для пользователя {user.username} сброшен")
+                current_app.logger.info(f"Пароль для пользователя {user.username} сброшен. Новый пароль: {new_password}")
+                # Не устанавливаем message, чтобы не было редиректа и AJAX мог получить HTML с паролем
             else:
-                flash("Пользователь не найден", "error")
+                message = "Пользователь не найден"
         except Exception as e:
             current_app.logger.error(f"Ошибка сброса пароля: {str(e)}")
-            db.session.rollback()  # Откатываем транзакцию при ошибке
-            flash("Ошибка при сбросе пароля", "error")
+            db.session.rollback()
+            message = "Ошибка при сбросе пароля"
 
     if request.method == "POST" and request.form.get("delete_user_id"):
         try:
@@ -186,9 +182,9 @@ def admin_users():
                     f"Найден пользователь для удаления: {user.username} (ID: {user.id})"
                 )
                 if user.id == current_user.id:
-                    flash("Нельзя удалить самого себя", "error")
+                    return redirect_with_notification("admin.admin_users", "Нельзя удалить самого себя", "error")
                 elif user.is_admin:
-                    flash("Нельзя удалить администратора", "error")
+                    return redirect_with_notification("admin.admin_users", "Нельзя удалить администратора", "error")
                 else:
                     username = user.username
                     current_app.logger.info(
@@ -288,7 +284,7 @@ def admin_users():
                         current_app.logger.info(
                             f"Пользователь {username} успешно удален"
                         )
-                        flash(f"Пользователь {username} удалён")
+                        return redirect_with_notification("admin.admin_users", f"Пользователь {username} удалён", "success")
 
                     except Exception as e:
                         current_app.logger.error(
@@ -620,7 +616,11 @@ def admin_users():
     except Exception as e:
         current_app.logger.error(f"Error loading users: {e}")
         users = []
-        flash("Ошибка загрузки пользователей.", "error")
+        message = "Ошибка загрузки пользователей"
+
+    # Если есть сообщение, добавляем его в URL для показа через JS
+    if message and request.method == "POST":
+        return redirect_with_notification("admin.admin_users", message, "info" if "успешно" in message.lower() or "назначен" in message.lower() or "удалён" in message.lower() or "сброшен" in message.lower() else "error")
 
     return render_template(
         "admin/users.html",
@@ -1026,6 +1026,31 @@ def admin_subject_groups() -> Union[str, Response]:
                     "Ошибка при массовом удалении предметов из групп", "error"
                 )
 
+        elif request.form.get("action") == "mass_delete_subjects":
+            try:
+                subject_ids = request.form.getlist("subject_ids")
+
+                if not subject_ids:
+                    flash("Выберите предметы для удаления", "error")
+                else:
+                    deleted_count = 0
+                    for subject_id in subject_ids:
+                        subject_id = int(subject_id)
+                        subject = Subject.query.get(subject_id)
+                        if subject:
+                            db.session.delete(subject)
+                            deleted_count += 1
+
+                    db.session.commit()
+                    flash(f"Успешно удалено {deleted_count} предметов")
+
+            except Exception as e:
+                current_app.logger.error(
+                    f"Ошибка массового удаления предметов: {str(e)}"
+                )
+                db.session.rollback()
+                flash("Ошибка при массовом удалении предметов", "error")
+
         elif request.form.get("remove_all_groups"):
             try:
                 subject_id = int(request.form.get("remove_all_groups"))
@@ -1078,6 +1103,9 @@ def admin_settings() -> Union[str, Response]:
         form.pattern_generation_enabled.data = SiteSettings.get_setting(
             "pattern_generation_enabled", True
         )
+        form.support_enabled.data = SiteSettings.get_setting(
+            "support_enabled", True
+        )
 
     if request.method == "POST" and form.validate_on_submit():
         try:
@@ -1100,6 +1128,11 @@ def admin_settings() -> Union[str, Response]:
                 "pattern_generation_enabled",
                 form.pattern_generation_enabled.data,
                 "Включить/выключить кнопку генерации паттернов",
+            )
+            SiteSettings.set_setting(
+                "support_enabled",
+                form.support_enabled.data,
+                "Включить/выключить систему тикетов и поддержки",
             )
 
             flash("Настройки успешно сохранены", "success")

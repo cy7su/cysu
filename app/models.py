@@ -211,7 +211,7 @@ class PasswordReset(db.Model):
 
         logger = logging.getLogger(__name__)
 
-        code = "".join(secrets.choice("0123456789") for _ in range(8))
+        code = "".join(secrets.choice("0123456789") for _ in range(6))
         logger.info(
             f"Generated password reset code: '{code}' (type: {type(code)}, length: {len(code)})"
         )
@@ -238,7 +238,7 @@ class Subject(db.Model):
         db.Text
     )  # Сгенерированный SVG паттерн (закрепляется за предметом)
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
-    materials = db.relationship("Material", backref="subject", lazy=True)
+    materials = db.relationship("Material", backref="subject", lazy=True, cascade="all, delete-orphan")
     groups = db.relationship(
         "SubjectGroup",
         backref="subject",

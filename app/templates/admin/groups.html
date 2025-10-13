@@ -299,9 +299,9 @@ function deleteSelectedGroups() {
         return;
     }
     
-    if (!confirm(`Удалить ${selectedCheckboxes.length} групп? Это действие нельзя отменить!`)) {
-        return;
-    }
+    customConfirm(
+        `Удалить ${selectedCheckboxes.length} групп? Это действие нельзя отменить!`,
+        function() {
     
     // Создаем форму для массового удаления
     const form = document.createElement('form');
@@ -355,9 +355,9 @@ function editGroup(groupId, name, description) {
 }
 
 function deleteGroup(groupId, name) {
-    if (!confirm(`Удалить группу "${name}"? Это действие нельзя отменить!`)) {
-        return;
-    }
+    customConfirm(
+        `Удалить группу "${name}"? Это действие нельзя отменить!`,
+        function() {
     
     const form = document.createElement('form');
     form.method = 'post';

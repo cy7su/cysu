@@ -213,3 +213,21 @@ def get_cdn_url_production(file_path: str, subject_id: int) -> str:
 
     filename = extract_filename(file_path)
     return f"https://cdn.yourdomain.com/{subject_id}/{filename}"
+
+
+def mask_email(email: str) -> str:
+    """Маскирует email адрес, оставляя видимыми только первые 2 и последние 2 символа до @"""
+    if not email or "@" not in email:
+        return email
+    
+    local_part, domain = email.split("@", 1)
+    
+    if len(local_part) <= 4:
+        # Если имя пользователя короткое, показываем только первый и последний символ
+        if len(local_part) <= 2:
+            return f"{local_part[0]}***@{domain}"
+        else:
+            return f"{local_part[0]}{'*' * (len(local_part) - 2)}{local_part[-1]}@{domain}"
+    else:
+        # Показываем первые 2 и последние 2 символа
+        return f"{local_part[:2]}{'*' * (len(local_part) - 4)}{local_part[-2:]}@{domain}"

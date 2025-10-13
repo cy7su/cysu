@@ -5,7 +5,6 @@ from flask import (
     Blueprint,
     Response,
     current_app,
-    flash,
     redirect,
     render_template,
     request,
@@ -25,6 +24,7 @@ from ..forms import (
 )
 from ..models import EmailVerification, PasswordReset, SiteSettings, User
 from ..utils.email_service import EmailService
+from ..utils.notifications import redirect_with_notification
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -48,8 +48,7 @@ def login() -> Union[str, Response]:
         user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            return redirect(url_for("main.index"))
-        flash("Неверное имя пользователя или пароль")
+            return redirect_with_notification("main.index", "Вход выполнен успешно", "success")
 
     return render_template("auth/login.html", form=form)
 
@@ -73,17 +72,8 @@ def register() -> Union[str, Response]:
             ).first()
 
             if existing_user:
-                if existing_user.username == form.username.data:
-                    flash(
-                        f'Пользователь с именем "{form.username.data}" уже существует',
-                        "error",
-                    )
-                else:
-                    flash(
-                        f'Пользователь с email "{form.email.data}" уже существует',
-                        "error",
-                    )
-                return render_template("auth/register.html", form=form)
+                error_msg = f'Пользователь с именем "{form.username.data}" уже существует' if existing_user.username == form.username.data else f'Пользователь с email "{form.email.data}" уже существует'
+                return render_template("auth/register.html", form=form, error=error_msg)
 
             session["pending_registration"] = {
                 "username": form.username.data,
@@ -120,11 +110,8 @@ def register() -> Union[str, Response]:
                 current_app.logger.info(
                     f"Debug mode: skipping email send, code is {verification.code}"
                 )
-                flash(
-                    f"Режим разработки: код подтверждения - {verification.code}"
-                )
                 session["pending_verification_id"] = verification.id
-                return redirect(url_for("auth.email_verification"))
+                return redirect_with_notification("auth.email_verification", f"Режим разработки: код подтверждения - {verification.code}", "info")
 
             email_sent = EmailService.send_verification_email(
                 form.email.data, verification.code
@@ -132,20 +119,19 @@ def register() -> Union[str, Response]:
             current_app.logger.info(f"Email send result: {email_sent}")
 
             if email_sent:
-                flash("Проверьте вашу почту для подтверждения email.")
                 session["pending_verification_id"] = verification.id
-                return redirect(url_for("auth.email_verification"))
+                return redirect_with_notification("auth.email_verification", "Проверьте вашу почту для подтверждения email", "info")
             else:
-                flash("Ошибка отправки email. Попробуйте еще раз.")
                 db.session.delete(verification)
                 db.session.commit()
+                return render_template("auth/register.html", form=form, error="Ошибка отправки email. Попробуйте еще раз")
 
         except Exception as e:
             current_app.logger.error(
                 f"Ошибка при обработке регистрации: {str(e)}"
             )
             db.session.rollback()
-            flash("Ошибка при обработке регистрации. Попробуйте еще раз.")
+            return render_template("auth/register.html", form=form, error="Ошибка при обработке регистрации. Попробуйте еще раз")
     else:
         current_app.logger.warning(f"Форма не валидна: {form.errors}")
         for field, errors in form.errors.items():
@@ -166,7 +152,7 @@ def email_verification() -> Union[str, Response]:
 
     form = EmailVerificationForm()
 
-    if form.validate_on_submit():
+    if request.method == "POST" and form.validate():
         verification = EmailVerification.query.filter_by(
             id=verification_id, code=form.code.data, is_used=False
         ).first()
@@ -215,20 +201,23 @@ def email_verification() -> Union[str, Response]:
                 session.pop("pending_verification_id", None)
                 session.pop("pending_registration", None)
 
-                flash(
-                    "Регистрация успешно завершена! Теперь вы можете войти в систему."
-                )
-                return redirect(url_for("auth.login"))
+                return redirect_with_notification("auth.login", "Регистрация успешно завершена! Теперь вы можете войти в систему", "success")
 
             except Exception as e:
                 current_app.logger.error(
                     f"Ошибка при создании пользователя после подтверждения: {str(e)}"
                 )
                 db.session.rollback()
-                flash("Ошибка при завершении регистрации. Попробуйте еще раз.")
-                return redirect(url_for("auth.register"))
+                return redirect_with_notification("auth.register", "Ошибка при завершении регистрации. Попробуйте еще раз", "error")
         else:
-            flash("Неверный код или код истек. Попробуйте еще раз.")
+            # Добавляем ошибку к полю формы вместо flash сообщения
+            form.code.errors.append("Неверный код или код истек. Попробуйте еще раз.")
+    elif request.method == "POST":
+        # Если форма не валидна, добавляем ошибку
+        if not form.code.data:
+            form.code.errors.append("Введите код подтверждения.")
+        else:
+            form.code.errors.append("Неверный код или код истек. Попробуйте еще раз.")
 
     return render_template(
         "auth/email_verification.html",
@@ -263,12 +252,9 @@ def resend_verification() -> Union[str, Response]:
 
         session["pending_verification_id"] = verification.id
 
-        if EmailService.send_resend_verification_email(
+        EmailService.send_resend_verification_email(
             pending_registration["email"], verification.code
-        ):
-            flash("Новый код подтверждения отправлен на ваш email.")
-        else:
-            flash("Ошибка отправки email. Попробуйте еще раз.")
+        )
 
     except Exception as e:
         current_app.logger.error(

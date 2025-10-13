@@ -1,0 +1,26 @@
+<!-- Плашка согласия на использование куки -->
+<div id="cookie-consent-banner" class="cookie-consent-banner" style="display: none;">
+    <div class="cookie-consent-content">
+        <div class="cookie-consent-text">
+            <h6 class="cookie-consent-title">
+                <i class="fas fa-cookie-bite me-2"></i>
+                Использование куки
+            </h6>
+            <p class="cookie-consent-description mb-0">
+                Мы используем куки для улучшения работы сайта, аналитики и персонализации контента. 
+                Продолжая использовать сайт, вы соглашаетесь с нашей 
+                <a href="{{ url_for('main.privacy') }}" target="_blank" class="cookie-consent-link">политикой конфиденциальности</a>.
+            </p>
+        </div>
+        <div class="cookie-consent-actions">
+            <button type="button" class="btn btn-outline-light btn-sm me-2" id="cookie-consent-decline">
+                <i class="fas fa-times me-1"></i>
+                Отклонить
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="cookie-consent-accept">
+                <i class="fas fa-check me-1"></i>
+                Принять
+            </button>
+        </div>
+    </div>
+</div>

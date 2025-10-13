@@ -2,12 +2,12 @@
 Flask==3.0.0
 Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.3
-Flask-Migrate==4.0.5
+Flask-Migrate>=4.0.6
 Flask-Mail==0.9.1
 Flask-WTF==1.2.1
 
 # База данных
-SQLAlchemy==2.0.23
+SQLAlchemy>=2.0.35
 
 # Формы и валидация
 WTForms==3.1.1

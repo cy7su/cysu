@@ -1,6 +1,9 @@
 
 import os
 import shutil
+import zipfile
+import tempfile
+from datetime import datetime
 from typing import Union
 
 from flask import (
@@ -13,7 +16,8 @@ from flask import (
     request,
     url_for,
     jsonify,
-    session
+    session,
+    send_file
 )
 from markupsafe import escape
 from flask_login import current_user, login_required
@@ -26,6 +30,7 @@ from ..models import Material, SiteSettings, Subject, SubjectGroup
 from ..utils.file_storage import FileStorageManager, safe_path_join
 from ..utils.payment_service import YooKassaService
 from ..utils.transliteration import get_safe_filename
+from ..utils.notifications import redirect_with_notification
 from .context_processors import (
     inject_admin_users,
     inject_json_parser,
@@ -41,6 +46,29 @@ main_bp.app_context_processor(inject_timestamp)
 main_bp.app_context_processor(inject_moment)
 main_bp.app_context_processor(inject_admin_users)
 main_bp.app_context_processor(inject_subscription_status)
+
+
+def clean_folder_name(name: str) -> str:
+    """Очищает название для использования в качестве имени папки"""
+    if not name:
+        return "Без_названия"
+    
+    # Заменяем недопустимые символы на подчеркивания
+    invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|', '\n', '\r', '\t']
+    for char in invalid_chars:
+        name = name.replace(char, '_')
+    
+    # Убираем множественные подчеркивания и пробелы
+    name = '_'.join(name.split())
+    
+    # Убираем подчеркивания в начале и конце
+    name = name.strip('_')
+    
+    # Если название стало пустым или слишком длинным
+    if not name or len(name) > 100:
+        return "Предмет"
+    
+    return name
 
 
 def generate_svg_pattern(pattern_type: str) -> str:
@@ -93,16 +121,14 @@ def index() -> Union[str, Response]:
                         upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
                         subject_path = os.path.join(upload_base, str(subject.id))
                         os.makedirs(subject_path, exist_ok=True)
-                        current_app.logger.info(f"Создана папка для предмета {subject.id}: {subject_path}")
                     except Exception as folder_error:
                         current_app.logger.error(f"Ошибка создания папки для предмета {subject.id}: {folder_error}")
 
-                    flash("Предмет добавлен")
-                    return redirect(url_for("main.index"))
+                    return redirect_with_notification("main.index", "Предмет добавлен", "success")
                 except Exception as e:
                     current_app.logger.error(f"Error creating subject: {e}")
-                    flash("Ошибка при создании предмета", "error")
                     db.session.rollback()
+                    return redirect_with_notification("main.index", "Ошибка при создании предмета", "error")
 
     try:
         if current_user.is_authenticated:
@@ -113,9 +139,9 @@ def index() -> Union[str, Response]:
             ).filter(Subject.id.in_([s.id for s in subjects])).all()
 
             if not subjects and current_user.group_id:
-                flash("У вашей группы нет назначенных предметов. Обратитесь к администратору.", "warning")
+                pass
             elif not subjects and not current_user.group_id:
-                flash("У вас не назначена группа. Обратитесь к администратору.", "warning")
+                pass
         else:
             subjects = Subject.query.options(
                 joinedload(Subject.materials),
@@ -124,7 +150,7 @@ def index() -> Union[str, Response]:
     except Exception as e:
         current_app.logger.error(f"Error querying subjects: {e}")
         subjects = []
-        flash("Ошибка загрузки предметов. Попробуйте обновить страницу.", "error")
+        pass
 
     pattern_generation_enabled = SiteSettings.get_setting('pattern_generation_enabled', True)
 
@@ -172,40 +198,24 @@ def profile() -> str:
 @main_bp.route("/subject/<int:subject_id>", methods=["GET", "POST"])
 def subject_detail(subject_id: int) -> Union[str, Response]:
     if request.method == "POST":
-        current_app.logger.info(f"POST запрос к subject_detail для предмета {subject_id}")
-        current_app.logger.info(f"Content-Length: {request.content_length}")
-        current_app.logger.info(f"Content-Type: {request.content_type}")
-        current_app.logger.info(f"MAX_CONTENT_LENGTH: {current_app.config.get('MAX_CONTENT_LENGTH')}")
-
-        if request.files:
-            for key, file in request.files.items():
-                if file and file.filename:
-                    current_app.logger.info(f"Файл в запросе {key}: {file.filename}")
-                    file_size = getattr(file, 'content_length', None)
-                    if file_size:
-                        current_app.logger.info(f"Размер файла {key}: {file_size} байт ({file_size / (1024*1024):.2f} MB)")
-                    else:
-                        current_app.logger.info(f"Размер файла {key}: неизвестен")
+        pass  # Обработка POST запросов будет добавлена позже
 
     try:
         subject = Subject.query.get_or_404(subject_id)
     except Exception as e:
         current_app.logger.error(f"Error loading subject {subject_id}: {e}")
-        flash("Ошибка загрузки предмета.", "error")
-        return redirect(url_for("main.index"))
+        return redirect_with_notification("main.index", "Ошибка загрузки предмета", "error")
 
     if current_user.is_authenticated:
         accessible_subjects = current_user.get_accessible_subjects()
         if subject not in accessible_subjects:
-            flash("У вас нет доступа к этому предмету.", "error")
-            return redirect(url_for("main.index"))
+            return redirect_with_notification("main.index", "У вас нет доступа к этому предмету", "error")
 
     if current_user.is_authenticated:
         try:
             payment_service = YooKassaService()
             if not payment_service.check_user_subscription(current_user):
-                flash("Для доступа к предметам необходима активная подписка.", "warning")
-                return redirect(url_for("payment.subscription"))
+                return redirect_with_notification("payment.subscription", "Для доступа к предметам необходима активная подписка", "warning")
 
             if not current_user.is_effective_admin():
                 if current_user.group:
@@ -214,15 +224,12 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                         group_id=current_user.group.id
                     ).first()
                     if not subject_group:
-                        flash("У вас нет доступа к этому предмету.", "error")
-                        return redirect(url_for("main.index"))
+                        return redirect_with_notification("main.index", "У вас нет доступа к этому предмету", "error")
                 else:
-                    flash("У вас не назначена группа. Обратитесь к администратору.", "error")
-                    return redirect(url_for("main.index"))
+                    return redirect_with_notification("main.index", "У вас не назначена группа. Обратитесь к администратору", "error")
         except Exception as e:
             current_app.logger.error(f"Error checking subscription in subject_detail: {e}")
-            flash("Ошибка проверки подписки.", "error")
-            return redirect(url_for("main.index"))
+            return redirect_with_notification("main.index", "Ошибка проверки подписки", "error")
 
     try:
         lectures = Material.query.filter_by(subject_id=subject.id, type="lecture").all()
@@ -235,7 +242,6 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         current_app.logger.error(f"Error loading materials for subject {subject.id}: {e}")
         lectures = []
         assignments = []
-        flash("Ошибка загрузки материалов.", "error")
 
     form = None
     user_submissions = {}
@@ -256,13 +262,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         form.subject_id.choices = [(subject.id, subject.title)]
         form.subject_id.data = subject.id
 
-        current_app.logger.info(f"Обработка формы материала для предмета {subject.id}")
-        current_app.logger.info(f"Метод запроса: {request.method}")
-        current_app.logger.info(f"Данные формы: {request.form}")
-        current_app.logger.info(f"Файлы: {request.files}")
-
         if form and form.validate_on_submit():
-            current_app.logger.info("Форма валидна, начинаем обработку")
             filename = None
             solution_filename = None
 
@@ -276,31 +276,22 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                 if hasattr(file, 'seek'):
                     file.seek(0)  # Возвращаем указатель в начало
 
-                current_app.logger.info(f"Загрузка файла материала: {file.filename} -> {original_filename}")
-                current_app.logger.info(f"Размер файла: {file_size} байт ({file_size / (1024*1024):.2f} MB)" if isinstance(file_size, int) else f"Размер файла: {file_size}")
-                current_app.logger.info(f"MAX_CONTENT_LENGTH: {current_app.config.get('MAX_CONTENT_LENGTH')} байт ({current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.2f} MB)")
 
                 if isinstance(file_size, int) and current_app.config.get('MAX_CONTENT_LENGTH'):
                     if file_size > current_app.config.get('MAX_CONTENT_LENGTH'):
                         current_app.logger.error(f"Файл слишком большой: {file_size} байт > {current_app.config.get('MAX_CONTENT_LENGTH')} байт")
-                        flash(f"Файл слишком большой. Максимальный размер: {current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.1f} MB", "error")
-                        return redirect(url_for("main.subject_detail", subject_id=subject_id))
+                        return redirect_with_notification("main.subject_detail", f"Файл слишком большой. Максимальный размер: {current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.1f} MB", "error", subject_id=subject_id)
 
                 full_path, relative_path = FileStorageManager.get_material_upload_path(
                     subject.id, original_filename
                 )
 
-                current_app.logger.info(f"Путь для сохранения: {full_path}")
-                current_app.logger.info(f"Относительный путь: {relative_path}")
-
                 try:
                     if FileStorageManager.save_file(file, full_path):
                         filename = relative_path
-                        current_app.logger.info(f"Файл материала успешно сохранен: {filename}")
                     else:
                         current_app.logger.error(f"Ошибка сохранения файла материала: {original_filename}")
-                        flash("Ошибка при сохранении файла материала", "error")
-                        return redirect(url_for("main.subject_detail", subject_id=subject_id))
+                        return redirect_with_notification("main.subject_detail", "Ошибка при сохранении файла материала", "error", subject_id=subject_id)
                 except Exception as e:
                     current_app.logger.error(f"Исключение при сохранении файла материала {original_filename}: {str(e)}")
                     flash(f"Ошибка при сохранении файла: {str(e)}", "error")
@@ -314,8 +305,6 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                 if hasattr(solution_file, 'seek'):
                     solution_file.seek(0)  # Возвращаем указатель в начало
 
-                current_app.logger.info(f"Загрузка файла решения: {solution_file.filename} -> {original_solution_filename}")
-                current_app.logger.info(f"Размер файла решения: {solution_file_size} байт ({solution_file_size / (1024*1024):.2f} MB)" if isinstance(solution_file_size, int) else f"Размер файла решения: {solution_file_size}")
 
                 if isinstance(solution_file_size, int) and current_app.config.get('MAX_CONTENT_LENGTH'):
                     if solution_file_size > current_app.config.get('MAX_CONTENT_LENGTH'):
@@ -332,7 +321,6 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
 
                 if FileStorageManager.save_file(solution_file, full_solution_path):
                     solution_filename = relative_solution_path
-                    current_app.logger.info(f"Файл решения сохранен: {solution_filename}")
                 else:
                     current_app.logger.error(f"Ошибка сохранения файла решения: {original_solution_filename}")
                     flash("Ошибка при сохранении файла решения", "error")
@@ -352,16 +340,19 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
             flash("Материал добавлен")
             return redirect(url_for("main.subject_detail", subject_id=subject.id))
         else:
-            current_app.logger.warning(f"Форма не валидна: {form.errors}")
-            for field, errors in form.errors.items():
-                for error in errors:
-                    current_app.logger.warning(f"Ошибка в поле {field}: {error}")
+            pass  # Форма не валидна
 
     can_add_materials = False
     can_manage_materials = False
     if current_user.is_authenticated:
         can_add_materials = current_user.can_add_materials_to_subject(subject)
         can_manage_materials = current_user.can_manage_subject_materials(subject)
+
+    assignments_completion_percent = 0
+    if current_user.is_authenticated and assignments:
+        completed_count = len(user_submissions)
+        total_count = len(assignments)
+        assignments_completion_percent = round((completed_count / total_count) * 100) if total_count > 0 else 0
 
     return render_template(
         "subjects/subject_detail.html",
@@ -372,6 +363,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         user_submissions=user_submissions,
         can_add_materials=can_add_materials,
         can_manage_materials=can_manage_materials,
+        assignments_completion_percent=assignments_completion_percent,
     )
 
 
@@ -405,7 +397,6 @@ def edit_subject(subject_id: int) -> Response:
 
         db.session.commit()
         flash("Предмет успешно обновлён")
-        current_app.logger.info(f"Предмет {subject.id} обновлён пользователем {current_user.id}")
 
     except Exception as e:
         current_app.logger.error(f"Ошибка редактирования предмета {subject_id}: {e}")
@@ -429,9 +420,6 @@ def delete_subject(subject_id: int) -> Response:
         subject_path = os.path.join(upload_base, str(subject.id))
         if os.path.exists(subject_path):
             shutil.rmtree(subject_path)
-            current_app.logger.info(f"Удалена папка предмета {subject.id}: {subject_path}")
-        else:
-            current_app.logger.info(f"Папка предмета {subject.id} не существует: {subject_path}")
     except Exception as folder_error:
         current_app.logger.error(f"Ошибка удаления папки предмета {subject.id}: {folder_error}")
 
@@ -454,6 +442,7 @@ def material_detail(material_id: int) -> Union[str, Response]:
         return redirect(url_for("payment.subscription"))
 
     user_submissions = {}
+    total_submissions = 0
     if material.type == 'assignment' and current_user.is_authenticated:
         from app.models import Submission
         submission = Submission.query.filter_by(
@@ -462,8 +451,36 @@ def material_detail(material_id: int) -> Union[str, Response]:
         ).first()
         if submission:
             user_submissions[material_id] = submission
+        
+        total_submissions = Submission.query.filter_by(material_id=material_id).count()
 
-    return render_template("subjects/material_detail.html", material=material, user_submissions=user_submissions)
+    created_by_user = None
+    if material.created_by:
+        from app.models import User
+        created_by_user = User.query.get(material.created_by)
+
+    import os
+    file_info = None
+    if material.file:
+        try:
+            file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], str(material.subject_id), material.file.split('/')[-1])
+            if os.path.exists(file_path):
+                file_size = os.path.getsize(file_path)
+                file_ext = os.path.splitext(material.file)[1].upper().replace('.', '')
+                file_info = {
+                    'size': file_size,
+                    'size_formatted': f"{file_size / 1024:.1f} КБ" if file_size < 1024*1024 else f"{file_size / (1024*1024):.1f} МБ",
+                    'extension': file_ext
+                }
+        except Exception as e:
+            current_app.logger.error(f"Error getting file info: {e}")
+
+    return render_template("subjects/material_detail.html", 
+                         material=material, 
+                         user_submissions=user_submissions,
+                         total_submissions=total_submissions,
+                         created_by_user=created_by_user,
+                         file_info=file_info)
 
 
 @main_bp.route("/submission/<int:submission_id>/delete", methods=["POST"])
@@ -494,20 +511,6 @@ def delete_solution(submission_id: int) -> Response:
 @main_bp.route("/material/<int:material_id>/add_solution", methods=["POST"])
 @login_required
 def add_solution_file(material_id: int) -> Response:
-    current_app.logger.info(f"POST запрос к add_solution_file для материала {material_id}")
-    current_app.logger.info(f"Content-Length: {request.content_length}")
-    current_app.logger.info(f"Content-Type: {request.content_type}")
-    current_app.logger.info(f"MAX_CONTENT_LENGTH: {current_app.config.get('MAX_CONTENT_LENGTH')}")
-
-    if request.files:
-        for key, file in request.files.items():
-            if file and file.filename:
-                current_app.logger.info(f"Файл в запросе {key}: {file.filename}")
-                file_size = getattr(file, 'content_length', None)
-                if file_size:
-                    current_app.logger.info(f"Размер файла {key}: {file_size} байт ({file_size / (1024*1024):.2f} MB)")
-                else:
-                    current_app.logger.info(f"Размер файла {key}: неизвестен")
     if not current_user.can_manage_materials():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
@@ -528,8 +531,6 @@ def add_solution_file(material_id: int) -> Response:
         if hasattr(file, 'seek'):
             file.seek(0)  # Возвращаем указатель в начало
 
-        current_app.logger.info(f"Загрузка готового решения: {file.filename} -> {original_filename}")
-        current_app.logger.info(f"Размер файла: {file_size} байт ({file_size / (1024*1024):.2f} MB)" if isinstance(file_size, int) else f"Размер файла: {file_size}")
 
         if isinstance(file_size, int) and current_app.config.get('MAX_CONTENT_LENGTH'):
             if file_size > current_app.config.get('MAX_CONTENT_LENGTH'):
@@ -545,7 +546,6 @@ def add_solution_file(material_id: int) -> Response:
             if FileStorageManager.save_file(file, full_path):
                 material.solution_file = relative_path
                 db.session.commit()
-                current_app.logger.info(f"Готовое решение успешно сохранено: {relative_path}")
                 flash("Готовая практика добавлена")
             else:
                 current_app.logger.error(f"Ошибка сохранения готового решения: {original_filename}")
@@ -560,20 +560,6 @@ def add_solution_file(material_id: int) -> Response:
 @main_bp.route("/material/<int:material_id>/submit_solution", methods=["POST"])
 @login_required
 def submit_solution(material_id: int) -> Response:
-    current_app.logger.info(f"POST запрос к submit_solution для материала {material_id} от пользователя {current_user.id}")
-    current_app.logger.info(f"Content-Length: {request.content_length}")
-    current_app.logger.info(f"Content-Type: {request.content_type}")
-    current_app.logger.info(f"MAX_CONTENT_LENGTH: {current_app.config.get('MAX_CONTENT_LENGTH')}")
-
-    if request.files:
-        for key, file in request.files.items():
-            if file and file.filename:
-                current_app.logger.info(f"Файл в запросе {key}: {file.filename}")
-                file_size = getattr(file, 'content_length', None)
-                if file_size:
-                    current_app.logger.info(f"Размер файла {key}: {file_size} байт ({file_size / (1024*1024):.2f} MB)")
-                else:
-                    current_app.logger.info(f"Размер файла {key}: неизвестен")
     material = Material.query.get_or_404(material_id)
 
     payment_service = YooKassaService()
@@ -594,8 +580,6 @@ def submit_solution(material_id: int) -> Response:
         if hasattr(file, 'seek'):
             file.seek(0)  # Возвращаем указатель в начало
 
-        current_app.logger.info(f"Загрузка решения пользователя {current_user.id}: {file.filename} -> {original_filename}")
-        current_app.logger.info(f"Размер файла: {file_size} байт ({file_size / (1024*1024):.2f} MB)" if isinstance(file_size, int) else f"Размер файла: {file_size}")
 
         if isinstance(file_size, int) and current_app.config.get('MAX_CONTENT_LENGTH'):
             if file_size > current_app.config.get('MAX_CONTENT_LENGTH'):
@@ -621,7 +605,6 @@ def submit_solution(material_id: int) -> Response:
                     db.session.add(submission)
                 submission.file = relative_path
                 db.session.commit()
-                current_app.logger.info(f"Решение пользователя {current_user.id} успешно сохранено: {relative_path}")
                 flash("Решение загружено")
             else:
                 current_app.logger.error(f"Ошибка сохранения решения пользователя {current_user.id}: {original_filename}")
@@ -685,7 +668,6 @@ def edit_material(material_id: int) -> Response:
 
         db.session.commit()
         flash("Материал успешно обновлён")
-        current_app.logger.info(f"Материал {material.id} обновлён пользователем {current_user.id}")
 
     except Exception as e:
         current_app.logger.error(f"Ошибка редактирования материала {material_id}: {e}")
@@ -717,7 +699,6 @@ def delete_material(material_id: int) -> Response:
             file_path = os.path.join(upload_base, material.file)
             if os.path.exists(file_path):
                 os.remove(file_path)
-                current_app.logger.info(f"Удален файл материала: {file_path}")
         except Exception as file_error:
             current_app.logger.error(f"Ошибка удаления файла материала {material.file}: {file_error}")
 
@@ -727,7 +708,6 @@ def delete_material(material_id: int) -> Response:
             solution_path = os.path.join(upload_base, material.solution_file)
             if os.path.exists(solution_path):
                 os.remove(solution_path)
-                current_app.logger.info(f"Удален файл решения: {solution_path}")
         except Exception as solution_error:
             current_app.logger.error(f"Ошибка удаления файла решения {material.solution_file}: {solution_error}")
 
@@ -997,9 +977,12 @@ def handle_503(error) -> Response:
     return redirect(url_for('main.error_page', error_code=503))
 
 
-@main_bp.route("/maintenance")
-def maintenance() -> str:
-    return render_template("maintenance.html")
+@main_bp.route("/grant-temp-access")
+def grant_temp_access() -> Response:
+    from datetime import datetime, timedelta
+    session["temp_access"] = (datetime.utcnow() + timedelta(minutes=3)).isoformat()
+    flash("Временный доступ предоставлен на 3 минуты", "info")
+    return redirect(url_for("auth.login"))
 
 
 @main_bp.route("/static/<path:filename>")
@@ -1035,17 +1018,6 @@ def static_files(filename: str) -> Response:
 @main_bp.route("/wiki")
 def wiki() -> str:
     return render_template("static/wiki.html")
-
-
-@main_bp.route("/macro/time")
-def macro_time() -> str:
-    return render_template("for_my_love/time.html")
-
-
-@main_bp.route("/macro")
-def macro() -> str:
-    return render_template("for_my_love/macro.html")
-
 
 @main_bp.route("/redirect")
 def redirect_page() -> str:
@@ -1089,8 +1061,6 @@ def serve_file(subject_id: int, filename: str) -> Response:
 
     from flask import Response, abort, request
 
-    current_app.logger.info(f"serve_file вызвана: subject_id={subject_id}, filename={filename}")
-    current_app.logger.info(f"UPLOAD_FOLDER: {current_app.config['UPLOAD_FOLDER']}")
     start_time = time.time()
 
     # Безопасное создание возможных путей
@@ -1134,12 +1104,9 @@ def serve_file(subject_id: int, filename: str) -> Response:
         pass
 
     file_path = None
-    for i, path in enumerate(possible_paths):
-        current_app.logger.info(f"Проверяем путь {i+1}: {path}")
-        current_app.logger.info(f"Путь существует: {os.path.exists(path)}")
+    for path in possible_paths:
         if os.path.exists(path):
             file_path = path
-            current_app.logger.info(f"Файл найден по пути: {path}")
             break
 
     if not file_path:
@@ -1166,11 +1133,9 @@ def serve_file(subject_id: int, filename: str) -> Response:
 
     try:
         file_size = os.path.getsize(file_path)
-        current_app.logger.info(f"Размер файла {filename}: {file_size} байт")
 
         range_header = request.headers.get('Range')
         if range_header:
-            current_app.logger.info(f"Range запрос: {range_header}")
             return _handle_range_request(file_path, file_size, mimetype, filename)
 
         if request.method == 'HEAD':
@@ -1218,8 +1183,6 @@ def serve_file(subject_id: int, filename: str) -> Response:
         # Добавляем заголовок для скачивания файлов
         response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
 
-        execution_time = time.time() - start_time
-        current_app.logger.info(f"Файл {filename} обработан за {execution_time:.3f} секунд")
 
         return response
 
@@ -1235,19 +1198,16 @@ def _handle_range_request(file_path: str, file_size: int, mimetype: str, filenam
 
     range_match = re.match(r'bytes=(\d+)-(\d*)', request.headers.get('Range', ''))
     if not range_match:
-        current_app.logger.warning("Некорректный Range заголовок")
         return Response('Bad Request', status=400)
 
     start = int(range_match.group(1))
     end = int(range_match.group(2)) if range_match.group(2) else file_size - 1
 
     if start >= file_size or end >= file_size or start > end:
-        current_app.logger.warning(f"Некорректный диапазон: {start}-{end} для файла размером {file_size}")
         return Response('Requested Range Not Satisfiable', status=416)
 
     content_length = end - start + 1
 
-    current_app.logger.info(f"Range запрос: {start}-{end} из {file_size} байт")
 
     def generate_range():
         try:
@@ -1293,7 +1253,6 @@ def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
     from flask import Response, abort, request
     from werkzeug.utils import secure_filename
 
-    current_app.logger.info(f"serve_user_file вызвана: subject_id={subject_id}, user_id={user_id}, filename={filename}")
     
     upload_folder = current_app.config['UPLOAD_FOLDER']
     safe_filename = secure_filename(filename)
@@ -1356,3 +1315,123 @@ def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
     except Exception as e:
         current_app.logger.error(f"Ошибка обработки файла {file_path}: {e}")
         abort(500)
+
+
+@main_bp.route("/export-solutions")
+@login_required
+def export_user_solutions() -> Response:
+    """Экспорт всех решений пользователя в zip архив"""
+    try:
+        from ..models import Submission, Material, Subject
+        
+        # Получаем все решения пользователя
+        submissions = Submission.query.filter_by(user_id=current_user.id).all()
+        
+        if not submissions:
+            flash("У вас нет загруженных решений для экспорта", "info")
+            return redirect(url_for("main.profile"))
+        
+        # Создаем временный файл для zip архива
+        temp_zip = tempfile.NamedTemporaryFile(delete=False, suffix='.zip')
+        temp_zip.close()
+        
+        upload_folder = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+        
+        with zipfile.ZipFile(temp_zip.name, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            # Группируем решения по предметам
+            subjects_dict = {}
+            
+            for submission in submissions:
+                if not submission.file:
+                    continue
+                    
+                material = Material.query.get(submission.material_id)
+                if not material:
+                    continue
+                    
+                subject = Subject.query.get(material.subject_id)
+                if not subject:
+                    continue
+                
+                if subject.id not in subjects_dict:
+                    subjects_dict[subject.id] = {
+                        'subject': subject,
+                        'files': []
+                    }
+                
+                # Путь к файлу решения пользователя
+                file_path = os.path.join(upload_folder, submission.file)
+                
+                if os.path.exists(file_path):
+                    # Безопасное имя файла
+                    safe_filename = secure_filename(os.path.basename(submission.file))
+                    
+                    # Путь внутри архива: название_предмета/файл
+                    subject_name = clean_folder_name(subject.title)
+                    archive_path = os.path.join(subject_name, safe_filename)
+                    
+                    subjects_dict[subject.id]['files'].append({
+                        'file_path': file_path,
+                        'archive_path': archive_path,
+                        'material_title': material.title
+                    })
+            
+            # Добавляем файлы в архив
+            for subject_data in subjects_dict.values():
+                for file_info in subject_data['files']:
+                    try:
+                        zip_file.write(file_info['file_path'], file_info['archive_path'])
+                    except Exception as e:
+                        current_app.logger.error(f"Ошибка добавления файла {file_info['file_path']} в архив: {e}")
+            
+            # Добавляем README файл с информацией
+            readme_content = f"""Архив решений пользователя {current_user.username}
+Дата создания: {datetime.now().strftime('%d.%m.%Y %H:%M')}
+
+Содержимое архива:
+"""
+            for subject_data in subjects_dict.values():
+                subject = subject_data['subject']
+                folder_name = clean_folder_name(subject.title)
+                readme_content += f"\n{subject.title} (папка: {folder_name}):\n"
+                for file_info in subject_data['files']:
+                    readme_content += f"  - {file_info['material_title']} ({os.path.basename(file_info['archive_path'])})\n"
+            
+            zip_file.writestr("README.txt", readme_content.encode('utf-8'))
+        
+        # Отправляем файл пользователю
+        def remove_file(response):
+            try:
+                os.unlink(temp_zip.name)
+            except Exception:
+                pass
+            return response
+        
+        # Создаем уникальное имя файла с временной меткой
+        timestamp = datetime.now().strftime('%d.%m.%Y %H-%M')
+        filename = f"{current_user.username}-{timestamp}.zip"
+        
+        response = send_file(
+            temp_zip.name,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/zip'
+        )
+        
+        # Добавляем заголовки для принудительного скачивания с новым именем  
+        from urllib.parse import quote
+        encoded_filename = quote(filename)
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"; filename*=UTF-8\'\'{encoded_filename}'
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        
+        # Очищаем временный файл после отправки
+        response.call_on_close(lambda: os.unlink(temp_zip.name) if os.path.exists(temp_zip.name) else None)
+        
+        return response
+        
+    except Exception as e:
+        current_app.logger.error(f"Ошибка создания архива решений для пользователя {current_user.id}: {e}")
+        flash("Ошибка при создании архива решений", "error")
+        return redirect(url_for("main.profile"))

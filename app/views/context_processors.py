@@ -124,3 +124,12 @@ def inject_maintenance_mode() -> Dict[str, Any]:
     except Exception as e:
         current_app.logger.error(f"Error in inject_maintenance_mode: {e}")
         return dict(maintenance_mode=False)
+
+
+def inject_support_enabled() -> Dict[str, Any]:
+    try:
+        support_enabled = SiteSettings.get_setting("support_enabled", True)
+        return dict(support_enabled=support_enabled)
+    except Exception as e:
+        current_app.logger.error(f"Error in inject_support_enabled: {e}")
+        return dict(support_enabled=True)

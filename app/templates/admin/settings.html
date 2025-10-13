@@ -81,6 +81,21 @@
                         </div>
                     </div>
                     
+              <div class="form-group">
+                <div class="admin-switch-item">
+                  {{ form.support_enabled(class="admin-switch", id="support_enabled") }}
+                  <label class="admin-switch-label" for="support_enabled">
+                    <div class="admin-switch-content">
+                                <strong>{{ form.support_enabled.label }}</strong>
+                      <div class="admin-switch-description">
+                        <i class="fas fa-info-circle"></i>
+                                При выключении система тикетов будет полностью скрыта (включая навигацию и футер)
+                      </div>
+                    </div>
+                  </label>
+                        </div>
+                    </div>
+                    
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary admin-btn-primary">
                   <i class="fas fa-save"></i>
