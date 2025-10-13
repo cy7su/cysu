@@ -79,6 +79,9 @@
                 {% if users %}
                 {% for user in users %}
                   <tr style="border-color: var(--border-secondary); background: var(--dp-02); color: var(--text-primary);" data-user-id="{{ user.id }}">
+                    {% if password_map.get(user.id) %}
+                    <span style="display:none;" data-password-for="{{ user.id }}" data-password="{{ password_map[user.id] }}"></span>
+                    {% endif %}
                     <td style="color: var(--text-primary);">
                       <input type="checkbox" class="user-checkbox" value="{{ user.id }}" onchange="updateSelectedCount()">
                     </td>
@@ -98,15 +101,13 @@
                       {% if user.email %}
                         {% if user.email.endswith('@telegram.org') %}
                           {% set telegram_id = user.email.split('@')[0] %}
-                            <span class="text-truncate" style="max-width: 150px;">@{{ telegram_id }}</span>
                           <button type="button" class="btn btn-sm btn-outline-info" 
-                                  onclick="copyToClipboard('tg://user?id={{ telegram_id }}')" 
-                                  title="Копировать Telegram ссылку"
+                                  onclick="openTelegram('{{ telegram_id }}')" 
+                                  title="Открыть в Telegram"
                                     style="width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center;">
                             <i class="fab fa-telegram" style="font-size: 0.6rem;"></i>
                           </button>
                         {% else %}
-                            <span class="text-truncate" style="max-width: 150px;">{{ user.email }}</span>
                           <button type="button" class="btn btn-sm btn-outline-primary" 
                                   onclick="copyToClipboard('{{ user.email }}')" 
                                   title="Копировать email"
@@ -115,7 +116,7 @@
                           </button>
                         {% endif %}
                     {% else %}
-                          <span class="text-muted">Не указан</span>
+                          <span class="text-muted">—</span>
                     {% endif %}
                     </div>
                   </td>
@@ -575,9 +576,39 @@ function deleteSelectedUsers() {
         return;
     }
     
-    if (!confirm(`Удалить ${selectedCheckboxes.length} пользователей? Это действие нельзя отменить!`)) {
-        return;
-    }
+    customConfirm(
+        `Удалить ${selectedCheckboxes.length} пользователей? Это действие нельзя отменить!`,
+        function() {
+            // Подтверждение - продолжаем удаление
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.style.display = 'none';
+            
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrf_token';
+            csrfInput.value = document.querySelector('input[name="csrf_token"]').value;
+            form.appendChild(csrfInput);
+            
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'mass_delete';
+            form.appendChild(actionInput);
+            
+            selectedCheckboxes.forEach(checkbox => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'user_ids';
+                input.value = checkbox.value;
+                form.appendChild(input);
+            });
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    );
+    return;
     
     // Создаем форму для массового удаления
     const form = document.createElement('form');
@@ -613,28 +644,119 @@ function deleteSelectedUsers() {
 
 // Функции для отдельных пользователей
 function resetPassword(userId, username) {
-    if (!confirm(`Сбросить пароль для пользователя ${username}?`)) {
+    customConfirm(
+        `Сбросить пароль для пользователя ${username}?`,
+        function() {
+            // Подтверждение - продолжаем сброс пароля
+    
+    const formData = new FormData();
+    formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+    formData.append('reset_user_id', userId);
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(html => {
+        console.log('Получен HTML ответ от сервера');
+        
+        // Парсим HTML ответ для поиска нового пароля
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Ищем элемент с новым паролем (если он есть в password_map)
+        const passwordElement = doc.querySelector(`[data-password-for="${userId}"]`);
+        
+        console.log('Поиск элемента пароля для userId:', userId);
+        console.log('Найден элемент:', passwordElement);
+        
+        if (passwordElement) {
+            const newPassword = passwordElement.dataset.password;
+            console.log('Новый пароль найден:', newPassword);
+            console.log('Вызов showPasswordNotification');
+            console.log('window.notificationManager:', window.notificationManager);
+            showPasswordNotification(username, newPassword);
+        } else {
+            // Если не нашли в password_map, просто перезагружаем
+            console.log('Пароль не найден в HTML, показываем стандартное уведомление');
+            window.showSuccess('Пароль сброшен');
+            setTimeout(() => location.reload(), 1500);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка AJAX:', error);
+        window.showError('Ошибка при сбросе пароля');
+    });
+        }
+    );
+}
+
+function showPasswordNotification(username, password) {
+    console.log('showPasswordNotification вызвана с:', { username, password });
+    console.log('Проверка window.notificationManager:', window.notificationManager);
+    
+    if (!window.notificationManager) {
+        console.error('window.notificationManager не найден!');
+        alert(`Пароль для ${username}: ${password}`);
+        location.reload();
         return;
     }
     
-    const form = document.createElement('form');
-    form.method = 'post';
-    form.style.display = 'none';
+    // Создаем HTML для уведомления с паролем
+    const notificationContent = `
+        <div style="max-width: 350px;">
+            <div style="font-weight: 600; margin-bottom: 8px;">
+                Пароль для пользователя ${username} сброшен
+            </div>
+            <div style="background: var(--dp-04); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-family: monospace; word-break: break-all; font-size: 14px;">
+                ${password}
+            </div>
+            <button class="btn btn-sm btn-outline-primary" onclick="copyPasswordToClipboard('${password}')" style="font-size: 12px; padding: 4px 12px;">
+                <i class="fas fa-copy me-1"></i>Копировать пароль
+            </button>
+            <div style="margin-top: 8px; font-size: 11px; color: var(--text-secondary);">
+                <i class="fas fa-exclamation-triangle me-1"></i>Сохраните пароль! Он больше не будет показан.
+            </div>
+        </div>
+    `;
     
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = 'csrf_token';
-    csrfInput.value = document.querySelector('input[name="csrf_token"]').value;
-    form.appendChild(csrfInput);
+    console.log('Показываем уведомление через notificationManager');
     
-    const userIdInput = document.createElement('input');
-    userIdInput.type = 'hidden';
-    userIdInput.name = 'reset_user_id';
-    userIdInput.value = userId;
-    form.appendChild(userIdInput);
+    // Показываем уведомление с увеличенным временем (30 секунд)
+    window.notificationManager.show(notificationContent, 'success', 30000);
     
-    document.body.appendChild(form);
-    form.submit();
+    // Перезагружаем страницу после закрытия через 31 секунду
+    setTimeout(() => {
+        location.reload();
+    }, 31000);
+}
+
+function copyPasswordToClipboard(password) {
+    // Создаем временный input для копирования
+    const tempInput = document.createElement('input');
+    tempInput.value = password;
+    tempInput.style.position = 'absolute';
+    tempInput.style.left = '-9999px';
+    document.body.appendChild(tempInput);
+    
+    tempInput.select();
+    tempInput.setSelectionRange(0, 99999);
+    
+    try {
+        document.execCommand('copy');
+        showSuccess('Пароль скопирован в буфер обмена');
+    } catch (err) {
+        console.error('Ошибка копирования:', err);
+        // Пробуем современный API
+        navigator.clipboard.writeText(password).then(() => {
+            showSuccess('Пароль скопирован в буфер обмена');
+        }).catch(err => {
+            showError('Не удалось скопировать пароль');
+        });
+    }
+    
+    document.body.removeChild(tempInput);
 }
 
 function changeUserGroup(userId, currentGroup) {
@@ -666,9 +788,12 @@ function changeUserStatus(userId, currentStatus) {
 
 function toggleSubscription(userId, username, hasSubscription) {
     const action = hasSubscription ? 'отозвать' : 'выдать';
-    if (!confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} подписку пользователю ${username}?`)) {
-        return;
-    }
+    const actionCapitalized = action.charAt(0).toUpperCase() + action.slice(1);
+    
+    customConfirm(
+        `${actionCapitalized} подписку пользователю ${username}?`,
+        function() {
+            // Подтверждение - продолжаем
     
     const form = document.createElement('form');
     form.method = 'post';
@@ -688,6 +813,8 @@ function toggleSubscription(userId, username, hasSubscription) {
     
     document.body.appendChild(form);
     form.submit();
+        }
+    );
 }
 
 function editUser(userId, username, email) {
@@ -701,28 +828,30 @@ function editUser(userId, username, email) {
 }
 
 function deleteUser(userId, username) {
-    if (!confirm(`Удалить пользователя ${username}? Это действие нельзя отменить!`)) {
-        return;
-    }
+    customConfirm(
+        `Удалить пользователя ${username}? Это действие нельзя отменить!`,
+        function() {
+            // Подтверждение - продолжаем удаление
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.style.display = 'none';
+            
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrf_token';
+            csrfInput.value = document.querySelector('input[name="csrf_token"]').value;
+            form.appendChild(csrfInput);
+            
+            const userIdInput = document.createElement('input');
+            userIdInput.type = 'hidden';
+            userIdInput.name = 'delete_user_id';
+            userIdInput.value = userId;
+            form.appendChild(userIdInput);
     
-    const form = document.createElement('form');
-    form.method = 'post';
-    form.style.display = 'none';
-    
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = 'csrf_token';
-    csrfInput.value = document.querySelector('input[name="csrf_token"]').value;
-    form.appendChild(csrfInput);
-    
-    const userIdInput = document.createElement('input');
-    userIdInput.type = 'hidden';
-    userIdInput.name = 'delete_user_id';
-    userIdInput.value = userId;
-    form.appendChild(userIdInput);
-    
-    document.body.appendChild(form);
-    form.submit();
+            document.body.appendChild(form);
+            form.submit();
+        }
+    );
 }
 
 // Функции сортировки
@@ -862,6 +991,12 @@ function showNotification(message, type = 'info') {
       notification.remove();
     }
   }, 3000);
+}
+
+function openTelegram(telegramId) {
+  const tgUrl = `tg://user?id=${telegramId}`;
+  window.open(tgUrl, '_blank');
+  showNotification('Открываем Telegram...', 'info');
 }
 </script>
 {% endblock %}

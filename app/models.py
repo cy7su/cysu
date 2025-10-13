@@ -238,7 +238,7 @@ class Subject(db.Model):
         db.Text
     )  # Сгенерированный SVG паттерн (закрепляется за предметом)
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
-    materials = db.relationship("Material", backref="subject", lazy=True)
+    materials = db.relationship("Material", backref="subject", lazy=True, cascade="all, delete-orphan")
     groups = db.relationship(
         "SubjectGroup",
         backref="subject",

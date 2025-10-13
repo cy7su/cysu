@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for, session
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -267,6 +267,38 @@ def create_app():
             app.logger.error(f"Error in inject_maintenance_mode: {e}")
             return dict(maintenance_mode=False)
 
+    @app.context_processor
+    def inject_support_enabled():
+        try:
+            from .models import SiteSettings
+
+            support_enabled = SiteSettings.get_setting(
+                "support_enabled", True
+            )
+            return dict(support_enabled=support_enabled)
+        except Exception as e:
+            app.logger.error(f"Error in inject_support_enabled: {e}")
+            return dict(support_enabled=True)
+
+    @app.context_processor
+    def inject_temp_access():
+        try:
+            from datetime import datetime
+            temp_access = session.get("temp_access")
+            has_temp_access = False
+            
+            if temp_access:
+                try:
+                    expiry = datetime.fromisoformat(temp_access)
+                    has_temp_access = datetime.utcnow() < expiry
+                except:
+                    pass
+            
+            return dict(has_temp_access=has_temp_access)
+        except Exception as e:
+            app.logger.error(f"Error in inject_temp_access: {e}")
+            return dict(has_temp_access=False)
+
     @app.before_request
     def check_maintenance_mode():
         if request.endpoint == "static":
@@ -304,22 +336,27 @@ def create_app():
             )
 
             if maintenance_mode:
-                if request.endpoint == "main.maintenance":
+                if request.endpoint == "main.grant_temp_access":
                     return
-                elif request.endpoint in ["auth.login", "auth.logout"]:
+                elif current_user.is_authenticated and current_user.is_admin:
+                    session.pop("temp_access", None)
                     return
                 else:
-                    if (
-                        not current_user.is_authenticated
-                        or not current_user.is_admin
-                    ):
-                        return redirect(url_for("main.maintenance"))
-            else:
-                if request.endpoint == "main.maintenance":
-                    app.logger.info(
-                        "Redirecting from maintenance to main page"
-                    )
-                    return redirect(url_for("main.index"))
+                    from datetime import datetime, timedelta
+                    temp_access = session.get("temp_access")
+                    
+                    if temp_access:
+                        try:
+                            expiry = datetime.fromisoformat(temp_access)
+                            if datetime.utcnow() < expiry:
+                                if request.endpoint in ["auth.login", "auth.logout"]:
+                                    return
+                                else:
+                                    return redirect(url_for("auth.login"))
+                            else:
+                                session.pop("temp_access", None)
+                        except:
+                            session.pop("temp_access", None)
         except Exception as e:
             app.logger.error(f"Error checking maintenance mode: {e}")
 

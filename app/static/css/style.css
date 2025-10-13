@@ -808,7 +808,7 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--dp-02);
     border: 1px solid var(--border-secondary);
     color: var(--text-primary);
-    border-radius: 20px;
+    border-radius: 8px;
     padding: 1rem 1.5rem;
     border-left: 4px solid;
     margin-bottom: 1.5rem;
@@ -1427,15 +1427,19 @@ a:hover {
         order: 2;
         flex-shrink: 0;
         margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
     
     .mobile-file-btn,
     .mobile-solution-btn,
     .mobile-upload-btn {
-        min-width: 80px;
-        font-size: 0.75rem !important;
-        padding: 4px 6px !important;
-        white-space: nowrap;
+        min-width: 70px !important;
+        font-size: 0.8rem !important;
+        padding: 6px 10px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
     }
     
     .mobile-delete-btn {
@@ -1482,17 +1486,20 @@ a:hover {
     
     @media (max-width: 480px) {
         .mobile-buttons-container {
-            flex-direction: column;
-            gap: 4px !important;
+            flex-direction: row;
+            gap: 3px !important;
+            flex-wrap: wrap;
         }
         
         .mobile-file-btn,
         .mobile-solution-btn,
         .mobile-upload-btn,
         .mobile-delete-btn {
-            min-width: 70px;
-            font-size: 0.7rem !important;
-            padding: 3px 5px !important;
+            min-width: 65px !important;
+            font-size: 0.75rem !important;
+            padding: 5px 8px !important;
+            max-width: none !important;
+            border-radius: 6px !important;
         }
         
         .mobile-edit-btn,
@@ -2228,7 +2235,6 @@ body.modal-open {
 /* Стили для навигационных цепочек (breadcrumbs) */
 .breadcrumb {
     background: var(--dp-02);
-    border: 1px solid var(--border-primary);
     border-radius: 20px;
     padding: 0.75rem 1rem;
     margin-bottom: 1rem;
@@ -2712,7 +2718,6 @@ body.modal-open {
 }
 
 .btn-primary {
-    width: 100%;
     background: var(--primary-color);
     color: white;
     border: none;
@@ -2743,7 +2748,7 @@ body.modal-open {
 }
 
 .btn-secondary {
-    width: 100%;
+    width: 60%;
     background: var(--dp-03);
     color: var(--primary-color);
     border: none;
@@ -2884,4 +2889,107 @@ body.modal-open {
         padding: 10px 14px;
         font-size: 13px;
     }
+}
+
+.btn-tickets {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+}
+
+.btn-tickets i {
+    font-size: 0.8rem;
+}
+
+.mobile-delete-btn {
+    background-color: rgba(244, 67, 54, 0.1) !important;
+    border-color: rgba(244, 67, 54, 0.3) !important;
+    color: rgba(244, 67, 54, 0.8) !important;
+    font-size: 0.75rem !important;
+    padding: 4px 6px !important;
+}
+
+.mobile-delete-btn:hover {
+    background-color: rgba(244, 67, 54, 0.2) !important;
+    border-color: rgba(244, 67, 54, 0.5) !important;
+    color: rgba(244, 67, 54, 1) !important;
+}
+
+.mobile-edit-btn {
+    background-color: rgba(255, 152, 0, 0.1) !important;
+    border-color: rgba(255, 152, 0, 0.3) !important;
+    color: rgba(255, 152, 0, 0.8) !important;
+    font-size: 0.75rem !important;
+    padding: 4px 8px !important;
+}
+
+.mobile-edit-btn:hover {
+    background-color: rgba(255, 152, 0, 0.2) !important;
+    border-color: rgba(255, 152, 0, 0.5) !important;
+    color: rgba(255, 152, 0, 1) !important;
+}
+
+.mobile-delete-subject-btn {
+    background-color: rgba(244, 67, 54, 0.1) !important;
+    border-color: rgba(244, 67, 54, 0.3) !important;
+    color: rgba(244, 67, 54, 0.8) !important;
+    font-size: 0.75rem !important;
+    padding: 4px 8px !important;
+}
+
+.mobile-delete-subject-btn:hover {
+    background-color: rgba(244, 67, 54, 0.2) !important;
+    border-color: rgba(244, 67, 54, 0.5) !important;
+    color: rgba(244, 67, 54, 1) !important;
+}
+
+.mobile-add-btn {
+    background-color: rgba(76, 175, 80, 0.1) !important;
+    border-color: rgba(76, 175, 80, 0.3) !important;
+    color: rgba(76, 175, 80, 0.8) !important;
+    font-size: 0.75rem !important;
+    padding: 4px 8px !important;
+}
+
+.mobile-add-btn:hover {
+    background-color: rgba(76, 175, 80, 0.2) !important;
+    border-color: rgba(76, 175, 80, 0.5) !important;
+    color: rgba(76, 175, 80, 1) !important;
+}
+
+.lectures-list {
+    counter-reset: lecture-counter;
+}
+
+.lecture-item {
+    display: flex;
+    align-items: center;
+}
+
+.lecture-item::before {
+    counter-increment: lecture-counter;
+    content: counter(lecture-counter) ". ";
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 600;
+    margin-right: 8px;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.assignments-list {
+    counter-reset: assignment-counter;
+}
+
+.assignment-item {
+    display: flex;
+    align-items: center;
+}
+
+.assignment-item::before {
+    counter-increment: assignment-counter;
+    content: counter(assignment-counter) ". ";
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 600;
+    margin-right: 8px;
+    font-size: 0.95rem;
+    flex-shrink: 0;
 }

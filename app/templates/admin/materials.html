@@ -109,11 +109,10 @@
                       <td class="admin-table-td">
                         <div class="admin-table-actions">
                           <form method="post" action="{{ url_for('main.delete_material', material_id=material.id) }}" 
-                                class="admin-form-inline" 
-                                onsubmit="return confirm('Удалить материал?')">
+                                class="admin-form-inline" id="deleteMaterialAdminForm{{ material.id }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-outline-danger admin-btn-action" 
-                                    title="Удалить">
+                            <button type="button" class="btn btn-outline-danger admin-btn-action" 
+                                    title="Удалить" onclick="customConfirm('Удалить материал?', function() { document.getElementById('deleteMaterialAdminForm{{ material.id }}').submit(); })">
                               <i class="fas fa-trash"></i>
                             </button>
                           </form>

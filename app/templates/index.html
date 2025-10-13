@@ -200,8 +200,8 @@
     <h2 class="mb-3 mb-md-0">Предметы</h2>
   </div>
   {% if current_user.is_admin and current_user.admin_mode_enabled %}
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addSubjectModal" style="padding: 4px 12px !important; font-size: 0.85rem;">
-        <i class="fas fa-plus d-md-none me-1"></i>Добавить предмет
+    <button class="btn btn-success btn-sm mobile-add-btn" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+        <i class="fas fa-plus me-1"></i>Добавить предмет
     </button>
   {% endif %}
 </div>

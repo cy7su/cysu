@@ -29,6 +29,9 @@
               <button type="button" class="btn btn-sm btn-warning" onclick="removeAllFromGroups()" disabled id="mass-remove-btn">
                 <i class="fas fa-unlink me-1"></i>Убрать из групп
               </button>
+              <button type="button" class="btn btn-sm btn-danger" onclick="deleteSelectedSubjects()" disabled id="mass-delete-btn">
+                <i class="fas fa-trash me-1"></i>Удалить выбранные
+              </button>
             </div>
           </div>
 
@@ -85,11 +88,11 @@
                     <td style="color: var(--text-primary);">
                       <div class="d-flex gap-1">
                         {% if subject.groups %}
-                          <form method="post" style="display: inline;">
+                          <form method="post" style="display: inline;" id="removeAllGroupsForm{{ subject.id }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="remove_all_groups" value="{{ subject.id }}">
-                            <button type="submit" class="btn btn-warning btn-sm" 
-                                    onclick="return confirm('Убрать предмет {{ subject.title }} из всех групп?')"
+                            <button type="button" class="btn btn-warning btn-sm" 
+                                    onclick="customConfirm('Убрать предмет {{ subject.title }} из всех групп?', function() { document.getElementById('removeAllGroupsForm{{ subject.id }}').submit(); })"
                                     style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
                               <i class="fas fa-unlink"></i>
                             </button>
@@ -288,6 +291,7 @@ function updateSelectedCount() {
     const countElement = document.getElementById('selected-count');
     const massAssignBtn = document.getElementById('mass-assign-btn');
     const massRemoveBtn = document.getElementById('mass-remove-btn');
+    const massDeleteBtn = document.getElementById('mass-delete-btn');
     const selectAllCheckbox = document.getElementById('select-all-checkbox');
     
     countElement.textContent = `Выбрано: ${count}`;
@@ -295,6 +299,7 @@ function updateSelectedCount() {
     // Включаем/выключаем кнопки массовых операций
     massAssignBtn.disabled = count === 0;
     massRemoveBtn.disabled = count === 0;
+    massDeleteBtn.disabled = count === 0;
     
     // Обновляем состояние главного чекбокса
     const allCheckboxes = document.querySelectorAll('.subject-checkbox');
@@ -340,9 +345,9 @@ function removeAllFromGroups() {
         return;
     }
     
-    if (!confirm(`Убрать ${selectedCheckboxes.length} предметов из всех групп?`)) {
-        return;
-    }
+    customConfirm(
+        `Убрать ${selectedCheckboxes.length} предметов из всех групп?`,
+        function() {
     
     // Создаем форму для массового удаления
     const form = document.createElement('form');
@@ -374,6 +379,48 @@ function removeAllFromGroups() {
     
     document.body.appendChild(form);
     form.submit();
+        }
+    );
+}
+
+function deleteSelectedSubjects() {
+    const selectedCheckboxes = document.querySelectorAll('.subject-checkbox:checked');
+    if (selectedCheckboxes.length === 0) {
+        alert('Выберите предметы для удаления');
+        return;
+    }
+    
+    customConfirm(
+        `Удалить ${selectedCheckboxes.length} предметов? Это действие нельзя отменить!`,
+        function() {
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.style.display = 'none';
+            
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrf_token';
+            csrfInput.value = document.querySelector('input[name="csrf_token"]').value;
+            form.appendChild(csrfInput);
+            
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'mass_delete_subjects';
+            form.appendChild(actionInput);
+            
+            selectedCheckboxes.forEach(checkbox => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'subject_ids';
+                input.value = checkbox.value;
+                form.appendChild(input);
+            });
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    );
 }
 
 // Функции сортировки

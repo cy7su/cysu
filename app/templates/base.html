@@ -1333,29 +1333,62 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: #000000e3;
             z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .maintenance-overlay .maintenance-icon {
-            animation: pulse 2s infinite;
+        .maintenance-overlay-content {
+            text-align: center;
+            max-width: 700px;
+            padding: 2rem;
         }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
+        .maintenance-overlay-icon {
+            font-size: 5rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
 
-            50% {
-                transform: scale(1.1);
-            }
+        .maintenance-overlay-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
 
-            100% {
-                transform: scale(1);
-            }
+        .maintenance-overlay-message {
+            font-size: 1.125rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .maintenance-overlay-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .maintenance-overlay-button:hover {
+            background: var(--primary-hover);
+            color: white;
+        }
+
+        .maintenance-overlay-note {
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
         }
 
         /* Стили для мобильного меню админки */
@@ -1560,23 +1593,24 @@
 </head>
 
 <body>
-    {% if maintenance_mode and (not current_user.is_authenticated or not current_user.is_admin) %}
+    {% if maintenance_mode and not has_temp_access and (not current_user.is_authenticated or not current_user.is_admin) %}
     <div class="maintenance-overlay">
-        <div class="text-center text-white p-5">
-            <div class="maintenance-icon mb-4">
-                <i class="fas fa-tools fa-4x text-warning"></i>
+        <div class="maintenance-overlay-content">
+            <div class="maintenance-overlay-icon">
+                <i class="fas fa-tools"></i>
             </div>
-            <h1 class="mb-3">Технические работы</h1>
-            <p class="lead mb-4">Сайт временно недоступен из-за проведения технических работ.</p>
-            <p class="text-muted">Мы работаем над улучшением функциональности и скоро вернемся к работе.</p>
-            {% if current_user.is_authenticated and current_user.is_admin %}
-            <div class="mt-4">
-                <small class="text-info">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Администратор может продолжать работу
-                </small>
+            <h1 class="maintenance-overlay-title">Технические работы</h1>
+            <p class="maintenance-overlay-message">
+                Сайт временно недоступен из-за проведения технических работ.
+            </p>
+            <a href="{{ url_for('main.grant_temp_access') }}" class="maintenance-overlay-button">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Вход для администратора</span>
+            </a>
+            <div class="maintenance-overlay-note">
+                <i class="fas fa-info-circle"></i>
+                Временный доступ на 3 минуты
             </div>
-            {% endif %}
         </div>
     </div>
     {% endif %}
@@ -1606,12 +1640,14 @@
                             <i class="fas fa-user d-lg-none me-2" aria-hidden="true"></i>Профиль
                         </a>
                     </li>
+                    {% if support_enabled %}
                     <li class="nav-item" role="none">
                         <a class="nav-link" href="{{ url_for('tickets.tickets') }}" role="menuitem"
                             aria-label="Перейти к тикетам">
                             <i class="fas fa-ticket-alt d-lg-none me-2" aria-hidden="true"></i>Поддержка
                         </a>
                     </li>
+                    {% endif %}
                     {% if not is_subscribed %}
                     <li class="nav-item">
                         <a class="nav-link text-warning" href="{{ url_for('payment.subscription') }}">
@@ -1727,30 +1763,23 @@
             <div class="row align-items-center mb-3"
                 style="border-bottom: 1px solid var(--border-secondary); padding-bottom: 1rem;">
                 <div class="col-6 col-md-6 mb-3 mb-md-0">
-                    <div class="d-flex align-items-center justify-content-start">
-                        <div class="bg-primary rounded me-2 d-flex align-items-center justify-content-center"
-                            style="width: 32px; height: 32px; background-color: var(--primary-color) !important; border-color: var(--primary-color) !important;">
-                            <i class="fas fa-graduation-cap text-white"></i>
-                        </div>
-                        <span class="text-primary fw-bold fs-5">cysu</span>
+                    <div class="d-flex align-items-center gap-2">
                         {% if current_user.is_authenticated and current_user.is_admin %}
-                        <div class="mode-switch" style="margin-left: 12px; display: flex; align-items: center;">
-                            <form method="post" action="{{ url_for('main.toggle_admin_mode') }}"
-                                style="display: inline;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <label class="mode-toggle" style="width: 36px; height: 20px;">
-                                    <input type="checkbox" {% if current_user.admin_mode_enabled %}checked{% endif %}
-                                        onchange="this.form.submit()">
-                                    <span class="mode-slider" style="border-radius: 20px;"></span>
-                                </label>
-                            </form>
-                        </div>
+                        <form method="post" action="{{ url_for('main.toggle_admin_mode') }}" id="adminToggleForm" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" 
+                                 alt="Toggle Admin" 
+                                 onclick="document.getElementById('adminToggleForm').submit()"
+                                 style="width: 32px;height: 32px;cursor: pointer;opacity: 1 !important; {% if current_user.admin_mode_enabled %}opacity: 1;{% else %}opacity: 0.2;{% endif %}"
+                                 title="{% if current_user.admin_mode_enabled %}Режим администратора включен{% else %}Режим администратора выключен{% endif %}">
+                        </form>
                         {% endif %}
+                        <span class="text-primary fw-bold fs-5">cysu</span>
                     </div>
                 </div>
                 <div class="col-6 col-md-6">
                     <div class="d-flex justify-content-end gap-2">
-                        {% if current_user.is_authenticated %}
+                        {% if current_user.is_authenticated and support_enabled %}
                         <button type="button"
                             class="btn btn-primary rounded d-flex align-items-center justify-content-center text-decoration-none"
                             style="width: 32px; height: 32px;" onclick="openTicketModal()" title="Создать тикет">
@@ -1772,6 +1801,7 @@
             </div>
 
             <div class="row mb-3">
+                {% if support_enabled %}
                 <div class="col-12 col-md-6 mb-3 mb-md-0">
                     <h6 class="text-primary mb-2 text-center text-md-start">КОНТАКТЫ</h6>
                     <div
@@ -1781,9 +1811,10 @@
                             Telegram</a>
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
-                    <h6 class="text-primary mb-2 text-center text-md-end">ИНФОРМАЦИЯ</h6>
-                    <div class="d-flex justify-content-center justify-content-md-end">
+                {% endif %}
+                <div class="col-12 {% if support_enabled %}col-md-6{% else %}{% endif %}">
+                    <h6 class="text-primary mb-2 text-center {% if support_enabled %}text-md-end{% else %}{% endif %}" style="text-align: end !important;">ИНФОРМАЦИЯ</h6>
+                    <div class="d-flex justify-content-center {% if support_enabled %}justify-content-md-end{% else %}{% endif %}" style="justify-content: end !important;">
                         <a href="{{ url_for('main.wiki') }}" class="text-muted text-decoration-none">База знаний</a>
                     </div>
                 </div>
@@ -2089,6 +2120,32 @@
                 this.container = document.getElementById('notifications-container');
                 this.notifications = new Map();
                 this.counter = 0;
+                this.init();
+            }
+
+            init() {
+                this.handleUrlParams();
+                this.cleanUrl();
+            }
+
+            handleUrlParams() {
+                const params = new URLSearchParams(window.location.search);
+                const message = params.get('notify');
+                const type = params.get('notify_type') || 'info';
+                
+                if (message) {
+                    this.show(decodeURIComponent(message), type);
+                }
+            }
+
+            cleanUrl() {
+                const params = new URLSearchParams(window.location.search);
+                if (params.has('notify') || params.has('notify_type')) {
+                    params.delete('notify');
+                    params.delete('notify_type');
+                    const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                    window.history.replaceState({}, '', newUrl);
+                }
             }
 
             /**
@@ -2135,7 +2192,7 @@
                 notification.innerHTML = `
             <div class="notification-header">
                 <div class="notification-title">${title}</div>
-                <button class="notification-close" onclick="notificationManager.close('${id}')">
+                <button class="notification-close" onclick="window.notificationManager.close('${id}')">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -2302,48 +2359,28 @@
         }
 
         // Создаем глобальный экземпляр менеджера уведомлений
-        const notificationManager = new NotificationManager();
-
-        // Обработка flash сообщений от Flask
-        document.addEventListener('DOMContentLoaded', function () {
-            // Получаем flash сообщения из Flask
-            {% with messages = get_flashed_messages(with_categories = true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            {% set type = 'info' %}
-            {% if category == 'error' %}
-            {% set type = 'error' %}
-            {% elif category == 'success' %}
-            {% set type = 'success' %}
-            {% elif category == 'warning' %}
-            {% set type = 'warning' %}
-            {% endif %}
-            notificationManager.show('{{ message }}', '{{ type }}', 8000);
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-        });
+        window.notificationManager = new NotificationManager();
 
         // Глобальная функция для показа уведомлений (можно вызывать из других скриптов)
-        function showNotification(message, type = 'info', duration = 8000) {
-            return notificationManager.show(message, type, duration);
+        window.showNotification = function(message, type = 'info', duration = 8000) {
+            return window.notificationManager.show(message, type, duration);
         }
 
         // Функции для удобного вызова разных типов уведомлений
-        function showSuccess(message, duration = 5000) {
-            return notificationManager.show(message, 'success', duration);
+        window.showSuccess = function(message, duration = 5000) {
+            return window.notificationManager.show(message, 'success', duration);
         }
 
-        function showError(message, duration = 5000) {
-            return notificationManager.show(message, 'error', duration);
+        window.showError = function(message, duration = 5000) {
+            return window.notificationManager.show(message, 'error', duration);
         }
 
-        function showWarning(message, duration = 3000) {
-            return notificationManager.show(message, 'warning', duration);
+        window.showWarning = function(message, duration = 3000) {
+            return window.notificationManager.show(message, 'warning', duration);
         }
 
-        function showInfo(message, duration = 3000) {
-            return notificationManager.show(message, 'info', duration);
+        window.showInfo = function(message, duration = 3000) {
+            return window.notificationManager.show(message, 'info', duration);
         }
 
         // Глобальная обработка ошибок AJAX
@@ -2380,12 +2417,12 @@
             {% if not current_user.is_authenticated %}
             // Для неавторизованных пользователей только на главной странице
             {% if request.endpoint == 'main.index' %}
-            notificationManager.show('Для просмотра материалов необходимо авторизоваться', 'auth-notification', 17000); // 17 секунд
+            window.notificationManager.show('Для просмотра материалов необходимо авторизоваться', 'auth-notification', 17000); // 17 секунд
             {% endif %}
             {% elif not is_subscribed %}
             // Для авторизованных пользователей без подписки (только на главной странице)
             {% if request.endpoint == 'main.index' %}
-            notificationManager.show('Для доступа к предметам необходима активная подписка. <a href="{{ url_for("payment.subscription") }}" style="color: #ff6b35 !important; text-decoration: none; font-weight: bold;">Оформить подписку</a>', 'persistent', 0); // 0 = бесконечно
+            window.notificationManager.show('Для доступа к предметам необходима активная подписка. <a href="{{ url_for("payment.subscription") }}" style="color: #ff6b35 !important; text-decoration: none; font-weight: bold;">Оформить подписку</a>', 'persistent', 0); // 0 = бесконечно
             {% endif %}
             {% endif %}
 
@@ -2393,7 +2430,7 @@
             {% if current_user.is_authenticated and subscription_info and subscription_info.is_trial %}
             {% if request.endpoint == 'main.index' %}
             setTimeout(function () {
-                notificationManager.show('Пробная подписка активна!', 'info', 1000); // 2 секунды
+                window.notificationManager.show('Пробная подписка активна!', 'info', 1000); // 2 секунды
             }, 100); // Показываем через 1 секунду после загрузки страницы
             {% endif %}
             {% endif %}
@@ -2690,7 +2727,7 @@
     `;
 
             // Показываем уведомление через NotificationManager (7 минут = 420000 мс)
-            const notificationId = notificationManager.show(notificationHtml, 'answer', 420000);
+            const notificationId = window.notificationManager.show(notificationHtml, 'answer', 420000);
 
             // Сохраняем информацию о уведомлении для последующего закрытия
             if (!window.ticketNotifications) {
@@ -2738,8 +2775,8 @@
             }
 
             // Закрываем уведомление через NotificationManager
-            if (notificationManager) {
-                notificationManager.close(managerNotificationId);
+            if (window.notificationManager) {
+                window.notificationManager.close(managerNotificationId);
             }
 
             // Отправляем запрос на сервер
@@ -2778,14 +2815,15 @@
     <script src="{{ url_for('static', filename='js/scroll-indicator.js') }}?v=4" defer></script>
 
     <!-- Preloader -->
-    <script src="{{ url_for('static', filename='js/preloader.js') }}?v=4" defer></script>
-
 
     <!-- Parallax Effects -->
     <script src="{{ url_for('static', filename='js/parallax.js') }}?v=4" defer></script>
     
     <!-- Cookie Consent -->
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}?v=1" defer></script>
+    
+    <!-- Custom Confirm Dialog -->
+    <script src="{{ url_for('static', filename='js/custom-confirm.js') }}?v=1" defer></script>
     
     <script>
         // Инициализация dropdown меню админки (только для десктопных устройств)

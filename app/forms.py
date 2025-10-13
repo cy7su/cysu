@@ -268,4 +268,7 @@ class SiteSettingsForm(FlaskForm):
     pattern_generation_enabled = BooleanField(
         "Включить кнопку генерации паттернов"
     )
+    support_enabled = BooleanField(
+        "Включить систему тикетов и поддержки"
+    )
     submit = SubmitField("Сохранить настройки")
