@@ -665,7 +665,7 @@
             background-color: var(--dp-03) !important;
             border-bottom: 1px solid var(--border-secondary) !important;
             color: var(--text-primary) !important;
-            border-radius: 8px 8px 0 0 !important;
+            border-radius: 16px 16px 0 0 !important;
         }
 
         /* Убираем закругления снизу у заголовка, если есть элементы списка */
@@ -1593,7 +1593,8 @@
 </head>
 
 <body>
-    {% if maintenance_mode and not has_temp_access and (not current_user.is_authenticated or not current_user.is_admin) %}
+    {% if maintenance_mode and not has_temp_access and (not current_user.is_authenticated or not current_user.is_admin)
+    %}
     <div class="maintenance-overlay">
         <div class="maintenance-overlay-content">
             <div class="maintenance-overlay-icon">
@@ -1765,13 +1766,13 @@
                 <div class="col-6 col-md-6 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-2">
                         {% if current_user.is_authenticated and current_user.is_admin %}
-                        <form method="post" action="{{ url_for('main.toggle_admin_mode') }}" id="adminToggleForm" style="display: inline;">
+                        <form method="post" action="{{ url_for('main.toggle_admin_mode') }}" id="adminToggleForm"
+                            style="display: inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" 
-                                 alt="Toggle Admin" 
-                                 onclick="document.getElementById('adminToggleForm').submit()"
-                                 style="width: 32px;height: 32px;cursor: pointer;opacity: 1 !important; {% if current_user.admin_mode_enabled %}opacity: 1;{% else %}opacity: 0.2;{% endif %}"
-                                 title="{% if current_user.admin_mode_enabled %}Режим администратора включен{% else %}Режим администратора выключен{% endif %}">
+                            <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Toggle Admin"
+                                onclick="document.getElementById('adminToggleForm').submit()"
+                                style="width: 32px;height: 32px;cursor: pointer;opacity: 1 !important; {% if current_user.admin_mode_enabled %}opacity: 1;{% else %}opacity: 0.2;{% endif %}"
+                                title="{% if current_user.admin_mode_enabled %}Режим администратора включен{% else %}Режим администратора выключен{% endif %}">
                         </form>
                         {% endif %}
                         <span class="text-primary fw-bold fs-5">cysu</span>
@@ -1813,8 +1814,10 @@
                 </div>
                 {% endif %}
                 <div class="col-12 {% if support_enabled %}col-md-6{% else %}{% endif %}">
-                    <h6 class="text-primary mb-2 text-center {% if support_enabled %}text-md-end{% else %}{% endif %}" style="text-align: end !important;">ИНФОРМАЦИЯ</h6>
-                    <div class="d-flex justify-content-center {% if support_enabled %}justify-content-md-end{% else %}{% endif %}" style="justify-content: end !important;">
+                    <h6 class="text-primary mb-2 text-center {% if support_enabled %}text-md-end{% else %}{% endif %}"
+                        style="text-align: end !important;">ИНФОРМАЦИЯ</h6>
+                    <div class="d-flex justify-content-center {% if support_enabled %}justify-content-md-end{% else %}{% endif %}"
+                        style="justify-content: end !important;">
                         <a href="{{ url_for('main.wiki') }}" class="text-muted text-decoration-none">База знаний</a>
                     </div>
                 </div>
@@ -2132,7 +2135,7 @@
                 const params = new URLSearchParams(window.location.search);
                 const message = params.get('notify');
                 const type = params.get('notify_type') || 'info';
-                
+
                 if (message) {
                     this.show(decodeURIComponent(message), type);
                 }
@@ -2362,24 +2365,24 @@
         window.notificationManager = new NotificationManager();
 
         // Глобальная функция для показа уведомлений (можно вызывать из других скриптов)
-        window.showNotification = function(message, type = 'info', duration = 8000) {
+        window.showNotification = function (message, type = 'info', duration = 8000) {
             return window.notificationManager.show(message, type, duration);
         }
 
         // Функции для удобного вызова разных типов уведомлений
-        window.showSuccess = function(message, duration = 5000) {
+        window.showSuccess = function (message, duration = 5000) {
             return window.notificationManager.show(message, 'success', duration);
         }
 
-        window.showError = function(message, duration = 5000) {
+        window.showError = function (message, duration = 5000) {
             return window.notificationManager.show(message, 'error', duration);
         }
 
-        window.showWarning = function(message, duration = 3000) {
+        window.showWarning = function (message, duration = 3000) {
             return window.notificationManager.show(message, 'warning', duration);
         }
 
-        window.showInfo = function(message, duration = 3000) {
+        window.showInfo = function (message, duration = 3000) {
             return window.notificationManager.show(message, 'info', duration);
         }
 
@@ -2475,7 +2478,7 @@
                         form.reset();
                         // Очищаем список файлов
                         document.getElementById('fileList').innerHTML = '';
-                        
+
                         // Переходим на страницу тикета
                         setTimeout(() => {
                             window.location.href = '/tickets/' + data.ticket_id;
@@ -2818,13 +2821,13 @@
 
     <!-- Parallax Effects -->
     <script src="{{ url_for('static', filename='js/parallax.js') }}?v=4" defer></script>
-    
+
     <!-- Cookie Consent -->
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}?v=1" defer></script>
-    
+
     <!-- Custom Confirm Dialog -->
     <script src="{{ url_for('static', filename='js/custom-confirm.js') }}?v=1" defer></script>
-    
+
     <script>
         // Инициализация dropdown меню админки (только для десктопных устройств)
         document.addEventListener('DOMContentLoaded', function () {
@@ -2934,7 +2937,7 @@
 
     <!-- Плашка согласия на куки (только на главной странице) -->
     {% if request.endpoint == 'main.index' %}
-        {% include 'macros/cookie_consent.html' %}
+    {% include 'macros/cookie_consent.html' %}
     {% endif %}
 
     {% block scripts %}{% endblock %}
