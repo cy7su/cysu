@@ -1589,6 +1589,21 @@
         .admin-pattern-btn i {
             font-size: 14px;
         }
+
+        /* Анимация поворота иконки админа */
+        @keyframes adminToggleRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .admin-toggle-rotating {
+            animation: adminToggleRotate 0.6s ease-in-out;
+        }
     </style>
 </head>
 
@@ -1663,11 +1678,6 @@
                         </a>
                     </li>
                     <li class="nav-item d-lg-none">
-                        <a class="nav-link" href="{{ url_for('admin.admin_groups') }}">
-                            <i class="fas fa-layer-group me-2"></i>Группы
-                        </a>
-                    </li>
-                    <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ url_for('admin.admin_subject_groups') }}">
                             <i class="fas fa-link me-2"></i>Предметы по группам
                         </a>
@@ -1690,13 +1700,6 @@
                                     href="{{ url_for('admin.admin_users') }}">
                                     <i class="fas fa-users me-3"></i>
                                     <span>Пользователи</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center"
-                                    href="{{ url_for('admin.admin_groups') }}">
-                                    <i class="fas fa-layer-group me-3"></i>
-                                    <span>Группы</span>
                                 </a>
                             </li>
                             <li>
@@ -1770,7 +1773,7 @@
                             style="display: inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Toggle Admin"
-                                onclick="document.getElementById('adminToggleForm').submit()"
+                                onclick="toggleAdminMode()" id="adminToggleIcon"
                                 style="width: 32px;height: 32px;cursor: pointer;opacity: 1 !important; {% if current_user.admin_mode_enabled %}opacity: 1;{% else %}opacity: 0.2;{% endif %}"
                                 title="{% if current_user.admin_mode_enabled %}Режим администратора включен{% else %}Режим администратора выключен{% endif %}">
                         </form>
@@ -2885,6 +2888,25 @@
 
             initDropdown();
         });
+
+        // Функция для переключения режима админа с анимацией
+        function toggleAdminMode() {
+            const icon = document.getElementById('adminToggleIcon');
+            if (icon) {
+                // Добавляем класс анимации
+                icon.classList.add('admin-toggle-rotating');
+
+                // Убираем класс анимации после завершения
+                setTimeout(() => {
+                    icon.classList.remove('admin-toggle-rotating');
+                }, 600);
+
+                // Отправляем форму
+                setTimeout(() => {
+                    document.getElementById('adminToggleForm').submit();
+                }, 300);
+            }
+        }
     </script>
 
     {% if current_user.is_authenticated %}

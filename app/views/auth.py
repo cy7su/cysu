@@ -45,7 +45,10 @@ def login() -> Union[str, Response]:
 
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        # Пытаемся найти пользователя по username или email
+        user = User.query.filter(
+            (User.username == form.username.data) | (User.email == form.username.data)
+        ).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
             return redirect_with_notification("main.index", "Вход выполнен успешно", "success")

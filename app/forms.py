@@ -23,7 +23,7 @@ from .models import Group
 
 
 class LoginForm(FlaskForm):
-    username = StringField("Имя пользователя", validators=[DataRequired()])
+    username = StringField("Имя пользователя или Email", validators=[DataRequired()])
     password = PasswordField("Пароль", validators=[DataRequired()])
     submit = SubmitField("Войти")
 

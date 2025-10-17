@@ -22,7 +22,7 @@ python-dotenv==1.0.0
 requests==2.31.0
 
 # Telegram Bot
-python-telegram-bot==20.7
+python-telegram-bot==21.0.1
 
 # Почта
 blinker==1.7.0

@@ -410,7 +410,7 @@ def admin_users():
             user_ids = request.form.getlist("user_ids")
             group_id = request.form.get("group_id")
             current_app.logger.info(f"Массовое назначение группы: {user_ids} -> {group_id}")
-            
+
             if not user_ids:
                 flash("Не выбраны пользователи", "error")
             else:
@@ -420,14 +420,14 @@ def admin_users():
                     if not group:
                         flash("Группа не найдена", "error")
                         return redirect(url_for("admin.admin_users"))
-                
+
                 updated_count = 0
                 for user_id in user_ids:
                     user = User.query.get(int(user_id))
                     if user and user.id != current_user.id:
                         user.group_id = group.id if group else None
                         updated_count += 1
-                
+
                 db.session.commit()
                 group_name = group.name if group else "без группы"
                 flash(f"Группа '{group_name}' назначена {updated_count} пользователям")
@@ -441,7 +441,7 @@ def admin_users():
             user_ids = request.form.getlist("user_ids")
             status = request.form.get("status")
             current_app.logger.info(f"Массовое изменение статуса: {user_ids} -> {status}")
-            
+
             if not user_ids:
                 flash("Не выбраны пользователи", "error")
             else:
@@ -452,14 +452,14 @@ def admin_users():
                         user.is_admin = False
                         user.is_moderator = False
                         user.admin_mode_enabled = False
-                        
+
                         if status == "admin":
                             user.is_admin = True
                         elif status == "moderator":
                             user.is_moderator = True
-                        
+
                         updated_count += 1
-                
+
                 db.session.commit()
                 status_names = {"admin": "администратор", "moderator": "модератор", "user": "пользователь"}
                 status_name = status_names.get(status, "пользователь")
@@ -473,7 +473,7 @@ def admin_users():
         try:
             user_ids = request.form.getlist("user_ids")
             current_app.logger.info(f"Массовое удаление пользователей: {user_ids}")
-            
+
             if not user_ids:
                 flash("Не выбраны пользователи", "error")
             else:
@@ -490,15 +490,15 @@ def admin_users():
                             Payment.query.filter_by(user_id=user.id).delete()
                             db.session.query(Submission).filter_by(user_id=user.id).delete()
                             ChatMessage.query.filter_by(user_id=user.id).delete()
-                            
+
                             # Удаляем файлы
                             FileStorageManager.delete_user_files(user.id)
-                            
+
                             db.session.delete(user)
                             deleted_count += 1
                         except Exception as e:
                             current_app.logger.error(f"Ошибка удаления пользователя {user.id}: {str(e)}")
-                
+
                 db.session.commit()
                 flash(f"Удалено {deleted_count} пользователей")
         except Exception as e:
@@ -511,18 +511,18 @@ def admin_users():
             user_id = int(request.form.get("edit_user_id"))
             new_username = request.form.get("new_username", "").strip()
             new_email = request.form.get("new_email", "").strip()
-            
+
             current_app.logger.info(f"Редактирование пользователя ID: {user_id}, новое имя: {new_username}, новый email: {new_email}")
-            
+
             user = User.query.get(user_id)
             if not user:
                 flash("Пользователь не найден", "error")
                 return redirect(url_for("admin.admin_users"))
-            
+
             if not new_username:
                 flash("Имя пользователя не может быть пустым", "error")
                 return redirect(url_for("admin.admin_users"))
-            
+
             # Проверяем уникальность имени пользователя
             existing_user = User.query.filter(
                 User.username == new_username,
@@ -531,7 +531,7 @@ def admin_users():
             if existing_user:
                 flash(f'Пользователь с именем "{new_username}" уже существует', "error")
                 return redirect(url_for("admin.admin_users"))
-            
+
             # Проверяем уникальность email
             if new_email:
                 existing_email = User.query.filter(
@@ -541,16 +541,16 @@ def admin_users():
                 if existing_email:
                     flash(f'Пользователь с email "{new_email}" уже существует', "error")
                     return redirect(url_for("admin.admin_users"))
-            
+
             # Обновляем данные
             old_username = user.username
             user.username = new_username
             user.email = new_email if new_email else None
-            
+
             db.session.commit()
             current_app.logger.info(f"Данные пользователя {old_username} успешно обновлены")
             flash(f"Данные пользователя {old_username} успешно обновлены")
-            
+
         except Exception as e:
             current_app.logger.error(f"Ошибка редактирования пользователя: {str(e)}")
             db.session.rollback()
@@ -632,9 +632,6 @@ def admin_users():
     )
 
 
-@admin_bp.route("/admin/groups", methods=["GET", "POST"])
-@login_required
-def admin_groups():
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
@@ -655,6 +652,8 @@ def admin_groups():
 
     if request.method == "POST":
         if request.form.get("submit") == "Сохранить":
+            # Заполняем форму данными из запроса
+            form.process(request.form)
             if form.validate_on_submit():
                 try:
                     existing_group = Group.query.filter_by(
@@ -838,7 +837,7 @@ def admin_groups():
             try:
                 group_ids = request.form.getlist("group_ids")
                 current_app.logger.info(f"Массовое удаление групп: {group_ids}")
-                
+
                 if not group_ids:
                     flash("Не выбраны группы", "error")
                 else:
@@ -858,7 +857,7 @@ def admin_groups():
                                 )
                                 db.session.delete(group)
                                 deleted_count += 1
-                    
+
                     db.session.commit()
                     if deleted_count > 0:
                         flash(f"Удалено {deleted_count} групп")
