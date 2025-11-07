@@ -17,9 +17,34 @@ from wtforms.validators import (
     Length,
     NumberRange,
     Optional,
+    ValidationError,
 )
 
 from .models import Group
+from .utils.email_validator import is_allowed_email_domain, get_allowed_domains_display
+from .utils.username_validator import contains_forbidden_word
+
+
+def validate_allowed_email_domain(form, field):
+    """
+    Валидатор для проверки разрешенных email доменов
+    """
+    if field.data:
+        if not is_allowed_email_domain(field.data):
+            raise ValidationError(
+                "Регистрация недоступна для этого почтового сервиса"
+            )
+
+
+def validate_username_allowed(form, field):
+    """
+    Валидатор для проверки username на запрещенные слова
+    """
+    if field.data:
+        if contains_forbidden_word(field.data):
+            raise ValidationError(
+                "Это имя пользователя недоступно"
+            )
 
 
 class LoginForm(FlaskForm):
@@ -30,9 +55,22 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     username = StringField(
-        "Имя пользователя", validators=[DataRequired(), Length(min=3, max=20)]
+        "Имя пользователя",
+        validators=[
+            DataRequired(),
+            Length(min=3, max=20),
+            validate_username_allowed
+        ]
     )
-    email = StringField("Email", validators=[DataRequired(), Email()])
+    email = StringField(
+        "Email",
+        validators=[
+            DataRequired(),
+            Email(message="Введите корректный email адрес"),
+            validate_allowed_email_domain
+        ],
+        render_kw={"data-description": get_allowed_domains_display()}
+    )
     password = PasswordField(
         "Пароль", validators=[DataRequired(), Length(min=6)]
     )
@@ -51,9 +89,22 @@ class RegistrationForm(FlaskForm):
 
 class AdminUserForm(FlaskForm):
     username = StringField(
-        "Имя пользователя", validators=[DataRequired(), Length(min=3, max=20)]
+        "Имя пользователя",
+        validators=[
+            DataRequired(),
+            Length(min=3, max=20),
+            validate_username_allowed
+        ]
     )
-    email = StringField("Email", validators=[DataRequired(), Email()])
+    email = StringField(
+        "Email",
+        validators=[
+            DataRequired(),
+            Email(message="Введите корректный email адрес"),
+            validate_allowed_email_domain
+        ],
+        render_kw={"data-description": get_allowed_domains_display()}
+    )
     password = PasswordField(
         "Пароль", validators=[DataRequired(), Length(min=6)]
     )
@@ -270,5 +321,8 @@ class SiteSettingsForm(FlaskForm):
     )
     support_enabled = BooleanField(
         "Включить систему тикетов и поддержки"
+    )
+    telegram_only_registration = BooleanField(
+        "Регистрация только через Telegram"
     )
     submit = SubmitField("Сохранить настройки")

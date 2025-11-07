@@ -1105,6 +1105,9 @@ def admin_settings() -> Union[str, Response]:
         form.support_enabled.data = SiteSettings.get_setting(
             "support_enabled", True
         )
+        form.telegram_only_registration.data = SiteSettings.get_setting(
+            "telegram_only_registration", False
+        )
 
     if request.method == "POST" and form.validate_on_submit():
         try:
@@ -1132,6 +1135,11 @@ def admin_settings() -> Union[str, Response]:
                 "support_enabled",
                 form.support_enabled.data,
                 "Включить/выключить систему тикетов и поддержки",
+            )
+            SiteSettings.set_setting(
+                "telegram_only_registration",
+                form.telegram_only_registration.data,
+                "Включить/выключить регистрацию только через Telegram",
             )
 
             flash("Настройки успешно сохранены", "success")

@@ -1,8 +1,7 @@
-
 :root {
     --primary-color: #B595FF;
     --primary-hover: #9A7FE6;
-    
+
     --dp-00: #121212;
     --dp-01: #1E1E1E;
     --dp-02: #222222;
@@ -13,19 +12,19 @@
     --dp-12: #333333;
     --dp-16: #343434;
     --dp-24: #383838;
-    
+
     --text-primary: #FFFFFF;
     --text-secondary: #B3B3B3;
     --text-disabled: #666666;
-    
+
     --border-primary: #333333;
     --border-secondary: #404040;
-    
+
     --success: #4CAF50;
     --warning: #FF9800;
     --error: #F44336;
     --info: #2196F3;
-    
+
     --dark-bg: var(--dp-00);
     --dark-element: var(--dp-02);
     --dark-text: var(--text-primary);
@@ -40,7 +39,7 @@
 .features-carousel-container {
     position: relative;
     overflow: hidden;
-    padding: 0px ;
+    padding: 0px;
     transition: all 0.3s ease;
     opacity: 1;
 }
@@ -50,6 +49,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -99,13 +99,15 @@
     0% {
         transform: translateX(0);
     }
+
     100% {
         transform: translateX(-100%);
     }
 }
 
 .feature-card {
-    flex: 0 0 33.333%; /* 3 карточки в ряд */
+    flex: 0 0 33.333%;
+    /* 3 карточки в ряд */
     padding: 0 8px;
     min-width: 0;
     opacity: 1;
@@ -117,6 +119,7 @@
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -171,6 +174,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -195,6 +199,7 @@
         opacity: 0;
         transform: scale(0.5);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -242,9 +247,11 @@
         stroke-dasharray: 0 100;
         opacity: 0.6;
     }
+
     50% {
         opacity: 0.3;
     }
+
     100% {
         stroke-dasharray: 100 0;
         opacity: 0.6;
@@ -256,10 +263,12 @@
         transform: scale(1);
         opacity: 0.3;
     }
+
     50% {
         transform: scale(1.1);
         opacity: 0.1;
     }
+
     100% {
         transform: scale(1);
         opacity: 0.3;
@@ -272,15 +281,15 @@
         flex: 0 0 50%;
         padding: 0 4px;
     }
-    
+
     .features-carousel-container {
         padding: 25px 0 35px 0;
     }
-    
+
     .features-carousel-wrapper {
         margin: 0 10px;
     }
-    
+
     .features-carousel-wrapper::before,
     .features-carousel-wrapper::after {
         width: 30px;
@@ -292,16 +301,16 @@
         flex: 0 0 100%;
         padding: 0 2px;
     }
-    
+
     .features-carousel-wrapper {
         margin: 0 5px;
     }
-    
+
     .features-carousel-wrapper::before,
     .features-carousel-wrapper::after {
         width: 20px;
     }
-    
+
     .carousel-indicators .indicator {
         width: 10px;
         height: 10px;
@@ -445,22 +454,22 @@
         gap: 16px;
         padding: 16px;
     }
-    
+
     .cookie-consent-actions {
         justify-content: center;
     }
-    
+
     .cookie-consent-actions .btn {
         flex: 1;
         max-width: 120px;
     }
-    
+
     .cookie-consent-toast {
         right: 10px;
         left: 10px;
         transform: translateY(-100%);
     }
-    
+
     .cookie-consent-toast.show {
         transform: translateY(0);
     }
@@ -470,11 +479,11 @@
     .cookie-consent-title {
         font-size: 15px;
     }
-    
+
     .cookie-consent-description {
         font-size: 13px;
     }
-    
+
     .cookie-consent-actions .btn {
         font-size: 12px;
         padding: 6px 12px;
@@ -520,7 +529,7 @@
     border: 1px solid var(--border-secondary);
     border-radius: 26px;
     transition: all 0.3s ease;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .mode-slider:before {
@@ -539,7 +548,7 @@
     font-size: 11px;
     font-weight: bold;
     color: var(--dp-00);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .footer .mode-toggle {
@@ -559,16 +568,16 @@
     font-size: 8px !important;
 }
 
-.footer .mode-toggle input:checked + .mode-slider:before {
+.footer .mode-toggle input:checked+.mode-slider:before {
     transform: translateX(16px) !important;
 }
 
-.mode-toggle input:checked + .mode-slider {
+.mode-toggle input:checked+.mode-slider {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
 
-.mode-toggle input:checked + .mode-slider:before {
+.mode-toggle input:checked+.mode-slider:before {
     transform: translateX(22px);
 }
 
@@ -582,7 +591,7 @@
     justify-content: center;
 }
 
-.mode-toggle input:checked + .mode-slider:before {
+.mode-toggle input:checked+.mode-slider:before {
     content: "А";
 }
 
@@ -634,7 +643,8 @@ textarea:-ms-input-placeholder {
 }
 
 
-html, body {
+html,
+body {
     background-color: var(--dp-00);
     color: var(--text-primary);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -645,7 +655,12 @@ html, body {
     flex-direction: column;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 1rem;
@@ -656,7 +671,7 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--dp-00);
     border-bottom: 1px solid var(--border-primary);
     padding: 0.5rem 0;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
@@ -688,13 +703,13 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid var(--border-primary);
     color: var(--text-primary);
     border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
 
 .card:hover {
     transform: none;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
@@ -717,7 +732,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-.form-control, .form-select {
+.form-control,
+.form-select {
     background-color: var(--dp-01);
     border: 1px solid var(--border-secondary);
     color: var(--text-primary);
@@ -727,7 +743,8 @@ h1, h2, h3, h4, h5, h6 {
     transition: all 0.3s ease;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
     background-color: var(--dp-04);
     border-color: var(--primary-color);
     color: var(--text-primary);
@@ -1205,11 +1222,15 @@ a:hover {
 }
 
 
-.bg-light, .bg-white, .bg-body, .bg-body-tertiary {
+.bg-light,
+.bg-white,
+.bg-body,
+.bg-body-tertiary {
     background-color: var(--dp-08) !important;
 }
 
-.text-dark, .text-body {
+.text-dark,
+.text-body {
     color: var(--text-primary);
 }
 
@@ -1219,172 +1240,173 @@ a:hover {
         font-size: 14px;
         line-height: 1.5;
     }
-    
+
     .navbar {
         padding: 0.5rem 0;
     }
-    
+
     .navbar-brand {
         font-size: 1.1rem;
     }
-    
+
     .navbar-nav .nav-link {
         padding: 0.75rem 1rem;
         border-bottom: 1px solid var(--border-primary);
     }
-    
+
     .navbar-nav .nav-link:last-child {
         border-bottom: none;
     }
-    
+
     .container {
         padding-left: 15px;
         padding-right: 15px;
     }
-    
+
     .card {
         margin-bottom: 1rem;
         border-radius: 12px;
     }
-    
+
     .card-body {
         padding: 1rem;
     }
-    
+
     .subject-card {
         max-width: 100%;
         margin: 0;
         min-height: auto;
     }
-    
+
     .subject-card .card-body {
         padding: 0.75rem;
     }
-    
+
     .subject-card .card-img {
         height: 60%;
         background-size: cover;
         background-position: center;
     }
-    
+
     .card-header {
         padding: 1rem;
         font-size: 1rem;
     }
-    
+
     .btn {
         padding: 0.5rem 1rem;
         font-size: 0.9rem;
         border-radius: 8px;
     }
-    
+
     .btn-sm {
         padding: 0.375rem 0.75rem;
         font-size: 0.8rem;
     }
-    
-    .form-control, .form-select {
+
+    .form-control,
+    .form-select {
         padding: 0.75rem;
         font-size: 16px;
         border-radius: 8px;
     }
-    
+
     .modal-dialog {
         margin: 1rem;
         max-width: calc(100% - 2rem);
     }
-    
+
     .modal-content {
         border-radius: 12px;
     }
-    
+
     .modal-header {
         padding: 1rem;
     }
-    
+
     .modal-body {
         padding: 1rem;
     }
-    
+
     .modal-footer {
         padding: 1rem;
     }
-    
+
     .table {
         font-size: 0.85rem;
     }
-    
+
     .table-responsive {
         border-radius: 8px;
     }
-    
+
     .list-group-item {
         padding: 0.75rem 1rem;
         font-size: 0.9rem;
     }
-    
+
     .alert {
         padding: 0.75rem 1rem;
         font-size: 0.9rem;
         border-radius: 8px;
     }
-    
+
     #notifications-container {
         top: 70px;
         right: 10px;
         left: auto;
         max-width: none;
     }
-    
+
     .notification {
         max-width: none;
         min-width: auto;
         margin-bottom: 8px;
         transform: translateX(0);
     }
-    
+
     footer {
         padding: 1rem 0 0.5rem 0;
     }
-    
+
     footer .row {
         margin-bottom: 1rem;
     }
-    
+
     footer .col-12 {
         padding-left: 10px;
         padding-right: 10px;
         margin-bottom: 1rem;
     }
-    
+
     footer h6 {
         font-size: 0.9rem;
         margin-bottom: 0.75rem;
     }
-    
+
     footer small {
         font-size: 0.8rem;
         line-height: 1.4;
     }
-    
+
     footer a {
         font-size: 0.8rem;
     }
-    
+
     footer .fs-5 {
         font-size: 1.2rem;
     }
-    
+
     footer .bg-primary.rounded {
         width: 32px;
         height: 32px;
     }
-    
+
     footer .bg-info.rounded {
         width: 32px;
         height: 32px;
     }
-    
+
     footer .btn-primary {
         width: 32px;
         height: 32px;
@@ -1393,36 +1415,36 @@ a:hover {
         border-color: var(--primary-color);
         color: white;
     }
-    
+
     .profile-page .card-body {
         padding: 1rem;
     }
-    
+
     .profile-page .col-md-4 {
         margin-bottom: 1rem;
     }
-    
+
     .col-md-4 {
         margin-bottom: 1rem;
     }
-    
+
     .pricing-card {
         margin-bottom: 1rem;
     }
-    
+
     .material-card {
         margin-bottom: 1rem;
     }
-    
+
     .admin-users .card-body {
         padding: 1rem;
     }
-    
+
     .admin-users .table {
         font-size: 0.8rem;
     }
-    
-    
+
+
     .mobile-buttons-container {
         order: 2;
         flex-shrink: 0;
@@ -1431,7 +1453,7 @@ a:hover {
         align-items: center;
         gap: 4px;
     }
-    
+
     .mobile-file-btn,
     .mobile-solution-btn,
     .mobile-upload-btn {
@@ -1441,7 +1463,7 @@ a:hover {
         white-space: nowrap !important;
         flex-shrink: 0 !important;
     }
-    
+
     .mobile-delete-btn {
         background-color: rgba(244, 67, 54, 0.1) !important;
         border-color: rgba(244, 67, 54, 0.3) !important;
@@ -1449,13 +1471,13 @@ a:hover {
         font-size: 0.75rem !important;
         padding: 4px 6px !important;
     }
-    
+
     .mobile-delete-btn:hover {
         background-color: rgba(244, 67, 54, 0.2) !important;
         border-color: rgba(244, 67, 54, 0.5) !important;
         color: rgba(244, 67, 54, 1) !important;
     }
-    
+
     .mobile-edit-btn {
         background-color: rgba(255, 152, 0, 0.1) !important;
         border-color: rgba(255, 152, 0, 0.3) !important;
@@ -1463,13 +1485,13 @@ a:hover {
         font-size: 0.75rem !important;
         padding: 4px 8px !important;
     }
-    
+
     .mobile-edit-btn:hover {
         background-color: rgba(255, 152, 0, 0.2) !important;
         border-color: rgba(255, 152, 0, 0.5) !important;
         color: rgba(255, 152, 0, 1) !important;
     }
-    
+
     .mobile-delete-subject-btn {
         background-color: rgba(244, 67, 54, 0.1) !important;
         border-color: rgba(244, 67, 54, 0.3) !important;
@@ -1477,20 +1499,20 @@ a:hover {
         font-size: 0.75rem !important;
         padding: 4px 8px !important;
     }
-    
+
     .mobile-delete-subject-btn:hover {
         background-color: rgba(244, 67, 54, 0.2) !important;
         border-color: rgba(244, 67, 54, 0.5) !important;
         color: rgba(244, 67, 54, 1) !important;
     }
-    
+
     @media (max-width: 480px) {
         .mobile-buttons-container {
             flex-direction: row;
             gap: 3px !important;
             flex-wrap: wrap;
         }
-        
+
         .mobile-file-btn,
         .mobile-solution-btn,
         .mobile-upload-btn,
@@ -1501,7 +1523,7 @@ a:hover {
             max-width: none !important;
             border-radius: 6px !important;
         }
-        
+
         .mobile-edit-btn,
         .mobile-delete-subject-btn {
             font-size: 0.7rem !important;
@@ -1515,51 +1537,51 @@ a:hover {
     body {
         font-size: 13px;
     }
-    
+
     .container {
         padding-left: 10px;
         padding-right: 10px;
     }
-    
+
     #notifications-container {
         right: 5px;
         left: auto;
     }
-    
+
     footer .col-12 {
         padding-left: 8px;
         padding-right: 8px;
         margin-bottom: 0.75rem;
     }
-    
+
     footer h6 {
         font-size: 0.85rem;
         margin-bottom: 0.5rem;
     }
-    
+
     footer small {
         font-size: 0.75rem;
         line-height: 1.3;
     }
-    
+
     footer a {
         font-size: 0.75rem;
     }
-    
+
     footer .fs-5 {
         font-size: 1.1rem;
     }
-    
+
     footer .bg-primary.rounded {
         width: 28px;
         height: 28px;
     }
-    
+
     footer .bg-info.rounded {
         width: 28px;
         height: 28px;
     }
-    
+
     footer .btn-primary {
         width: 28px;
         height: 28px;
@@ -1568,30 +1590,31 @@ a:hover {
         border-color: var(--primary-color);
         color: white;
     }
-    
+
     .card-body {
         padding: 0.75rem;
     }
-    
+
     .card-header {
         padding: 0.75rem;
     }
-    
+
     .btn {
         padding: 0.5rem 0.75rem;
         font-size: 0.85rem;
     }
-    
-    .form-control, .form-select {
+
+    .form-control,
+    .form-select {
         padding: 0.625rem;
         font-size: 16px;
     }
-    
+
     .modal-dialog {
         margin: 0.5rem;
         max-width: calc(100% - 1rem);
     }
-    
+
     .navbar-brand {
         font-size: 1rem;
     }
@@ -1602,11 +1625,11 @@ a:hover {
     .container {
         max-width: 95%;
     }
-    
+
     .card-body {
         padding: 1.25rem;
     }
-    
+
     .btn {
         padding: 0.6rem 1.2rem;
     }
@@ -1618,27 +1641,28 @@ a:hover {
         min-height: 44px;
         min-width: 44px;
     }
-    
+
     .nav-link {
         min-height: 44px;
         display: flex;
         align-items: center;
     }
-    
-    .form-control, .form-select {
+
+    .form-control,
+    .form-select {
         min-height: 44px;
     }
-    
+
     .btn:hover {
         transform: none;
         box-shadow: none;
     }
-    
+
     .card:hover {
         transform: none;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    
+
     .btn:focus,
     .form-control:focus,
     .nav-link:focus {
@@ -1648,16 +1672,18 @@ a:hover {
 }
 
 
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
     .btn {
         border-width: 0.5px;
     }
-    
+
     .card {
         border-width: 0.5px;
     }
-    
-    .form-control, .form-select {
+
+    .form-control,
+    .form-select {
         border-width: 0.5px;
     }
 }
@@ -1674,16 +1700,16 @@ a:hover {
     .notification {
         transition: transform 0.3s ease, opacity 0.3s ease;
     }
-    
+
     .notification.hide {
         transform: translateX(100%);
         opacity: 0;
     }
-    
+
     .modal.fade .modal-dialog {
         transition: transform 0.3s ease;
     }
-    
+
     .modal.show .modal-dialog {
         transform: none;
     }
@@ -1691,17 +1717,19 @@ a:hover {
 
 
 @supports (-webkit-touch-callout: none) {
-    .form-control, .form-select {
+
+    .form-control,
+    .form-select {
         font-size: 16px;
         -webkit-appearance: none;
         border-radius: 8px;
     }
-    
+
     .btn {
         -webkit-appearance: none;
         border-radius: 8px;
     }
-    
+
     input[type="file"] {
         -webkit-appearance: none;
     }
@@ -1709,11 +1737,13 @@ a:hover {
 
 
 @supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
-    .form-control, .form-select {
+
+    .form-control,
+    .form-select {
         -webkit-appearance: none;
         appearance: none;
     }
-    
+
     .btn {
         -webkit-appearance: none;
         appearance: none;
@@ -1914,6 +1944,7 @@ select[multiple]::-webkit-scrollbar-corner {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1925,15 +1956,15 @@ select[multiple]::-webkit-scrollbar-corner {
     .admin-groups .container-fluid {
         padding: 1rem;
     }
-    
+
     .admin-groups .card {
         margin-bottom: 1rem;
     }
-    
+
     .admin-groups .table-responsive {
         border-radius: 10px;
     }
-    
+
     .admin-groups .btn-sm {
         font-size: 0.65rem;
         padding: 0.2rem 0.4rem;
@@ -2058,31 +2089,31 @@ body.modal-open {
         -webkit-transition: opacity 0.15s linear;
         -webkit-animation: none;
     }
-    
+
     .modal-dialog {
         -webkit-transform: none;
         -webkit-transition: none;
         -webkit-animation: none;
     }
-    
+
     .modal-content {
         -webkit-transform: none;
         -webkit-transition: none;
         -webkit-animation: none;
     }
-    
+
     .modal-header {
         -webkit-transform: none;
         -webkit-transition: none;
         -webkit-animation: none;
     }
-    
+
     .modal-body {
         -webkit-transform: none;
         -webkit-transition: none;
         -webkit-animation: none;
     }
-    
+
     .modal-footer {
         -webkit-transform: none;
         -webkit-transition: none;
@@ -2245,7 +2276,7 @@ body.modal-open {
     color: var(--text-secondary);
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
+.breadcrumb-item+.breadcrumb-item::before {
     content: "›";
     color: var(--text-disabled);
     font-weight: bold;
@@ -2280,11 +2311,11 @@ body.modal-open {
         font-size: 0.85rem;
         border-radius: 12px;
     }
-    
-    .breadcrumb-item + .breadcrumb-item::before {
+
+    .breadcrumb-item+.breadcrumb-item::before {
         margin: 0 0.25rem;
     }
-    
+
     .breadcrumb-item i {
         font-size: 0.75rem;
     }
@@ -2296,7 +2327,7 @@ body.modal-open {
         font-size: 0.8rem;
         margin-bottom: 0.75rem;
     }
-    
+
     .breadcrumb-item {
         white-space: nowrap;
         overflow: hidden;
@@ -2418,9 +2449,19 @@ body.modal-open {
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
 }
 
 .verification-submit {
@@ -2471,17 +2512,17 @@ body.modal-open {
         padding: 30px 20px;
         margin: 0 15px;
     }
-    
+
     .verification-title {
         font-size: 20px;
     }
-    
+
     .code-input {
         width: 40px;
         height: 40px;
         font-size: 16px;
     }
-    
+
     .code-inputs {
         gap: 6px;
     }
@@ -2491,17 +2532,17 @@ body.modal-open {
     .verification-card {
         padding: 25px 15px;
     }
-    
+
     .verification-title {
         font-size: 18px;
     }
-    
+
     .code-input {
         width: 35px;
         height: 35px;
         font-size: 14px;
     }
-    
+
     .code-inputs {
         gap: 4px;
     }
@@ -2573,6 +2614,98 @@ body.modal-open {
     text-align: center;
     max-width: 420px;
     margin: 0 auto;
+}
+
+.registration-card-wide {
+    max-width: 600px;
+    padding: 40px 35px;
+}
+
+.telegram-alert {
+    background: rgba(0, 136, 204, 0.1);
+    border: 1px solid #0088cc;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 20px;
+}
+
+.telegram-alert-content {
+    text-align: center;
+}
+
+.telegram-icon {
+    font-size: 64px;
+    color: #0088cc;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.telegram-title {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.telegram-description {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.telegram-register-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    background: #0088cc;
+    color: white;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    width: 100%;
+    max-width: 400px;
+}
+
+.telegram-register-btn:hover {
+    background: #006ba3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
+    color: white;
+}
+
+.telegram-register-btn i {
+    font-size: 20px;
+}
+
+.telegram-only-message .login-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.form-input.is-invalid {
+    border-color: var(--error);
+    background: var(--dp-03);
+}
+
+.form-input.is-invalid:focus {
+    border-color: var(--error);
+    box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
+}
+
+.invalid-feedback {
+    color: var(--error);
+    font-size: 13px;
+    margin-top: 6px;
+    display: block;
+}
+
+.invalid-feedback i {
+    margin-right: 4px;
 }
 
 .registration-header {
@@ -2657,11 +2790,19 @@ body.modal-open {
 
 .checkbox-label {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     cursor: pointer;
     color: var(--text-secondary);
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.6;
+    gap: 10px;
+    word-wrap: break-word;
+}
+
+.checkbox-text {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.6;
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -2673,18 +2814,18 @@ body.modal-open {
     height: 18px;
     border: 2px solid var(--border-secondary);
     border-radius: 4px;
-    margin-right: 10px;
     position: relative;
     transition: all 0.2s ease;
     flex-shrink: 0;
+    margin-top: 2px;
 }
 
-.checkbox-label input[type="checkbox"]:checked + .checkmark {
+.checkbox-label input[type="checkbox"]:checked+.checkmark {
     background: var(--primary-color);
     border-color: var(--primary-color);
 }
 
-.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+.checkbox-label input[type="checkbox"]:checked+.checkmark::after {
     content: '';
     position: absolute;
     left: 5px;
@@ -2718,6 +2859,7 @@ body.modal-open {
 }
 
 .btn-primary {
+    width: 100%;
     background: var(--primary-color);
     color: white;
     border: none;
@@ -2728,6 +2870,10 @@ body.modal-open {
     cursor: pointer;
     transition: all 0.2s ease;
     opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 .btn-primary:hover {
@@ -2748,7 +2894,7 @@ body.modal-open {
 }
 
 .btn-secondary {
-    width: 60%;
+    width: 100%;
     background: var(--dp-03);
     color: var(--primary-color);
     border: none;
@@ -2759,7 +2905,10 @@ body.modal-open {
     text-decoration: none;
     text-align: center;
     transition: all 0.2s ease;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 .btn-secondary:hover {
@@ -2840,30 +2989,30 @@ body.modal-open {
         padding: 25px 20px;
         margin: 0 15px;
     }
-    
+
     .registration-title {
         font-size: 18px;
     }
-    
+
     .button-group {
         margin-bottom: 10px;
     }
-    
+
     .login-link {
         margin-bottom: 20px;
     }
-    
+
     .social-login {
         flex-direction: column;
     }
-    
+
     /* Адаптивность для чекбокса и ссылки "Забыли пароль?" */
     .checkbox-group {
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 10px;
     }
-    
+
     .checkbox-group .resend-link {
         align-self: flex-end;
     }
@@ -2873,16 +3022,16 @@ body.modal-open {
     .registration-card {
         padding: 20px 15px;
     }
-    
+
     .registration-title {
         font-size: 16px;
     }
-    
+
     .form-input {
         padding: 8px 12px;
         font-size: 13px;
     }
-    
+
     .btn-primary,
     .btn-secondary,
     .social-btn {

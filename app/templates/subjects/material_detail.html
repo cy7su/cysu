@@ -4,7 +4,8 @@
 {% block title %}{{ material.title }}{% endblock %}
 
 {% block breadcrumbs %}
-{{ material_breadcrumb(material.subject.title, url_for('main.subject_detail', subject_id=material.subject.id), material.title) }}
+{{ material_breadcrumb(material.subject.title, url_for('main.subject_detail', subject_id=material.subject.id),
+material.title) }}
 {% endblock %}
 
 {% block content %}
@@ -13,43 +14,69 @@
         <div class="col-lg-8 mb-4">
             <!-- Основная карточка материала -->
             <div class="card shadow-sm" style="border: 1px solid var(--dp-12);">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, var(--dp-02) 0%, var(--dp-03) 100%); border-bottom: 1px solid var(--dp-12);">
+                <div class="card-header d-flex justify-content-between align-items-center"
+                    style="background: linear-gradient(135deg, var(--dp-02) 0%, var(--dp-03) 100%); border-bottom: 1px solid var(--dp-12);">
                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <h2 class="mb-0" style="font-size: 1.5rem; color: var(--text-primary);">{{ material.title }}</h2>
+                        <h2 class="mb-0" style="font-size: 1.5rem; color: var(--text-primary);">{{ material.title }}
+                        </h2>
                     </div>
                     {% if current_user.is_authenticated and current_user.can_manage_materials() %}
-                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
-                            <i class="fas fa-edit me-1"></i>Редактировать
-                        </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#editModal">
+                        <i class="fas fa-edit me-1"></i>Редактировать
+                    </button>
                     {% endif %}
                 </div>
                 <div class="card-body" style="padding: 1.5rem;">
                     {% if material.description %}
-                        <div class="alert" style="background-color: rgba(181, 149, 255, 0.1); border-left: 3px solid var(--primary-color); margin-bottom: 1.5rem; padding: 1rem;">
-                            <div style="color: var(--text-primary);">{{ material.description | format_description | safe }}</div>
+                    <div class="alert"
+                        style="background-color: rgba(181, 149, 255, 0.1); border-left: 3px solid var(--primary-color); margin-bottom: 1.5rem; padding: 1rem;">
+                        <div style="color: var(--text-primary);">{{ material.description | format_description | safe }}
                         </div>
+                    </div>
                     {% endif %}
-                    
+
                     <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
                         {% if material.file %}
-                            <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}" class="btn btn-primary d-flex align-items-center gap-2" target="_blank">
-                                <i class="fas fa-download"></i>
-                                <span>Скачать материал</span>
-                            </a>
+                        <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}"
+                            class="btn btn-primary d-flex align-items-center gap-2" target="_blank">
+                            <i class="fas fa-download"></i>
+                            <span>Скачать материал</span>
+                        </a>
+                        {% if current_user.is_authenticated and current_user.can_manage_materials() %}
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#replaceFileModal">
+                            <i class="fas fa-exchange-alt me-1"></i>Заменить файл
+                        </button>
                         {% endif %}
-                        
+                        {% endif %}
+
                         {% if material.solution_file %}
-                            <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.solution_file | extract_filename) }}" class="btn btn-success d-flex align-items-center gap-2" target="_blank">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Готовое решение</span>
-                            </a>
+                        <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.solution_file | extract_filename) }}"
+                            class="btn btn-success d-flex align-items-center gap-2" target="_blank">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Готовое решение</span>
+                        </a>
+                        {% if current_user.is_authenticated and current_user.can_manage_materials() and material.type ==
+                        'assignment' %}
+                        <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#replaceSolutionFileModal">
+                            <i class="fas fa-exchange-alt me-1"></i>Заменить решение
+                        </button>
                         {% endif %}
-                        
+                        {% elif current_user.is_authenticated and current_user.can_manage_materials() and material.type
+                        == 'assignment' %}
+                        <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#replaceSolutionFileModal">
+                            <i class="fas fa-plus me-1"></i>Добавить решение
+                        </button>
+                        {% endif %}
+
                         {% if file_info %}
-                            <div class="d-flex align-items-center gap-3 text-muted" style="font-size: 0.875rem;">
-                                <span><i class="fas fa-file me-1"></i>{{ file_info.extension }}</span>
-                                <span><i class="fas fa-hdd me-1"></i>{{ file_info.size_formatted }}</span>
-                            </div>
+                        <div class="d-flex align-items-center gap-3 text-muted" style="font-size: 0.875rem;">
+                            <span><i class="fas fa-file me-1"></i>{{ file_info.extension }}</span>
+                            <span><i class="fas fa-hdd me-1"></i>{{ file_info.size_formatted }}</span>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -57,53 +84,62 @@
 
             <!-- Форма загрузки решения для практик -->
             {% if current_user.is_authenticated and material.type == 'assignment' %}
-                {% set my_submission = user_submissions.get(material.id) if user_submissions else None %}
-                
-                {% if not my_submission or not my_submission.file %}
-                    <div class="card mt-4 shadow-sm" style="border: 1px solid var(--dp-12);">
-                        <div class="card-header" style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%); border-bottom: 1px solid var(--dp-12);">
-                            <h5 class="mb-0 text-success"><i class="fas fa-cloud-upload-alt me-2"></i>Загрузить решение</h5>
+            {% set my_submission = user_submissions.get(material.id) if user_submissions else None %}
+
+            {% if not my_submission or not my_submission.file %}
+            <div class="card mt-4 shadow-sm" style="border: 1px solid var(--dp-12);">
+                <div class="card-header"
+                    style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%); border-bottom: 1px solid var(--dp-12);">
+                    <h5 class="mb-0 text-success"><i class="fas fa-cloud-upload-alt me-2"></i>Загрузить решение</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.submit_solution', material_id=material.id) }}"
+                        enctype="multipart/form-data" id="uploadForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="solution_file" class="form-label">Выберите файл с решением</label>
+                            <input type="file" class="form-control" id="solution_file" name="solution_file" required
+                                accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt">
+                            <div class="form-text">Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 16
+                                МБ</div>
                         </div>
-                        <div class="card-body">
-                            <form method="POST" action="{{ url_for('main.submit_solution', material_id=material.id) }}" enctype="multipart/form-data" id="uploadForm">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <div class="mb-3">
-                                    <label for="solution_file" class="form-label">Выберите файл с решением</label>
-                                    <input type="file" class="form-control" id="solution_file" name="solution_file" required accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt">
-                                    <div class="form-text">Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 16 МБ</div>
-                                </div>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-upload me-2"></i>Загрузить решение
-                                </button>
-                            </form>
-                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-upload me-2"></i>Загрузить решение
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="card mt-4 shadow-sm" style="border: 1px solid var(--dp-12);">
+                <div class="card-header"
+                    style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.05) 100%); border-bottom: 1px solid var(--dp-12);">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-check-circle me-2"></i>Моё решение</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success mb-3">
+                        <i class="fas fa-info-circle me-2"></i>Ваше решение успешно загружено
                     </div>
-                {% else %}
-                    <div class="card mt-4 shadow-sm" style="border: 1px solid var(--dp-12);">
-                        <div class="card-header" style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.05) 100%); border-bottom: 1px solid var(--dp-12);">
-                            <h5 class="mb-0 text-primary"><i class="fas fa-check-circle me-2"></i>Моё решение</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-success mb-3">
-                                <i class="fas fa-info-circle me-2"></i>Ваше решение успешно загружено
-                            </div>
-                            <div class="d-flex gap-2 flex-wrap">
-                                <a href="{{ url_for('main.serve_user_file', subject_id=material.subject_id, user_id=my_submission.file | extract_user_id_from_path, filename=my_submission.file | extract_filename) }}" class="btn btn-sm btn-outline-primary mobile-file-btn" target="_blank">
-                                    <i class="fas fa-download me-1"></i>Скачать
-                                </a>
-                                <form method="POST" action="{{ url_for('main.delete_solution', submission_id=my_submission.id) }}" style="display: inline; margin: 0;" id="deleteSolutionForm">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="button" class="btn btn-sm btn-outline-danger mobile-delete-btn" onclick="customConfirm('Удалить решение и загрузить новое?', function() { document.getElementById('deleteSolutionForm').submit(); })">
-                                        <i class="fas fa-trash me-1"></i>Удалить
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{{ url_for('main.serve_user_file', subject_id=material.subject_id, user_id=my_submission.file | extract_user_id_from_path, filename=my_submission.file | extract_filename) }}"
+                            class="btn btn-sm btn-outline-primary mobile-file-btn" target="_blank">
+                            <i class="fas fa-download me-1"></i>Скачать
+                        </a>
+                        <form method="POST"
+                            action="{{ url_for('main.delete_solution', submission_id=my_submission.id) }}"
+                            style="display: inline; margin: 0;" id="deleteSolutionForm">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="button" class="btn btn-sm btn-outline-danger mobile-delete-btn"
+                                onclick="customConfirm('Удалить решение и загрузить новое?', function() { document.getElementById('deleteSolutionForm').submit(); })">
+                                <i class="fas fa-trash me-1"></i>Удалить
+                            </button>
+                        </form>
                     </div>
-                {% endif %}
+                </div>
+            </div>
+            {% endif %}
             {% endif %}
         </div>
-        
+
         <div class="col-lg-4">
             <!-- Информационная панель -->
             <div class="card shadow-sm mb-3" style="border: 1px solid var(--dp-12);">
@@ -113,64 +149,69 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <small class="text-muted d-block mb-1">Предмет</small>
-                        <a href="{{ url_for('main.subject_detail', subject_id=material.subject.id) }}" class="text-decoration-none">
+                        <a href="{{ url_for('main.subject_detail', subject_id=material.subject.id) }}"
+                            class="text-decoration-none">
                             <strong style="color: var(--primary-color);">{{ material.subject.title }}</strong>
                         </a>
                     </div>
-                    
+
                     <div class="mb-3">
                         <small class="text-muted d-block mb-1">Тип материала</small>
                         <div>
-                            <span class="badge" style="background-color: {{ '#B595FF' if material.type == 'assignment' else '#4CAF50' }}; font-size: 0.875rem;">
+                            <span class="badge"
+                                style="background-color: {{ '#B595FF' if material.type == 'assignment' else '#4CAF50' }}; font-size: 0.875rem;">
                                 {{ 'Практика' if material.type == 'assignment' else 'Лекция' }}
                             </span>
                         </div>
                     </div>
-                    
+
                     {% if created_by_user %}
-                        <div class="mb-3">
-                            <small class="text-muted d-block mb-1">Создано</small>
-                            <strong style="color: var(--text-primary);">{{ created_by_user.username }}</strong>
-                        </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">Создано</small>
+                        <strong style="color: var(--text-primary);">{{ created_by_user.username }}</strong>
+                    </div>
                     {% endif %}
-                    
+
                     <div class="mb-3">
                         <small class="text-muted d-block mb-1">Дата создания</small>
-                        <strong style="color: var(--text-primary);">{{ material.created_at.strftime('%d.%m.%Y %H:%M') }}</strong>
+                        <strong style="color: var(--text-primary);">{{ material.created_at.strftime('%d.%m.%Y %H:%M')
+                            }}</strong>
                     </div>
-                    
+
                     {% if material.updated_at and material.updated_at != material.created_at %}
-                        <div class="mb-0">
-                            <small class="text-muted d-block mb-1">Последнее обновление</small>
-                            <strong style="color: var(--text-primary);">{{ material.updated_at.strftime('%d.%m.%Y %H:%M') }}</strong>
-                        </div>
+                    <div class="mb-0">
+                        <small class="text-muted d-block mb-1">Последнее обновление</small>
+                        <strong style="color: var(--text-primary);">{{ material.updated_at.strftime('%d.%m.%Y %H:%M')
+                            }}</strong>
+                    </div>
                     {% endif %}
                 </div>
             </div>
 
             <!-- Статистика для практик -->
             {% if material.type == 'assignment' %}
-                <div class="card shadow-sm" style="border: 1px solid var(--dp-12);">
-                    <div class="card-header" style="background: var(--dp-02); border-bottom: 1px solid var(--dp-12);">
-                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2 text-success"></i>Статистика</h5>
+            <div class="card shadow-sm" style="border: 1px solid var(--dp-12);">
+                <div class="card-header" style="background: var(--dp-02); border-bottom: 1px solid var(--dp-12);">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2 text-success"></i>Статистика</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="text-muted">Всего решений</span>
+                        <span class="badge bg-success" style="font-size: 1rem; padding: 0.5rem 1rem;">{{
+                            total_submissions }}</span>
                     </div>
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="text-muted">Всего решений</span>
-                            <span class="badge bg-success" style="font-size: 1rem; padding: 0.5rem 1rem;">{{ total_submissions }}</span>
-                        </div>
-                        
-                        {% set my_submission = user_submissions.get(material.id) if user_submissions else None %}
-                        <div class="d-flex align-items-center justify-content-between">
-                            <span class="text-muted">Ваш статус</span>
-                            {% if my_submission and my_submission.file %}
-                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Выполнено</span>
-                            {% else %}
-                                <span class="badge bg-secondary"><i class="fas fa-clock me-1"></i>Не выполнено</span>
-                            {% endif %}
-                        </div>
+
+                    {% set my_submission = user_submissions.get(material.id) if user_submissions else None %}
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="text-muted">Ваш статус</span>
+                        {% if my_submission and my_submission.file %}
+                        <span class="badge bg-success"><i class="fas fa-check me-1"></i>Выполнено</span>
+                        {% else %}
+                        <span class="badge bg-secondary"><i class="fas fa-clock me-1"></i>Не выполнено</span>
+                        {% endif %}
                     </div>
                 </div>
+            </div>
             {% endif %}
         </div>
     </div>
@@ -189,24 +230,28 @@
             <form method="POST" action="{{ url_for('main.edit_material', material_id=material.id) }}">
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    
+
                     <div class="mb-3">
                         <label for="title" class="form-label">Название</label>
-                        <input type="text" class="form-control" id="title" name="title" value="{{ material.title }}" required>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ material.title }}"
+                            required>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="description" class="form-label">Описание</label>
-                        <textarea class="form-control" id="description" name="description" rows="3" maxlength="300">{{ material.description or '' }}</textarea>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                            maxlength="300">{{ material.description or '' }}</textarea>
                         <div class="form-text">Максимум 300 символов</div>
                     </div>
-                    
+
                     <div class="card bg-light">
                         <div class="card-body">
                             <h6 class="card-title">Информация о материале</h6>
                             <p class="card-text mb-1"><strong>Предмет:</strong> {{ material.subject.title }}</p>
-                            <p class="card-text mb-1"><strong>Тип:</strong> {{ 'Лекция' if material.type == 'lecture' else 'Практика' }}</p>
-                            <p class="card-text mb-0"><strong>Создан:</strong> {{ material.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                            <p class="card-text mb-1"><strong>Тип:</strong> {{ 'Лекция' if material.type == 'lecture'
+                                else 'Практика' }}</p>
+                            <p class="card-text mb-0"><strong>Создан:</strong> {{ material.created_at.strftime('%d.%m.%Y
+                                %H:%M') }}</p>
                         </div>
                     </div>
                 </div>
@@ -222,5 +267,122 @@
         </div>
     </div>
 </div>
+
+<!-- Модальное окно замены основного файла -->
+<div class="modal fade" id="replaceFileModal" tabindex="-1" aria-labelledby="replaceFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="replaceFileModalLabel">
+                    <i class="fas fa-exchange-alt me-2"></i>Замена файла материала
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('main.replace_material_file', material_id=material.id) }}"
+                enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Внимание!</strong> Старый файл будет удален и заменен новым.
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Выберите новый файл</label>
+                        <input type="file" class="form-control" id="file" name="file" required
+                            accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt">
+                        <div class="form-text">Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 200 МБ
+                        </div>
+                    </div>
+
+                    {% if material.file %}
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Текущий файл</h6>
+                            <p class="card-text mb-0">
+                                <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}"
+                                    target="_blank">
+                                    <i class="fas fa-file me-1"></i>{{ material.file | extract_filename }}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Отмена
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-1"></i>Заменить файл
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно замены файла решения -->
+{% if material.type == 'assignment' %}
+<div class="modal fade" id="replaceSolutionFileModal" tabindex="-1" aria-labelledby="replaceSolutionFileModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="replaceSolutionFileModalLabel">
+                    <i class="fas fa-exchange-alt me-2"></i>{{ 'Замена файла решения' if material.solution_file else
+                    'Добавление файла решения' }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('main.replace_material_solution_file', material_id=material.id) }}"
+                enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    {% if material.solution_file %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Внимание!</strong> Старый файл решения будет удален и заменен новым.
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="solution_file" class="form-label">Выберите файл решения</label>
+                        <input type="file" class="form-control" id="solution_file" name="solution_file" required
+                            accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt">
+                        <div class="form-text">Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 200 МБ
+                        </div>
+                    </div>
+
+                    {% if material.solution_file %}
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Текущий файл решения</h6>
+                            <p class="card-text mb-0">
+                                <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.solution_file | extract_filename) }}"
+                                    target="_blank">
+                                    <i class="fas fa-file me-1"></i>{{ material.solution_file | extract_filename }}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Отмена
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-upload me-1"></i>{{ 'Заменить файл' if material.solution_file else 'Добавить
+                        файл' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endif %}
 {% endblock %}

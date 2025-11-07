@@ -5,6 +5,7 @@ from flask import (
     Blueprint,
     Response,
     current_app,
+    flash,
     redirect,
     render_template,
     request,
@@ -60,6 +61,15 @@ def login() -> Union[str, Response]:
 def register() -> Union[str, Response]:
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
+
+    # Проверяем, включена ли регистрация только через Telegram
+    telegram_only = SiteSettings.get_setting("telegram_only_registration", False)
+    if telegram_only:
+        # Если включена регистрация только через Telegram, показываем сообщение
+        if request.method == "POST":
+            # Блокируем POST запросы, если включена регистрация только через Telegram
+            flash("Регистрация доступна только через Telegram", "warning")
+        return render_template("auth/register.html", telegram_only=True, form=None)
 
     form = RegistrationForm()
     current_app.logger.info(f"Регистрация - метод: {request.method}")
@@ -141,7 +151,7 @@ def register() -> Union[str, Response]:
             for error in errors:
                 current_app.logger.warning(f"Ошибка в поле {field}: {error}")
 
-    return render_template("auth/register.html", form=form)
+    return render_template("auth/register.html", form=form, telegram_only=False)
 
 
 @auth_bp.route("/email/verification", methods=["GET", "POST"])

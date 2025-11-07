@@ -52,22 +52,22 @@ def clean_folder_name(name: str) -> str:
     """Очищает название для использования в качестве имени папки"""
     if not name:
         return "Без_названия"
-    
+
     # Заменяем недопустимые символы на подчеркивания
     invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|', '\n', '\r', '\t']
     for char in invalid_chars:
         name = name.replace(char, '_')
-    
+
     # Убираем множественные подчеркивания и пробелы
     name = '_'.join(name.split())
-    
+
     # Убираем подчеркивания в начале и конце
     name = name.strip('_')
-    
+
     # Если название стало пустым или слишком длинным
     if not name or len(name) > 100:
         return "Предмет"
-    
+
     return name
 
 
@@ -451,7 +451,7 @@ def material_detail(material_id: int) -> Union[str, Response]:
         ).first()
         if submission:
             user_submissions[material_id] = submission
-        
+
         total_submissions = Submission.query.filter_by(material_id=material_id).count()
 
     created_by_user = None
@@ -475,8 +475,8 @@ def material_detail(material_id: int) -> Union[str, Response]:
         except Exception as e:
             current_app.logger.error(f"Error getting file info: {e}")
 
-    return render_template("subjects/material_detail.html", 
-                         material=material, 
+    return render_template("subjects/material_detail.html",
+                         material=material,
                          user_submissions=user_submissions,
                          total_submissions=total_submissions,
                          created_by_user=created_by_user,
@@ -672,6 +672,146 @@ def edit_material(material_id: int) -> Response:
     except Exception as e:
         current_app.logger.error(f"Ошибка редактирования материала {material_id}: {e}")
         flash("Ошибка при обновлении материала", "error")
+        db.session.rollback()
+
+    return redirect(url_for("main.material_detail", material_id=material.id))
+
+
+@main_bp.route("/material/<int:material_id>/replace_file", methods=["POST"])
+@login_required
+def replace_material_file(material_id: int) -> Response:
+    """Замена основного файла материала (лекции или практики)"""
+    if not current_user.can_manage_materials():
+        flash("Доступ запрещён", "error")
+        return redirect(url_for("main.index"))
+
+    material = Material.query.get_or_404(material_id)
+
+    if current_user.is_moderator:
+        accessible_subjects = current_user.get_accessible_subjects()
+        if material.subject not in accessible_subjects:
+            flash("У вас нет доступа к этому предмету.", "error")
+            return redirect(url_for("main.index"))
+
+    file = request.files.get("file")
+    if not file or not file.filename:
+        flash("Файл не выбран", "error")
+        return redirect(url_for("main.material_detail", material_id=material.id))
+
+    try:
+        subject = material.subject
+        original_filename = get_safe_filename(file.filename)
+
+        # Проверка размера файла
+        file_size = getattr(file, 'content_length', None) or len(file.read()) if hasattr(file, 'read') else 'unknown'
+        if hasattr(file, 'seek'):
+            file.seek(0)
+
+        if isinstance(file_size, int) and current_app.config.get('MAX_CONTENT_LENGTH'):
+            if file_size > current_app.config.get('MAX_CONTENT_LENGTH'):
+                flash(f"Файл слишком большой. Максимальный размер: {current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.1f} MB", "error")
+                return redirect(url_for("main.material_detail", material_id=material.id))
+
+        # Удаляем старый файл, если он существует
+        if material.file:
+            try:
+                upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+                old_file_path = os.path.join(upload_base, material.file)
+                if os.path.exists(old_file_path):
+                    os.remove(old_file_path)
+                    current_app.logger.info(f"Старый файл материала удален: {old_file_path}")
+            except Exception as e:
+                current_app.logger.error(f"Ошибка удаления старого файла материала: {e}")
+
+        # Сохраняем новый файл
+        full_path, relative_path = FileStorageManager.get_material_upload_path(
+            subject.id, original_filename
+        )
+
+        if FileStorageManager.save_file(file, full_path):
+            material.file = relative_path
+            material.updated_at = datetime.utcnow()
+            db.session.commit()
+            flash("Файл материала успешно заменён", "success")
+        else:
+            current_app.logger.error(f"Ошибка сохранения нового файла материала: {original_filename}")
+            flash("Ошибка при сохранении нового файла", "error")
+
+    except Exception as e:
+        current_app.logger.error(f"Ошибка замены файла материала {material_id}: {e}")
+        flash(f"Ошибка при замене файла: {str(e)}", "error")
+        db.session.rollback()
+
+    return redirect(url_for("main.material_detail", material_id=material.id))
+
+
+@main_bp.route("/material/<int:material_id>/replace_solution_file", methods=["POST"])
+@login_required
+def replace_material_solution_file(material_id: int) -> Response:
+    """Замена файла решения для практики"""
+    if not current_user.can_manage_materials():
+        flash("Доступ запрещён", "error")
+        return redirect(url_for("main.index"))
+
+    material = Material.query.get_or_404(material_id)
+
+    if material.type != "assignment":
+        flash("Файл решения можно заменить только для практик", "error")
+        return redirect(url_for("main.material_detail", material_id=material.id))
+
+    if current_user.is_moderator:
+        accessible_subjects = current_user.get_accessible_subjects()
+        if material.subject not in accessible_subjects:
+            flash("У вас нет доступа к этому предмету.", "error")
+            return redirect(url_for("main.index"))
+
+    file = request.files.get("solution_file")
+    if not file or not file.filename:
+        flash("Файл не выбран", "error")
+        return redirect(url_for("main.material_detail", material_id=material.id))
+
+    try:
+        subject = material.subject
+        original_filename = get_safe_filename(file.filename)
+
+        # Проверка размера файла
+        file_size = getattr(file, 'content_length', None) or len(file.read()) if hasattr(file, 'read') else 'unknown'
+        if hasattr(file, 'seek'):
+            file.seek(0)
+
+        if isinstance(file_size, int) and current_app.config.get('MAX_CONTENT_LENGTH'):
+            if file_size > current_app.config.get('MAX_CONTENT_LENGTH'):
+                flash(f"Файл слишком большой. Максимальный размер: {current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.1f} MB", "error")
+                return redirect(url_for("main.material_detail", material_id=material.id))
+
+        # Удаляем старый файл решения, если он существует
+        if material.solution_file:
+            try:
+                upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
+                old_solution_path = os.path.join(upload_base, material.solution_file)
+                if os.path.exists(old_solution_path):
+                    os.remove(old_solution_path)
+                    current_app.logger.info(f"Старый файл решения удален: {old_solution_path}")
+            except Exception as e:
+                current_app.logger.error(f"Ошибка удаления старого файла решения: {e}")
+
+        # Сохраняем новый файл решения
+        full_path, relative_path = FileStorageManager.get_material_upload_path(
+            subject.id, original_filename
+        )
+
+        if FileStorageManager.save_file(file, full_path):
+            material.solution_file = relative_path
+            material.updated_at = datetime.utcnow()
+            db.session.commit()
+            flash("Файл решения успешно заменён", "success")
+        else:
+            current_app.logger.error(f"Ошибка сохранения нового файла решения: {original_filename}")
+            flash("Ошибка при сохранении нового файла решения", "error")
+
+    except Exception as e:
+        current_app.logger.error(f"Ошибка замены файла решения материала {material_id}: {e}")
+        flash(f"Ошибка при замене файла решения: {str(e)}", "error")
         db.session.rollback()
 
     return redirect(url_for("main.material_detail", material_id=material.id))
@@ -1253,17 +1393,17 @@ def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
     from flask import Response, abort, request
     from werkzeug.utils import secure_filename
 
-    
+
     upload_folder = current_app.config['UPLOAD_FOLDER']
     safe_filename = secure_filename(filename)
-    
+
     # Строим путь к файлу пользователя
     file_path = safe_path_join(upload_folder, str(subject_id), "users", str(user_id), safe_filename)
-    
+
     if not os.path.exists(file_path):
         current_app.logger.error(f"Файл пользователя не найден: {file_path}")
         abort(404)
-    
+
     # Определяем MIME тип
     if filename.lower().endswith('.pdf'):
         mimetype = 'application/pdf'
@@ -1281,10 +1421,10 @@ def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
         mimetype = 'application/zip'
     else:
         mimetype = 'application/octet-stream'
-    
+
     try:
         file_size = os.path.getsize(file_path)
-        
+
         def generate_file():
             try:
                 with open(file_path, 'rb') as f:
@@ -1296,7 +1436,7 @@ def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
             except Exception as e:
                 current_app.logger.error(f"Ошибка чтения файла {file_path}: {e}")
                 return
-        
+
         response = Response(
             generate_file(),
             mimetype=mimetype,
@@ -1309,9 +1449,9 @@ def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
                 'Content-Disposition': f'attachment; filename="{os.path.basename(filename)}"'
             }
         )
-        
+
         return response
-        
+
     except Exception as e:
         current_app.logger.error(f"Ошибка обработки файла {file_path}: {e}")
         abort(500)
@@ -1323,59 +1463,59 @@ def export_user_solutions() -> Response:
     """Экспорт всех решений пользователя в zip архив"""
     try:
         from ..models import Submission, Material, Subject
-        
+
         # Получаем все решения пользователя
         submissions = Submission.query.filter_by(user_id=current_user.id).all()
-        
+
         if not submissions:
             flash("У вас нет загруженных решений для экспорта", "info")
             return redirect(url_for("main.profile"))
-        
+
         # Создаем временный файл для zip архива
         temp_zip = tempfile.NamedTemporaryFile(delete=False, suffix='.zip')
         temp_zip.close()
-        
+
         upload_folder = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
-        
+
         with zipfile.ZipFile(temp_zip.name, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             # Группируем решения по предметам
             subjects_dict = {}
-            
+
             for submission in submissions:
                 if not submission.file:
                     continue
-                    
+
                 material = Material.query.get(submission.material_id)
                 if not material:
                     continue
-                    
+
                 subject = Subject.query.get(material.subject_id)
                 if not subject:
                     continue
-                
+
                 if subject.id not in subjects_dict:
                     subjects_dict[subject.id] = {
                         'subject': subject,
                         'files': []
                     }
-                
+
                 # Путь к файлу решения пользователя
                 file_path = os.path.join(upload_folder, submission.file)
-                
+
                 if os.path.exists(file_path):
                     # Безопасное имя файла
                     safe_filename = secure_filename(os.path.basename(submission.file))
-                    
+
                     # Путь внутри архива: название_предмета/файл
                     subject_name = clean_folder_name(subject.title)
                     archive_path = os.path.join(subject_name, safe_filename)
-                    
+
                     subjects_dict[subject.id]['files'].append({
                         'file_path': file_path,
                         'archive_path': archive_path,
                         'material_title': material.title
                     })
-            
+
             # Добавляем файлы в архив
             for subject_data in subjects_dict.values():
                 for file_info in subject_data['files']:
@@ -1383,7 +1523,7 @@ def export_user_solutions() -> Response:
                         zip_file.write(file_info['file_path'], file_info['archive_path'])
                     except Exception as e:
                         current_app.logger.error(f"Ошибка добавления файла {file_info['file_path']} в архив: {e}")
-            
+
             # Добавляем README файл с информацией
             readme_content = f"""Архив решений пользователя {current_user.username}
 Дата создания: {datetime.now().strftime('%d.%m.%Y %H:%M')}
@@ -1396,9 +1536,9 @@ def export_user_solutions() -> Response:
                 readme_content += f"\n{subject.title} (папка: {folder_name}):\n"
                 for file_info in subject_data['files']:
                     readme_content += f"  - {file_info['material_title']} ({os.path.basename(file_info['archive_path'])})\n"
-            
+
             zip_file.writestr("README.txt", readme_content.encode('utf-8'))
-        
+
         # Отправляем файл пользователю
         def remove_file(response):
             try:
@@ -1406,31 +1546,31 @@ def export_user_solutions() -> Response:
             except Exception:
                 pass
             return response
-        
+
         # Создаем уникальное имя файла с временной меткой
         timestamp = datetime.now().strftime('%d.%m.%Y %H-%M')
         filename = f"{current_user.username}-{timestamp}.zip"
-        
+
         response = send_file(
             temp_zip.name,
             as_attachment=True,
             download_name=filename,
             mimetype='application/zip'
         )
-        
-        # Добавляем заголовки для принудительного скачивания с новым именем  
+
+        # Добавляем заголовки для принудительного скачивания с новым именем
         from urllib.parse import quote
         encoded_filename = quote(filename)
         response.headers['Content-Disposition'] = f'attachment; filename="{filename}"; filename*=UTF-8\'\'{encoded_filename}'
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
-        
+
         # Очищаем временный файл после отправки
         response.call_on_close(lambda: os.unlink(temp_zip.name) if os.path.exists(temp_zip.name) else None)
-        
+
         return response
-        
+
     except Exception as e:
         current_app.logger.error(f"Ошибка создания архива решений для пользователя {current_user.id}: {e}")
         flash("Ошибка при создании архива решений", "error")
