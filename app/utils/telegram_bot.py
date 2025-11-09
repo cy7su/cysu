@@ -22,9 +22,17 @@ from werkzeug.security import generate_password_hash
 from app import create_app, db
 from app.models import TelegramUser, User
 
+import os
+log_dir = '/root/logs'
+os.makedirs(log_dir, exist_ok=True)
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO,
+    handlers=[
+        logging.FileHandler(os.path.join(log_dir, 'telegram_bot.log'), encoding='utf-8'),
+        logging.StreamHandler()
+    ]
 )
 logger = logging.getLogger(__name__)
 

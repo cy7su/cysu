@@ -147,7 +147,7 @@ def create_app():
         "SUBSCRIPTION_CURRENCY", "RUB"
     )
 
-    app.config["LOG_FILE"] = os.getenv("LOG_FILE", "logs/app.log")
+    app.config["LOG_FILE"] = os.getenv("LOG_FILE", "/root/logs/cysu.log")
     app.config["LOG_LEVEL"] = os.getenv("LOG_LEVEL", "INFO")
 
     log_dir = os.path.dirname(app.config["LOG_FILE"])
@@ -286,14 +286,14 @@ def create_app():
             from datetime import datetime
             temp_access = session.get("temp_access")
             has_temp_access = False
-            
+
             if temp_access:
                 try:
                     expiry = datetime.fromisoformat(temp_access)
                     has_temp_access = datetime.utcnow() < expiry
                 except:
                     pass
-            
+
             return dict(has_temp_access=has_temp_access)
         except Exception as e:
             app.logger.error(f"Error in inject_temp_access: {e}")
@@ -344,7 +344,7 @@ def create_app():
                 else:
                     from datetime import datetime, timedelta
                     temp_access = session.get("temp_access")
-                    
+
                     if temp_access:
                         try:
                             expiry = datetime.fromisoformat(temp_access)
