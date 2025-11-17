@@ -1,0 +1,468 @@
+{% extends "base.html" %}
+{% from 'macros/breadcrumbs.html' import admin_breadcrumb %}
+
+{% block title %}Настройки сайта - cysu{% endblock %}
+
+{% block breadcrumbs %}
+{{ admin_breadcrumb("Настройки") }}
+{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+  <div class="admin-content">
+    <div class="admin-layout">
+      <!-- Основной контент -->
+      <div class="admin-main" style="grid-column: 1 / -1; max-width: 600px; margin: 0 auto; padding: 0 1rem;">
+        <div class="admin-card">
+          <div class="admin-card-header"
+            style="background: linear-gradient(135deg, var(--dp-02) 0%, var(--dp-03) 100%); border-bottom: 1px solid var(--dp-12); text-align: center; padding: 1rem;">
+            <h3 class="admin-card-title"
+              style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem; margin: 0;">
+              <i class="fas fa-cogs" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+              Настройки
+            </h3>
+          </div>
+          <div class="admin-card-body" style="padding: 1rem;">
+            <form method="POST" class="admin-form">
+              {{ form.csrf_token }}
+
+              <div class="form-group">
+                <div class="admin-switch-item">
+                  {{ form.maintenance_mode(class="admin-switch", id="maintenance_mode") }}
+                  <label class="admin-switch-label" for="maintenance_mode">
+                    <div class="admin-switch-content">
+                      <strong>{{ form.maintenance_mode.label }}</strong>
+                      <div class="admin-switch-description">
+                        <i class="fas fa-info-circle"></i>
+                        При включении все пользователи (кроме администраторов) будут видеть страницу технических работ
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="admin-switch-item">
+                  {{ form.trial_subscription_enabled(class="admin-switch", id="trial_subscription_enabled") }}
+                  <label class="admin-switch-label" for="trial_subscription_enabled">
+                    <div class="admin-switch-content">
+                      <strong>{{ form.trial_subscription_enabled.label }}</strong>
+                      <div class="admin-switch-description">
+                        <i class="fas fa-info-circle"></i>
+                        При включении новые пользователи автоматически получат пробную подписку
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group" id="trial-days-group">
+                <label for="{{ form.trial_subscription_days.id }}" class="form-label">
+                  <i class="fas fa-calendar-alt"></i>
+                  {{ form.trial_subscription_days.label }}
+                </label>
+                {{ form.trial_subscription_days(class="form-control admin-input", id="trial_subscription_days", min="1",
+                max="365") }}
+                <div class="form-help">
+                  <i class="fas fa-info-circle"></i>
+                  Укажите количество дней для пробной подписки (от 1 до 365 дней)
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="admin-switch-item">
+                  {{ form.pattern_generation_enabled(class="admin-switch", id="pattern_generation_enabled") }}
+                  <label class="admin-switch-label" for="pattern_generation_enabled">
+                    <div class="admin-switch-content">
+                      <strong>{{ form.pattern_generation_enabled.label }}</strong>
+                      <div class="admin-switch-description">
+                        <i class="fas fa-info-circle"></i>
+                        При включении администраторы смогут генерировать новые паттерны для карточек предметов
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="admin-switch-item">
+                  {{ form.support_enabled(class="admin-switch", id="support_enabled") }}
+                  <label class="admin-switch-label" for="support_enabled">
+                    <div class="admin-switch-content">
+                      <strong>{{ form.support_enabled.label }}</strong>
+                      <div class="admin-switch-description">
+                        <i class="fas fa-info-circle"></i>
+                        При выключении система тикетов будет полностью скрыта (включая навигацию и футер)
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="admin-switch-item">
+                  {{ form.telegram_only_registration(class="admin-switch", id="telegram_only_registration") }}
+                  <label class="admin-switch-label" for="telegram_only_registration">
+                    <div class="admin-switch-content">
+                      <strong>{{ form.telegram_only_registration.label }}</strong>
+                      <div class="admin-switch-description">
+                        <i class="fas fa-info-circle"></i>
+                        При включении обычная регистрация будет заблокирована, доступна только регистрация через
+                        Telegram
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary admin-btn-primary">
+                  <i class="fas fa-save"></i>
+                  Сохранить настройки
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block head %}
+<style>
+  /* Стили для переключателей */
+  .admin-switch-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--dp-03);
+    border: 1px solid var(--dp-12);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-switch-item:hover {
+    background: var(--dp-02);
+    border-color: var(--primary-color);
+  }
+
+  .admin-switch {
+    width: 40px;
+    height: 20px;
+    background: var(--dp-01);
+    border: 1px solid var(--dp-12);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    outline: none;
+    flex-shrink: 0;
+  }
+
+  .admin-switch:checked {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .admin-switch::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .admin-switch:checked::before {
+    transform: translateX(20px);
+    background: white;
+  }
+
+  .admin-switch-label {
+    cursor: pointer;
+    flex: 1;
+  }
+
+  .admin-switch-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+  }
+
+  .admin-switch-content strong {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .admin-switch-description {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .admin-switch-description i {
+    color: var(--primary-color);
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+    font-size: 0.7rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group label i {
+    color: var(--primary-color);
+    font-size: 0.8rem;
+  }
+
+  .form-control {
+    background: var(--dp-02);
+    border: 1px solid var(--dp-12);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.2s ease;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(181, 149, 255, 0.2);
+    background: var(--dp-03);
+  }
+
+  .form-help {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .form-help i {
+    color: var(--primary-color);
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+    font-size: 0.7rem;
+  }
+
+  .form-actions {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--dp-12);
+    display: flex;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+  }
+
+  /* Мобильная оптимизация */
+  @media (max-width: 768px) {
+    .admin-page {
+      padding: 0.25rem;
+    }
+
+    .admin-card {
+      margin: 0;
+      border-radius: 6px;
+    }
+
+    .admin-card-header {
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .admin-card-title {
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    .admin-card-body {
+      padding: 0.75rem !important;
+    }
+
+    .admin-switch-item {
+      padding: 0.5rem;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .admin-switch {
+      width: 36px;
+      height: 18px;
+    }
+
+    .admin-switch::before {
+      width: 14px;
+      height: 14px;
+    }
+
+    .admin-switch:checked::before {
+      transform: translateX(18px);
+    }
+
+    .admin-switch-content strong {
+      font-size: 0.85rem;
+    }
+
+    .admin-switch-description {
+      font-size: 0.75rem;
+      gap: 0.4rem;
+    }
+
+    .form-group {
+      margin-bottom: 0.75rem;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+    }
+
+    .form-control {
+      font-size: 0.85rem;
+      padding: 0.4rem 0.6rem;
+    }
+
+    .form-help {
+      font-size: 0.7rem;
+    }
+
+    .btn-primary {
+      font-size: 0.85rem;
+      padding: 0.4rem 1.25rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .admin-page {
+      padding: 0.125rem;
+    }
+
+    .admin-card-header {
+      padding: 0.5rem;
+    }
+
+    .admin-card-title {
+      font-size: 0.9rem;
+    }
+
+    .admin-card-body {
+      padding: 0.5rem !important;
+    }
+
+    .admin-switch-item {
+      padding: 0.4rem;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .admin-switch {
+      width: 32px;
+      height: 16px;
+    }
+
+    .admin-switch::before {
+      width: 12px;
+      height: 12px;
+    }
+
+    .admin-switch:checked::before {
+      transform: translateX(16px);
+    }
+
+    .admin-switch-content strong {
+      font-size: 0.8rem;
+    }
+
+    .admin-switch-description {
+      font-size: 0.7rem;
+    }
+
+    .form-group {
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+    }
+
+    .form-control {
+      font-size: 0.8rem;
+      padding: 0.35rem 0.5rem;
+    }
+
+    .form-help {
+      font-size: 0.65rem;
+    }
+
+    .btn-primary {
+      font-size: 0.8rem;
+      padding: 0.35rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const trialEnabledSwitch = document.getElementById('trial_subscription_enabled');
+    const trialDaysGroup = document.getElementById('trial-days-group');
+
+    function toggleTrialDaysField() {
+      if (trialEnabledSwitch.checked) {
+        trialDaysGroup.style.display = 'block';
+      } else {
+        trialDaysGroup.style.display = 'none';
+      }
+    }
+
+    // Инициализируем состояние при загрузке
+    toggleTrialDaysField();
+
+    // Обрабатываем изменения переключателя
+    trialEnabledSwitch.addEventListener('change', toggleTrialDaysField);
+  });
+</script>
+{% endblock %}

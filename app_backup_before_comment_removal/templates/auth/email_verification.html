@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Двухфакторная аутентификация{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7 col-12">
+            <div class="verification-card">
+                <div class="verification-header">
+                    <div class="verification-logo" style="background: none; border-radius: 0;">
+                        <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Логотип сайта" style="width: 48px; height: 48px;">
+                    </div>
+                    <h1 class="verification-title">Двухфакторная аутентификация</h1>
+                </div>
+
+                <div class="verification-content">
+                    <p class="verification-text">На адрес <span class="email-masked">{{ user_email | mask_email }}</span> было отправлено электронное письмо с одноразовым кодом.</p>
+                    <p class="verification-text">Пожалуйста, введите этот код, чтобы продолжить.</p>
+                    <p class="verification-text">Проверяйте папки "Спам" и "Корзина".</p>
+                </div>
+
+                <form method="POST" class="verification-form">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="code-input-container">
+                        <label class="code-label">Код подтверждения из письма:</label>
+                        <div class="code-inputs">
+                            <input type="text" class="code-input" maxlength="1" data-index="0" autocomplete="off">
+                            <input type="text" class="code-input" maxlength="1" data-index="1" autocomplete="off">
+                            <input type="text" class="code-input" maxlength="1" data-index="2" autocomplete="off">
+                            <input type="text" class="code-input" maxlength="1" data-index="3" autocomplete="off">
+                            <input type="text" class="code-input" maxlength="1" data-index="4" autocomplete="off">
+                            <input type="text" class="code-input" maxlength="1" data-index="5" autocomplete="off">
+                        </div>
+                        {% if form.code.errors %}
+                            <div class="code-error-message">
+                                {% for error in form.code.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {{ form.code(id="full-code", type="hidden") }}
+
+                    <button type="submit" class="verification-submit">
+                        Подтвердить
+                    </button>
+                </form>
+
+                <div class="verification-footer">
+                    <p class="resend-text">Не получили код? <a href="{{ url_for('auth.resend_verification') }}" class="resend-link">Отправить заново</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const codeInputs = document.querySelectorAll('.code-input');
+    const hiddenInput = document.getElementById('full-code');
+    const errorMessage = document.querySelector('.code-error-message');
+    
+    // Функция для очистки всех полей
+    function clearAllInputs() {
+        codeInputs.forEach(input => {
+            input.value = '';
+            input.classList.remove('error');
+        });
+        hiddenInput.value = '';
+        if (errorMessage) {
+            errorMessage.style.display = 'none';
+        }
+        codeInputs[0].focus();
+    }
+    
+    // Функция для показа ошибки
+    function showError() {
+        codeInputs.forEach(input => {
+            input.classList.add('error');
+        });
+        if (errorMessage) {
+            errorMessage.style.display = 'block';
+        }
+    }
+    
+    // Проверяем, есть ли ошибки при загрузке страницы
+    if (errorMessage && errorMessage.textContent.trim()) {
+        showError();
+        // Очищаем поля при ошибке, но оставляем сообщение об ошибке
+        codeInputs.forEach(input => {
+            input.value = '';
+            input.classList.add('error');
+        });
+        hiddenInput.value = '';
+        codeInputs[0].focus();
+    }
+    
+    // Функция для обновления скрытого поля формы
+    function updateFormCode() {
+        let fullCode = '';
+        codeInputs.forEach(input => {
+            fullCode += input.value || '';
+        });
+        hiddenInput.value = fullCode;
+        
+        // Если код полностью введен (6 цифр), автоматически отправляем форму
+        if (fullCode.length === 6) {
+            setTimeout(() => {
+                document.querySelector('.verification-form').submit();
+            }, 300); // Небольшая задержка для лучшего UX
+        }
+    }
+    
+    // Функция для перехода к следующему полю
+    function moveToNext(currentIndex) {
+        if (currentIndex < codeInputs.length - 1) {
+            codeInputs[currentIndex + 1].focus();
+        }
+    }
+    
+    // Функция для перехода к предыдущему полю
+    function moveToPrevious(currentIndex) {
+        if (currentIndex > 0) {
+            codeInputs[currentIndex - 1].focus();
+        }
+    }
+    
+    // Обработчики для каждого поля
+    codeInputs.forEach((input, index) => {
+        // Обработчик ввода
+        input.addEventListener('input', function(e) {
+            // Убираем ошибку при вводе
+            input.classList.remove('error');
+            if (errorMessage) {
+                errorMessage.style.display = 'none';
+            }
+            
+            // Разрешаем только цифры
+            const value = e.target.value.replace(/[^0-9]/g, '');
+            e.target.value = value;
+            
+            updateFormCode();
+            
+            // Если введена цифра, переходим к следующему полю
+            if (value) {
+                moveToNext(index);
+            }
+        });
+        
+        // Обработчик клавиш
+        input.addEventListener('keydown', function(e) {
+            // Backspace - удаляем и переходим к предыдущему полю
+            if (e.key === 'Backspace' && !e.target.value) {
+                moveToPrevious(index);
+            }
+            // Стрелки
+            else if (e.key === 'ArrowLeft') {
+                moveToPrevious(index);
+            }
+            else if (e.key === 'ArrowRight') {
+                moveToNext(index);
+            }
+            // Разрешаем только цифры, backspace, delete, стрелки, tab
+            else if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+        
+        // Обработчик вставки
+        input.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+            
+            // Заполняем поля начиная с текущего
+            for (let i = 0; i < pastedData.length && (index + i) < codeInputs.length; i++) {
+                codeInputs[index + i].value = pastedData[i];
+            }
+            
+            updateFormCode();
+            
+            // Фокус на последнее заполненное поле
+            const lastFilledIndex = Math.min(index + pastedData.length - 1, codeInputs.length - 1);
+            codeInputs[lastFilledIndex].focus();
+        });
+    });
+    
+    // Фокус на первое поле при загрузке
+    codeInputs[0].focus();
+});
+</script>
+{% endblock %} 

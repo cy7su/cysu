@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from typing import Tuple, Union
-
 from flask import (
     Blueprint,
     Response,
@@ -13,11 +12,11 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
-
 from .. import db
 from ..forms import PaymentStatusForm
 from ..models import Payment, User
 from ..utils.payment_service import YooKassaService
+from ..services import PaymentService
 
 payment_bp = Blueprint("payment", __name__)
 
@@ -31,32 +30,25 @@ def subscription() -> Union[str, Response]:
     current_app.logger.info(f"Все параметры запроса: {dict(request.args)}")
     current_app.logger.info(f"URL запроса: {request.url}")
     current_app.logger.info(f"Метод запроса: {request.method}")
-
     try:
         prices = current_app.config["SUBSCRIPTION_PRICES"]
     except Exception as e:
         current_app.logger.error(f"Error getting subscription prices: {e}")
         prices = {}
         flash("Ошибка загрузки цен подписки.", "error")
-
     period = request.args.get("period")
     amount = request.args.get("amount")
-
     if period and amount:
         try:
             current_app.logger.info(
                 f"Создание платежа - period: {period}, amount: {amount}"
             )
-
             payment_service = YooKassaService()
             current_app.logger.info("Сервис платежей создан")
-
             return_url = url_for("payment.payment_success", _external=True)
             current_app.logger.info(f"Return URL: {return_url}")
-
             return_url += "?source=yookassa"
             current_app.logger.info(f"Return URL с параметром: {return_url}")
-
             current_app.logger.info(
                 f"Передаем цену в payment_service: {amount} (тип: {type(amount)})"
             )
@@ -66,7 +58,6 @@ def subscription() -> Union[str, Response]:
             current_app.logger.info(
                 f"Платеж создан: {payment_info['payment_id']} с суммой: {payment_info.get('amount')}"
             )
-
             if payment_info.get("payment_url"):
                 current_app.logger.info(
                     f"Перенаправление на страницу оплаты: {payment_info['payment_url']}"
@@ -81,7 +72,6 @@ def subscription() -> Union[str, Response]:
                     payment_id=None,
                     prices=prices,
                 )
-
         except Exception as e:
             current_app.logger.error(f"Ошибка при создании платежа: {str(e)}")
             import traceback
@@ -94,7 +84,6 @@ def subscription() -> Union[str, Response]:
             return render_template(
                 "payment/subscription.html", payment_url=None, prices=prices
             )
-
     current_app.logger.info("Показываем страницу выбора подписки")
     return render_template(
         "payment/subscription.html",
@@ -109,85 +98,31 @@ def payment_webhook() -> Tuple[str, int]:
     try:
         data = request.get_json()
         current_app.logger.info(f"Получен webhook от ЮKassa: {data}")
-
         if not data:
             current_app.logger.error("Пустые данные в webhook")
             return "OK", 200
-
         event = data.get("event")
         payment_data = data.get("object", {})
         payment_id = payment_data.get("id")
-
         if not payment_id:
             current_app.logger.error("Payment ID не найден в webhook")
             return "OK", 200
-
         current_app.logger.info(
             f"Обработка webhook: event={event}, payment_id={payment_id}"
         )
-
-        payment_record = Payment.query.filter_by(
-            yookassa_payment_id=payment_id
-        ).first()
-
-        if not payment_record:
+        success = PaymentService.process_payment_webhook(event, payment_data)
+        if success:
+            current_app.logger.info(
+                f"Webhook обработан успешно: payment_id={payment_id}"
+            )
+        else:
             current_app.logger.error(
-                f"Платеж {payment_id} не найден в базе данных"
+                f"Ошибка обработки webhook: payment_id={payment_id}"
             )
-            return "OK", 200
-
-        payment_record.status = payment_data.get("status", "pending")
-        payment_record.updated_at = datetime.utcnow()
-
-        if payment_data.get("status") == "succeeded" and payment_data.get(
-            "paid", False
-        ):
-            current_app.logger.info(
-                f"Платеж {payment_id} успешен, активируем подписку"
-            )
-
-            user = User.query.get(payment_record.user_id)
-            if user:
-                user.is_subscribed = True
-
-                payment_service = YooKassaService()
-                subscription_days = payment_service._get_subscription_days(
-                    payment_record.amount
-                )
-                user.subscription_expires = datetime.utcnow() + timedelta(
-                    days=subscription_days
-                )
-
-                current_app.logger.info(
-                    f"Подписка активирована для пользователя {user.username} на {subscription_days} дней"
-                )
-
-        elif payment_data.get("status") == "canceled":
-            current_app.logger.info(
-                f"Платеж {payment_id} отменен, сбрасываем подписку"
-            )
-
-            user = User.query.get(payment_record.user_id)
-            if user:
-                user.is_subscribed = False
-                user.subscription_expires = None
-                current_app.logger.info(
-                    f"Подписка сброшена для пользователя {user.username}"
-                )
-
-        db.session.commit()
-        current_app.logger.info(
-            f"Webhook обработан успешно: payment_id={payment_id}, status={payment_data.get('status')}"
-        )
-
         return "OK", 200
-
     except Exception as e:
         current_app.logger.error(f"Ошибка обработки webhook: {str(e)}")
-        return (
-            "OK",
-            200,
-        )  # Всегда возвращаем 200, чтобы ЮKassa не повторял запрос
+        return "OK", 200
 
 
 @payment_bp.route("/payment/success")
@@ -196,28 +131,18 @@ def payment_success() -> Union[str, Response]:
     current_app.logger.info("=== ВХОД В PAYMENT_SUCCESS ===")
     current_app.logger.info(f"Все параметры запроса: {dict(request.args)}")
     current_app.logger.info(f"Полный URL: {request.url}")
-
     payment_id = request.args.get("payment_id")
     source = request.args.get("source")
-
-    current_app.logger.info(
-        f"Обработка платежа: {payment_id}, источник: {source}"
-    )
+    current_app.logger.info(f"Обработка платежа: {payment_id}, источник: {source}")
     current_app.logger.info(f"Пользователь: {current_user.username}")
-
     if source == "yookassa":
         current_app.logger.info(
             "Обнаружен возврат от ЮKassa - проверяем статус платежа"
         )
-
         payment_service = YooKassaService()
-
         if payment_id:
             payment_status = payment_service.get_payment_status(payment_id)
-            current_app.logger.info(
-                f"Статус платежа от ЮKassa: {payment_status}"
-            )
-
+            current_app.logger.info(f"Статус платежа от ЮKassa: {payment_status}")
             if payment_status.get("status") == "canceled":
                 current_app.logger.info(
                     "Платеж отменен - перенаправляем на страницу отмены"
@@ -225,7 +150,6 @@ def payment_success() -> Union[str, Response]:
                 return redirect(
                     url_for("payment.payment_cancel", payment_id=payment_id)
                 )
-
             elif payment_status.get("status") == "pending":
                 current_app.logger.info(
                     "Платеж в обработке - показываем страницу ожидания"
@@ -235,15 +159,9 @@ def payment_success() -> Union[str, Response]:
                     "info",
                 )
                 return render_template("payment/pending.html")
-
     if request.args.get("cancel") == "true":
-        current_app.logger.info(
-            "Обнаружена отмена платежа через параметр cancel"
-        )
-        return redirect(
-            url_for("payment.payment_cancel", payment_id=payment_id)
-        )
-
+        current_app.logger.info("Обнаружена отмена платежа через параметр cancel")
+        return redirect(url_for("payment.payment_cancel", payment_id=payment_id))
     if not payment_id:
         current_app.logger.info(
             "Payment ID не найден в параметрах, ищем последний платеж пользователя"
@@ -254,17 +172,12 @@ def payment_success() -> Union[str, Response]:
                 .order_by(Payment.created_at.desc())
                 .first()
             )
-
             if payment_record:
                 payment_id = payment_record.yookassa_payment_id
-                current_app.logger.info(
-                    f"Найден последний платеж: {payment_id}"
-                )
+                current_app.logger.info(f"Найден последний платеж: {payment_id}")
             else:
                 current_app.logger.error("Платежи пользователя не найдены")
-                current_app.logger.info(
-                    "Попытка найти платеж по email пользователя"
-                )
+                current_app.logger.info("Попытка найти платеж по email пользователя")
                 flash(
                     "Платеж не найден. Попробуйте оформить подписку снова.",
                     "warning",
@@ -277,15 +190,12 @@ def payment_success() -> Union[str, Response]:
                 "error",
             )
             return redirect(url_for("payment.subscription"))
-
     payment_service = YooKassaService()
     current_app.logger.info("Обработка платежа")
-
     try:
         payment_record = Payment.query.filter_by(
             yookassa_payment_id=payment_id, user_id=current_user.id
         ).first()
-
         if not payment_record:
             current_app.logger.error(
                 f"Платеж {payment_id} не найден для пользователя {current_user.id}"
@@ -293,7 +203,6 @@ def payment_success() -> Union[str, Response]:
             payment_record = Payment.query.filter_by(
                 yookassa_payment_id=payment_id
             ).first()
-
             if payment_record:
                 current_app.logger.warning(
                     f"Платеж найден, но принадлежит другому пользователю: {payment_record.user_id}"
@@ -301,31 +210,21 @@ def payment_success() -> Union[str, Response]:
                 flash("Платеж не принадлежит вам.", "error")
                 return redirect(url_for("main.index"))
             else:
-                current_app.logger.error(
-                    f"Платеж {payment_id} не найден в базе данных"
-                )
+                current_app.logger.error(f"Платеж {payment_id} не найден в базе данных")
                 flash(
                     "Платеж не найден. Попробуйте оформить подписку снова.",
                     "warning",
                 )
                 return redirect(url_for("payment.subscription"))
     except Exception as e:
-        current_app.logger.error(
-            f"Error searching for payment {payment_id}: {e}"
-        )
+        current_app.logger.error(f"Error searching for payment {payment_id}: {e}")
         flash("Ошибка поиска платежа. Попробуйте позже.", "error")
         return redirect(url_for("main.index"))
-
     current_app.logger.info(f"Платеж найден: {payment_record.status}")
-
     payment_status = payment_service.get_payment_status(payment_id)
     current_app.logger.info(f"Статус платежа от ЮKassa: {payment_status}")
-
     if "error" in payment_status:
-        current_app.logger.error(
-            f"Ошибка получения статуса: {payment_status['error']}"
-        )
-
+        current_app.logger.error(f"Ошибка получения статуса: {payment_status['error']}")
         if payment_service.simulation_mode or "HTTP 401" in str(
             payment_status["error"]
         ):
@@ -370,12 +269,8 @@ def payment_success() -> Union[str, Response]:
             "info",
         )
     elif payment_status.get("status") == "canceled":
-        current_app.logger.info(
-            "Платеж отменен - перенаправляем на страницу отмены"
-        )
-        return redirect(
-            url_for("payment.payment_cancel", payment_id=payment_id)
-        )
+        current_app.logger.info("Платеж отменен - перенаправляем на страницу отмены")
+        return redirect(url_for("payment.payment_cancel", payment_id=payment_id))
     elif payment_status.get("status") == "waiting_for_capture":
         current_app.logger.info("Платеж ожидает подтверждения")
         flash(
@@ -390,7 +285,6 @@ def payment_success() -> Union[str, Response]:
             f"Статус платежа: {payment_status.get('status', 'неизвестен')}. Обратитесь в поддержку.",
             "error",
         )
-
     return render_template("payment/success.html")
 
 
@@ -398,40 +292,18 @@ def payment_success() -> Union[str, Response]:
 @login_required
 def payment_cancel() -> str:
     payment_id = request.args.get("payment_id")
-
     current_app.logger.info(
         f"Отмена платежа: payment_id={payment_id}, пользователь={current_user.username}"
     )
-
     if payment_id:
-        try:
-            payment_record = Payment.query.filter_by(
-                yookassa_payment_id=payment_id
-            ).first()
-            if payment_record:
-                payment_record.status = "canceled"
-                payment_record.updated_at = datetime.utcnow()
-                db.session.commit()
-                current_app.logger.info(
-                    f"Статус платежа {payment_id} обновлен на 'canceled'"
-                )
-            else:
-                current_app.logger.warning(
-                    f"Платеж {payment_id} не найден в базе данных"
-                )
-        except Exception as e:
-            current_app.logger.error(
-                f"Ошибка при обновлении статуса платежа: {e}"
-            )
-
-        flash(
-            "Платеж был отменен. Попробуйте оформить подписку снова.",
-            "warning",
-        )
+        success, message = PaymentService.cancel_payment(payment_id, current_user)
+        if success:
+            flash(message, "warning")
+        else:
+            flash(message, "error")
     else:
         current_app.logger.info("Отмена платежа без payment_id")
         flash("Информация о платеже не найдена.", "error")
-
     return render_template("payment/cancel.html")
 
 
@@ -439,23 +311,18 @@ def payment_cancel() -> str:
 @login_required
 def payment_status() -> str:
     form = PaymentStatusForm()
-
     if form.validate_on_submit():
         payment_id = form.payment_id.data
         try:
             payment_service = YooKassaService()
             status = payment_service.get_payment_status(payment_id)
-
             if "error" in status:
-                flash(
-                    f"Ошибка при получении статуса: {status['error']}", "error"
-                )
+                flash(f"Ошибка при получении статуса: {status['error']}", "error")
             else:
                 flash(f"Статус платежа: {status['status']}", "info")
         except Exception as e:
             current_app.logger.error(f"Error checking payment status: {e}")
             flash("Ошибка при проверке статуса платежа.", "error")
-
     return render_template("payment/payment_status.html", form=form)
 
 

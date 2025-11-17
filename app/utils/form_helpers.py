@@ -1,6 +1,5 @@
 import logging
 from typing import Optional, Union
-
 from flask import flash, redirect, request, url_for
 from flask_login import current_user
 from sqlalchemy.exc import SQLAlchemyError
@@ -33,7 +32,6 @@ def handle_form_submission(
         except Exception as e:
             logger.error(f"Unexpected error in form submission: {e}")
             flash("Произошла неожиданная ошибка", "error")
-
     return None
 
 
@@ -41,17 +39,13 @@ def validate_user_permissions(required_admin: bool = False) -> bool:
     if not current_user.is_authenticated:
         flash("Необходима авторизация", "error")
         return False
-
     if required_admin and not current_user.is_admin:
         flash("Недостаточно прав", "error")
         return False
-
     return True
 
 
-def safe_int_conversion(
-    value: str, field_name: str = "field"
-) -> Optional[int]:
+def safe_int_conversion(value: str, field_name: str = "field") -> Optional[int]:
     try:
         return int(value)
     except (ValueError, TypeError):
@@ -60,18 +54,12 @@ def safe_int_conversion(
         return None
 
 
-def log_form_action(
-    action: str, user_id: Optional[int] = None, **kwargs
-) -> None:
-    user_id = user_id or (
-        current_user.id if current_user.is_authenticated else None
-    )
+def log_form_action(action: str, user_id: Optional[int] = None, **kwargs) -> None:
+    user_id = user_id or (current_user.id if current_user.is_authenticated else None)
     logger.info(f"Form action: {action}, user_id: {user_id}, params: {kwargs}")
 
 
-def handle_database_operation(
-    operation_func, success_message: str, error_message: str
-):
+def handle_database_operation(operation_func, success_message: str, error_message: str):
     try:
         operation_func()
         flash(success_message, "success")

@@ -1,8 +1,6 @@
 import secrets
 from datetime import datetime, timedelta
-
 from flask_login import UserMixin
-
 from . import db
 
 
@@ -12,7 +10,6 @@ class Group(db.Model):
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
-
     users = db.relationship("User", backref="group", lazy=True)
     subjects = db.relationship(
         "SubjectGroup",
@@ -27,12 +24,9 @@ class Group(db.Model):
 
 class SubjectGroup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    subject_id = db.Column(
-        db.Integer, db.ForeignKey("subject.id"), nullable=False
-    )
+    subject_id = db.Column(db.Integer, db.ForeignKey("subject.id"), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey("group.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
     __table_args__ = (db.UniqueConstraint("subject_id", "group_id"),)
 
     def __repr__(self) -> str:
@@ -46,27 +40,15 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     is_moderator = db.Column(db.Boolean, default=False)
-    admin_mode_enabled = db.Column(
-        db.Boolean, default=False
-    )  # Для админов переключения
+    admin_mode_enabled = db.Column(db.Boolean, default=False)
     is_subscribed = db.Column(db.Boolean, default=False)
     subscription_expires = db.Column(db.DateTime)
-    is_manual_subscription = db.Column(
-        db.Boolean, default=False
-    )  # Подписка выдана вручную администратором
-    is_trial_subscription = db.Column(
-        db.Boolean, default=False
-    )  # Пробная подписка на 14 дней
-    trial_subscription_expires = db.Column(
-        db.DateTime
-    )  # Дата окончания пробной подписки
-    is_verified = db.Column(db.Boolean, default=False)  # Подтверждение email
-    group_id = db.Column(
-        db.Integer, db.ForeignKey("group.id"), nullable=True
-    )  # Новая связь с группой
-    created_at = db.Column(
-        db.DateTime, default=datetime.utcnow
-    )  # Дата создания аккаунта
+    is_manual_subscription = db.Column(db.Boolean, default=False)
+    is_trial_subscription = db.Column(db.Boolean, default=False)
+    trial_subscription_expires = db.Column(db.DateTime)
+    is_verified = db.Column(db.Boolean, default=False)
+    group_id = db.Column(db.Integer, db.ForeignKey("group.id"), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     submissions = db.relationship(
         "Submission", backref="user", lazy=True, cascade="all, delete-orphan"
     )
@@ -134,9 +116,7 @@ class User(UserMixin, db.Model):
     def get_role_display(self):
         if self.is_admin:
             return "Администратор" + (
-                " (Админ режим)"
-                if self.admin_mode_enabled
-                else " (Пользователь режим)"
+                " (Админ режим)" if self.admin_mode_enabled else " (Пользователь режим)"
             )
         elif self.is_moderator:
             return "Модератор"
@@ -146,22 +126,15 @@ class User(UserMixin, db.Model):
 
 class EmailVerification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=True
-    )  # Может быть NULL для временных кодов
-    email = db.Column(
-        db.String(120), nullable=True
-    )  # Email для временных кодов
-    code = db.Column(db.String(6), nullable=False)  # 6-значный код
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    email = db.Column(db.String(120), nullable=True)
+    code = db.Column(db.String(6), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime, nullable=False)
     is_used = db.Column(db.Boolean, default=False)
-
     user = db.relationship(
         "User",
-        backref=db.backref(
-            "email_verifications", cascade="all, delete-orphan"
-        ),
+        backref=db.backref("email_verifications", cascade="all, delete-orphan"),
     )
 
     def __repr__(self) -> str:
@@ -172,7 +145,6 @@ class EmailVerification(db.Model):
         import logging
 
         logger = logging.getLogger(__name__)
-
         code = "".join(secrets.choice("0123456789") for _ in range(6))
         logger.info(
             f"Generated verification code: '{code}' (type: {type(code)}, length: {len(code)})"
@@ -188,16 +160,13 @@ class EmailVerification(db.Model):
     ) -> "EmailVerification":
         code = cls.generate_code()
         expires_at = datetime.utcnow() + timedelta(minutes=expires_in_minutes)
-
-        return cls(
-            user_id=user_id, email=email, code=code, expires_at=expires_at
-        )
+        return cls(user_id=user_id, email=email, code=code, expires_at=expires_at)
 
 
 class PasswordReset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), nullable=False)  # Email пользователя
-    code = db.Column(db.String(8), nullable=False)  # 8-символьный код
+    email = db.Column(db.String(120), nullable=False)
+    code = db.Column(db.String(6), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime, nullable=False)
     is_used = db.Column(db.Boolean, default=False)
@@ -210,7 +179,6 @@ class PasswordReset(db.Model):
         import logging
 
         logger = logging.getLogger(__name__)
-
         code = "".join(secrets.choice("0123456789") for _ in range(6))
         logger.info(
             f"Generated password reset code: '{code}' (type: {type(code)}, length: {len(code)})"
@@ -218,12 +186,9 @@ class PasswordReset(db.Model):
         return code
 
     @classmethod
-    def create_reset(
-        cls, email: str, expires_in_minutes: int = 15
-    ) -> "PasswordReset":
+    def create_reset(cls, email: str, expires_in_minutes: int = 15) -> "PasswordReset":
         code = cls.generate_code()
         expires_at = datetime.utcnow() + timedelta(minutes=expires_in_minutes)
-
         return cls(email=email, code=code, expires_at=expires_at)
 
 
@@ -231,14 +196,12 @@ class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
-    pattern_type = db.Column(
-        db.String(50), default="dots"
-    )  # Тип SVG паттерна для фона
-    pattern_svg = db.Column(
-        db.Text
-    )  # Сгенерированный SVG паттерн (закрепляется за предметом)
+    pattern_type = db.Column(db.String(50), default="dots")
+    pattern_svg = db.Column(db.Text)
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
-    materials = db.relationship("Material", backref="subject", lazy=True, cascade="all, delete-orphan")
+    materials = db.relationship(
+        "Material", backref="subject", lazy=True, cascade="all, delete-orphan"
+    )
     groups = db.relationship(
         "SubjectGroup",
         backref="subject",
@@ -252,18 +215,14 @@ class Material(db.Model):
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
     file = db.Column(db.String(255))
-    type = db.Column(db.String(20))  # 'lecture' or 'assignment'
-    solution_file = db.Column(
-        db.String(255)
-    )  # Готовое задание (только для практик)
+    type = db.Column(db.String(20))
+    solution_file = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
-    subject_id = db.Column(
-        db.Integer, db.ForeignKey("subject.id"), nullable=False
-    )
+    subject_id = db.Column(db.Integer, db.ForeignKey("subject.id"), nullable=False)
     submissions = db.relationship(
         "Submission",
         backref="material",
@@ -275,9 +234,7 @@ class Material(db.Model):
 class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    material_id = db.Column(
-        db.Integer, db.ForeignKey("material.id"), nullable=False
-    )
+    material_id = db.Column(db.Integer, db.ForeignKey("material.id"), nullable=False)
     file = db.Column(db.String(255))
     text = db.Column(db.Text)
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -286,14 +243,10 @@ class Submission(db.Model):
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    yookassa_payment_id = db.Column(
-        db.String(255), unique=True, nullable=False
-    )
+    yookassa_payment_id = db.Column(db.String(255), unique=True, nullable=False)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
     currency = db.Column(db.String(3), default="RUB")
-    status = db.Column(
-        db.String(20), default="pending"
-    )  # pending, succeeded, canceled, failed
+    status = db.Column(db.String(20), default="pending")
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
@@ -308,18 +261,19 @@ class ChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    file_path = db.Column(db.String(255))  # Путь к загруженному файлу
-    file_name = db.Column(db.String(255))  # Оригинальное имя файла
-    file_type = db.Column(db.String(50))  # Тип файла (image, document, etc.)
+    file_path = db.Column(db.String(255))
+    file_name = db.Column(db.String(255))
+    file_type = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
     user = db.relationship(
         "User",
         backref=db.backref("chat_messages", cascade="all, delete-orphan"),
     )
 
     def __repr__(self) -> str:
-        return f'<ChatMessage {self.id}: {self.user.username if self.user else "Unknown"}>'
+        return (
+            f'<ChatMessage {self.id}: {self.user.username if self.user else "Unknown"}>'
+        )
 
 
 class Ticket(db.Model):
@@ -327,27 +281,19 @@ class Ticket(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     subject = db.Column(db.String(255), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    status = db.Column(
-        db.String(20), default="pending"
-    )  # pending, accepted, rejected, closed
+    status = db.Column(db.String(20), default="pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
-    admin_response = db.Column(db.Text)  # Ответ администратора
+    admin_response = db.Column(db.Text)
     admin_response_at = db.Column(db.DateTime)
-    admin_id = db.Column(
-        db.Integer, db.ForeignKey("user.id")
-    )  # ID администратора, который обработал тикет
-    user_response = db.Column(
-        db.Text
-    )  # Ответ пользователя на ответ администратора
-    user_response_at = db.Column(db.DateTime)  # Время ответа пользователя
-
+    admin_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_response = db.Column(db.Text)
+    user_response_at = db.Column(db.DateTime)
     files = db.relationship(
         "TicketFile", backref="ticket", lazy=True, cascade="all, delete-orphan"
     )
-
     admin = db.relationship(
         "User", foreign_keys=[admin_id], backref="administered_tickets"
     )
@@ -358,13 +304,11 @@ class Ticket(db.Model):
 
 class TicketFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    ticket_id = db.Column(
-        db.Integer, db.ForeignKey("ticket.id"), nullable=False
-    )
+    ticket_id = db.Column(db.Integer, db.ForeignKey("ticket.id"), nullable=False)
     file_path = db.Column(db.String(255), nullable=False)
     file_name = db.Column(db.String(255), nullable=False)
-    file_size = db.Column(db.Integer)  # Размер файла в байтах
-    file_type = db.Column(db.String(50))  # MIME тип файла
+    file_size = db.Column(db.Integer)
+    file_type = db.Column(db.String(50))
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self) -> str:
@@ -373,16 +317,11 @@ class TicketFile(db.Model):
 
 class TicketMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    ticket_id = db.Column(
-        db.Integer, db.ForeignKey("ticket.id"), nullable=False
-    )
+    ticket_id = db.Column(db.Integer, db.ForeignKey("ticket.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    is_admin = db.Column(
-        db.Boolean, default=False
-    )  # True если сообщение от администратора
+    is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
     ticket = db.relationship("Ticket", backref="messages")
     user = db.relationship("User", backref="ticket_messages")
 
@@ -395,12 +334,10 @@ class Notification(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     title = db.Column(db.String(255), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    type = db.Column(
-        db.String(20), default="info"
-    )  # info, success, warning, error
+    type = db.Column(db.String(20), default="info")
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    link = db.Column(db.String(255))  # Ссылка для перехода
+    link = db.Column(db.String(255))
 
     def __repr__(self) -> str:
         return f"<Notification {self.id}: {self.title}>"
@@ -410,9 +347,7 @@ class ShortLink(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(16), unique=True, nullable=False, index=True)
     original_url = db.Column(db.Text, nullable=False)
-    created_at = db.Column(
-        db.DateTime, default=datetime.utcnow, nullable=False
-    )
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     clicks = db.Column(db.Integer, default=0, nullable=False)
 
     def __repr__(self) -> str:
@@ -420,15 +355,11 @@ class ShortLink(db.Model):
 
     @staticmethod
     def generate_code(length: int = 3) -> str:
-        alphabet = (
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        )
+        alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return "".join(secrets.choice(alphabet) for _ in range(length))
 
     @classmethod
-    def create_unique(
-        cls, original_url: str, max_tries: int = 5
-    ) -> "ShortLink":
+    def create_unique(cls, original_url: str, max_tries: int = 5) -> "ShortLink":
         for _ in range(max_tries):
             code = cls.generate_code()
             if not cls.query.filter_by(code=code).first():
@@ -450,15 +381,10 @@ class ShortLinkRule(db.Model):
     )
     expires_at = db.Column(db.DateTime, nullable=True)
     max_clicks = db.Column(db.Integer, nullable=True)
-    created_at = db.Column(
-        db.DateTime, default=datetime.utcnow, nullable=False
-    )
-
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     short_link = db.relationship(
         "ShortLink",
-        backref=db.backref(
-            "rule", uselist=False, cascade="all, delete-orphan"
-        ),
+        backref=db.backref("rule", uselist=False, cascade="all, delete-orphan"),
     )
 
     def __repr__(self) -> str:
@@ -508,12 +434,9 @@ class TelegramUser(db.Model):
     last_name = db.Column(db.String(100), nullable=True)
     is_bot = db.Column(db.Boolean, default=False)
     language_code = db.Column(db.String(10), nullable=True)
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=True
-    )  # Связь с пользователем сайта
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_activity = db.Column(db.DateTime, default=datetime.utcnow)
-
     user = db.relationship("User", backref="telegram_account", uselist=False)
 
     def __repr__(self) -> str:

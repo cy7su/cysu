@@ -2,7 +2,6 @@ import secrets
 import string
 from datetime import datetime, timedelta
 from typing import Union
-
 from flask import (
     Blueprint,
     Response,
@@ -14,12 +13,10 @@ from flask import (
     request,
     url_for,
 )
-
 from ..utils.notifications import redirect_with_notification
 from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash
-
 from .. import db
 from ..forms import (
     AdminUserForm,
@@ -28,20 +25,13 @@ from ..forms import (
     SubjectGroupForm,
 )
 from ..models import (
-    ChatMessage,
-    EmailVerification,
     Group,
-    Notification,
-    Payment,
     SiteSettings,
     Subject,
     SubjectGroup,
-    Submission,
-    Ticket,
-    TicketMessage,
     User,
 )
-from ..utils.file_storage import FileStorageManager
+from ..services import UserService, UserManagementService
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -49,22 +39,18 @@ admin_bp = Blueprint("admin", __name__)
 @admin_bp.route("/admin/users", methods=["GET", "POST"])
 @login_required
 def admin_users():
-    if not current_user.is_effective_admin():
+    if not UserManagementService.is_effective_admin(current_user):
         return redirect_with_notification("main.index", "Доступ запрещён", "error")
-
     form = AdminUserForm()
     password_map = {}
     message = ""
-
     current_app.logger.info(f"Форма создана: {form}")
     current_app.logger.info(
         f"CSRF токен: {form.csrf_token.current_token if form.csrf_token else 'Нет токена'}"
     )
-
     current_app.logger.info(f"Метод запроса: {request.method}")
     current_app.logger.info(f"Данные формы: {request.form}")
     current_app.logger.info(f"Значение submit: {request.form.get('submit')}")
-
     if request.method == "POST":
         current_app.logger.info("POST запрос получен")
         if request.form.get("submit") == "Зарегистрироваться":
@@ -73,592 +59,164 @@ def admin_users():
             current_app.logger.info(
                 f"Кнопка не найдена. Доступные поля: {list(request.form.keys())}"
             )
-
-    if (
-        request.method == "POST"
-        and request.form.get("submit") == "Зарегистрироваться"
-    ):
-        current_app.logger.info("Обрабатываем форму создания пользователя")
-        current_app.logger.info("Проверяем валидацию формы")
-        current_app.logger.info(f"Ошибки формы: {form.errors}")
-
+    if request.method == "POST" and request.form.get("submit") == "Зарегистрироваться":
         if form.validate_on_submit():
-            current_app.logger.info(
-                f"Админка - создание пользователя: {form.username.data}, {form.email.data}"
+            user, message_response = UserService.create_user(
+                username=form.username.data,
+                email=form.email.data,
+                password=form.password.data,
+                is_admin=form.is_admin.data,
+                is_moderator=form.is_moderator.data,
+                group_id=form.group_id.data if form.group_id.data else None,
             )
-            try:
-                existing_user = User.query.filter(
-                    (User.username == form.username.data)
-                    | (User.email == form.email.data)
-                ).first()
-
-                if existing_user:
-                    if existing_user.username == form.username.data:
-                        current_app.logger.warning(
-                            f"Пользователь с именем {form.username.data} уже существует"
-                        )
-                        message = f'Пользователь с именем "{form.username.data}" уже существует'
-                    else:
-                        current_app.logger.warning(
-                            f"Пользователь с email {form.email.data} уже существует"
-                        )
-                        message = f'Пользователь с email "{form.email.data}" уже существует'
-                else:
-                    current_app.logger.info(
-                        f"Создаем нового пользователя: {form.username.data}"
-                    )
-                    user = User(
-                        username=form.username.data,
-                        email=form.email.data,
-                        password=generate_password_hash(form.password.data),
-                        is_admin=form.is_admin.data,
-                        is_moderator=form.is_moderator.data,
-                        is_subscribed=False,
-                        group_id=(
-                            form.group_id.data if form.group_id.data else None
-                        ),
-                    )
-                    db.session.add(user)
-                    db.session.commit()
-                    current_app.logger.info(
-                        f"Пользователь успешно создан с ID: {user.id}"
-                    )
-                    password_map[user.id] = form.password.data
-                    message = f"Пользователь {user.username} успешно создан"
-
-            except Exception as e:
-                current_app.logger.error(
-                    f"Ошибка создания пользователя: {str(e)}"
-                )
-                import traceback
-
-                current_app.logger.error(
-                    f"Traceback: {traceback.format_exc()}"
-                )
-                db.session.rollback()
-                message = "Ошибка при создании пользователя"
-        else:
-            current_app.logger.warning(
-                f"Форма админки не валидна: {form.errors}"
-            )
-            for field, errors in form.errors.items():
-                for error in errors:
-                    current_app.logger.warning(
-                        f"Ошибка в поле {field}: {error}"
-                    )
-
+            if user:
+                password_map[user.id] = form.password.data
+            message = message_response
     if request.method == "POST" and request.form.get("reset_user_id"):
-        try:
-            user_id = int(request.form.get("reset_user_id"))
-            user = User.query.get(user_id)
-            if user:
-                new_password = "".join(
-                    secrets.choice(
-                        string.ascii_letters + string.digits + "!@#$%^&*"
-                    )
-                    for _ in range(10)
-                )
-                user.password = generate_password_hash(new_password)
-                db.session.commit()
-                password_map[user.id] = new_password
-                current_app.logger.info(f"Пароль для пользователя {user.username} сброшен. Новый пароль: {new_password}")
-                # Не устанавливаем message, чтобы не было редиректа и AJAX мог получить HTML с паролем
-            else:
-                message = "Пользователь не найден"
-        except Exception as e:
-            current_app.logger.error(f"Ошибка сброса пароля: {str(e)}")
-            db.session.rollback()
-            message = "Ошибка при сбросе пароля"
-
+        user_id = int(request.form.get("reset_user_id"))
+        new_password, message = UserService.reset_user_password(user_id)
+        if new_password:
+            password_map[int(request.form.get("reset_user_id"))] = new_password
     if request.method == "POST" and request.form.get("delete_user_id"):
-        try:
-            user_id = int(request.form.get("delete_user_id"))
-            current_app.logger.info(
-                f"Попытка удаления пользователя с ID: {user_id}"
-            )
-            user = User.query.get(user_id)
-            if user:
-                current_app.logger.info(
-                    f"Найден пользователь для удаления: {user.username} (ID: {user.id})"
-                )
-                if user.id == current_user.id:
-                    return redirect_with_notification("admin.admin_users", "Нельзя удалить самого себя", "error")
-                elif user.is_admin:
-                    return redirect_with_notification("admin.admin_users", "Нельзя удалить администратора", "error")
-                else:
-                    username = user.username
-                    current_app.logger.info(
-                        f"Начинаем удаление пользователя {username} (ID: {user.id})"
-                    )
-
-                    try:
-                        notifications_count = Notification.query.filter_by(
-                            user_id=user.id
-                        ).count()
-                        Notification.query.filter_by(user_id=user.id).delete()
-                        current_app.logger.info(
-                            f"Удалено уведомлений: {notifications_count}"
-                        )
-
-                        ticket_messages_count = TicketMessage.query.filter_by(
-                            user_id=user.id
-                        ).count()
-                        TicketMessage.query.filter_by(user_id=user.id).delete()
-                        current_app.logger.info(
-                            f"Удалено сообщений тикетов: {ticket_messages_count}"
-                        )
-
-                        tickets_count = Ticket.query.filter_by(
-                            user_id=user.id
-                        ).count()
-                        Ticket.query.filter_by(user_id=user.id).delete()
-                        current_app.logger.info(
-                            f"Удалено тикетов: {tickets_count}"
-                        )
-
-                        email_verifications_count = (
-                            EmailVerification.query.filter_by(
-                                user_id=user.id
-                            ).count()
-                        )
-                        EmailVerification.query.filter_by(
-                            user_id=user.id
-                        ).delete()
-                        current_app.logger.info(
-                            f"Удалено кодов подтверждения email: {email_verifications_count}"
-                        )
-
-                        payments_count = Payment.query.filter_by(
-                            user_id=user.id
-                        ).count()
-                        Payment.query.filter_by(user_id=user.id).delete()
-                        current_app.logger.info(
-                            f"Удалено платежей: {payments_count}"
-                        )
-
-                        submissions_count = (
-                            db.session.query(Submission)
-                            .filter_by(user_id=user.id)
-                            .count()
-                        )
-                        db.session.query(Submission).filter_by(
-                            user_id=user.id
-                        ).delete()
-                        current_app.logger.info(
-                            f"Удалено решений: {submissions_count}"
-                        )
-
-                        chat_messages_count = ChatMessage.query.filter_by(
-                            user_id=user.id
-                        ).count()
-                        ChatMessage.query.filter_by(user_id=user.id).delete()
-                        current_app.logger.info(
-                            f"Удалено сообщений чата: {chat_messages_count}"
-                        )
-
-                        if FileStorageManager.delete_user_files(user.id):
-                            current_app.logger.info(
-                                f"Файлы пользователя {user.id} успешно удалены"
-                            )
-                        else:
-                            current_app.logger.warning(
-                                f"Ошибка при удалении файлов пользователя {user.id}"
-                            )
-
-                        for ticket in Ticket.query.filter_by(
-                            user_id=user.id
-                        ).all():
-                            if FileStorageManager.delete_ticket_files(
-                                ticket.id
-                            ):
-                                current_app.logger.info(
-                                    f"Файлы тикета {ticket.id} успешно удалены"
-                                )
-                            else:
-                                current_app.logger.warning(
-                                    f"Ошибка при удалении файлов тикета {ticket.id}"
-                                )
-
-                        db.session.delete(user)
-                        db.session.commit()
-                        current_app.logger.info(
-                            f"Пользователь {username} успешно удален"
-                        )
-                        return redirect_with_notification("admin.admin_users", f"Пользователь {username} удалён", "success")
-
-                    except Exception as e:
-                        current_app.logger.error(
-                            f"Ошибка при удалении связанных данных пользователя {username}: {str(e)}"
-                        )
-                        import traceback
-
-                        current_app.logger.error(
-                            f"Traceback: {traceback.format_exc()}"
-                        )
-                        db.session.rollback()
-                        flash(
-                            f"Ошибка при удалении пользователя {username}",
-                            "error",
-                        )
-                        return redirect(url_for("admin.admin_users"))
-            else:
-                flash("Пользователь не найден", "error")
-        except Exception as e:
-            current_app.logger.error(f"Ошибка удаления пользователя: {str(e)}")
-            db.session.rollback()  # Откатываем транзакцию при ошибке
-            flash("Ошибка при удалении пользователя", "error")
-
+        user_id = int(request.form.get("delete_user_id"))
+        success, message = UserService.delete_user(user_id, current_user.id)
+        if success:
+            return redirect_with_notification("admin.admin_users", message, "success")
+        else:
+            return redirect_with_notification("admin.admin_users", message, "error")
     if request.method == "POST" and request.form.get("toggle_admin_id"):
-        try:
-            user_id = int(request.form.get("toggle_admin_id"))
-            user = User.query.get(user_id)
-            if user:
-                if user.id == current_user.id:
-                    flash(
-                        "Нельзя изменить статус администратора для самого себя",
-                        "error",
-                    )
-                else:
-                    user.is_admin = not user.is_admin
-                    status = (
-                        "назначен администратором"
-                        if user.is_admin
-                        else "снят с администратора"
-                    )
-                    db.session.commit()
-                    flash(f"Пользователь {user.username} {status}")
-            else:
-                flash("Пользователь не найден", "error")
-        except Exception as e:
-            current_app.logger.error(
-                f"Ошибка изменения статуса администратора: {str(e)}"
-            )
-            db.session.rollback()  # Откатываем транзакцию при ошибке
-            flash("Ошибка при изменении статуса администратора", "error")
-
+        user_id = int(request.form.get("toggle_admin_id"))
+        success, message = UserService.toggle_admin_mode(user_id)
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "error")
     if request.method == "POST" and request.form.get("change_group_user_id"):
-        try:
-            user_id = int(request.form.get("change_group_user_id"))
-            new_group_id = request.form.get("new_group_id")
-            user = User.query.get(user_id)
-
-            if user:
-                if new_group_id:
-                    group = Group.query.get(int(new_group_id))
-                    if group:
-                        user.group_id = group.id
-                        flash(
-                            f"Пользователь {user.username} перемещен в группу '{group.name}'"
-                        )
-                    else:
-                        flash("Группа не найдена", "error")
-                        return redirect(url_for("admin.admin_users"))
-                else:
-                    user.group_id = None
-                    flash(f"Пользователь {user.username} убран из группы")
-
-                db.session.commit()
-            else:
-                flash("Пользователь не найден", "error")
-        except Exception as e:
-            current_app.logger.error(
-                f"Ошибка изменения группы пользователя: {str(e)}"
-            )
-            db.session.rollback()
-            flash("Ошибка при изменении группы пользователя", "error")
-
+        user_id = int(request.form.get("change_group_user_id"))
+        new_group_id = request.form.get("new_group_id")
+        result, message = UserService.change_user_group(
+            user_id=user_id,
+            group_id=None,
+            new_group_id=int(new_group_id) if new_group_id else None,
+        )
+        if result:
+            flash(message, "success")
+        else:
+            flash(message, "error")
+            return redirect(url_for("admin.admin_users"))
     if request.method == "POST" and request.form.get("change_status_user_id"):
-        try:
-            user_id = int(request.form.get("change_status_user_id"))
-            new_role = request.form.get("new_role")
-            admin_mode_enabled = request.form.get("admin_mode_enabled") == "on"
-            user = User.query.get(user_id)
-
-            if user:
-                user.is_admin = False
-                user.is_moderator = False
-                user.admin_mode_enabled = False
-
-                if new_role == "admin":
-                    user.is_admin = True
-                    user.admin_mode_enabled = admin_mode_enabled
-                    mode = "админ" if admin_mode_enabled else "пользователь"
-                    flash(
-                        f"Пользователь {user.username} назначен администратором в режиме {mode}"
-                    )
-                elif new_role == "moderator":
-                    user.is_moderator = True
-                    flash(f"Пользователь {user.username} назначен модератором")
-                else:  # user
-                    flash(
-                        f"Пользователь {user.username} назначен обычным пользователем"
-                    )
-
-                db.session.commit()
-            else:
-                flash("Пользователь не найден", "error")
-        except Exception as e:
-            current_app.logger.error(
-                f"Ошибка изменения статуса пользователя: {str(e)}"
-            )
-            db.session.rollback()
-            flash("Ошибка при изменении статуса пользователя", "error")
-
-    # Массовые операции
+        user_id = int(request.form.get("change_status_user_id"))
+        new_role = request.form.get("new_role")
+        admin_mode_enabled = request.form.get("admin_mode_enabled") == "on"
+        success, message = UserService.change_user_status(
+            user_id=user_id,
+            current_user_id=current_user.id,
+            new_role=new_role,
+            admin_mode_enabled=admin_mode_enabled,
+        )
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "error")
     if request.method == "POST" and request.form.get("action") == "mass_group":
-        try:
-            user_ids = request.form.getlist("user_ids")
-            group_id = request.form.get("group_id")
-            current_app.logger.info(f"Массовое назначение группы: {user_ids} -> {group_id}")
-
-            if not user_ids:
-                flash("Не выбраны пользователи", "error")
-            else:
-                group = None
-                if group_id:
-                    group = Group.query.get(int(group_id))
-                    if not group:
-                        flash("Группа не найдена", "error")
-                        return redirect(url_for("admin.admin_users"))
-
-                updated_count = 0
-                for user_id in user_ids:
-                    user = User.query.get(int(user_id))
-                    if user and user.id != current_user.id:
-                        user.group_id = group.id if group else None
-                        updated_count += 1
-
-                db.session.commit()
-                group_name = group.name if group else "без группы"
-                flash(f"Группа '{group_name}' назначена {updated_count} пользователям")
-        except Exception as e:
-            current_app.logger.error(f"Ошибка массового назначения группы: {str(e)}")
-            db.session.rollback()
-            flash("Ошибка при массовом назначении группы", "error")
-
+        user_ids = request.form.getlist("user_ids")
+        group_id = request.form.get("group_id")
+        success, message = UserService.mass_change_group(
+            user_ids=user_ids,
+            group_id=int(group_id) if group_id else None,
+            current_user_id=current_user.id,
+        )
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "error")
+            if "группа не найдена" in message.lower():
+                return redirect(url_for("admin.admin_users"))
     if request.method == "POST" and request.form.get("action") == "mass_status":
-        try:
-            user_ids = request.form.getlist("user_ids")
-            status = request.form.get("status")
-            current_app.logger.info(f"Массовое изменение статуса: {user_ids} -> {status}")
-
-            if not user_ids:
-                flash("Не выбраны пользователи", "error")
-            else:
-                updated_count = 0
-                for user_id in user_ids:
-                    user = User.query.get(int(user_id))
-                    if user and user.id != current_user.id:
-                        user.is_admin = False
-                        user.is_moderator = False
-                        user.admin_mode_enabled = False
-
-                        if status == "admin":
-                            user.is_admin = True
-                        elif status == "moderator":
-                            user.is_moderator = True
-
-                        updated_count += 1
-
-                db.session.commit()
-                status_names = {"admin": "администратор", "moderator": "модератор", "user": "пользователь"}
-                status_name = status_names.get(status, "пользователь")
-                flash(f"Статус '{status_name}' назначен {updated_count} пользователям")
-        except Exception as e:
-            current_app.logger.error(f"Ошибка массового изменения статуса: {str(e)}")
-            db.session.rollback()
-            flash("Ошибка при массовом изменении статуса", "error")
-
+        user_ids = request.form.getlist("user_ids")
+        status = request.form.get("status")
+        success, message = UserService.mass_change_status(
+            user_ids=user_ids, new_role=status, current_user_id=current_user.id
+        )
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "error")
     if request.method == "POST" and request.form.get("action") == "mass_delete":
-        try:
-            user_ids = request.form.getlist("user_ids")
-            current_app.logger.info(f"Массовое удаление пользователей: {user_ids}")
-
-            if not user_ids:
-                flash("Не выбраны пользователи", "error")
-            else:
-                deleted_count = 0
-                for user_id in user_ids:
-                    user = User.query.get(int(user_id))
-                    if user and user.id != current_user.id and not user.is_admin:
-                        try:
-                            # Удаляем связанные данные
-                            Notification.query.filter_by(user_id=user.id).delete()
-                            TicketMessage.query.filter_by(user_id=user.id).delete()
-                            Ticket.query.filter_by(user_id=user.id).delete()
-                            EmailVerification.query.filter_by(user_id=user.id).delete()
-                            Payment.query.filter_by(user_id=user.id).delete()
-                            db.session.query(Submission).filter_by(user_id=user.id).delete()
-                            ChatMessage.query.filter_by(user_id=user.id).delete()
-
-                            # Удаляем файлы
-                            FileStorageManager.delete_user_files(user.id)
-
-                            db.session.delete(user)
-                            deleted_count += 1
-                        except Exception as e:
-                            current_app.logger.error(f"Ошибка удаления пользователя {user.id}: {str(e)}")
-
-                db.session.commit()
-                flash(f"Удалено {deleted_count} пользователей")
-        except Exception as e:
-            current_app.logger.error(f"Ошибка массового удаления: {str(e)}")
-            db.session.rollback()
-            flash("Ошибка при массовом удалении пользователей", "error")
-
+        user_ids = request.form.getlist("user_ids")
+        success, message = UserService.mass_delete_users(
+            user_ids=user_ids, current_user_id=current_user.id
+        )
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "error")
     if request.method == "POST" and request.form.get("edit_user_id"):
-        try:
-            user_id = int(request.form.get("edit_user_id"))
-            new_username = request.form.get("new_username", "").strip()
-            new_email = request.form.get("new_email", "").strip()
-
-            current_app.logger.info(f"Редактирование пользователя ID: {user_id}, новое имя: {new_username}, новый email: {new_email}")
-
-            user = User.query.get(user_id)
-            if not user:
-                flash("Пользователь не найден", "error")
-                return redirect(url_for("admin.admin_users"))
-
-            if not new_username:
-                flash("Имя пользователя не может быть пустым", "error")
-                return redirect(url_for("admin.admin_users"))
-
-            # Проверяем уникальность имени пользователя
-            existing_user = User.query.filter(
-                User.username == new_username,
-                User.id != user_id
-            ).first()
-            if existing_user:
-                flash(f'Пользователь с именем "{new_username}" уже существует', "error")
-                return redirect(url_for("admin.admin_users"))
-
-            # Проверяем уникальность email
-            if new_email:
-                existing_email = User.query.filter(
-                    User.email == new_email,
-                    User.id != user_id
-                ).first()
-                if existing_email:
-                    flash(f'Пользователь с email "{new_email}" уже существует', "error")
-                    return redirect(url_for("admin.admin_users"))
-
-            # Обновляем данные
-            old_username = user.username
-            user.username = new_username
-            user.email = new_email if new_email else None
-
-            db.session.commit()
-            current_app.logger.info(f"Данные пользователя {old_username} успешно обновлены")
-            flash(f"Данные пользователя {old_username} успешно обновлены")
-
-        except Exception as e:
-            current_app.logger.error(f"Ошибка редактирования пользователя: {str(e)}")
-            db.session.rollback()
-            flash("Ошибка при редактировании пользователя", "error")
-
+        user_id = int(request.form.get("edit_user_id"))
+        new_username = request.form.get("new_username", "").strip()
+        new_email = request.form.get("new_email", "").strip()
+        success, message = UserService.update_user(
+            user_id=user_id, username=new_username, email=new_email
+        )
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "error")
+            return redirect(url_for("admin.admin_users"))
     if request.method == "POST" and request.form.get("toggle_subscription_id"):
-        try:
-            user_id = int(request.form.get("toggle_subscription_id"))
-            current_app.logger.info(
-                f"Обрабатываем изменение подписки для пользователя ID: {user_id}"
-            )
-            user = User.query.get(user_id)
-            if user:
-                current_app.logger.info(
-                    f"Пользователь найден: {user.username}, текущий статус подписки: {user.is_subscribed}"
-                )
-                if user.is_subscribed:
-                    current_app.logger.info(
-                        f"Отзываем подписку у пользователя {user.username}"
-                    )
-                    user.is_subscribed = False
-                    user.subscription_expires = None
-                    user.is_manual_subscription = (
-                        False  # Сбрасываем флаг ручной подписки
-                    )
-                    status = "отозвана"
-                else:
-                    trial_days = int(
-                        SiteSettings.get_setting("trial_subscription_days", 14)
-                    )
-                    current_app.logger.info(
-                        f"Выдаем подписку пользователю {user.username} на {trial_days} дней"
-                    )
-                    user.is_subscribed = True
-                    user.subscription_expires = datetime.utcnow() + timedelta(
-                        days=trial_days
-                    )
-                    user.is_manual_subscription = (
-                        True  # Устанавливаем флаг ручной подписки
-                    )
-                    status = f"выдана на {trial_days} дней"
-
-                db.session.commit()
-                current_app.logger.info(
-                    f"Подписка успешно изменена: {user.username} - {status}"
-                )
-                flash(f"Подписка для пользователя {user.username} {status}")
-            else:
-                current_app.logger.error(
-                    f"Пользователь с ID {user_id} не найден"
-                )
-                flash("Пользователь не найден", "error")
-        except Exception as e:
-            current_app.logger.error(f"Ошибка изменения подписки: {str(e)}")
-            import traceback
-
-            current_app.logger.error(f"Traceback: {traceback.format_exc()}")
-            db.session.rollback()  # Откатываем транзакцию при ошибке
-            flash("Ошибка при изменении подписки", "error")
-
+        user_id = int(request.form.get("toggle_subscription_id"))
+        success, message = UserService.toggle_subscription(user_id)
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "error")
     try:
         users = User.query.all()
     except Exception as e:
         current_app.logger.error(f"Error loading users: {e}")
         users = []
         message = "Ошибка загрузки пользователей"
-
-    # Если есть сообщение, добавляем его в URL для показа через JS
     if message and request.method == "POST":
-        return redirect_with_notification("admin.admin_users", message, "info" if "успешно" in message.lower() or "назначен" in message.lower() or "удалён" in message.lower() or "сброшен" in message.lower() else "error")
-
+        return redirect_with_notification(
+            "admin.admin_users",
+            message,
+            (
+                "info"
+                if "успешно" in message.lower()
+                or "назначен" in message.lower()
+                or "удалён" in message.lower()
+                or "сброшен" in message.lower()
+                else "error"
+            ),
+        )
     return render_template(
         "admin/users.html",
         users=users,
         form=form,
         password_map=password_map,
         message=message,
-        groups=Group.query.all(),  # Добавляем группы для модальных окон
+        groups=Group.query.all(),
     )
-
-
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
-
     if request.method == "POST":
         current_app.logger.info(f"POST запрос в admin_groups: {request.form}")
         current_app.logger.info(
             f"CSRF токен в запросе: {request.form.get('csrf_token', 'НЕ НАЙДЕН')}"
         )
-
         if not request.form.get("csrf_token"):
             current_app.logger.error("CSRF токен отсутствует в запросе")
             flash("Ошибка безопасности: отсутствует CSRF токен", "error")
             return redirect(url_for("admin.admin_groups"))
-
     form = GroupForm()
     message = ""
-
     if request.method == "POST":
         if request.form.get("submit") == "Сохранить":
-            # Заполняем форму данными из запроса
             form.process(request.form)
             if form.validate_on_submit():
                 try:
-                    existing_group = Group.query.filter_by(
-                        name=form.name.data
-                    ).first()
+                    existing_group = Group.query.filter_by(name=form.name.data).first()
                     if existing_group:
                         flash(
                             f'Группа с названием "{form.name.data}" уже существует',
@@ -677,17 +235,12 @@ def admin_users():
                         form.description.data = ""
                         form.is_active.data = True
                 except Exception as e:
-                    current_app.logger.error(
-                        f"Ошибка создания группы: {str(e)}"
-                    )
+                    current_app.logger.error(f"Ошибка создания группы: {str(e)}")
                     db.session.rollback()
                     flash("Ошибка при создании группы", "error")
-
         elif request.form.get("action") == "edit":
             try:
-                current_app.logger.info(
-                    f"Редактирование группы: {request.form}"
-                )
+                current_app.logger.info(f"Редактирование группы: {request.form}")
                 group_id = int(request.form.get("group_id"))
                 group = Group.query.get(group_id)
                 if group:
@@ -697,19 +250,15 @@ def admin_users():
                     current_app.logger.info(
                         f"Новые данные: name='{request.form.get('name')}', description='{request.form.get('description')}', is_active='{request.form.get('is_active')}'"
                     )
-
                     group.name = request.form.get("name")
                     group.description = request.form.get("description")
-
                     is_active_value = request.form.get("is_active")
                     if is_active_value is not None:
                         group.is_active = bool(int(is_active_value))
                         current_app.logger.info(
                             f"Статус активности обновлен: {group.is_active}"
                         )
-
                     db.session.commit()
-
                     if request.headers.get("Accept") == "application/json":
                         return jsonify(
                             {
@@ -733,9 +282,7 @@ def admin_users():
                     else:
                         flash("Группа не найдена", "error")
             except Exception as e:
-                current_app.logger.error(
-                    f"Ошибка редактирования группы: {str(e)}"
-                )
+                current_app.logger.error(f"Ошибка редактирования группы: {str(e)}")
                 db.session.rollback()
                 if request.headers.get("Accept") == "application/json":
                     return (
@@ -749,17 +296,13 @@ def admin_users():
                     )
                 else:
                     flash("Ошибка при редактировании группы", "error")
-
         elif request.form.get("action") == "delete":
             current_app.logger.info(
                 f"Получен запрос на удаление группы: {request.form}"
             )
             try:
                 group_id = int(request.form.get("group_id"))
-                current_app.logger.info(
-                    f"Попытка удаления группы с ID: {group_id}"
-                )
-
+                current_app.logger.info(f"Попытка удаления группы с ID: {group_id}")
                 group = Group.query.get(group_id)
                 if group:
                     current_app.logger.info(f"Группа найдена: {group.name}")
@@ -801,9 +344,7 @@ def admin_users():
                         else:
                             flash(f"Группа '{group.name}' успешно удалена")
                 else:
-                    current_app.logger.error(
-                        f"Группа с ID {group_id} не найдена"
-                    )
+                    current_app.logger.error(f"Группа с ID {group_id} не найдена")
                     if request.headers.get("Accept") == "application/json":
                         return (
                             jsonify(
@@ -832,12 +373,10 @@ def admin_users():
                     )
                 else:
                     flash("Ошибка при удалении группы", "error")
-
         elif request.form.get("action") == "mass_delete":
             try:
                 group_ids = request.form.getlist("group_ids")
                 current_app.logger.info(f"Массовое удаление групп: {group_ids}")
-
                 if not group_ids:
                     flash("Не выбраны группы", "error")
                 else:
@@ -857,24 +396,24 @@ def admin_users():
                                 )
                                 db.session.delete(group)
                                 deleted_count += 1
-
                     db.session.commit()
                     if deleted_count > 0:
                         flash(f"Удалено {deleted_count} групп")
                     if skipped_count > 0:
-                        flash(f"Пропущено {skipped_count} групп (в них есть пользователи)", "warning")
+                        flash(
+                            f"Пропущено {skipped_count} групп (в них есть пользователи)",
+                            "warning",
+                        )
             except Exception as e:
                 current_app.logger.error(f"Ошибка массового удаления групп: {str(e)}")
                 db.session.rollback()
                 flash("Ошибка при массовом удалении групп", "error")
-
     try:
         groups = Group.query.order_by(Group.name).all()
     except Exception as e:
         current_app.logger.error(f"Error loading groups: {e}")
         groups = []
         flash("Ошибка загрузки групп.", "error")
-
     return render_template(
         "admin/groups.html",
         groups=groups,
@@ -889,46 +428,35 @@ def admin_subject_groups() -> Union[str, Response]:
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
-
     try:
         subjects = (
             Subject.query.options(joinedload(Subject.groups))
             .order_by(Subject.title)
             .all()
         )
-        groups = (
-            Group.query.filter_by(is_active=True).order_by(Group.name).all()
-        )
+        groups = Group.query.filter_by(is_active=True).order_by(Group.name).all()
     except Exception as e:
         current_app.logger.error(f"Error loading subjects or groups: {e}")
         subjects = []
         groups = []
         flash("Ошибка загрузки предметов или групп.", "error")
-
     form = SubjectGroupForm()
     form.populate_choices(subjects, groups)
     message = ""
-
     if request.method == "POST":
         if request.form.get("submit") == "Сохранить":
             if form.validate_on_submit():
                 try:
                     subject_id = form.subject_id.data
                     group_ids = form.group_ids.data
-
-                    SubjectGroup.query.filter_by(
-                        subject_id=subject_id
-                    ).delete()
-
+                    SubjectGroup.query.filter_by(subject_id=subject_id).delete()
                     for group_id in group_ids:
                         subject_group = SubjectGroup(
                             subject_id=subject_id, group_id=group_id
                         )
                         db.session.add(subject_group)
-
                     db.session.commit()
                     flash("Предмет успешно назначен группам")
-
                     form.subject_id.data = 0
                     form.group_ids.data = []
                 except Exception as e:
@@ -937,98 +465,68 @@ def admin_subject_groups() -> Union[str, Response]:
                     )
                     db.session.rollback()
                     flash("Ошибка при назначении предмета группам", "error")
-
         elif request.form.get("edit_subject_id"):
             try:
                 subject_id = int(request.form.get("edit_subject_id"))
                 group_ids = request.form.getlist("edit_group_ids")
-
                 SubjectGroup.query.filter_by(subject_id=subject_id).delete()
-
                 for group_id in group_ids:
-                    if group_id:  # Проверяем, что group_id не пустой
+                    if group_id:
                         subject_group = SubjectGroup(
                             subject_id=subject_id, group_id=int(group_id)
                         )
                         db.session.add(subject_group)
-
                 db.session.commit()
                 flash("Группы предмета успешно обновлены")
             except Exception as e:
-                current_app.logger.error(
-                    f"Ошибка обновления групп предмета: {str(e)}"
-                )
+                current_app.logger.error(f"Ошибка обновления групп предмета: {str(e)}")
                 db.session.rollback()
                 flash("Ошибка при обновлении групп предмета", "error")
-
         elif request.form.get("action") == "mass_assign":
             try:
                 subject_ids = request.form.getlist("subject_ids")
                 group_ids = request.form.getlist("group_ids")
-
                 if not subject_ids or not group_ids:
                     flash("Выберите предметы и группы", "error")
                 else:
                     for subject_id in subject_ids:
                         subject_id = int(subject_id)
-
-                        SubjectGroup.query.filter_by(
-                            subject_id=subject_id
-                        ).delete()
-
+                        SubjectGroup.query.filter_by(subject_id=subject_id).delete()
                         for group_id in group_ids:
-                            if group_id:  # Проверяем, что group_id не пустой
+                            if group_id:
                                 subject_group = SubjectGroup(
                                     subject_id=subject_id,
                                     group_id=int(group_id),
                                 )
                                 db.session.add(subject_group)
-
                     db.session.commit()
-                    flash(
-                        f"Успешно назначено {len(subject_ids)} предметов группам"
-                    )
-
+                    flash(f"Успешно назначено {len(subject_ids)} предметов группам")
             except Exception as e:
                 current_app.logger.error(
                     f"Ошибка массового назначения предметов группам: {str(e)}"
                 )
                 db.session.rollback()
-                flash(
-                    "Ошибка при массовом назначении предметов группам", "error"
-                )
-
+                flash("Ошибка при массовом назначении предметов группам", "error")
         elif request.form.get("action") == "mass_remove":
             try:
                 subject_ids = request.form.getlist("subject_ids")
-
                 if not subject_ids:
                     flash("Выберите предметы для удаления из групп", "error")
                 else:
                     for subject_id in subject_ids:
                         subject_id = int(subject_id)
-                        SubjectGroup.query.filter_by(
-                            subject_id=subject_id
-                        ).delete()
-
+                        SubjectGroup.query.filter_by(subject_id=subject_id).delete()
                     db.session.commit()
-                    flash(
-                        f"Успешно убрано {len(subject_ids)} предметов из всех групп"
-                    )
-
+                    flash(f"Успешно убрано {len(subject_ids)} предметов из всех групп")
             except Exception as e:
                 current_app.logger.error(
                     f"Ошибка массового удаления предметов из групп: {str(e)}"
                 )
                 db.session.rollback()
-                flash(
-                    "Ошибка при массовом удалении предметов из групп", "error"
-                )
-
+                flash("Ошибка при массовом удалении предметов из групп", "error")
         elif request.form.get("action") == "mass_delete_subjects":
             try:
                 subject_ids = request.form.getlist("subject_ids")
-
                 if not subject_ids:
                     flash("Выберите предметы для удаления", "error")
                 else:
@@ -1039,25 +537,20 @@ def admin_subject_groups() -> Union[str, Response]:
                         if subject:
                             db.session.delete(subject)
                             deleted_count += 1
-
                     db.session.commit()
                     flash(f"Успешно удалено {deleted_count} предметов")
-
             except Exception as e:
                 current_app.logger.error(
                     f"Ошибка массового удаления предметов: {str(e)}"
                 )
                 db.session.rollback()
                 flash("Ошибка при массовом удалении предметов", "error")
-
         elif request.form.get("remove_all_groups"):
             try:
                 subject_id = int(request.form.get("remove_all_groups"))
                 subject = Subject.query.get(subject_id)
                 if subject:
-                    SubjectGroup.query.filter_by(
-                        subject_id=subject_id
-                    ).delete()
+                    SubjectGroup.query.filter_by(subject_id=subject_id).delete()
                     db.session.commit()
                     flash(f"Предмет '{subject.title}' убран из всех групп")
                 else:
@@ -1067,10 +560,7 @@ def admin_subject_groups() -> Union[str, Response]:
                     f"Ошибка удаления связей предмета с группами: {str(e)}"
                 )
                 db.session.rollback()
-                flash(
-                    "Ошибка при удалении связей предмета с группами", "error"
-                )
-
+                flash("Ошибка при удалении связей предмета с группами", "error")
     return render_template(
         "admin/subject_groups.html",
         subjects=subjects,
@@ -1086,13 +576,9 @@ def admin_settings() -> Union[str, Response]:
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
-
     form = SiteSettingsForm()
-
     if request.method == "GET":
-        form.maintenance_mode.data = SiteSettings.get_setting(
-            "maintenance_mode", False
-        )
+        form.maintenance_mode.data = SiteSettings.get_setting("maintenance_mode", False)
         form.trial_subscription_enabled.data = SiteSettings.get_setting(
             "trial_subscription_enabled", True
         )
@@ -1102,13 +588,10 @@ def admin_settings() -> Union[str, Response]:
         form.pattern_generation_enabled.data = SiteSettings.get_setting(
             "pattern_generation_enabled", True
         )
-        form.support_enabled.data = SiteSettings.get_setting(
-            "support_enabled", True
-        )
+        form.support_enabled.data = SiteSettings.get_setting("support_enabled", True)
         form.telegram_only_registration.data = SiteSettings.get_setting(
             "telegram_only_registration", False
         )
-
     if request.method == "POST" and form.validate_on_submit():
         try:
             SiteSettings.set_setting(
@@ -1141,11 +624,9 @@ def admin_settings() -> Union[str, Response]:
                 form.telegram_only_registration.data,
                 "Включить/выключить регистрацию только через Telegram",
             )
-
             flash("Настройки успешно сохранены", "success")
             return redirect(url_for("admin.admin_settings"))
         except Exception as e:
             current_app.logger.error(f"Ошибка сохранения настроек: {str(e)}")
             flash("Ошибка при сохранении настроек", "error")
-
     return render_template("admin/settings.html", form=form)

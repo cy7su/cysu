@@ -1,28 +1,38 @@
 {% extends 'base.html' %}
 {% block title %}cysu | Образовательная платформа{% endblock %}
-{% block meta_description %}cysu - современная образовательная платформа для изучения программирования и IT. Лекции, практические задания, материалы по информационным технологиям.{% endblock %}
-{% block meta_keywords %}образовательная платформа, программирование, обучение, лекции, практика, IT, разработка, Python, JavaScript, Java, C++, веб-разработка, базы данных, алгоритмы, информационные технологии, электронное обучение, дистанционное образование, cysu{% endblock %}
+{% block meta_description %}cysu - современная образовательная платформа для изучения программирования и IT. Лекции,
+практические задания, материалы по информационным технологиям.{% endblock %}
+{% block meta_keywords %}образовательная платформа, программирование, обучение, лекции, практика, IT, разработка,
+Python, JavaScript, Java, C++, веб-разработка, базы данных, алгоритмы, информационные технологии, электронное обучение,
+дистанционное образование, cysu{% endblock %}
 {% block content %}
 
 {% if not current_user.is_authenticated %}
-<section class="hero-container" style="min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center;">
+<section class="hero-container"
+    style="min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center;">
     <div class="container">
         <header class="text-center">
             <div class="mb-5">
-                <h1 class="display-5 fw-bold text-white mb-3" data-parallax='{"speed": 0.3, "direction": "vertical"}'>cysu</h1>
-                <p class="text-muted mb-3" data-parallax='{"speed": 0.2, "direction": "vertical"}'>Современная образовательная платформа</p>
-                
+                <h1 class="display-5 fw-bold text-white mb-3" data-parallax='{"speed": 0.3, "direction": "vertical"}'>
+                    cysu</h1>
+                <p class="text-muted mb-3" data-parallax='{"speed": 0.2, "direction": "vertical"}'>Современная
+                    образовательная платформа</p>
+
                 <!-- Декоративные элементы с parallax -->
-                <div class="parallax-elements position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">
-                    <div class="floating-circle" style="position: absolute; top: 20%; left: 10%; width: 60px; height: 60px; background: linear-gradient(45deg, #B595FF, #9A7FE6); border-radius: 50%; opacity: 0.3;" 
-                         data-parallax='{"speed": 0.5, "direction": "vertical"}'></div>
-                    <div class="floating-circle" style="position: absolute; top: 60%; right: 15%; width: 40px; height: 40px; background: linear-gradient(45deg, #7C3AED, #B595FF); border-radius: 50%; opacity: 0.4;" 
-                         data-parallax='{"speed": 0.3, "direction": "vertical"}'></div>
-                    <div class="floating-circle" style="position: absolute; top: 30%; right: 25%; width: 80px; height: 80px; background: linear-gradient(45deg, #9A7FE6, #7C3AED); border-radius: 50%; opacity: 0.2;" 
-                         data-parallax='{"speed": 0.7, "direction": "vertical"}'></div>
+                <div class="parallax-elements position-absolute"
+                    style="top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">
+                    <div class="floating-circle"
+                        style="position: absolute; top: 20%; left: 10%; width: 60px; height: 60px; background: linear-gradient(45deg, var(--primary-color), var(--primary-hover)); border-radius: 50%; opacity: 0.3;"
+                        data-parallax='{"speed": 0.5, "direction": "vertical"}'></div>
+                    <div class="floating-circle"
+                        style="position: absolute; top: 60%; right: 15%; width: 40px; height: 40px; background: linear-gradient(45deg, #7C3AED, var(--primary-color)); border-radius: 50%; opacity: 0.4;"
+                        data-parallax='{"speed": 0.3, "direction": "vertical"}'></div>
+                    <div class="floating-circle"
+                        style="position: absolute; top: 30%; right: 25%; width: 80px; height: 80px; background: linear-gradient(45deg, #9A7FE6, #7C3AED); border-radius: 50%; opacity: 0.2;"
+                        data-parallax='{"speed": 0.7, "direction": "vertical"}'></div>
                 </div>
             </div>
-            
+
             <!-- Карусель функций -->
             <section class="features-carousel-container mb-4">
                 <div class="features-carousel-wrapper">
@@ -35,7 +45,7 @@
                                 <small class="text-muted">Выкладываются в удобном формате</small>
                             </div>
                         </div>
-                        
+
                         <div class="feature-card">
                             <div class="quick-feature p-3">
                                 <i class="fas fa-code text-primary mb-2"></i>
@@ -43,7 +53,7 @@
                                 <small class="text-muted">Загружай решения, быстро и удобно</small>
                             </div>
                         </div>
-                        
+
                         <div class="feature-card">
                             <div class="quick-feature p-3">
                                 <i class="fas fa-comments text-primary mb-2"></i>
@@ -51,7 +61,7 @@
                                 <small class="text-muted">Чат и тикеты - решат все твои проблемы</small>
                             </div>
                         </div>
-                        
+
                         <!-- Второй набор карточек (дубликат для бесконечной прокрутки) -->
                         <div class="feature-card">
                             <div class="quick-feature p-3">
@@ -60,7 +70,7 @@
                                 <small class="text-muted">Структурированные курсы и программы</small>
                             </div>
                         </div>
-                        
+
                         <div class="feature-card">
                             <div class="quick-feature p-3">
                                 <i class="fas fa-mobile-alt text-primary mb-2"></i>
@@ -68,7 +78,7 @@
                                 <small class="text-muted">Учись в любое время и в любом месте</small>
                             </div>
                         </div>
-                        
+
                         <div class="feature-card">
                             <div class="quick-feature p-3">
                                 <i class="fas fa-book text-primary mb-2"></i>
@@ -76,7 +86,7 @@
                                 <small class="text-muted">Выкладываются в удобном формате</small>
                             </div>
                         </div>
-                        
+
                         <!-- Третий набор карточек (дубликат для бесконечной прокрутки) -->
                         <div class="feature-card">
                             <div class="quick-feature p-3">
@@ -85,7 +95,7 @@
                                 <small class="text-muted">Загружай решения, быстро и удобно</small>
                             </div>
                         </div>
-                        
+
                         <div class="feature-card">
                             <div class="quick-feature p-3">
                                 <i class="fas fa-comments text-primary mb-2"></i>
@@ -93,7 +103,7 @@
                                 <small class="text-muted">Чат и тикеты - решат все твои проблемы</small>
                             </div>
                         </div>
-                        
+
                         <div class="feature-card">
                             <div class="quick-feature p-3">
                                 <i class="fas fa-graduation-cap text-primary mb-2"></i>
@@ -103,9 +113,9 @@
                         </div>
                     </div>
                 </div>
-                
+
             </section>
-            
+
             <nav class="d-flex gap-2 justify-content-center flex-wrap">
                 <a href="{{ url_for('auth.register') }}" class="btn btn-primary-custom">
                     Регистрация
@@ -119,155 +129,167 @@
 </section>
 
 <style>
-/* Стили для быстрых функций (используются в карусели) */
-.quick-feature {
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
+    /* Стили для быстрых функций (используются в карусели) */
+    .quick-feature {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
 
-.quick-feature:hover {
-    border-color: var(--primary-color) !important;
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(181, 149, 255, 0.15);
-}
+    .quick-feature:hover {
+        border-color: var(--primary-color) !important;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(181, 149, 255, 0.15);
+    }
 
-/* Анимация блеска при наведении */
-.quick-feature::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(181, 149, 255, 0.1), transparent);
-    transition: left 0.6s ease;
-}
+    /* Анимация блеска при наведении */
+    .quick-feature::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, var(--primary-glow), transparent);
+        transition: left 0.6s ease;
+    }
 
-.quick-feature:hover::before {
-    left: 100%;
-}
+    .quick-feature:hover::before {
+        left: 100%;
+    }
 
-/* Стили для кнопок на главной странице */
-.btn-primary-custom {
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    text-decoration: none;
-    text-align: center;
-    transition: all 0.2s ease;
-    display: inline-block;
-    min-width: 100px;
-}
+    /* Стили для кнопок на главной странице */
+    .btn-primary-custom {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.2s ease;
+        display: inline-block;
+        min-width: 100px;
+    }
 
-.btn-primary-custom:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-    color: white;
-    text-decoration: none;
-}
+    .btn-primary-custom:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+        color: white;
+        text-decoration: none;
+    }
 
-.btn-secondary-custom {
-    background: var(--dp-03);
-    color: var(--primary-color);
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    text-decoration: none;
-    text-align: center;
-    transition: all 0.2s ease;
-    display: inline-block;
-    min-width: 100px;
-}
+    .btn-secondary-custom {
+        background: var(--dp-03);
+        color: var(--primary-color);
+        border: none;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.2s ease;
+        display: inline-block;
+        min-width: 100px;
+    }
 
-.btn-secondary-custom:hover {
-    background: var(--dp-04);
-    transform: translateY(-1px);
-    color: var(--primary-hover);
-    text-decoration: none;
-}
+    .btn-secondary-custom:hover {
+        background: var(--dp-04);
+        transform: translateY(-1px);
+        color: var(--primary-hover);
+        text-decoration: none;
+    }
 </style>
 
 {% else %}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
-  <div class="d-flex align-items-center">
-    <h2 class="mb-3 mb-md-0">Предметы</h2>
-  </div>
-  {% if current_user.is_admin and current_user.admin_mode_enabled %}
+    <div class="d-flex align-items-center">
+        <h2 class="mb-3 mb-md-0">Предметы</h2>
+    </div>
+    {% if current_user.is_admin and current_user.admin_mode_enabled %}
     <button class="btn btn-success btn-sm mobile-add-btn" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
         <i class="fas fa-plus me-1"></i>Добавить предмет
     </button>
-  {% endif %}
+    {% endif %}
 </div>
 <div class="row g-4" style="column-gap: 110px;">
     {% for subject in subjects %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-        <div class="card shadow-sm subject-card position-relative" id="subject-card-{{ subject.id }}" data-subject-id="{{ subject.id }}" data-url="{{ url_for('main.subject_detail', subject_id=subject.id) }}" onclick="window.location.href=this.getAttribute('data-url')">
+        <div class="card shadow-sm subject-card position-relative" id="subject-card-{{ subject.id }}"
+            data-subject-id="{{ subject.id }}" data-url="{{ url_for('main.subject_detail', subject_id=subject.id) }}"
+            onclick="window.location.href=this.getAttribute('data-url')">
             {% if current_user.is_effective_admin() and pattern_generation_enabled %}
-            <button class="admin-pattern-btn" onclick="event.stopPropagation(); generateNewPattern('subject-card-{{ subject.id }}')" title="Сгенерировать новый паттерн">
+            <button class="admin-pattern-btn"
+                onclick="event.stopPropagation(); generateNewPattern('subject-card-{{ subject.id }}')"
+                title="Сгенерировать новый паттерн">
                 <i class="fas fa-palette"></i>
             </button>
             {% endif %}
-            
-            <div class="card-img dashboard-card-img pattern-container" data-pattern-type="{{ subject.pattern_type or 'dots' }}" data-pattern-svg="{{ subject.pattern_svg or '' }}">
+
+            <div class="card-img dashboard-card-img pattern-container"
+                data-pattern-type="{{ subject.pattern_type or 'dots' }}"
+                data-pattern-svg="{{ subject.pattern_svg or '' }}">
                 <span class="sr-only">Изображение предмета</span>
             </div>
-            
+
             <div class="card-body">
-                <h6 class="card-title text-primary mb-1">{{ subject.title[:35]|e }}{% if subject.title|length > 35 %}...{% endif %}</h6>
-                <p class="card-text text-muted mb-1">{% if subject.description %}{{ subject.description[:70]|e }}{% if subject.description|length > 70 %}...{% endif %}{% else %}Описание отсутствует{% endif %}</p>
+                <h6 class="card-title text-primary mb-1">{{ subject.title[:35]|e }}{% if subject.title|length > 35
+                    %}...{% endif %}</h6>
+                <p class="card-text text-muted mb-1">{% if subject.description %}{{ subject.description[:70]|e }}{% if
+                    subject.description|length > 70 %}...{% endif %}{% else %}Описание отсутствует{% endif %}</p>
             </div>
         </div>
     </div>
     {% else %}
-    <div class="col-12"><div class="alert alert-info">Нет предметов</div></div>
+    <div class="col-12">
+        <div class="alert alert-info">Нет предметов</div>
+    </div>
     {% endfor %}
 </div>
 {% if current_user.is_admin and current_user.admin_mode_enabled %}
 <div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addSubjectModalLabel">Добавить предмет</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSubjectModalLabel">Добавить предмет</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="pattern_svg" id="pattern-svg-input" value="">
+                    <div class="mb-3">
+                        <label class="form-label">Название предмета</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea name="description" class="form-control"
+                            style="min-height: 80px; resize: vertical;"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Фон предмета</label>
+                        <select id="pattern-select" name="pattern_type" class="form-select">
+                            <option value="circles">Круги</option>
+                            <option value="quilt">Лоскутное одеяло</option>
+                            <option value="waves">Волны</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <div id="pattern-preview" class="pattern-preview"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
         </div>
-        <form method="post">
-          <div class="modal-body">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="pattern_svg" id="pattern-svg-input" value="">
-            <div class="mb-3">
-              <label class="form-label">Название предмета</label>
-              <input type="text" name="title" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Описание</label>
-              <textarea name="description" class="form-control" style="min-height: 80px; resize: vertical;"></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Фон предмета</label>
-              <select id="pattern-select" name="pattern_type" class="form-select">
-                <option value="circles">Круги</option>
-                <option value="quilt">Лоскутное одеяло</option>
-                <option value="waves">Волны</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <div id="pattern-preview" class="pattern-preview"></div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-          </div>
-        </form>
     </div>
-  </div>
 </div>
 {% endif %}
 {% endif %}
@@ -276,294 +298,294 @@
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Ждем загрузки SVGPatternGenerator
-    function initializePatternGenerator() {
-        // Сначала проверяем глобальный экземпляр
-        if (window.patternGenerator && typeof window.patternGenerator.generatePattern === 'function') {
-            const generator = window.patternGenerator;
-            
-            // Применяем паттерны к карточкам предметов
-            applyPatternsToCards(generator);
-            
-            // Инициализируем предпросмотр в модальном окне
-            initializePatternPreview(generator);
-            return;
-        }
-        
-        if (typeof SVGPatternGenerator === 'undefined') {
-            // Пробуем еще 50 раз (5 секунд максимум)
-            if (window.patternLoadAttempts === undefined) {
-                window.patternLoadAttempts = 0;
-            }
-            if (window.patternLoadAttempts < 50) {
-                window.patternLoadAttempts++;
-                setTimeout(initializePatternGenerator, 100);
-                return;
-            } else {
-                useFallbackPatterns();
+    document.addEventListener('DOMContentLoaded', function () {
+        // Ждем загрузки SVGPatternGenerator
+        function initializePatternGenerator() {
+            // Сначала проверяем глобальный экземпляр
+            if (window.patternGenerator && typeof window.patternGenerator.generatePattern === 'function') {
+                const generator = window.patternGenerator;
+
+                // Применяем паттерны к карточкам предметов
+                applyPatternsToCards(generator);
+
+                // Инициализируем предпросмотр в модальном окне
+                initializePatternPreview(generator);
                 return;
             }
-        }
-        
-        try {
-            // Создаем экземпляр генератора
-            const generator = new SVGPatternGenerator();
-            
-            // Применяем паттерны к карточкам предметов
-            applyPatternsToCards(generator);
-            
-            // Инициализируем предпросмотр в модальном окне
-            initializePatternPreview(generator);
-            
-        } catch (error) {
-            useFallbackPatterns();
-        }
-    }
-    
-    // Функция fallback паттернов
-    function useFallbackPatterns() {
-        console.log('Используем fallback паттерны');
-        const subjectCards = document.querySelectorAll('.dashboard-card-img');
-        
-        if (subjectCards.length === 0) {
-            return;
-        }
-        
-        // Простые CSS градиенты как fallback
-        const fallbackPatterns = [
-            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-            'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
-            'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)'
-        ];
-        
-        subjectCards.forEach(function(card, index) {
-            const patternIndex = index % fallbackPatterns.length;
-            card.style.background = fallbackPatterns[patternIndex];
-        });
-    }
-    
-    // Запускаем инициализацию
-    initializePatternGenerator();
-    
-    // Функция применения паттернов к карточкам
-    function applyPatternsToCards(generator) {
-        const subjectCards = document.querySelectorAll('.dashboard-card-img');
-        
-        if (subjectCards.length === 0) {
-            return;
-        }
-        
-        subjectCards.forEach(function(card, index) {
-            // Проверяем, есть ли уже сохраненный SVG в базе данных
-            const savedSvg = card.getAttribute('data-pattern-svg');
-            const patternType = card.getAttribute('data-pattern-type');
-            
-            if (savedSvg && savedSvg.trim() !== '') {
-                // Используем сохраненный SVG из базы данных
-                try {
-                    // Проверяем, является ли savedSvg уже base64 или обычным SVG
-                    let svgToUse;
-                    if (savedSvg.includes('<svg')) {
-                        // Это обычный SVG, кодируем в base64
-                        svgToUse = btoa(unescape(encodeURIComponent(savedSvg)));
-                    } else {
-                        // Это уже base64, используем как есть
-                        svgToUse = savedSvg;
-                    }
-                    
-                    card.style.backgroundImage = `url("data:image/svg+xml;base64,${svgToUse}")`;
-                } catch (error) {
-                    // Если ошибка с сохраненным SVG, генерируем новый
-                    generateAndApplyPattern(card, generator, index);
+
+            if (typeof SVGPatternGenerator === 'undefined') {
+                // Пробуем еще 50 раз (5 секунд максимум)
+                if (window.patternLoadAttempts === undefined) {
+                    window.patternLoadAttempts = 0;
                 }
-            } else {
-                // Генерируем новый паттерн только если нет сохраненного
-                generateAndApplyPattern(card, generator, index);
-            }
-        });
-    }
-    
-    // Функция для генерации нового паттерна для конкретной карточки
-    window.generateNewPatternForCard = function(cardId) {
-        if (typeof window !== 'undefined' && window.patternGenerator) {
-            const newPattern = window.patternGenerator.generateRandomPattern();
-            const card = document.getElementById(cardId);
-            if (card) {
-                const patternContainer = card.querySelector('.pattern-container');
-                const button = card.querySelector('.admin-pattern-btn');
-                
-                if (patternContainer) {
-                    // Показываем индикатор загрузки на кнопке
-                    if (button) {
-                        const originalContent = button.innerHTML;
-                        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                        button.disabled = true;
-                        
-                        // Восстанавливаем кнопку через 3 секунды максимум
-                        setTimeout(() => {
-                            button.innerHTML = originalContent;
-                            button.disabled = false;
-                        }, 3000);
-                    }
-                    
-                    // Кодируем SVG в base64 для применения как background-image
-                    const encodedPattern = btoa(unescape(encodeURIComponent(newPattern)));
-                    patternContainer.style.backgroundImage = `url("data:image/svg+xml;base64,${encodedPattern}")`;
-                    
-                    // Получаем ID предмета из data-атрибута карточки
-                    const subjectId = card.getAttribute('data-subject-id');
-                    if (subjectId) {
-                        // Отправляем запрос на сервер для сохранения паттерна
-                        savePatternToServer(subjectId, newPattern, button);
-                    }
-                    
-                    return true;
+                if (window.patternLoadAttempts < 50) {
+                    window.patternLoadAttempts++;
+                    setTimeout(initializePatternGenerator, 100);
+                    return;
+                } else {
+                    useFallbackPatterns();
+                    return;
                 }
             }
-        }
-        return false;
-    }
-    
-    // Функция для сохранения паттерна на сервер
-    function savePatternToServer(subjectId, patternSvg, button) {
-        fetch(`/api/subject/${subjectId}/pattern`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
-            },
-            body: JSON.stringify({
-                pattern_svg: patternSvg,
-                pattern_type: 'random'
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Паттерн сохранен без уведомлений
-        })
-        .catch(error => {
-            // Ошибка без уведомлений
-        })
-        .finally(() => {
-            // Восстанавливаем кнопку после завершения запроса
-            if (button) {
-                button.innerHTML = '<i class="fas fa-palette"></i>';
-                button.disabled = false;
-            }
-        });
-    }
-    
-    // Функция генерации и применения паттерна (используется только для новых предметов)
-    function generateAndApplyPattern(card, generator, index) {
-        const patternType = card.getAttribute('data-pattern-type') || 'dots';
-        
-        try {
-            // Используем существующий генератор для создания уникального SVG
-            const pattern = generator.generatePattern(patternType);
-            if (pattern && pattern.includes('<svg')) {
-                const encodedPattern = btoa(unescape(encodeURIComponent(pattern)));
-                card.style.backgroundImage = `url("data:image/svg+xml;base64,${encodedPattern}")`;
-            }
-        } catch (error) {
-            // Игнорируем ошибки
-        }
-    }
-    
-    // Функция для генерации уникального SVG при создании предмета
-    function generateUniqueSVGForSubject(patternType) {
-        if (window.patternGenerator && typeof window.patternGenerator.generatePattern === 'function') {
+
             try {
-                // Генерируем уникальный SVG используя существующий генератор
-                const uniqueSVG = window.patternGenerator.generatePattern(patternType);
-                if (uniqueSVG && uniqueSVG.includes('<svg')) {
-                    // Кодируем SVG для передачи в форму
-                    const encodedSVG = btoa(unescape(encodeURIComponent(uniqueSVG)));
-                    return encodedSVG;
-                }
+                // Создаем экземпляр генератора
+                const generator = new SVGPatternGenerator();
+
+                // Применяем паттерны к карточкам предметов
+                applyPatternsToCards(generator);
+
+                // Инициализируем предпросмотр в модальном окне
+                initializePatternPreview(generator);
+
             } catch (error) {
-                console.error('Ошибка генерации уникального SVG:', error);
+                useFallbackPatterns();
             }
         }
-        return null;
-    }
-    
-    // Функция инициализации предпросмотра
-    function initializePatternPreview(generator) {
-        const patternSelect = document.getElementById('pattern-select');
-        const patternPreview = document.getElementById('pattern-preview');
-        const svgInput = document.getElementById('pattern-svg-input');
-        
-        if (patternSelect && patternPreview && svgInput) {
-            function updatePatternPreview() {
-                const selectedPattern = patternSelect.value;
-                
-                if (selectedPattern) {
+
+        // Функция fallback паттернов
+        function useFallbackPatterns() {
+            console.log('Используем fallback паттерны');
+            const subjectCards = document.querySelectorAll('.dashboard-card-img');
+
+            if (subjectCards.length === 0) {
+                return;
+            }
+
+            // Простые CSS градиенты как fallback
+            const fallbackPatterns = [
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+                'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)'
+            ];
+
+            subjectCards.forEach(function (card, index) {
+                const patternIndex = index % fallbackPatterns.length;
+                card.style.background = fallbackPatterns[patternIndex];
+            });
+        }
+
+        // Запускаем инициализацию
+        initializePatternGenerator();
+
+        // Функция применения паттернов к карточкам
+        function applyPatternsToCards(generator) {
+            const subjectCards = document.querySelectorAll('.dashboard-card-img');
+
+            if (subjectCards.length === 0) {
+                return;
+            }
+
+            subjectCards.forEach(function (card, index) {
+                // Проверяем, есть ли уже сохраненный SVG в базе данных
+                const savedSvg = card.getAttribute('data-pattern-svg');
+                const patternType = card.getAttribute('data-pattern-type');
+
+                if (savedSvg && savedSvg.trim() !== '') {
+                    // Используем сохраненный SVG из базы данных
                     try {
-                        // Генерируем УНИКАЛЬНЫЙ SVG каждый раз при изменении типа
-                        const uniqueSVG = generator.generatePattern(selectedPattern);
-                        if (uniqueSVG && uniqueSVG.includes('<svg')) {
-                            // Показываем в предпросмотре
-                            const encodedPattern = btoa(unescape(encodeURIComponent(uniqueSVG)));
-                            patternPreview.style.backgroundImage = `url("data:image/svg+xml;base64,${encodedPattern}")`;
-                            
-                            // Сохраняем УНИКАЛЬНЫЙ SVG в скрытое поле для передачи на сервер
-                            svgInput.value = uniqueSVG;
+                        // Проверяем, является ли savedSvg уже base64 или обычным SVG
+                        let svgToUse;
+                        if (savedSvg.includes('<svg')) {
+                            // Это обычный SVG, кодируем в base64
+                            svgToUse = btoa(unescape(encodeURIComponent(savedSvg)));
+                        } else {
+                            // Это уже base64, используем как есть
+                            svgToUse = savedSvg;
                         }
+
+                        card.style.backgroundImage = `url("data:image/svg+xml;base64,${svgToUse}")`;
                     } catch (error) {
-                        // Игнорируем ошибки
+                        // Если ошибка с сохраненным SVG, генерируем новый
+                        generateAndApplyPattern(card, generator, index);
                     }
                 } else {
-                    patternPreview.style.backgroundImage = 'none';
-                    svgInput.value = '';
+                    // Генерируем новый паттерн только если нет сохраненного
+                    generateAndApplyPattern(card, generator, index);
+                }
+            });
+        }
+
+        // Функция для генерации нового паттерна для конкретной карточки
+        window.generateNewPatternForCard = function (cardId) {
+            if (typeof window !== 'undefined' && window.patternGenerator) {
+                const newPattern = window.patternGenerator.generateRandomPattern();
+                const card = document.getElementById(cardId);
+                if (card) {
+                    const patternContainer = card.querySelector('.pattern-container');
+                    const button = card.querySelector('.admin-pattern-btn');
+
+                    if (patternContainer) {
+                        // Показываем индикатор загрузки на кнопке
+                        if (button) {
+                            const originalContent = button.innerHTML;
+                            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                            button.disabled = true;
+
+                            // Восстанавливаем кнопку через 3 секунды максимум
+                            setTimeout(() => {
+                                button.innerHTML = originalContent;
+                                button.disabled = false;
+                            }, 3000);
+                        }
+
+                        // Кодируем SVG в base64 для применения как background-image
+                        const encodedPattern = btoa(unescape(encodeURIComponent(newPattern)));
+                        patternContainer.style.backgroundImage = `url("data:image/svg+xml;base64,${encodedPattern}")`;
+
+                        // Получаем ID предмета из data-атрибута карточки
+                        const subjectId = card.getAttribute('data-subject-id');
+                        if (subjectId) {
+                            // Отправляем запрос на сервер для сохранения паттерна
+                            savePatternToServer(subjectId, newPattern, button);
+                        }
+
+                        return true;
+                    }
                 }
             }
-            
-            // Генерируем SVG при изменении типа паттерна
-            patternSelect.addEventListener('change', updatePatternPreview);
-            
-            // Генерируем SVG при открытии модального окна
-            const modal = document.getElementById('addSubjectModal');
-            if (modal) {
-                modal.addEventListener('show.bs.modal', function() {
-                    // Генерируем SVG только при открытии модального окна
-                    updatePatternPreview();
-                });
-            }
-            
+            return false;
+        }
 
+        // Функция для сохранения паттерна на сервер
+        function savePatternToServer(subjectId, patternSvg, button) {
+            fetch(`/api/subject/${subjectId}/pattern`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                },
+                body: JSON.stringify({
+                    pattern_svg: patternSvg,
+                    pattern_type: 'random'
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Паттерн сохранен без уведомлений
+                })
+                .catch(error => {
+                    // Ошибка без уведомлений
+                })
+                .finally(() => {
+                    // Восстанавливаем кнопку после завершения запроса
+                    if (button) {
+                        button.innerHTML = '<i class="fas fa-palette"></i>';
+                        button.disabled = false;
+                    }
+                });
+        }
+
+        // Функция генерации и применения паттерна (используется только для новых предметов)
+        function generateAndApplyPattern(card, generator, index) {
+            const patternType = card.getAttribute('data-pattern-type') || 'dots';
+
+            try {
+                // Используем существующий генератор для создания уникального SVG
+                const pattern = generator.generatePattern(patternType);
+                if (pattern && pattern.includes('<svg')) {
+                    const encodedPattern = btoa(unescape(encodeURIComponent(pattern)));
+                    card.style.backgroundImage = `url("data:image/svg+xml;base64,${encodedPattern}")`;
+                }
+            } catch (error) {
+                // Игнорируем ошибки
+            }
+        }
+
+        // Функция для генерации уникального SVG при создании предмета
+        function generateUniqueSVGForSubject(patternType) {
+            if (window.patternGenerator && typeof window.patternGenerator.generatePattern === 'function') {
+                try {
+                    // Генерируем уникальный SVG используя существующий генератор
+                    const uniqueSVG = window.patternGenerator.generatePattern(patternType);
+                    if (uniqueSVG && uniqueSVG.includes('<svg')) {
+                        // Кодируем SVG для передачи в форму
+                        const encodedSVG = btoa(unescape(encodeURIComponent(uniqueSVG)));
+                        return encodedSVG;
+                    }
+                } catch (error) {
+                    console.error('Ошибка генерации уникального SVG:', error);
+                }
+            }
+            return null;
+        }
+
+        // Функция инициализации предпросмотра
+        function initializePatternPreview(generator) {
+            const patternSelect = document.getElementById('pattern-select');
+            const patternPreview = document.getElementById('pattern-preview');
+            const svgInput = document.getElementById('pattern-svg-input');
+
+            if (patternSelect && patternPreview && svgInput) {
+                function updatePatternPreview() {
+                    const selectedPattern = patternSelect.value;
+
+                    if (selectedPattern) {
+                        try {
+                            // Генерируем УНИКАЛЬНЫЙ SVG каждый раз при изменении типа
+                            const uniqueSVG = generator.generatePattern(selectedPattern);
+                            if (uniqueSVG && uniqueSVG.includes('<svg')) {
+                                // Показываем в предпросмотре
+                                const encodedPattern = btoa(unescape(encodeURIComponent(uniqueSVG)));
+                                patternPreview.style.backgroundImage = `url("data:image/svg+xml;base64,${encodedPattern}")`;
+
+                                // Сохраняем УНИКАЛЬНЫЙ SVG в скрытое поле для передачи на сервер
+                                svgInput.value = uniqueSVG;
+                            }
+                        } catch (error) {
+                            // Игнорируем ошибки
+                        }
+                    } else {
+                        patternPreview.style.backgroundImage = 'none';
+                        svgInput.value = '';
+                    }
+                }
+
+                // Генерируем SVG при изменении типа паттерна
+                patternSelect.addEventListener('change', updatePatternPreview);
+
+                // Генерируем SVG при открытии модального окна
+                const modal = document.getElementById('addSubjectModal');
+                if (modal) {
+                    modal.addEventListener('show.bs.modal', function () {
+                        // Генерируем SVG только при открытии модального окна
+                        updatePatternPreview();
+                    });
+                }
+
+
+            }
+        }
+    });
+
+    function deleteSubject(subjectId) {
+        if (confirm('Вы уверены, что хотите удалить этот предмет?')) {
+            fetch(`/subject/${subjectId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `csrf_token={{ csrf_token() }}`
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Ошибка при удалении предмета');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Ошибка при удалении предмета');
+                });
         }
     }
-});
-
-function deleteSubject(subjectId) {
-    if (confirm('Вы уверены, что хотите удалить этот предмет?')) {
-        fetch(`/subject/${subjectId}/delete`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `csrf_token={{ csrf_token() }}`
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                alert('Ошибка при удалении предмета');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ошибка при удалении предмета');
-        });
-    }
-}
 </script>
 
 
-{% endblock %} 
+{% endblock %}

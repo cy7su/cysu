@@ -3,10 +3,10 @@
 
 class SVGPatternGenerator {
     constructor() {
-        this.primaryColor = '#B595FF';
-        this.primaryHover = '#9A7FE6';
+        this.primaryColor = 'var(--primary-color)';
+        this.primaryHover = 'var(--primary-hover)';
         this.backgroundColor = '#1a1a1a';
-        
+
         this.colorPalettes = {
             teal: ['#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A', '#00695C', '#004D40', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B', '#B2F5EA', '#7DD3FC', '#38BDF8', '#0EA5E9', '#0284C7', '#0D9488', '#14B8A6', '#2DD4BF', '#5EEAD4', '#99F6E4', '#CCFBF1', '#F0FDFA', '#134E4A', '#115E59', '#0F766E', '#0D9488', '#14B8A6', '#2DD4BF', '#5EEAD4', '#99F6E4', '#CCFBF1', '#F0FDFA', '#134E4A', '#115E59', '#0F766E'],
             yellow: ['#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58', '#F57F17', '#FF8F00', '#FFC107', '#FFD54F', '#FFECB3', '#FFF8E1', '#F9A825', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24', '#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F', '#451A03', '#7C2D12', '#9A3412', '#C2410C', '#EA580C', '#F97316', '#FB923C', '#FDBA74', '#FED7AA', '#FEF3C7', '#FDE68A', '#FCD34D', '#FBBF24'],
@@ -29,7 +29,7 @@ class SVGPatternGenerator {
             bright: ['#FF0000', '#FF4000', '#FF8000', '#FFBF00', '#FFFF00', '#BFFF00', '#80FF00', '#40FF00', '#00FF00', '#00FF40', '#00FF80', '#00FFBF', '#00FFFF', '#00BFFF', '#0080FF', '#0040FF', '#0000FF', '#4000FF', '#8000FF', '#BF00FF', '#FF0000', '#FF4000', '#FF8000', '#FFBF00', '#FFFF00', '#BFFF00', '#80FF00', '#40FF00', '#00FF00', '#00FF40', '#00FF80', '#00FFBF', '#00FFFF', '#00BFFF', '#0080FF', '#0040FF', '#0000FF', '#4000FF', '#8000FF', '#BF00FF'],
             nature: ['#228B22', '#32CD32', '#00FF00', '#7CFC00', '#ADFF2F', '#9ACD32', '#6B8E23', '#556B2F', '#8FBC8F', '#90EE90', '#98FB98', '#8FBC8F', '#2E8B57', '#3CB371', '#20B2AA', '#48D1CC', '#40E0D0', '#00CED1', '#00BFFF', '#87CEEB', '#228B22', '#32CD32', '#00FF00', '#7CFC00', '#ADFF2F', '#9ACD32', '#6B8E23', '#556B2F', '#8FBC8F', '#90EE90', '#98FB98', '#8FBC8F', '#2E8B57', '#3CB371', '#20B2AA', '#48D1CC', '#40E0D0', '#00CED1', '#00BFFF', '#87CEEB']
         };
-        
+
         this.colorPalette = [
             '#FFFFFF', '#F8F9FA', '#F1F3F4', '#E8EAED', '#DADCE0', '#F5F5F5', '#EEEEEE', '#E0E0E0', '#FAFAFA', '#F0F0F0',
             '#FFF8E1', '#FFF3E0', '#FFECB3', '#FFE0B2', '#FFCCBC', '#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58',
@@ -55,7 +55,7 @@ class SVGPatternGenerator {
             '#FFE4E1', '#FFD1DC', '#FFB6C1', '#FFA0B4', '#FF91A4', '#FFC0CB', '#FFCCCB', '#E6E6FA', '#D8BFD8', '#DDA0DD',
             '#DA70D6', '#EE82EE', '#F0E68C', '#F5DEB3', '#FFE4B5', '#FFEFD5', '#FFF8DC', '#F0FFF0', '#F5FFFA', '#F0F8FF'
         ];
-        
+
         this.backgroundPalette = [
             '#0f0f0f', '#121212', '#141414', '#161616', '#181818', '#1a1a1a', '#1c1c1c', '#1e1e1e', '#202020', '#212121',
             '#242424', '#262626', '#282828', '#2a2a2a', '#2c2c2c', '#2d2d2d', '#2f2f2f', '#313131', '#333333', '#353535',
@@ -77,7 +77,7 @@ class SVGPatternGenerator {
             '#500724', '#831843', '#9d174d', '#be185d', '#db2777', '#ec4899', '#f472b6', '#f9a8d4', '#fbcfe8', '#fce7f3',
             '#4c0519', '#7c2d12', '#991b1b', '#b91c1b', '#dc2626', '#881337', '#9f1239', '#be123c', '#e11d48', '#f43f5e'
         ];
-        
+
     }
 
     setColors(primary, hover, background) {
@@ -89,12 +89,12 @@ class SVGPatternGenerator {
     getRandomColor() {
         return this.colorPalette[Math.floor(Math.random() * this.colorPalette.length)];
     }
-    
+
     getRandomPalette() {
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
-        
+
         const numColors = this.randomInt(4, 12);
         const paletteColors = [];
         for (let i = 0; i < numColors; i++) {
@@ -102,10 +102,10 @@ class SVGPatternGenerator {
             const randomOpacity = this.random(0.3, 0.8);
             paletteColors.push({ color: randomColor, opacity: randomOpacity });
         }
-        
+
         return paletteColors;
     }
-    
+
     getColorFromPalette(paletteName) {
         const palette = this.colorPalettes[paletteName];
         if (palette) {
@@ -113,7 +113,7 @@ class SVGPatternGenerator {
         }
         return this.getRandomColor();
     }
-    
+
     getColorsFromPalette(paletteName, count = 3) {
         const palette = this.colorPalettes[paletteName];
         if (palette) {
@@ -172,29 +172,29 @@ class SVGPatternGenerator {
     generateCirclesPattern() {
         const size = this.getRandomSize();
         const circles = [];
-        
+
         // Выбираем одну случайную палитру для всего паттерна
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
-        
+
         const numCircles = this.randomInt(30, 60);
         const circleTypes = ['solid', 'gradient', 'outline', 'double'];
-        
+
         for (let i = 0; i < numCircles; i++) {
             const x = this.random(-30, size.width + 30);
             const y = this.random(-30, size.height + 30);
             const radius = this.random(15, 120);
             const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
             const opacity = this.random(0.1, 0.9); // Более широкий диапазон прозрачности
-            
+
             const circleType = circleTypes[Math.floor(Math.random() * circleTypes.length)];
-            
+
             if (circleType === 'gradient') {
                 const gradientId = `gradient_${i}`;
                 const gradientColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                 const gradientOpacity = this.random(0.1, 0.8);
-                
+
                 circles.push(`<defs>
                     <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
                         <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
@@ -204,23 +204,23 @@ class SVGPatternGenerator {
                 circles.push(`<circle cx="${x}" cy="${y}" r="${radius}" fill="url(#${gradientId})"/>`);
             } else if (circleType === 'outline') {
                 const strokeWidth = this.random(2, 8);
-                circles.push(`<circle cx="${x}" cy="${y}" r="${radius}" 
+                circles.push(`<circle cx="${x}" cy="${y}" r="${radius}"
                     fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
             } else if (circleType === 'double') {
                 const innerRadius = radius * this.random(0.3, 0.7);
                 const innerColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                 const innerOpacity = this.random(0.2, 0.8);
-                
-                circles.push(`<circle cx="${x}" cy="${y}" r="${radius}" 
+
+                circles.push(`<circle cx="${x}" cy="${y}" r="${radius}"
                     fill="${color}" opacity="${opacity}"/>`);
-                circles.push(`<circle cx="${x}" cy="${y}" r="${innerRadius}" 
+                circles.push(`<circle cx="${x}" cy="${y}" r="${innerRadius}"
                     fill="${innerColor}" opacity="${innerOpacity}"/>`);
             } else {
-                circles.push(`<circle cx="${x}" cy="${y}" r="${radius}" 
+                circles.push(`<circle cx="${x}" cy="${y}" r="${radius}"
                     fill="${color}" opacity="${opacity}"/>`);
             }
         }
-        
+
         return this.createSVG(size.width, size.height, circles.join(''));
     }
 
@@ -239,16 +239,16 @@ class SVGPatternGenerator {
     generateSpiralPattern() {
         const size = this.getRandomSize();
         const spirals = [];
-        
+
         // Выбираем одну случайную палитру для всего паттерна
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
-        
+
         const numSpirals = this.randomInt(12, 25);
         const maxRadius = Math.min(size.width, size.height) * 0.5;
         const turns = this.randomInt(2, 6);
-        
+
         for (let i = 0; i < numSpirals; i++) {
             const centerX = this.random(-50, size.width + 50);
             const centerY = this.random(-50, size.height + 50);
@@ -257,32 +257,32 @@ class SVGPatternGenerator {
             const strokeWidth = this.randomInt(1, 5);
             const spiralRadius = this.random(maxRadius * 0.3, maxRadius);
             const spiralTurns = this.randomInt(1, turns);
-            
+
             const path = this.generateSpiralPath(centerX, centerY, spiralRadius, spiralTurns);
-            spirals.push(`<path d="${path}" fill="none" stroke="${color}" 
+            spirals.push(`<path d="${path}" fill="none" stroke="${color}"
                 stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
         }
-        
+
         return this.createSVG(size.width, size.height, spirals.join(''));
     }
 
     generateSpiralPath(centerX, centerY, maxRadius, turns) {
         const points = [];
         const steps = 50;
-        
+
         for (let i = 0; i <= steps; i++) {
             const t = (i / steps) * turns * Math.PI * 2;
             const radius = (i / steps) * maxRadius;
             const x = centerX + radius * Math.cos(t);
             const y = centerY + radius * Math.sin(t);
-            
+
             if (i === 0) {
                 points.push(`M${x},${y}`);
             } else {
                 points.push(`L${x},${y}`);
             }
         }
-        
+
         return points.join(' ');
     }
 
@@ -293,15 +293,15 @@ class SVGPatternGenerator {
     generateFlowersPattern() {
         const size = this.getRandomSize();
         const flowers = [];
-        
+
         // Выбираем одну случайную палитру для всего паттерна
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
-        
+
         const numFlowers = this.randomInt(12, 25);
         const flowerTypes = ['simple', 'complex', 'gradient', 'layered'];
-        
+
         for (let i = 0; i < numFlowers; i++) {
             const x = this.random(-30, size.width + 30);
             const y = this.random(-30, size.height + 30);
@@ -312,28 +312,28 @@ class SVGPatternGenerator {
             const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
             const centerColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
             const centerOpacity = this.random(0.3, 0.8);
-            
+
             const flowerType = flowerTypes[Math.floor(Math.random() * flowerTypes.length)];
-            
+
             if (flowerType === 'gradient') {
                 const gradientId = `flower_grad_${i}`;
                 const gradientColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
-                
+
                 flowers.push(`<defs>
                     <radialGradient id="${gradientId}" cx="50%" cy="50%" r="50%">
                         <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
                         <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${opacity * 0.5}"/>
                     </radialGradient>
                 </defs>`);
-                
+
                 for (let j = 0; j < petals; j++) {
                     const angle = (j * Math.PI * 2) / petals;
                     const petalX = x + flowerSize * Math.cos(angle);
                     const petalY = y + flowerSize * Math.sin(angle);
-                    
-                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}" 
-                        rx="${petalSize}" ry="${petalSize * 0.7}" 
-                        fill="url(#${gradientId})" 
+
+                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}"
+                        rx="${petalSize}" ry="${petalSize * 0.7}"
+                        fill="url(#${gradientId})"
                         transform="rotate(${angle * 180 / Math.PI} ${petalX} ${petalY})"/>`);
                 }
             } else if (flowerType === 'layered') {
@@ -342,28 +342,28 @@ class SVGPatternGenerator {
                     const angle = (j * Math.PI * 2) / petals;
                     const petalX = x + flowerSize * Math.cos(angle);
                     const petalY = y + flowerSize * Math.sin(angle);
-                    
-                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}" 
-                        rx="${petalSize}" ry="${petalSize * 0.7}" 
-                        fill="${color}" opacity="${opacity}" 
+
+                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}"
+                        rx="${petalSize}" ry="${petalSize * 0.7}"
+                        fill="${color}" opacity="${opacity}"
                         transform="rotate(${angle * 180 / Math.PI} ${petalX} ${petalY})"/>`);
                 }
-                
+
                 // Внутренний слой лепестков
                 const innerPetals = Math.floor(petals / 2);
                 const innerSize = flowerSize * 0.6;
                 const innerPetalSize = petalSize * 0.7;
                 const innerColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                 const innerOpacity = this.random(0.3, 0.8);
-                
+
                 for (let j = 0; j < innerPetals; j++) {
                     const angle = (j * Math.PI * 2) / innerPetals;
                     const petalX = x + innerSize * Math.cos(angle);
                     const petalY = y + innerSize * Math.sin(angle);
-                    
-                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}" 
-                        rx="${innerPetalSize}" ry="${innerPetalSize * 0.7}" 
-                        fill="${innerColor}" opacity="${innerOpacity}" 
+
+                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}"
+                        rx="${innerPetalSize}" ry="${innerPetalSize * 0.7}"
+                        fill="${innerColor}" opacity="${innerOpacity}"
                         transform="rotate(${angle * 180 / Math.PI} ${petalX} ${petalY})"/>`);
                 }
             } else {
@@ -372,36 +372,36 @@ class SVGPatternGenerator {
                     const angle = (j * Math.PI * 2) / petals;
                     const petalX = x + flowerSize * Math.cos(angle);
                     const petalY = y + flowerSize * Math.sin(angle);
-                    
-                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}" 
-                        rx="${petalSize}" ry="${petalSize * 0.7}" 
-                        fill="${color}" opacity="${opacity}" 
+
+                    flowers.push(`<ellipse cx="${petalX}" cy="${petalY}"
+                        rx="${petalSize}" ry="${petalSize * 0.7}"
+                        fill="${color}" opacity="${opacity}"
                         transform="rotate(${angle * 180 / Math.PI} ${petalX} ${petalY})"/>`);
                 }
             }
-            
+
             // Центр цветка
-            flowers.push(`<circle cx="${x}" cy="${y}" r="${flowerSize * 0.3}" 
+            flowers.push(`<circle cx="${x}" cy="${y}" r="${flowerSize * 0.3}"
                 fill="${centerColor}" opacity="${centerOpacity}"/>`);
         }
-        
+
         return this.createSVG(size.width, size.height, flowers.join(''));
     }
 
     generateGeometricPattern() {
         const size = this.getRandomSize();
         const shapes = [];
-        
+
         // Выбираем одну случайную палитру для всего паттерна
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
-        
+
         const cellSize = this.randomInt(25, 60);
         const cols = Math.ceil(size.width / cellSize) + 1;
         const rows = Math.ceil(size.height / cellSize) + 1;
         const shapeTypes = ['square', 'diamond', 'circle', 'triangle', 'hexagon', 'star'];
-        
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const x = col * cellSize;
@@ -411,142 +411,142 @@ class SVGPatternGenerator {
                 const centerX = x + cellSize / 2;
                 const centerY = y + cellSize / 2;
                 const shapeSize = cellSize * this.random(0.6, 0.9);
-                
+
                 const shapeType = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
-                
+
                 if (shapeType === 'square') {
                     const offset = (cellSize - shapeSize) / 2;
                     const cornerRadius = this.random(0, shapeSize * 0.2);
-                    shapes.push(`<rect x="${x + offset}" y="${y + offset}" 
-                        width="${shapeSize}" height="${shapeSize}" 
+                    shapes.push(`<rect x="${x + offset}" y="${y + offset}"
+                        width="${shapeSize}" height="${shapeSize}"
                         rx="${cornerRadius}" ry="${cornerRadius}"
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (shapeType === 'diamond') {
                     const diamondSize = shapeSize * 0.8;
-                    const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
-                    shapes.push(`<polygon points="${points}" 
+                    const points = `${centerX},${centerY - diamondSize / 2} ${centerX + diamondSize / 2},${centerY} ${centerX},${centerY + diamondSize / 2} ${centerX - diamondSize / 2},${centerY}`;
+                    shapes.push(`<polygon points="${points}"
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (shapeType === 'circle') {
                     const radius = shapeSize / 2;
-                    shapes.push(`<circle cx="${centerX}" cy="${centerY}" r="${radius}" 
+                    shapes.push(`<circle cx="${centerX}" cy="${centerY}" r="${radius}"
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (shapeType === 'triangle') {
                     const triSize = shapeSize * 0.8;
-                    const points = `${centerX},${centerY - triSize/2} ${centerX + triSize/2},${centerY + triSize/2} ${centerX - triSize/2},${centerY + triSize/2}`;
-                    shapes.push(`<polygon points="${points}" 
+                    const points = `${centerX},${centerY - triSize / 2} ${centerX + triSize / 2},${centerY + triSize / 2} ${centerX - triSize / 2},${centerY + triSize / 2}`;
+                    shapes.push(`<polygon points="${points}"
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (shapeType === 'hexagon') {
                     const hexPoints = this.generateHexagonPoints(centerX, centerY, shapeSize / 2);
-                    shapes.push(`<polygon points="${hexPoints}" 
+                    shapes.push(`<polygon points="${hexPoints}"
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (shapeType === 'star') {
                     const starPoints = this.generateStarPoints(centerX, centerY, shapeSize / 2, this.randomInt(5, 8));
-                    shapes.push(`<polygon points="${starPoints}" 
+                    shapes.push(`<polygon points="${starPoints}"
                         fill="${color}" opacity="${opacity}"/>`);
                 }
-                
+
                 // Добавляем случайные декоративные элементы
                 if (this.randomInt(0, 3) === 0) {
                     const decorColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                     const decorOpacity = this.random(0.1, 0.5);
                     const decorSize = this.random(2, 8);
-                    
-                    const decorX = centerX + this.random(-shapeSize/3, shapeSize/3);
-                    const decorY = centerY + this.random(-shapeSize/3, shapeSize/3);
-                    
-                    shapes.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}" 
+
+                    const decorX = centerX + this.random(-shapeSize / 3, shapeSize / 3);
+                    const decorY = centerY + this.random(-shapeSize / 3, shapeSize / 3);
+
+                    shapes.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}"
                         fill="${decorColor}" opacity="${decorOpacity}"/>`);
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, shapes.join(''));
     }
 
     generateDiamondsPattern() {
         const size = this.getRandomSize();
         const diamonds = [];
-        
+
         // Выбираем одну случайную палитру для всего паттерна
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
-        
+
         const diamondSize = this.randomInt(20, 50);
         const cols = Math.ceil(size.width / diamondSize) + 2;
         const rows = Math.ceil(size.height / diamondSize) + 2;
         const diamondTypes = ['solid', 'gradient', 'outline', 'layered'];
-        
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const x = col * diamondSize;
                 const y = row * diamondSize;
-                
+
                 const offsetX = (row % 2) * diamondSize / 2;
                 const finalX = x + offsetX;
-                
+
                 if (finalX < size.width + diamondSize && y < size.height + diamondSize) {
                     const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                     const opacity = this.random(0.2, 0.9); // Более широкий диапазон прозрачности
                     const centerX = finalX + diamondSize / 2;
                     const centerY = y + diamondSize / 2;
                     const actualDiamondSize = diamondSize * this.random(0.7, 1.0);
-                    const points = `${centerX},${centerY - actualDiamondSize/2} ${centerX + actualDiamondSize/2},${centerY} ${centerX},${centerY + actualDiamondSize/2} ${centerX - actualDiamondSize/2},${centerY}`;
-                    
+                    const points = `${centerX},${centerY - actualDiamondSize / 2} ${centerX + actualDiamondSize / 2},${centerY} ${centerX},${centerY + actualDiamondSize / 2} ${centerX - actualDiamondSize / 2},${centerY}`;
+
                     const diamondType = diamondTypes[Math.floor(Math.random() * diamondTypes.length)];
-                    
+
                     if (diamondType === 'gradient') {
                         const gradientId = `diamond_grad_${row}_${col}`;
                         const gradientColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                         const gradientOpacity = this.random(0.3, 0.8);
-                        
+
                         diamonds.push(`<defs>
                             <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
                                 <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${gradientOpacity}"/>
                             </linearGradient>
                         </defs>`);
-                        diamonds.push(`<polygon points="${points}" 
+                        diamonds.push(`<polygon points="${points}"
                             fill="url(#${gradientId})"/>`);
                     } else if (diamondType === 'outline') {
                         const strokeWidth = this.randomInt(1, 4);
-                        diamonds.push(`<polygon points="${points}" 
+                        diamonds.push(`<polygon points="${points}"
                             fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
                     } else if (diamondType === 'layered') {
                         // Внешний алмаз
-                        diamonds.push(`<polygon points="${points}" 
+                        diamonds.push(`<polygon points="${points}"
                             fill="${color}" opacity="${opacity}"/>`);
-                        
+
                         // Внутренний алмаз
                         const innerColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                         const innerOpacity = this.random(0.3, 0.7);
                         const innerSize = actualDiamondSize * this.random(0.4, 0.7);
-                        const innerPoints = `${centerX},${centerY - innerSize/2} ${centerX + innerSize/2},${centerY} ${centerX},${centerY + innerSize/2} ${centerX - innerSize/2},${centerY}`;
-                        
-                        diamonds.push(`<polygon points="${innerPoints}" 
+                        const innerPoints = `${centerX},${centerY - innerSize / 2} ${centerX + innerSize / 2},${centerY} ${centerX},${centerY + innerSize / 2} ${centerX - innerSize / 2},${centerY}`;
+
+                        diamonds.push(`<polygon points="${innerPoints}"
                             fill="${innerColor}" opacity="${innerOpacity}"/>`);
                     } else {
                         // Простой алмаз
-                        diamonds.push(`<polygon points="${points}" 
+                        diamonds.push(`<polygon points="${points}"
                             fill="${color}" opacity="${opacity}"/>`);
                     }
-                    
+
                     // Добавляем случайные декоративные элементы
                     if (this.randomInt(0, 4) === 0) {
                         const decorColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                         const decorOpacity = this.random(0.1, 0.6);
                         const decorSize = this.random(1, 4);
-                        
-                        const decorX = centerX + this.random(-actualDiamondSize/4, actualDiamondSize/4);
-                        const decorY = centerY + this.random(-actualDiamondSize/4, actualDiamondSize/4);
-                        
-                        diamonds.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}" 
+
+                        const decorX = centerX + this.random(-actualDiamondSize / 4, actualDiamondSize / 4);
+                        const decorY = centerY + this.random(-actualDiamondSize / 4, actualDiamondSize / 4);
+
+                        diamonds.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}"
                             fill="${decorColor}" opacity="${decorOpacity}"/>`);
                     }
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, diamonds.join(''));
     }
 
@@ -555,56 +555,56 @@ class SVGPatternGenerator {
     generateChevronsPattern() {
         const size = this.getRandomSize();
         const chevrons = [];
-        
+
         // Выбираем одну случайную палитру для всего паттерна
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
-        
+
         const chevronWidth = this.randomInt(25, 60);
         const chevronHeight = this.randomInt(15, 45);
         const cols = Math.ceil(size.width / chevronWidth) + 2;
         const rows = Math.ceil(size.height / chevronHeight) + 2;
         const chevronTypes = ['solid', 'gradient', 'outline', 'layered', 'double'];
-        
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const x = col * chevronWidth;
                 const y = row * chevronHeight;
-                
+
                 const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                 const opacity = this.random(0.2, 0.9); // Более широкий диапазон прозрачности
                 const actualWidth = chevronWidth * this.random(0.8, 1.2);
                 const actualHeight = chevronHeight * this.random(0.8, 1.2);
-                
+
                 const chevronType = chevronTypes[Math.floor(Math.random() * chevronTypes.length)];
-                
+
                 if (chevronType === 'gradient') {
                     const gradientId = `chevron_grad_${row}_${col}`;
                     const gradientColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                     const gradientOpacity = this.random(0.3, 0.8);
-                    
+
                     chevrons.push(`<defs>
                         <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
                             <stop offset="100%" style="stop-color:${gradientColor};stop-opacity:${gradientOpacity}"/>
                         </linearGradient>
                     </defs>`);
-                    
-                    const points = `${x},${y} ${x + actualWidth/2},${y + actualHeight} ${x + actualWidth},${y}`;
-                    chevrons.push(`<polygon points="${points}" 
+
+                    const points = `${x},${y} ${x + actualWidth / 2},${y + actualHeight} ${x + actualWidth},${y}`;
+                    chevrons.push(`<polygon points="${points}"
                         fill="url(#${gradientId})"/>`);
                 } else if (chevronType === 'outline') {
                     const strokeWidth = this.randomInt(1, 4);
-                    const points = `${x},${y} ${x + actualWidth/2},${y + actualHeight} ${x + actualWidth},${y}`;
-                    chevrons.push(`<polygon points="${points}" 
+                    const points = `${x},${y} ${x + actualWidth / 2},${y + actualHeight} ${x + actualWidth},${y}`;
+                    chevrons.push(`<polygon points="${points}"
                         fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
                 } else if (chevronType === 'layered') {
                     // Внешний шеврон
-                    const points = `${x},${y} ${x + actualWidth/2},${y + actualHeight} ${x + actualWidth},${y}`;
-                    chevrons.push(`<polygon points="${points}" 
+                    const points = `${x},${y} ${x + actualWidth / 2},${y + actualHeight} ${x + actualWidth},${y}`;
+                    chevrons.push(`<polygon points="${points}"
                         fill="${color}" opacity="${opacity}"/>`);
-                    
+
                     // Внутренний шеврон
                     const innerColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                     const innerOpacity = this.random(0.3, 0.7);
@@ -612,43 +612,43 @@ class SVGPatternGenerator {
                     const innerHeight = actualHeight * this.random(0.4, 0.7);
                     const innerX = x + (actualWidth - innerWidth) / 2;
                     const innerY = y + (actualHeight - innerHeight) / 2;
-                    const innerPoints = `${innerX},${innerY} ${innerX + innerWidth/2},${innerY + innerHeight} ${innerX + innerWidth},${innerY}`;
-                    
-                    chevrons.push(`<polygon points="${innerPoints}" 
+                    const innerPoints = `${innerX},${innerY} ${innerX + innerWidth / 2},${innerY + innerHeight} ${innerX + innerWidth},${innerY}`;
+
+                    chevrons.push(`<polygon points="${innerPoints}"
                         fill="${innerColor}" opacity="${innerOpacity}"/>`);
                 } else if (chevronType === 'double') {
                     // Двойной шеврон
-                    const points1 = `${x},${y} ${x + actualWidth/2},${y + actualHeight} ${x + actualWidth},${y}`;
-                    chevrons.push(`<polygon points="${points1}" 
+                    const points1 = `${x},${y} ${x + actualWidth / 2},${y + actualHeight} ${x + actualWidth},${y}`;
+                    chevrons.push(`<polygon points="${points1}"
                         fill="${color}" opacity="${opacity}"/>`);
-                    
+
                     const secondColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                     const secondOpacity = this.random(0.2, 0.6);
-                    const points2 = `${x + actualWidth/4},${y + actualHeight/2} ${x + actualWidth/2},${y + actualHeight} ${x + 3*actualWidth/4},${y + actualHeight/2}`;
-                    chevrons.push(`<polygon points="${points2}" 
+                    const points2 = `${x + actualWidth / 4},${y + actualHeight / 2} ${x + actualWidth / 2},${y + actualHeight} ${x + 3 * actualWidth / 4},${y + actualHeight / 2}`;
+                    chevrons.push(`<polygon points="${points2}"
                         fill="${secondColor}" opacity="${secondOpacity}"/>`);
                 } else {
                     // Простой шеврон
-                    const points = `${x},${y} ${x + actualWidth/2},${y + actualHeight} ${x + actualWidth},${y}`;
-                    chevrons.push(`<polygon points="${points}" 
+                    const points = `${x},${y} ${x + actualWidth / 2},${y + actualHeight} ${x + actualWidth},${y}`;
+                    chevrons.push(`<polygon points="${points}"
                         fill="${color}" opacity="${opacity}"/>`);
                 }
-                
+
                 // Добавляем случайные декоративные элементы
                 if (this.randomInt(0, 5) === 0) {
                     const decorColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                     const decorOpacity = this.random(0.1, 0.5);
                     const decorSize = this.random(2, 6);
-                    
-                    const decorX = x + actualWidth/2 + this.random(-actualWidth/4, actualWidth/4);
-                    const decorY = y + actualHeight/2 + this.random(-actualHeight/4, actualHeight/4);
-                    
-                    chevrons.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}" 
+
+                    const decorX = x + actualWidth / 2 + this.random(-actualWidth / 4, actualWidth / 4);
+                    const decorY = y + actualHeight / 2 + this.random(-actualHeight / 4, actualHeight / 4);
+
+                    chevrons.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}"
                         fill="${decorColor}" opacity="${decorOpacity}"/>`);
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, chevrons.join(''));
     }
 
@@ -657,41 +657,41 @@ class SVGPatternGenerator {
     generateQuiltPattern() {
         const size = this.getRandomSize();
         const quilt = [];
-        
+
         // Выбираем одну случайную палитру для всего паттерна
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
-        
+
         const basePatchSize = this.randomInt(12, 35);
         const cols = Math.ceil(size.width / basePatchSize) + 2;
         const rows = Math.ceil(size.height / basePatchSize) + 2;
-        
+
         const layers = this.randomInt(2, 5);
-        
+
         for (let layer = 0; layer < layers; layer++) {
             const layerOpacity = this.random(0.2, 0.8); // Более широкий диапазон прозрачности
             const layerOffset = layer * 2;
-        
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
+
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
                     const x = col * basePatchSize + layerOffset;
                     const y = row * basePatchSize + layerOffset;
-                    
+
                     if (x < size.width && y < size.height) {
                         const patchSize = basePatchSize + this.randomInt(-8, 15);
                         const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                         const colorOpacity = this.random(0.3, 0.9); // Более широкий диапазон прозрачности
                         const secondaryColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                         const secondaryOpacity = this.random(0.2, 0.8);
-                        
+
                         const patchType = this.randomInt(0, 8);
-                        
+
                         if (patchType === 0) {
                             // Простой квадрат с закругленными углами
                             const cornerRadius = patchSize * this.random(0.05, 0.3);
-                            quilt.push(`<rect x="${x}" y="${y}" 
-                                width="${patchSize}" height="${patchSize}" 
+                            quilt.push(`<rect x="${x}" y="${y}"
+                                width="${patchSize}" height="${patchSize}"
                                 rx="${cornerRadius}" ry="${cornerRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                         } else if (patchType === 1) {
@@ -703,23 +703,23 @@ class SVGPatternGenerator {
                                     <stop offset="100%" style="stop-color:${secondaryColor};stop-opacity:${secondaryOpacity}"/>
                                 </linearGradient>
                             </defs>`);
-                            quilt.push(`<rect x="${x}" y="${y}" 
-                                width="${patchSize}" height="${patchSize}" 
+                            quilt.push(`<rect x="${x}" y="${y}"
+                                width="${patchSize}" height="${patchSize}"
                                 rx="${patchSize * 0.1}" ry="${patchSize * 0.1}"
                                 fill="url(#${gradientId})"/>`);
                         } else if (patchType === 2) {
                             // Квадрат с внутренним квадратом
                             const cornerRadius = patchSize * 0.1;
-                            quilt.push(`<rect x="${x}" y="${y}" 
-                                width="${patchSize}" height="${patchSize}" 
+                            quilt.push(`<rect x="${x}" y="${y}"
+                                width="${patchSize}" height="${patchSize}"
                                 rx="${cornerRadius}" ry="${cornerRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
-                            
+
                             const innerSize = patchSize * this.random(0.4, 0.8);
                             const innerX = x + (patchSize - innerSize) / 2;
                             const innerY = y + (patchSize - innerSize) / 2;
-                            quilt.push(`<rect x="${innerX}" y="${innerY}" 
-                                width="${innerSize}" height="${innerSize}" 
+                            quilt.push(`<rect x="${innerX}" y="${innerY}"
+                                width="${innerSize}" height="${innerSize}"
                                 rx="${cornerRadius * 0.5}" ry="${cornerRadius * 0.5}"
                                 fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
                         } else if (patchType === 3) {
@@ -727,43 +727,43 @@ class SVGPatternGenerator {
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
                             const diamondSize = patchSize * this.random(0.6, 0.9);
-                            const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
-                            quilt.push(`<polygon points="${points}" 
+                            const points = `${centerX},${centerY - diamondSize / 2} ${centerX + diamondSize / 2},${centerY} ${centerX},${centerY + diamondSize / 2} ${centerX - diamondSize / 2},${centerY}`;
+                            quilt.push(`<polygon points="${points}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                         } else if (patchType === 4) {
                             // Квадрат с кругом
                             const cornerRadius = patchSize * 0.1;
-                            quilt.push(`<rect x="${x}" y="${y}" 
-                                width="${patchSize}" height="${patchSize}" 
+                            quilt.push(`<rect x="${x}" y="${y}"
+                                width="${patchSize}" height="${patchSize}"
                                 rx="${cornerRadius}" ry="${cornerRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
-                            
+
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
                             const circleRadius = patchSize * this.random(0.2, 0.4);
-                            quilt.push(`<circle cx="${centerX}" cy="${centerY}" r="${circleRadius}" 
+                            quilt.push(`<circle cx="${centerX}" cy="${centerY}" r="${circleRadius}"
                                 fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
                         } else if (patchType === 5) {
                             // Квадрат со звездой
                             const cornerRadius = patchSize * 0.1;
-                            quilt.push(`<rect x="${x}" y="${y}" 
-                                width="${patchSize}" height="${patchSize}" 
+                            quilt.push(`<rect x="${x}" y="${y}"
+                                width="${patchSize}" height="${patchSize}"
                                 rx="${cornerRadius}" ry="${cornerRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
-                            
+
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
                             const starRadius = patchSize * this.random(0.2, 0.4);
                             const starPoints = this.generateStarPoints(centerX, centerY, starRadius, this.randomInt(5, 8));
-                            quilt.push(`<polygon points="${starPoints}" 
+                            quilt.push(`<polygon points="${starPoints}"
                                 fill="${secondaryColor}" opacity="${secondaryOpacity}"/>`);
                         } else if (patchType === 6) {
                             // Треугольник
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
                             const triSize = patchSize * this.random(0.6, 0.9);
-                            const points = `${centerX},${centerY - triSize/2} ${centerX + triSize/2},${centerY + triSize/2} ${centerX - triSize/2},${centerY + triSize/2}`;
-                            quilt.push(`<polygon points="${points}" 
+                            const points = `${centerX},${centerY - triSize / 2} ${centerX + triSize / 2},${centerY + triSize / 2} ${centerX - triSize / 2},${centerY + triSize / 2}`;
+                            quilt.push(`<polygon points="${points}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                         } else if (patchType === 7) {
                             // Шестиугольник
@@ -771,28 +771,28 @@ class SVGPatternGenerator {
                             const centerY = y + patchSize / 2;
                             const hexSize = patchSize * this.random(0.4, 0.8);
                             const hexPoints = this.generateHexagonPoints(centerX, centerY, hexSize);
-                            quilt.push(`<polygon points="${hexPoints}" 
+                            quilt.push(`<polygon points="${hexPoints}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                         } else {
                             // Круг
                             const centerX = x + patchSize / 2;
                             const centerY = y + patchSize / 2;
                             const circleRadius = patchSize * this.random(0.3, 0.5);
-                            quilt.push(`<circle cx="${centerX}" cy="${centerY}" r="${circleRadius}" 
+                            quilt.push(`<circle cx="${centerX}" cy="${centerY}" r="${circleRadius}"
                                 fill="${color}" opacity="${colorOpacity}"/>`);
                         }
-                        
+
                         if (this.randomInt(0, 4) === 0) {
                             const decorType = this.randomInt(0, 3);
                             const decorColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                             const decorOpacity = this.random(0.1, 0.6);
-                            
+
                             if (decorType === 0) {
                                 for (let i = 0; i < 3; i++) {
                                     const dotX = x + this.random(5, patchSize - 5);
                                     const dotY = y + this.random(5, patchSize - 5);
                                     const dotRadius = this.random(1, 3);
-                                    quilt.push(`<circle cx="${dotX}" cy="${dotY}" r="${dotRadius}" 
+                                    quilt.push(`<circle cx="${dotX}" cy="${dotY}" r="${dotRadius}"
                                         fill="${decorColor}" opacity="${decorOpacity}"/>`);
                                 }
                             } else if (decorType === 1) {
@@ -800,14 +800,14 @@ class SVGPatternGenerator {
                                 const lineY1 = y + this.random(0, patchSize);
                                 const lineX2 = x + this.random(0, patchSize);
                                 const lineY2 = y + this.random(0, patchSize);
-                                quilt.push(`<line x1="${lineX1}" y1="${lineY1}" x2="${lineX2}" y2="${lineY2}" 
+                                quilt.push(`<line x1="${lineX1}" y1="${lineY1}" x2="${lineX2}" y2="${lineY2}"
                                     stroke="${decorColor}" stroke-width="${this.random(1, 3)}" opacity="${decorOpacity}"/>`);
                             } else {
                                 const triX = x + patchSize / 2;
                                 const triY = y + patchSize / 2;
                                 const triSize = this.random(3, 8);
                                 const triPoints = `${triX},${triY - triSize} ${triX + triSize},${triY + triSize} ${triX - triSize},${triY + triSize}`;
-                                quilt.push(`<polygon points="${triPoints}" 
+                                quilt.push(`<polygon points="${triPoints}"
                                     fill="${decorColor}" opacity="${decorOpacity}"/>`);
                             }
                         }
@@ -815,22 +815,22 @@ class SVGPatternGenerator {
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, quilt.join(''));
     }
 
     generateWavesPattern() {
         const size = this.getRandomSize();
         const waves = [];
-        
+
         // Выбираем одну случайную палитру для всего паттерна
         const paletteNames = Object.keys(this.colorPalettes);
         const randomPaletteName = paletteNames[Math.floor(Math.random() * paletteNames.length)];
         const selectedPalette = this.colorPalettes[randomPaletteName];
-        
+
         const numWaves = this.randomInt(8, 20);
         const waveTypes = ['sine', 'cosine', 'complex', 'gradient', 'layered'];
-        
+
         for (let i = 0; i < numWaves; i++) {
             const color = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
             const opacity = this.random(0.1, 0.8); // Более широкий диапазон прозрачности
@@ -839,14 +839,14 @@ class SVGPatternGenerator {
             const phase = this.random(0, Math.PI * 2);
             const yOffset = this.random(0, size.height);
             const strokeWidth = this.randomInt(1, 6);
-            
+
             const waveType = waveTypes[Math.floor(Math.random() * waveTypes.length)];
-            
+
             if (waveType === 'gradient') {
                 const gradientId = `wave_grad_${i}`;
                 const gradientColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                 const gradientOpacity = this.random(0.2, 0.7);
-                
+
                 waves.push(`<defs>
                     <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" style="stop-color:${color};stop-opacity:${opacity}"/>
@@ -854,22 +854,22 @@ class SVGPatternGenerator {
                         <stop offset="100%" style="stop-color:${color};stop-opacity:${opacity}"/>
                     </linearGradient>
                 </defs>`);
-                
+
                 const path = this.generateWavePath(size.width, yOffset, amplitude, frequency, phase, 'sine');
                 waves.push(`<path d="${path}" fill="none" stroke="url(#${gradientId})" stroke-width="${strokeWidth}"/>`);
             } else if (waveType === 'layered') {
                 // Основная волна
                 const path1 = this.generateWavePath(size.width, yOffset, amplitude, frequency, phase, 'sine');
                 waves.push(`<path d="${path1}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
-                
+
                 // Дополнительная волна
                 const secondaryColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                 const secondaryOpacity = this.random(0.2, 0.6);
                 const secondaryAmplitude = amplitude * this.random(0.3, 0.7);
                 const secondaryFrequency = frequency * this.random(1.5, 3);
-                const secondaryPhase = phase + this.random(-Math.PI/2, Math.PI/2);
+                const secondaryPhase = phase + this.random(-Math.PI / 2, Math.PI / 2);
                 const secondaryYOffset = yOffset + this.random(-20, 20);
-                
+
                 const path2 = this.generateWavePath(size.width, secondaryYOffset, secondaryAmplitude, secondaryFrequency, secondaryPhase, 'cosine');
                 waves.push(`<path d="${path2}" fill="none" stroke="${secondaryColor}" stroke-width="${strokeWidth * 0.7}" opacity="${secondaryOpacity}"/>`);
             } else if (waveType === 'complex') {
@@ -882,67 +882,67 @@ class SVGPatternGenerator {
                 const path = this.generateWavePath(size.width, yOffset, amplitude, frequency, phase, waveFunction);
                 waves.push(`<path d="${path}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" opacity="${opacity}"/>`);
             }
-            
+
             // Добавляем случайные декоративные элементы
             if (this.randomInt(0, 5) === 0) {
                 const decorColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)];
                 const decorOpacity = this.random(0.1, 0.5);
                 const decorSize = this.random(2, 8);
-                
+
                 const decorX = this.random(0, size.width);
                 const decorY = yOffset + amplitude * Math.sin(frequency * decorX + phase);
-                
-                waves.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}" 
+
+                waves.push(`<circle cx="${decorX}" cy="${decorY}" r="${decorSize}"
                     fill="${decorColor}" opacity="${decorOpacity}"/>`);
             }
         }
-        
+
         return this.createSVG(size.width, size.height, waves.join(''));
     }
 
     generateWavePath(width, yOffset, amplitude, frequency, phase, waveFunction) {
         const points = [];
         const steps = 100;
-        
+
         for (let i = 0; i <= steps; i++) {
             const x = (i / steps) * width;
             let y;
-            
+
             if (waveFunction === 'cosine') {
                 y = yOffset + amplitude * Math.cos(frequency * x + phase);
             } else {
                 y = yOffset + amplitude * Math.sin(frequency * x + phase);
             }
-            
+
             if (i === 0) {
                 points.push(`M${x},${y}`);
             } else {
                 points.push(`L${x},${y}`);
             }
         }
-        
+
         return points.join(' ');
     }
 
     generateComplexWavePath(width, yOffset, amplitude, frequency, phase) {
         const points = [];
         const steps = 100;
-        
+
         for (let i = 0; i <= steps; i++) {
             const x = (i / steps) * width;
             // Сложная волна с несколькими частотами
-            const y = yOffset + 
+            const y = yOffset +
                 amplitude * Math.sin(frequency * x + phase) +
-                amplitude * 0.5 * Math.sin(frequency * 2 * x + phase + Math.PI/4) +
-                amplitude * 0.3 * Math.sin(frequency * 3 * x + phase + Math.PI/2);
-            
+                amplitude * 0.5 * Math.sin(frequency * 2 * x + phase + Math.PI / 4) +
+                amplitude * 0.3 * Math.sin(frequency * 3 * x + phase + Math.PI / 2);
+
             if (i === 0) {
                 points.push(`M${x},${y}`);
             } else {
                 points.push(`L${x},${y}`);
             }
         }
-        
+
         return points.join(' ');
     }
 
@@ -950,30 +950,30 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const concentric = [];
         const palette = this.getRandomPalette();
-        
+
         const centerX = size.width / 2;
         const centerY = size.height / 2;
         const maxRadius = Math.min(size.width, size.height) / 2;
-        
+
         const numRings = this.randomInt(6, 12);
         const ringSpacing = maxRadius / numRings;
-        
+
         for (let ring = 0; ring < numRings; ring++) {
             const radius = ringSpacing * (ring + 1);
             const opacity = this.random(0.2, 0.6);
             const color = palette[Math.floor(Math.random() * palette.length)];
-            
-            concentric.push(`<circle cx="${centerX}" cy="${centerY}" r="${radius}" 
+
+            concentric.push(`<circle cx="${centerX}" cy="${centerY}" r="${radius}"
                 fill="none" stroke="${color}" stroke-width="${this.randomInt(2, 5)}" opacity="${opacity}"/>`);
-            
+
             if (ring % 2 === 0 && ring > 0) {
                 const innerRadius = radius * 0.7;
                 const innerColor = palette[Math.floor(Math.random() * palette.length)];
-                concentric.push(`<circle cx="${centerX}" cy="${centerY}" r="${innerRadius}" 
+                concentric.push(`<circle cx="${centerX}" cy="${centerY}" r="${innerRadius}"
                     fill="${innerColor}" opacity="${opacity * 0.5}"/>`);
             }
         }
-        
+
         return this.createSVG(size.width, size.height, concentric.join(''));
     }
 
@@ -983,43 +983,43 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const brick = [];
         const palette = this.getRandomPalette();
-        
+
         const brickWidth = this.randomInt(30, 50);
         const brickHeight = this.randomInt(15, 25);
         const cols = Math.ceil(size.width / brickWidth) + 1;
         const rows = Math.ceil(size.height / brickHeight) + 1;
-        
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const x = col * brickWidth;
                 const y = row * brickHeight;
-                
+
                 const offsetX = (row % 2) * brickWidth / 2;
                 const finalX = x + offsetX;
-                
+
                 if (finalX < size.width + brickWidth && y < size.height + brickHeight) {
                     const color = palette[Math.floor(Math.random() * palette.length)];
                     const opacity = this.random(0.4, 0.8);
-                    
+
                     const cornerRadius = Math.min(brickWidth, brickHeight) * 0.1;
-                    brick.push(`<rect x="${finalX}" y="${y}" 
-                        width="${brickWidth}" height="${brickHeight}" 
+                    brick.push(`<rect x="${finalX}" y="${y}"
+                        width="${brickWidth}" height="${brickHeight}"
                         rx="${cornerRadius}" ry="${cornerRadius}"
                         fill="${color}" opacity="${opacity}"/>`);
-                    
+
                     const innerColor = palette[Math.floor(Math.random() * palette.length)];
                     const innerWidth = brickWidth * 0.6;
                     const innerHeight = brickHeight * 0.6;
                     const innerX = finalX + (brickWidth - innerWidth) / 2;
                     const innerY = y + (brickHeight - innerHeight) / 2;
-                    brick.push(`<rect x="${innerX}" y="${innerY}" 
-                        width="${innerWidth}" height="${innerHeight}" 
+                    brick.push(`<rect x="${innerX}" y="${innerY}"
+                        width="${innerWidth}" height="${innerHeight}"
                         rx="${cornerRadius * 0.5}" ry="${cornerRadius * 0.5}"
                         fill="${innerColor}" opacity="${opacity * 0.6}"/>`);
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, brick.join(''));
     }
 
@@ -1027,39 +1027,39 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const diamondGrid = [];
         const palette = this.getRandomPalette();
-        
+
         const diamondSize = this.randomInt(25, 40);
         const cols = Math.ceil(size.width / diamondSize) + 1;
         const rows = Math.ceil(size.height / diamondSize) + 1;
-        
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const x = col * diamondSize;
                 const y = row * diamondSize;
-                
+
                 const offsetX = (row % 2) * diamondSize / 2;
                 const finalX = x + offsetX;
-                
+
                 if (finalX < size.width + diamondSize && y < size.height + diamondSize) {
                     const color = palette[Math.floor(Math.random() * palette.length)];
                     const opacity = this.random(0.3, 0.7);
-                    
+
                     const centerX = finalX + diamondSize / 2;
                     const centerY = y + diamondSize / 2;
-                    const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
-                    
-                    diamondGrid.push(`<polygon points="${points}" 
+                    const points = `${centerX},${centerY - diamondSize / 2} ${centerX + diamondSize / 2},${centerY} ${centerX},${centerY + diamondSize / 2} ${centerX - diamondSize / 2},${centerY}`;
+
+                    diamondGrid.push(`<polygon points="${points}"
                         fill="${color}" opacity="${opacity}"/>`);
-                    
+
                     const innerColor = palette[Math.floor(Math.random() * palette.length)];
                     const innerSize = diamondSize * 0.4;
-                    const innerPoints = `${centerX},${centerY - innerSize/2} ${centerX + innerSize/2},${centerY} ${centerX},${centerY + innerSize/2} ${centerX - innerSize/2},${centerY}`;
-                    diamondGrid.push(`<polygon points="${innerPoints}" 
+                    const innerPoints = `${centerX},${centerY - innerSize / 2} ${centerX + innerSize / 2},${centerY} ${centerX},${centerY + innerSize / 2} ${centerX - innerSize / 2},${centerY}`;
+                    diamondGrid.push(`<polygon points="${innerPoints}"
                         fill="${innerColor}" opacity="${opacity * 0.8}"/>`);
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, diamondGrid.join(''));
     }
 
@@ -1067,45 +1067,45 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const mandala = [];
         const palette = this.getRandomPalette();
-        
+
         const centerX = size.width / 2;
         const centerY = size.height / 2;
         const maxRadius = Math.min(size.width, size.height) / 2;
-        
+
         const numRings = this.randomInt(4, 8);
         const ringSpacing = maxRadius / numRings;
-        
+
         for (let ring = 0; ring < numRings; ring++) {
             const ringRadius = ringSpacing * (ring + 1);
             const numElements = this.randomInt(6, 16);
             const elementSize = ringSpacing * 0.3;
             const opacity = this.random(0.3, 0.7);
-            
+
             for (let i = 0; i < numElements; i++) {
                 const angle = (i * 2 * Math.PI) / numElements;
                 const x = centerX + ringRadius * Math.cos(angle);
                 const y = centerY + ringRadius * Math.sin(angle);
-                
+
                 const color = palette[Math.floor(Math.random() * palette.length)];
-                
+
                 const elementType = this.randomInt(0, 3);
-                
+
                 if (elementType === 0) {
-                    mandala.push(`<circle cx="${x}" cy="${y}" r="${elementSize}" 
+                    mandala.push(`<circle cx="${x}" cy="${y}" r="${elementSize}"
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (elementType === 1) {
-                    mandala.push(`<rect x="${x - elementSize}" y="${y - elementSize}" 
-                        width="${elementSize * 2}" height="${elementSize * 2}" 
-                        fill="${color}" opacity="${opacity}" 
+                    mandala.push(`<rect x="${x - elementSize}" y="${y - elementSize}"
+                        width="${elementSize * 2}" height="${elementSize * 2}"
+                        fill="${color}" opacity="${opacity}"
                         transform="rotate(${angle * 180 / Math.PI} ${x} ${y})"/>`);
                 } else {
                     const points = `${x},${y - elementSize} ${x + elementSize},${y} ${x},${y + elementSize} ${x - elementSize},${y}`;
-                    mandala.push(`<polygon points="${points}" 
+                    mandala.push(`<polygon points="${points}"
                         fill="${color}" opacity="${opacity}"/>`);
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, mandala.join(''));
     }
 
@@ -1113,31 +1113,31 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const tessellation = [];
         const palette = this.getRandomPalette();
-        
+
         const cellSize = this.randomInt(20, 35);
         const cols = Math.ceil(size.width / cellSize) + 1;
         const rows = Math.ceil(size.height / cellSize) + 1;
-        
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const x = col * cellSize;
                 const y = row * cellSize;
-                
+
                 const color = palette[Math.floor(Math.random() * palette.length)];
                 const opacity = this.random(0.4, 0.8);
-                
+
                 const shapeType = this.randomInt(0, 4);
-                
+
                 if (shapeType === 0) {
                     const numSides = this.randomInt(5, 8);
                     const points = [];
                     for (let i = 0; i < numSides; i++) {
                         const angle = (i * 2 * Math.PI) / numSides;
-                        const px = x + cellSize/2 + (cellSize/2 * 0.8) * Math.cos(angle);
-                        const py = y + cellSize/2 + (cellSize/2 * 0.8) * Math.sin(angle);
+                        const px = x + cellSize / 2 + (cellSize / 2 * 0.8) * Math.cos(angle);
+                        const py = y + cellSize / 2 + (cellSize / 2 * 0.8) * Math.sin(angle);
                         points.push(`${px},${py}`);
                     }
-                    tessellation.push(`<polygon points="${points.join(' ')}" 
+                    tessellation.push(`<polygon points="${points.join(' ')}"
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (shapeType === 1) {
                     const numPoints = this.randomInt(5, 8);
@@ -1147,34 +1147,34 @@ class SVGPatternGenerator {
                     for (let i = 0; i < numPoints * 2; i++) {
                         const angle = (i * Math.PI) / numPoints;
                         const radius = i % 2 === 0 ? outerRadius : innerRadius;
-                        const px = x + cellSize/2 + radius * Math.cos(angle);
-                        const py = y + cellSize/2 + radius * Math.sin(angle);
+                        const px = x + cellSize / 2 + radius * Math.cos(angle);
+                        const py = y + cellSize / 2 + radius * Math.sin(angle);
                         points.push(`${px},${py}`);
                     }
-                    tessellation.push(`<polygon points="${points.join(' ')}" 
+                    tessellation.push(`<polygon points="${points.join(' ')}"
                         fill="${color}" opacity="${opacity}"/>`);
                 } else if (shapeType === 2) {
-                    const centerX = x + cellSize/2;
-                    const centerY = y + cellSize/2;
+                    const centerX = x + cellSize / 2;
+                    const centerY = y + cellSize / 2;
                     const diamondSize = cellSize * 0.6;
-                    const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
-                    tessellation.push(`<polygon points="${points}" 
+                    const points = `${centerX},${centerY - diamondSize / 2} ${centerX + diamondSize / 2},${centerY} ${centerX},${centerY + diamondSize / 2} ${centerX - diamondSize / 2},${centerY}`;
+                    tessellation.push(`<polygon points="${points}"
                         fill="${color}" opacity="${opacity}"/>`);
-                    
+
                     const innerColor = palette[Math.floor(Math.random() * palette.length)];
-                    tessellation.push(`<circle cx="${centerX}" cy="${centerY}" r="${diamondSize/4}" 
+                    tessellation.push(`<circle cx="${centerX}" cy="${centerY}" r="${diamondSize / 4}"
                         fill="${innerColor}" opacity="${opacity * 0.7}"/>`);
                 } else {
-                    const centerX = x + cellSize/2;
-                    const centerY = y + cellSize/2;
+                    const centerX = x + cellSize / 2;
+                    const centerY = y + cellSize / 2;
                     const hexSize = cellSize * 0.4;
                     const points = this.generateHexagonPoints(centerX, centerY, hexSize);
-                    tessellation.push(`<polygon points="${points}" 
+                    tessellation.push(`<polygon points="${points}"
                         fill="${color}" opacity="${opacity}"/>`);
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, tessellation.join(''));
     }
 
@@ -1182,38 +1182,38 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const fractal = [];
         const palette = this.getRandomPalette();
-        
+
         const centerX = size.width / 2;
         const centerY = size.height / 2;
         const maxRadius = Math.min(size.width, size.height) / 2;
-        
+
         const numLevels = this.randomInt(4, 6);
         const baseRadius = maxRadius / numLevels;
-        
+
         for (let level = 0; level < numLevels; level++) {
             const levelRadius = baseRadius * (level + 1);
             const numBranches = this.randomInt(6, 12);
             const branchLength = levelRadius * 0.8;
             const opacity = this.random(0.2, 0.6);
-            
+
             for (let branch = 0; branch < numBranches; branch++) {
                 const angle = (branch * 2 * Math.PI) / numBranches;
                 const startX = centerX + levelRadius * Math.cos(angle);
                 const startY = centerY + levelRadius * Math.sin(angle);
                 const endX = centerX + (levelRadius + branchLength) * Math.cos(angle);
                 const endY = centerY + (levelRadius + branchLength) * Math.sin(angle);
-                
+
                 const color = palette[Math.floor(Math.random() * palette.length)];
-                
+
                 const elementType = this.randomInt(0, 4);
-                
+
                 if (elementType === 0) {
                     const spiralPoints = this.generateSpiralPoints(startX, startY, endX, endY, 3);
                     fractal.push(`<path d="${spiralPoints}" stroke="${color}" stroke-width="${2 + level}" fill="none" opacity="${opacity}"/>`);
                 } else if (elementType === 1) {
                     const circleRadius = branchLength * 0.3;
                     fractal.push(`<circle cx="${endX}" cy="${endY}" r="${circleRadius}" fill="${color}" opacity="${opacity}"/>`);
-                    
+
                     const innerColor = palette[Math.floor(Math.random() * palette.length)];
                     for (let i = 0; i < 4; i++) {
                         const innerAngle = (i * Math.PI) / 2;
@@ -1240,7 +1240,7 @@ class SVGPatternGenerator {
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, fractal.join(''));
     }
 
@@ -1248,33 +1248,33 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const optical = [];
         const palette = this.getRandomPalette();
-        
+
         const numLayers = this.randomInt(3, 5);
         const layerSpacing = size.height / numLayers;
-        
+
         for (let layer = 0; layer < numLayers; layer++) {
             const y = layer * layerSpacing;
             const layerHeight = layerSpacing;
             const opacity = this.random(0.3, 0.7);
-            
+
             const effectType = this.randomInt(0, 3);
-            
+
             if (effectType === 0) {
                 const numWaves = this.randomInt(8, 15);
                 const waveAmplitude = layerHeight * 0.3;
                 const waveLength = size.width / numWaves;
-                
+
                 for (let i = 0; i < numWaves; i++) {
                     const x = i * waveLength;
                     const color = palette[Math.floor(Math.random() * palette.length)];
-                    
+
                     const wavePoints = [];
                     for (let j = 0; j < 20; j++) {
                         const waveX = x + (j * waveLength) / 20;
-                        const waveY = y + layerHeight/2 + waveAmplitude * Math.sin((j * Math.PI) / 10);
+                        const waveY = y + layerHeight / 2 + waveAmplitude * Math.sin((j * Math.PI) / 10);
                         wavePoints.push(`${waveX},${waveY}`);
                     }
-                    
+
                     optical.push(`<polyline points="${wavePoints.join(' ')}" stroke="${color}" stroke-width="${3 + layer}" fill="none" opacity="${opacity}"/>`);
                 }
             } else if (effectType === 1) {
@@ -1282,7 +1282,7 @@ class SVGPatternGenerator {
                 const centerY = y + layerHeight / 2;
                 const maxRadius = Math.min(size.width, layerHeight) / 2;
                 const numSpirals = this.randomInt(2, 4);
-                
+
                 for (let spiral = 0; spiral < numSpirals; spiral++) {
                     const color = palette[Math.floor(Math.random() * palette.length)];
                     const spiralRadius = maxRadius * (0.3 + spiral * 0.2);
@@ -1292,45 +1292,45 @@ class SVGPatternGenerator {
             } else {
                 const numShapes = this.randomInt(6, 12);
                 const shapeSize = Math.min(size.width, layerHeight) / numShapes;
-                
+
                 for (let i = 0; i < numShapes; i++) {
                     const x = i * shapeSize;
                     const color = palette[Math.floor(Math.random() * palette.length)];
-                    
+
                     const shapeType = this.randomInt(0, 3);
-                    
+
                     if (shapeType === 0) {
                         const numSides = this.randomInt(6, 10);
                         const points = [];
-                        for (let j = 
+                        for (let j =
                             0; j < numSides; j++) {
                             const angle = (j * 2 * Math.PI) / numSides;
-                            const px = x + shapeSize/2 + (shapeSize/2 * 0.8) * Math.cos(angle);
-                            const py = y + layerHeight/2 + (shapeSize/2 * 0.8) * Math.sin(angle);
+                            const px = x + shapeSize / 2 + (shapeSize / 2 * 0.8) * Math.cos(angle);
+                            const py = y + layerHeight / 2 + (shapeSize / 2 * 0.8) * Math.sin(angle);
                             points.push(`${px},${py}`);
                         }
                         optical.push(`<polygon points="${points.join(' ')}" fill="${color}" opacity="${opacity}"/>`);
                     } else if (shapeType === 1) {
                         const numPoints = this.randomInt(6, 10);
                         const starRadius = shapeSize * 0.4;
-                        const starPoints = this.generateStarPoints(x + shapeSize/2, y + layerHeight/2, starRadius, numPoints);
+                        const starPoints = this.generateStarPoints(x + shapeSize / 2, y + layerHeight / 2, starRadius, numPoints);
                         optical.push(`<polygon points="${starPoints}" fill="${color}" opacity="${opacity}"/>`);
                     } else {
                         const circleRadius = shapeSize * 0.4;
-                        optical.push(`<circle cx="${x + shapeSize/2}" cy="${y + layerHeight/2}" r="${circleRadius}" fill="${color}" opacity="${opacity}"/>`);
-                        
+                        optical.push(`<circle cx="${x + shapeSize / 2}" cy="${y + layerHeight / 2}" r="${circleRadius}" fill="${color}" opacity="${opacity}"/>`);
+
                         const innerColor = palette[Math.floor(Math.random() * palette.length)];
                         for (let k = 0; k < 6; k++) {
                             const innerAngle = (k * Math.PI) / 3;
-                            const innerX = x + shapeSize/2 + circleRadius * 0.6 * Math.cos(innerAngle);
-                            const innerY = y + layerHeight/2 + circleRadius * 0.6 * Math.sin(innerAngle);
+                            const innerX = x + shapeSize / 2 + circleRadius * 0.6 * Math.cos(innerAngle);
+                            const innerY = y + layerHeight / 2 + circleRadius * 0.6 * Math.sin(innerAngle);
                             optical.push(`<circle cx="${innerX}" cy="${innerY}" r="${circleRadius * 0.2}" fill="${innerColor}" opacity="${opacity * 0.8}"/>`);
                         }
                     }
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, optical.join(''));
     }
 
@@ -1338,67 +1338,67 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const mosaic = [];
         const palette = this.getRandomPalette();
-        
+
         const numLayers = this.randomInt(3, 5);
         const cellSize = this.randomInt(15, 25);
         const cols = Math.ceil(size.width / cellSize) + 1;
         const rows = Math.ceil(size.height / cellSize) + 1;
-        
+
         for (let layer = 0; layer < numLayers; layer++) {
             const layerOpacity = this.random(0.2, 0.5);
             const layerOffset = layer * 2;
-            
+
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col < cols; col++) {
                     const x = col * cellSize + layerOffset;
                     const y = row * cellSize + layerOffset;
-                    
+
                     if (x < size.width && y < size.height) {
                         const color = palette[Math.floor(Math.random() * palette.length)];
-                        
+
                         const elementType = this.randomInt(0, 4);
-                        
+
                         if (elementType === 0) {
                             const numSides = this.randomInt(5, 8);
                             const points = [];
                             for (let i = 0; i < numSides; i++) {
                                 const angle = (i * 2 * Math.PI) / numSides;
-                                const px = x + cellSize/2 + (cellSize/2 * 0.8) * Math.cos(angle);
-                                const py = y + cellSize/2 + (cellSize/2 * 0.8) * Math.sin(angle);
+                                const px = x + cellSize / 2 + (cellSize / 2 * 0.8) * Math.cos(angle);
+                                const py = y + cellSize / 2 + (cellSize / 2 * 0.8) * Math.sin(angle);
                                 points.push(`${px},${py}`);
                             }
                             mosaic.push(`<polygon points="${points.join(' ')}" fill="${color}" opacity="${layerOpacity}"/>`);
                         } else if (elementType === 1) {
                             const numPoints = this.randomInt(5, 8);
                             const starRadius = cellSize * 0.4;
-                            const starPoints = this.generateStarPoints(x + cellSize/2, y + cellSize/2, starRadius, numPoints);
+                            const starPoints = this.generateStarPoints(x + cellSize / 2, y + cellSize / 2, starRadius, numPoints);
                             mosaic.push(`<polygon points="${starPoints}" fill="${color}" opacity="${layerOpacity}"/>`);
                         } else if (elementType === 2) {
                             const circleRadius = cellSize * 0.4;
-                            mosaic.push(`<circle cx="${x + cellSize/2}" cy="${y + cellSize/2}" r="${circleRadius}" fill="${color}" opacity="${layerOpacity}"/>`);
-                            
+                            mosaic.push(`<circle cx="${x + cellSize / 2}" cy="${y + cellSize / 2}" r="${circleRadius}" fill="${color}" opacity="${layerOpacity}"/>`);
+
                             const innerColor = palette[Math.floor(Math.random() * palette.length)];
                             for (let k = 0; k < 4; k++) {
                                 const innerAngle = (k * Math.PI) / 2;
-                                const innerX = x + cellSize/2 + circleRadius * 0.6 * Math.cos(innerAngle);
-                                const innerY = y + cellSize/2 + circleRadius * 0.6 * Math.sin(innerAngle);
+                                const innerX = x + cellSize / 2 + circleRadius * 0.6 * Math.cos(innerAngle);
+                                const innerY = y + cellSize / 2 + circleRadius * 0.6 * Math.sin(innerAngle);
                                 mosaic.push(`<circle cx="${innerX}" cy="${innerY}" r="${circleRadius * 0.2}" fill="${innerColor}" opacity="${layerOpacity * 0.8}"/>`);
                             }
                         } else {
-                            const centerX = x + cellSize/2;
-                            const centerY = y + cellSize/2;
+                            const centerX = x + cellSize / 2;
+                            const centerY = y + cellSize / 2;
                             const diamondSize = cellSize * 0.6;
-                            const points = `${centerX},${centerY - diamondSize/2} ${centerX + diamondSize/2},${centerY} ${centerX},${centerY + diamondSize/2} ${centerX - diamondSize/2},${centerY}`;
+                            const points = `${centerX},${centerY - diamondSize / 2} ${centerX + diamondSize / 2},${centerY} ${centerX},${centerY + diamondSize / 2} ${centerX - diamondSize / 2},${centerY}`;
                             mosaic.push(`<polygon points="${points}" fill="${color}" opacity="${layerOpacity}"/>`);
-                            
+
                             const innerColor = palette[Math.floor(Math.random() * palette.length)];
-                            mosaic.push(`<circle cx="${centerX}" cy="${centerY}" r="${diamondSize/4}" fill="${innerColor}" opacity="${layerOpacity * 0.7}"/>`);
+                            mosaic.push(`<circle cx="${centerX}" cy="${centerY}" r="${diamondSize / 4}" fill="${innerColor}" opacity="${layerOpacity * 0.7}"/>`);
                         }
                     }
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, mosaic.join(''));
     }
 
@@ -1406,23 +1406,23 @@ class SVGPatternGenerator {
         const size = this.getRandomSize();
         const celtic = [];
         const palette = this.getRandomPalette();
-        
+
         const numKnots = this.randomInt(3, 6);
         const knotSize = Math.min(size.width, size.height) / numKnots;
-        
+
         for (let knot = 0; knot < numKnots; knot++) {
             const centerX = (knot + 1) * (size.width / (numKnots + 1));
             const centerY = size.height / 2;
             const opacity = this.random(0.3, 0.7);
-            
+
             const knotType = this.randomInt(0, 3);
-            
+
             if (knotType === 0) {
                 const numArms = this.randomInt(4, 8);
                 for (let arm = 0; arm < numArms; arm++) {
                     const angle = (arm * 2 * Math.PI) / numArms;
                     const color = palette[Math.floor(Math.random() * palette.length)];
-                    
+
                     const endX = centerX + knotSize * 0.8 * Math.cos(angle);
                     const endY = centerY + knotSize * 0.8 * Math.sin(angle);
                     const spiralPoints = this.generateSpiralPoints(centerX, centerY, endX, endY, 3);
@@ -1431,24 +1431,24 @@ class SVGPatternGenerator {
             } else if (knotType === 1) {
                 const numRings = this.randomInt(3, 5);
                 const ringSpacing = knotSize / (numRings * 2);
-                
+
                 for (let ring = 0; ring < numRings; ring++) {
                     const ringRadius = ringSpacing * (ring + 1);
                     const numElements = this.randomInt(6, 12);
                     const elementSize = ringSpacing * 0.3;
-                    
+
                     for (let i = 0; i < numElements; i++) {
                         const angle = (i * 2 * Math.PI) / numElements;
                         const x = centerX + ringRadius * Math.cos(angle);
                         const y = centerY + ringRadius * Math.sin(angle);
-                        
+
                         const color = palette[Math.floor(Math.random() * palette.length)];
-                        
+
                         const elementType = this.randomInt(0, 2);
-                        
+
                         if (elementType === 0) {
                             celtic.push(`<circle cx="${x}" cy="${y}" r="${elementSize}" fill="${color}" opacity="${opacity}"/>`);
-                            
+
                             const innerColor = palette[Math.floor(Math.random() * palette.length)];
                             for (let k = 0; k < 4; k++) {
                                 const innerAngle = angle + (k * Math.PI) / 2;
@@ -1467,43 +1467,43 @@ class SVGPatternGenerator {
                 const cellSize = knotSize * 0.3;
                 const cols = Math.ceil(knotSize / cellSize);
                 const rows = Math.ceil(knotSize / cellSize);
-                
+
                 for (let row = 0; row < rows; row++) {
                     for (let col = 0; col < cols; col++) {
-                        const x = centerX - knotSize/2 + col * cellSize;
-                        const y = centerY - knotSize/2 + row * cellSize;
-                        
-                        if (x >= centerX - knotSize/2 && x <= centerX + knotSize/2 && 
-                            y >= centerY - knotSize/2 && y <= centerY + knotSize/2) {
-                            
+                        const x = centerX - knotSize / 2 + col * cellSize;
+                        const y = centerY - knotSize / 2 + row * cellSize;
+
+                        if (x >= centerX - knotSize / 2 && x <= centerX + knotSize / 2 &&
+                            y >= centerY - knotSize / 2 && y <= centerY + knotSize / 2) {
+
                             const color = palette[Math.floor(Math.random() * palette.length)];
-                            
+
                             const shapeType = this.randomInt(0, 3);
-                            
+
                             if (shapeType === 0) {
                                 const numSides = this.randomInt(5, 8);
                                 const points = [];
                                 for (let i = 0; i < numSides; i++) {
                                     const angle = (i * 2 * Math.PI) / numSides;
-                                    const px = x + cellSize/2 + (cellSize/2 * 0.8) * Math.cos(angle);
-                                    const py = y + cellSize/2 + (cellSize/2 * 0.8) * Math.sin(angle);
+                                    const px = x + cellSize / 2 + (cellSize / 2 * 0.8) * Math.cos(angle);
+                                    const py = y + cellSize / 2 + (cellSize / 2 * 0.8) * Math.sin(angle);
                                     points.push(`${px},${py}`);
                                 }
                                 celtic.push(`<polygon points="${points.join(' ')}" fill="${color}" opacity="${opacity}"/>`);
                             } else if (shapeType === 1) {
                                 const numPoints = this.randomInt(5, 8);
                                 const starRadius = cellSize * 0.4;
-                                const starPoints = this.generateStarPoints(x + cellSize/2, y + cellSize/2, starRadius, numPoints);
+                                const starPoints = this.generateStarPoints(x + cellSize / 2, y + cellSize / 2, starRadius, numPoints);
                                 celtic.push(`<polygon points="${starPoints}" fill="${color}" opacity="${opacity}"/>`);
                             } else {
                                 const circleRadius = cellSize * 0.4;
-                                celtic.push(`<circle cx="${x + cellSize/2}" cy="${y + cellSize/2}" r="${circleRadius}" fill="${color}" opacity="${opacity}"/>`);
-                                
+                                celtic.push(`<circle cx="${x + cellSize / 2}" cy="${y + cellSize / 2}" r="${circleRadius}" fill="${color}" opacity="${opacity}"/>`);
+
                                 const innerColor = palette[Math.floor(Math.random() * palette.length)];
                                 for (let k = 0; k < 6; k++) {
                                     const innerAngle = (k * Math.PI) / 3;
-                                    const innerX = x + cellSize/2 + circleRadius * 0.6 * Math.cos(innerAngle);
-                                    const innerY = y + cellSize/2 + circleRadius * 0.6 * Math.sin(innerAngle);
+                                    const innerX = x + cellSize / 2 + circleRadius * 0.6 * Math.cos(innerAngle);
+                                    const innerY = y + cellSize / 2 + circleRadius * 0.6 * Math.sin(innerAngle);
                                     celtic.push(`<circle cx="${innerX}" cy="${innerY}" r="${circleRadius * 0.2}" fill="${innerColor}" opacity="${opacity * 0.8}"/>`);
                                 }
                             }
@@ -1512,7 +1512,7 @@ class SVGPatternGenerator {
                 }
             }
         }
-        
+
         return this.createSVG(size.width, size.height, celtic.join(''));
     }
 
@@ -1522,7 +1522,7 @@ class SVGPatternGenerator {
         const dx = endX - startX;
         const dy = endY - startY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        
+
         for (let i = 0; i <= numPoints; i++) {
             const t = i / numPoints;
             const angle = t * turns * 2 * Math.PI;
@@ -1531,7 +1531,7 @@ class SVGPatternGenerator {
             const y = startY + t * dy + radius * Math.sin(angle);
             points.push(`${x},${y}`);
         }
-        
+
         return `M ${points.join(' L ')}`;
     }
 
@@ -1539,7 +1539,7 @@ class SVGPatternGenerator {
         const points = [];
         const outerRadius = radius;
         const innerRadius = radius * 0.5;
-        
+
         for (let i = 0; i < numPoints * 2; i++) {
             const angle = (i * Math.PI) / numPoints;
             const r = i % 2 === 0 ? outerRadius : innerRadius;
@@ -1547,7 +1547,7 @@ class SVGPatternGenerator {
             const y = centerY + r * Math.sin(angle);
             points.push(`${x},${y}`);
         }
-        
+
         return points.join(' ');
     }
 
@@ -1578,7 +1578,7 @@ class SVGPatternGenerator {
         const outerRadius = size;
         const innerRadius = size * 0.4;
         const numPoints = 5;
-        
+
         for (let i = 0; i < numPoints * 2; i++) {
             const angle = (i * Math.PI) / numPoints - Math.PI / 2;
             const radius = i % 2 === 0 ? outerRadius : innerRadius;
@@ -1612,11 +1612,11 @@ class SVGPatternGenerator {
         try {
             const selectedPatterns = [];
             const numPatterns = this.randomInt(3, 6);
-            
+
             for (let i = 0; i < numPatterns; i++) {
                 selectedPatterns.push(this.generateCirclesPattern());
             }
-            
+
             return selectedPatterns;
         } catch (error) {
             return [this.generateCirclesPattern()];
@@ -1669,13 +1669,13 @@ if (typeof window !== 'undefined') {
     } catch (error) {
         window.patternGenerator = null;
     }
-    
+
     window.SVGPatternGenerator = SVGPatternGenerator;
     window.getRandomPattern = getRandomPattern;
     window.getAllPatterns = getAllPatterns;
     window.setPatternColors = setPatternColors;
     window.generateNewPatternForCard = generateNewPatternForCard;
-    
+
 } else if (typeof module !== 'undefined' && module.exports) {
     module.exports = { SVGPatternGenerator, getRandomPattern, getAllPatterns, setPatternColors };
 }

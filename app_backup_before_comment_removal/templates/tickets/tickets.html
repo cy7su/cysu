@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% from 'macros/breadcrumbs.html' import render_breadcrumbs %}
+
+{% block title %}Тикеты поддержки{% endblock %}
+
+{% block breadcrumbs %}
+{{ render_breadcrumbs([
+{"title": "Главная", "url": url_for('main.index'), "icon": "fas fa-home"},
+{"title": "Поддержка", "url": url_for('main.index'), "icon": "fas fa-life-ring"},
+{"title": "Тикеты", "url": None, "icon": "fas fa-ticket-alt"}
+]) }}
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-headset me-2"></i>Тикеты поддержки
+                </h1>
+                <div class="d-flex gap-2">
+                    {% if current_user.is_admin and current_user.admin_mode_enabled %}
+                    <button class="btn btn-danger btn-tickets" onclick="deleteAllClosedTickets()">
+                        <i class="fas fa-trash me-2"></i>Удалить все закрытые
+                    </button>
+                    {% endif %}
+                    <button class="btn btn-primary btn-tickets" data-bs-toggle="modal"
+                        data-bs-target="#createTicketModal">
+                        <i class="fas fa-plus me-2"></i>Создать тикет
+                    </button>
+                </div>
+            </div>
+
+            {% if tickets %}
+            <div class="row g-3">
+                {% for ticket in tickets %}
+                <div class="col-12">
+                    <div class="card"
+                        style="background: var(--dp-02); border: 1px solid var(--border-primary); border-radius: 20px;">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="mb-1 text-primary">{{ ticket.subject }}</h6>
+                                        <span class="badge
+                                                    {% if ticket.status == 'open' %}bg-warning
+                                                    {% elif ticket.status == 'accepted' %}bg-info
+                                                    {% elif ticket.status == 'closed' %}bg-success
+                                                    {% else %}bg-secondary{% endif %}">
+                                            {% if ticket.status == 'open' %}Открыт
+                                            {% elif ticket.status == 'accepted' %}Принят
+                                            {% elif ticket.status == 'closed' %}Закрыт
+                                            {% else %}{{ ticket.status }}{% endif %}
+                                        </span>
+                                    </div>
+                                    <p class="text-muted small mb-2">{{ ticket.message[:100] }}{% if
+                                        ticket.message|length > 100 %}...{% endif %}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>
+                                            {% if current_user.is_admin and current_user.admin_mode_enabled %}
+                                            {{ ticket.user.username if ticket.user else 'Неизвестный пользователь' }}
+                                            {% endif %}
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>
+                                            {{ ticket.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <a href="{{ url_for('tickets.ticket_detail', ticket_id=ticket.id) }}"
+                                        class="btn btn-primary btn-tickets">
+                                        <i class="fas fa-eye me-1"></i>Просмотр
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Тикеты не найдены</h5>
+                <p class="text-muted">У вас пока нет тикетов поддержки</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createTicketModal" tabindex="-1" aria-labelledby="createTicketModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createTicketModalLabel">
+                    <i class="fas fa-plus me-2"></i>Создать тикет
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="ticketForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="ticketSubject" class="form-label">Тема</label>
+                        <input type="text" class="form-control" id="ticketSubject" name="subject" required
+                            placeholder="Введите тему тикета">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ticketMessage" class="form-label">Сообщение</label>
+                        <textarea class="form-control" id="ticketMessage" name="message" rows="4" required
+                            placeholder="Опишите вашу проблему или вопрос"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ticketFiles" class="form-label">Прикрепить файлы (до 1 ГБ каждый)</label>
+                        <input type="file" class="form-control" id="ticketFiles" name="files" multiple
+                            accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar">
+                        <div class="form-text text-muted">Поддерживаемые форматы: изображения, PDF, документы, архивы
+                        </div>
+                    </div>
+                    <div id="fileList" class="mb-3">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="ticketSubmitBtn" onclick="createTicket()">
+                        <i class="fas fa-paper-plane me-1"></i>Отправить тикет
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Обработчик изменения файлов
+    document.getElementById('ticketFiles').addEventListener('change', function (e) {
+        const fileList = document.getElementById('fileList');
+        fileList.innerHTML = '';
+
+        Array.from(e.target.files).forEach(file => {
+            const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+            const fileItem = document.createElement('div');
+            fileItem.className = 'd-flex align-items-center justify-content-between p-2 bg-light rounded mb-2';
+            fileItem.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas fa-file me-2 text-primary"></i>
+                <span>${file.name}</span>
+            </div>
+            <span class="text-muted small">${fileSize} МБ</span>
+        `;
+            fileList.appendChild(fileItem);
+        });
+    });
+
+    function createTicket() {
+        const subject = document.getElementById('ticketSubject').value.trim();
+        const message = document.getElementById('ticketMessage').value.trim();
+        const files = document.getElementById('ticketFiles').files;
+
+        if (!subject || !message) {
+            alert('Пожалуйста, заполните все обязательные поля');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('subject', subject);
+        formData.append('message', message);
+
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+
+        // Отправляем запрос
+        fetch('/api/ticket/create', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Закрываем модальное окно если оно открыто
+                    const modalElement = document.getElementById('createTicketModal');
+                    if (modalElement) {
+                        const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                        modal.hide();
+                    }
+                    // Очищаем форму
+                    document.getElementById('ticketForm').reset();
+                    document.getElementById('fileList').innerHTML = '';
+
+                    // Показываем уведомление об успехе
+                    showSuccess('Тикет успешно создан!');
+
+                    // Переходим на страницу тикета
+                    setTimeout(() => {
+                        window.location.href = '/tickets/' + data.ticket_id;
+                    }, 1500);
+                } else {
+                    showError('Ошибка при создании тикета: ' + (data.error || 'Неизвестная ошибка'));
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                if (error.message.includes('413')) {
+                    showError('Файл слишком большой. Максимальный размер: 1 ГБ на файл');
+                } else {
+                    showError('Ошибка сети при создании тикета: ' + error.message);
+                }
+            });
+    }
+
+    // Функция для удаления всех закрытых и отклоненных тикетов
+    function deleteAllClosedTickets() {
+        if (!confirm('Вы уверены, что хотите удалить ВСЕ закрытые и отклоненные тикеты? Это действие нельзя отменить!')) {
+            return;
+        }
+
+        // Показываем индикатор загрузки
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Удаление...';
+        button.disabled = true;
+
+        fetch('/api/delete_all_closed_tickets', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Успешно удалено ${data.deleted_count} тикетов`);
+                    location.reload();
+                } else {
+                    alert('Ошибка при удалении тикетов: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при удалении тикетов');
+            })
+            .finally(() => {
+                // Восстанавливаем кнопку
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+    }
+
+    // Функции для показа уведомлений
+    function showSuccess(message) {
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-success alert-dismissible fade show';
+        notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        notification.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+        document.body.appendChild(notification);
+
+        // Автоматически скрываем через 3 секунды
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 3000);
+    }
+
+    function showError(message) {
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-danger alert-dismissible fade show';
+        notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        notification.innerHTML = `
+        <i class="fas fa-exclamation-circle me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+        document.body.appendChild(notification);
+
+        // Автоматически скрываем через 5 секунд
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+</script>
+{% endblock %}

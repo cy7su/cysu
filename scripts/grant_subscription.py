@@ -17,9 +17,13 @@ def grant_subscription(username):
             return False
         print(f"Найден пользователь: {user.username} (ID: {user.id})")
         print(f"Email: {user.email}")
-        print(f"Текущий статус подписки: {'Активна' if user.is_subscribed else 'Неактивна'}")
+        print(
+            f"Текущий статус подписки: {'Активна' if user.is_subscribed else 'Неактивна'}"
+        )
         if user.subscription_expires:
-            print(f"Текущая дата окончания: {user.subscription_expires.strftime('%d.%m.%Y')}")
+            print(
+                f"Текущая дата окончания: {user.subscription_expires.strftime('%d.%m.%Y')}"
+            )
         subscription_end = datetime(2099, 12, 31, 23, 59, 59)
         user.is_subscribed = True
         user.subscription_expires = subscription_end
@@ -29,6 +33,8 @@ def grant_subscription(username):
         print(f"📅 Дата окончания: {subscription_end.strftime('%d.%m.%Y')}")
         print(f"⏰ Время окончания: {subscription_end.strftime('%H:%M:%S')}")
         return True
+
+
 def main():
     if len(sys.argv) != 2:
         print("Использование: python3 scripts/grant_subscription.py <username>")
@@ -45,5 +51,7 @@ def main():
         print("=" * 50)
         print("❌ Операция завершена с ошибкой!")
         sys.exit(1)
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     main()

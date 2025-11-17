@@ -19,10 +19,9 @@ from wtforms.validators import (
     Optional,
     ValidationError,
 )
-
 from .models import Group
-from .utils.email_validator import is_allowed_email_domain, get_allowed_domains_display
-from .utils.username_validator import contains_forbidden_word
+from .utils.email_validator import is_allowed_email_domain, get_allowed_domains_display, validate_email_chars
+from .utils.username_validator import contains_forbidden_word, has_allowed_characters, validate_username_length
 
 
 def validate_allowed_email_domain(form, field):
@@ -31,9 +30,21 @@ def validate_allowed_email_domain(form, field):
     """
     if field.data:
         if not is_allowed_email_domain(field.data):
-            raise ValidationError(
-                "Регистрация недоступна для этого почтового сервиса"
-            )
+            raise ValidationError("Регистрация недоступна для этого почтового сервиса")
+
+
+def validate_username_characters(form, field):
+    """
+    Валидатор для проверки допустимых символов в username
+    """
+    if not field.data:
+        return
+    if "@" in field.data:
+        raise ValidationError("Это тебе не почта нихуя")
+    if not has_allowed_characters(field.data):
+        raise ValidationError(
+            "Имя пользователя может содержать только буквы латиницы и кириллицы"
+        )
 
 
 def validate_username_allowed(form, field):
@@ -42,9 +53,7 @@ def validate_username_allowed(form, field):
     """
     if field.data:
         if contains_forbidden_word(field.data):
-            raise ValidationError(
-                "Это имя пользователя недоступно"
-            )
+            raise ValidationError("Это имя пользователя недоступно")
 
 
 class LoginForm(FlaskForm):
@@ -58,21 +67,23 @@ class RegistrationForm(FlaskForm):
         "Имя пользователя",
         validators=[
             DataRequired(),
-            Length(min=3, max=20),
-            validate_username_allowed
-        ]
+            Length(min=3, max=14),
+            validate_username_characters,
+            validate_username_allowed,
+        ],
     )
     email = StringField(
         "Email",
         validators=[
             DataRequired(),
             Email(message="Введите корректный email адрес"),
-            validate_allowed_email_domain
+            validate_allowed_email_domain,
         ],
-        render_kw={"data-description": get_allowed_domains_display()}
+        render_kw={"data-description": get_allowed_domains_display()},
     )
-    password = PasswordField(
-        "Пароль", validators=[DataRequired(), Length(min=6)]
+    password = PasswordField("Пароль", validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField(
+        "Подтвердите пароль", validators=[DataRequired(), EqualTo("password")]
     )
     group_id = SelectField("Группа", validators=[DataRequired()])
     submit = SubmitField("Зарегистрироваться")
@@ -92,28 +103,25 @@ class AdminUserForm(FlaskForm):
         "Имя пользователя",
         validators=[
             DataRequired(),
-            Length(min=3, max=20),
-            validate_username_allowed
-        ]
+            Length(min=3, max=14),
+            validate_username_characters,
+            validate_username_allowed,
+        ],
     )
     email = StringField(
         "Email",
         validators=[
             DataRequired(),
             Email(message="Введите корректный email адрес"),
-            validate_allowed_email_domain
+            validate_allowed_email_domain,
         ],
-        render_kw={"data-description": get_allowed_domains_display()}
+        render_kw={"data-description": get_allowed_domains_display()},
     )
-    password = PasswordField(
-        "Пароль", validators=[DataRequired(), Length(min=6)]
-    )
+    password = PasswordField("Пароль", validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField(
         "Подтвердите пароль", validators=[DataRequired(), EqualTo("password")]
     )
-    group_id = SelectField(
-        "Группа", validators=[Optional()]
-    )  # Группа необязательна в админке
+    group_id = SelectField("Группа", validators=[Optional()])
     is_admin = BooleanField("Администратор")
     is_moderator = BooleanField("Модератор")
     submit = SubmitField("Зарегистрироваться")
@@ -162,9 +170,7 @@ class PasswordResetForm(FlaskForm):
         "Новый пароль",
         validators=[
             DataRequired(message="Введите новый пароль"),
-            Length(
-                min=6, message="Пароль должен содержать минимум 6 символов"
-            ),
+            Length(min=6, message="Пароль должен содержать минимум 6 символов"),
         ],
     )
     confirm_password = PasswordField(
@@ -182,17 +188,13 @@ class MaterialForm(FlaskForm):
     description = TextAreaField(
         "Описание",
         validators=[
-            Length(
-                max=300, message="Описание не должно превышать 300 символов"
-            )
+            Length(max=300, message="Описание не должно превышать 300 символов")
         ],
     )
     type = SelectField(
         "Тип", choices=[("lecture", "Лекция"), ("assignment", "Задание")]
     )
-    subject_id = SelectField(
-        "Предмет", coerce=int, validators=[DataRequired()]
-    )
+    subject_id = SelectField("Предмет", coerce=int, validators=[DataRequired()])
     file = FileField("Файл")
     solution_file = FileField("Готовое решение (только для заданий)")
     submit = SubmitField("Сохранить")
@@ -253,9 +255,7 @@ class TicketForm(FlaskForm):
             ),
         ],
     )
-    files = FileField(
-        "Прикрепить файлы (до 5 МБ каждый)", render_kw={"multiple": True}
-    )
+    files = FileField("Прикрепить файлы (до 5 МБ каждый)", render_kw={"multiple": True})
     submit = SubmitField("Отправить тикет")
 
 
@@ -283,12 +283,8 @@ class SolutionForm(FlaskForm):
 
 
 class SubjectGroupForm(FlaskForm):
-    subject_id = SelectField(
-        "Предмет", coerce=int, validators=[DataRequired()]
-    )
-    group_ids = SelectMultipleField(
-        "Группы", coerce=int, validators=[DataRequired()]
-    )
+    subject_id = SelectField("Предмет", coerce=int, validators=[DataRequired()])
+    group_ids = SelectMultipleField("Группы", coerce=int, validators=[DataRequired()])
     submit = SubmitField("Сохранить")
 
     def __init__(self, *args, **kwargs):
@@ -316,13 +312,7 @@ class SiteSettingsForm(FlaskForm):
             )
         ],
     )
-    pattern_generation_enabled = BooleanField(
-        "Включить кнопку генерации паттернов"
-    )
-    support_enabled = BooleanField(
-        "Включить систему тикетов и поддержки"
-    )
-    telegram_only_registration = BooleanField(
-        "Регистрация только через Telegram"
-    )
+    pattern_generation_enabled = BooleanField("Включить кнопку генерации паттернов")
+    support_enabled = BooleanField("Включить систему тикетов и поддержки")
+    telegram_only_registration = BooleanField("Регистрация только через Telegram")
     submit = SubmitField("Сохранить настройки")

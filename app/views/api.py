@@ -1,11 +1,10 @@
 from typing import Any, Dict
-
 from flask import Blueprint, current_app, jsonify, request
 from flask_login import current_user, login_required
 from flask_wtf.csrf import validate_csrf
 from wtforms import ValidationError
-
 from ..models import Notification, Subject
+from ..services import UserManagementService
 
 api_bp = Blueprint("api", __name__)
 
@@ -18,7 +17,6 @@ def get_notifications() -> Dict[str, Any]:
         .order_by(Notification.created_at.desc())
         .all()
     )
-
     return jsonify(
         {
             "success": True,
@@ -37,21 +35,16 @@ def get_notifications() -> Dict[str, Any]:
     )
 
 
-@api_bp.route(
-    "/api/notifications/<int:notification_id>/read", methods=["POST"]
-)
+@api_bp.route("/api/notifications/<int:notification_id>/read", methods=["POST"])
 @login_required
 def mark_notification_read(notification_id: int) -> Dict[str, Any]:
     from .. import db
 
     notification = Notification.query.get_or_404(notification_id)
-
     if notification.user_id != current_user.id:
         return jsonify({"success": False, "error": "Доступ запрещен"})
-
     notification.is_read = True
     db.session.commit()
-
     return jsonify({"success": True})
 
 
@@ -67,30 +60,20 @@ def update_subject_pattern(subject_id: int) -> Dict[str, Any]:
                 jsonify({"success": False, "error": "Отсутствует CSRF токен"}),
                 400,
             )
-
         validate_csrf(csrf_token)
     except ValidationError:
         return jsonify({"success": False, "error": "Неверный CSRF токен"}), 400
-
-    if not current_user.is_effective_admin():
+    if not UserManagementService.is_effective_admin(current_user):
         return jsonify({"success": False, "error": "Доступ запрещен"})
-
     subject = Subject.query.get_or_404(subject_id)
-
     data = request.get_json()
     if not data or "pattern_svg" not in data:
-        return jsonify(
-            {"success": False, "error": "Отсутствуют данные паттерна"}
-        )
-
+        return jsonify({"success": False, "error": "Отсутствуют данные паттерна"})
     try:
         subject.pattern_svg = data["pattern_svg"]
         subject.pattern_type = data.get("pattern_type", "random")
-
         db.session.commit()
-
         return jsonify({"success": True})
-
     except Exception as e:
         current_app.logger.error(f"Ошибка обновления паттерна: {e}")
         db.session.rollback()

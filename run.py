@@ -6,7 +6,7 @@ def run_website():
     from app import create_app
 
     app = create_app()
-    app.run(host='::', port=8002, debug=False)
+    app.run(host="::", port=8002, debug=False)
 
 
 def run_telegram_bot():

@@ -2,12 +2,11 @@ import json
 import locale
 from datetime import datetime
 from typing import Any, Dict
-
 from flask import current_app
 from flask_login import current_user
-
 from ..models import SiteSettings, User
 from ..utils.payment_service import YooKassaService
+from ..services import UserManagementService
 
 
 def inject_json_parser() -> Dict[str, Any]:
@@ -21,9 +20,7 @@ def inject_json_parser() -> Dict[str, Any]:
 
 
 def inject_timestamp() -> Dict[str, int]:
-    # Используем фиксированную версию для статических файлов
-    # Это позволит браузеру кэшировать файлы
-    return dict(timestamp=4)  # Версия 4 для текущих статических файлов
+    return dict(timestamp=4)
 
 
 def inject_moment() -> Dict[str, Any]:
@@ -33,7 +30,7 @@ def inject_moment() -> Dict[str, Any]:
         try:
             locale.setlocale(locale.LC_TIME, "ru_RU")
         except (locale.Error, OSError):
-            pass  # Если русская локаль недоступна, используем системную
+            pass
 
     def moment() -> datetime:
         return datetime.now()
@@ -66,7 +63,8 @@ def inject_admin_users() -> Dict[str, Any]:
     try:
         users = (
             User.query.all()
-            if current_user.is_authenticated and current_user.is_admin
+            if current_user.is_authenticated
+            and UserManagementService.is_effective_admin(current_user)
             else []
         )
     except Exception as e:
@@ -78,7 +76,6 @@ def inject_admin_users() -> Dict[str, Any]:
 def inject_subscription_status() -> Dict[str, Any]:
     is_subscribed = False
     subscription_info = None
-
     if current_user.is_authenticated:
         try:
             current_app.logger.info(
@@ -90,31 +87,19 @@ def inject_subscription_status() -> Dict[str, Any]:
             current_app.logger.info(
                 f"trial_subscription_expires: {current_user.trial_subscription_expires}"
             )
-
             payment_service = YooKassaService()
-            is_subscribed = payment_service.check_user_subscription(
-                current_user
-            )
-
-            subscription_info = payment_service.get_subscription_info(
-                current_user
-            )
+            is_subscribed = UserManagementService.has_active_subscription(current_user)
+            subscription_info = payment_service.get_subscription_info(current_user)
             current_app.logger.info(
                 f"Получена информация о подписке: {subscription_info}"
             )
-
         except Exception as e:
-            current_app.logger.error(
-                f"Error in inject_subscription_status: {e}"
-            )
+            current_app.logger.error(f"Error in inject_subscription_status: {e}")
             is_subscribed = False
             subscription_info = None
     else:
         current_app.logger.info("Пользователь не авторизован")
-
-    return dict(
-        is_subscribed=is_subscribed, subscription_info=subscription_info
-    )
+    return dict(is_subscribed=is_subscribed, subscription_info=subscription_info)
 
 
 def inject_maintenance_mode() -> Dict[str, Any]:

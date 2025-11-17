@@ -2056,6 +2056,8 @@
                 'qa': 'fas fa-clipboard-check',
                 'numerical': 'fas fa-chart-line',
                 'android': 'devicon-android-plain colored',
+                'snow': 'fas fa-snowflake',
+                'terminal': 'fas fa-terminal',
             };
 
             // Находим все элементы с классами text-muted mb-1 и text-muted mb-0
@@ -2492,7 +2494,7 @@
                 })
                 .catch(error => {
                     if (error.message.includes('413')) {
-                        showError('Файл слишком большой. Максимальный размер: 10 МБ на файл');
+                        showError('Файл слишком большой. Максимальный размер: 1 ГБ на файл');
                     } else {
                         showError('Ошибка сети при создании тикета');
                     }
@@ -2623,7 +2625,7 @@
                 })
                 .catch(error => {
                     if (error.message.includes('413')) {
-                        showError('Файл слишком большой. Максимальный размер: 10 МБ на файл');
+                        showError('Файл слишком большой. Максимальный размер: 1 ГБ на файл');
                     } else {
                         showError('Ошибка сети при отправке ответа');
                     }
@@ -2831,6 +2833,9 @@
     <!-- Custom Confirm Dialog -->
     <script src="{{ url_for('static', filename='js/custom-confirm.js') }}?v=1" defer></script>
 
+    <!-- Color Theme Toggle System -->
+    <script src="{{ url_for('static', filename='js/color_theme_toggle.js') }}?v=1"></script>
+
     <script>
         // Инициализация dropdown меню админки (только для десктопных устройств)
         document.addEventListener('DOMContentLoaded', function () {
@@ -2935,7 +2940,7 @@
                                 placeholder="Подробно опишите вашу проблему или вопрос" minlength="10"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="ticketFiles" class="form-label text-white">Прикрепить файлы (до 200 МБ
+                            <label for="ticketFiles" class="form-label text-white">Прикрепить файлы (до 1 ГБ
                                 каждый)</label>
                             <input type="file" class="form-control" id="ticketFiles" name="files" multiple
                                 accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar">

@@ -1,8 +1,6 @@
 import logging
-
 from flask import current_app
 from flask_mail import Message
-
 from .. import mail
 
 logger = logging.getLogger(__name__)
@@ -17,28 +15,22 @@ class EmailService:
     def send_email_with_timeout(msg, timeout=10):
         """
         Отправляет email с таймаутом
-
         Args:
             msg: Message объект для отправки
             timeout: Таймаут в секундах (по умолчанию 10)
-
         Returns:
             bool: True если email отправлен успешно, False в противном случае
         """
         try:
-            # Устанавливаем таймаут для SMTP соединения
             import socket
 
             original_timeout = socket.getdefaulttimeout()
             socket.setdefaulttimeout(timeout)
-
             try:
                 mail.send(msg)
                 return True
             finally:
-                # Восстанавливаем оригинальный таймаут
                 socket.setdefaulttimeout(original_timeout)
-
         except socket.timeout:
             logger.error(f"Email send timeout after {timeout} seconds")
             return False
@@ -47,16 +39,12 @@ class EmailService:
             return False
 
     @staticmethod
-    def send_verification_email(
-        user_email: str, verification_code: str
-    ) -> bool:
+    def send_verification_email(user_email: str, verification_code: str) -> bool:
         """
         Отправляет email с кодом подтверждения
-
         Args:
             user_email: Email пользователя
             verification_code: Код подтверждения
-
         Returns:
             bool: True если email отправлен успешно, False в противном случае
         """
@@ -80,21 +68,21 @@ class EmailService:
                         margin: 0;
                         padding: 20px;
                         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                        background-color: #f8f9fa;
-                        color: #212529;
+                        background-color: 
+                        color: 
                         line-height: 1.6;
                     }}
                     .container {{
                         max-width: 600px;
                         margin: 0 auto;
-                        background: #ffffff;
+                        background: 
                         border-radius: 20px;
                         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                         overflow: hidden;
-                        border: 1px solid #e9ecef;
+                        border: 1px solid 
                     }}
                     .header {{
-                        background: linear-gradient(135deg, #B595FF 0%, #9A7FE6 100%);
+                        background: linear-gradient(135deg, 
                         padding: 40px 30px;
                         text-align: center;
                         color: white;
@@ -131,18 +119,18 @@ class EmailService:
                     .verification-title {{
                         font-size: 24px;
                         font-weight: 600;
-                        color: #212529;
+                        color: 
                         margin-bottom: 15px;
                     }}
                     .verification-desc {{
-                        color: #6c757d;
+                        color: 
                         font-size: 16px;
                         margin-bottom: 35px;
                         line-height: 1.6;
                     }}
                     .code-container {{
-                        background: #f8f9fa;
-                        border: 2px solid #e9ecef;
+                        background: 
+                        border: 2px solid 
                         border-radius: 20px;
                         padding: 35px;
                         margin: 25px 0;
@@ -153,34 +141,34 @@ class EmailService:
                         font-size: 42px;
                         font-weight: 700;
                         font-family: 'Courier New', monospace;
-                        color: #B595FF;
+                        color: 
                         letter-spacing: 12px;
                         margin: 0;
                     }}
                     .code-info {{
-                        color: #6c757d;
+                        color: 
                         font-size: 14px;
                         margin-top: 20px;
                         font-weight: 500;
                     }}
                     .footer {{
-                        background: #f8f9fa;
+                        background: 
                         padding: 30px;
                         text-align: center;
-                        border-top: 1px solid #e9ecef;
+                        border-top: 1px solid 
                     }}
                     .footer p {{
                         margin: 8px 0;
-                        color: #6c757d;
+                        color: 
                         font-size: 14px;
                     }}
                     .warning {{
                         background: rgba(255, 152, 0, 0.1);
-                        border: 1px solid #FF9800;
+                        border: 1px solid 
                         border-radius: 20px;
                         padding: 20px;
                         margin: 25px 0;
-                        color: #FF9800;
+                        color: 
                         font-size: 14px;
                         font-weight: 500;
                     }}
@@ -225,15 +213,10 @@ class EmailService:
             """
             text_body = f"""
             Добро пожаловать в cysu!
-
             Для завершения регистрации введите следующий код подтверждения:
-
             {verification_code}
-
             Код действителен в течение 15 минут.
-
             Если вы не регистрировались в cysu, просто проигнорируйте это письмо.
-
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
@@ -242,8 +225,6 @@ class EmailService:
                 html=html_body,
                 body=text_body,
             )
-
-            # Используем метод с таймаутом
             success = EmailService.send_email_with_timeout(msg, timeout=10)
             if success:
                 logger.info(
@@ -256,22 +237,16 @@ class EmailService:
                 )
                 return False
         except Exception as e:
-            logger.error(
-                f"Failed to send verification email to {user_email}: {str(e)}"
-            )
+            logger.error(f"Failed to send verification email to {user_email}: {str(e)}")
             return False
 
     @staticmethod
-    def send_resend_verification_email(
-        user_email: str, verification_code: str
-    ) -> bool:
+    def send_resend_verification_email(user_email: str, verification_code: str) -> bool:
         """
         Отправляет повторный email с кодом подтверждения
-
         Args:
             user_email: Email пользователя
             verification_code: Код подтверждения
-
         Returns:
             bool: True если email отправлен успешно, False в противном случае
         """
@@ -292,21 +267,21 @@ class EmailService:
                         margin: 0;
                         padding: 20px;
                         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                        background-color: #f8f9fa;
-                        color: #212529;
+                        background-color: 
+                        color: 
                         line-height: 1.6;
                     }}
                     .container {{
                         max-width: 600px;
                         margin: 0 auto;
-                        background: #ffffff;
+                        background: 
                         border-radius: 20px;
                         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                         overflow: hidden;
-                        border: 1px solid #e9ecef;
+                        border: 1px solid 
                     }}
                     .header {{
-                        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                        background: linear-gradient(135deg, 
                         padding: 40px 30px;
                         text-align: center;
                         color: white;
@@ -343,18 +318,18 @@ class EmailService:
                     .verification-title {{
                         font-size: 24px;
                         font-weight: 600;
-                        color: #212529;
+                        color: 
                         margin-bottom: 15px;
                     }}
                     .verification-desc {{
-                        color: #6c757d;
+                        color: 
                         font-size: 16px;
                         margin-bottom: 35px;
                         line-height: 1.6;
                     }}
                     .code-container {{
-                        background: #f8f9fa;
-                        border: 2px solid #e9ecef;
+                        background: 
+                        border: 2px solid 
                         border-radius: 20px;
                         padding: 35px;
                         margin: 25px 0;
@@ -365,34 +340,34 @@ class EmailService:
                         font-size: 42px;
                         font-weight: 700;
                         font-family: 'Courier New', monospace;
-                        color: #4CAF50;
+                        color: 
                         letter-spacing: 12px;
                         margin: 0;
                     }}
                     .code-info {{
-                        color: #6c757d;
+                        color: 
                         font-size: 14px;
                         margin-top: 20px;
                         font-weight: 500;
                     }}
                     .footer {{
-                        background: #f8f9fa;
+                        background: 
                         padding: 30px;
                         text-align: center;
-                        border-top: 1px solid #e9ecef;
+                        border-top: 1px solid 
                     }}
                     .footer p {{
                         margin: 8px 0;
-                        color: #6c757d;
+                        color: 
                         font-size: 14px;
                     }}
                     .warning {{
                         background: rgba(255, 152, 0, 0.1);
-                        border: 1px solid #FF9800;
+                        border: 1px solid 
                         border-radius: 20px;
                         padding: 20px;
                         margin: 25px 0;
-                        color: #FF9800;
+                        color: 
                         font-size: 14px;
                         font-weight: 500;
                     }}
@@ -437,15 +412,10 @@ class EmailService:
             """
             text_body = f"""
             Новый код подтверждения - cysu
-
             Для завершения регистрации введите следующий код подтверждения:
-
             {verification_code}
-
             Код действителен в течение 15 минут.
-
             Если вы не регистрировались в cysu, просто проигнорируйте это письмо.
-
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
@@ -454,8 +424,6 @@ class EmailService:
                 html=html_body,
                 body=text_body,
             )
-
-            # Используем метод с таймаутом
             success = EmailService.send_email_with_timeout(msg, timeout=10)
             if success:
                 logger.info(
@@ -477,11 +445,9 @@ class EmailService:
     def send_password_reset_email(user_email: str, reset_code: str) -> bool:
         """
         Отправляет email с кодом восстановления пароля
-
         Args:
             user_email: Email пользователя
             reset_code: Код восстановления пароля
-
         Returns:
             bool: True если email отправлен успешно, False в противном случае
         """
@@ -490,7 +456,6 @@ class EmailService:
             current_app.logger.info(
                 f"Sending password reset email to {user_email} with code: '{reset_code}' (type: {type(reset_code)}, length: {len(reset_code)})"
             )
-
             html_body = f"""
             <!DOCTYPE html>
             <html lang="ru">
@@ -503,21 +468,21 @@ class EmailService:
                         margin: 0;
                         padding: 20px;
                         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                        background-color: #f8f9fa;
-                        color: #212529;
+                        background-color: 
+                        color: 
                         line-height: 1.6;
                     }}
                     .container {{
                         max-width: 600px;
                         margin: 0 auto;
-                        background: #ffffff;
+                        background: 
                         border-radius: 20px;
                         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                         overflow: hidden;
-                        border: 1px solid #e9ecef;
+                        border: 1px solid 
                     }}
                     .header {{
-                        background: linear-gradient(135deg, #F44336 0%, #d32f2f 100%);
+                        background: linear-gradient(135deg, 
                         padding: 40px 30px;
                         text-align: center;
                         color: white;
@@ -554,18 +519,18 @@ class EmailService:
                     .verification-title {{
                         font-size: 24px;
                         font-weight: 600;
-                        color: #212529;
+                        color: 
                         margin-bottom: 15px;
                     }}
                     .verification-desc {{
-                        color: #6c757d;
+                        color: 
                         font-size: 16px;
                         margin-bottom: 35px;
                         line-height: 1.6;
                     }}
                     .code-container {{
-                        background: #f8f9fa;
-                        border: 2px solid #e9ecef;
+                        background: 
+                        border: 2px solid 
                         border-radius: 20px;
                         padding: 35px;
                         margin: 25px 0;
@@ -576,34 +541,34 @@ class EmailService:
                         font-size: 36px;
                         font-weight: 700;
                         font-family: 'Courier New', monospace;
-                        color: #F44336;
+                        color: 
                         letter-spacing: 8px;
                         margin: 0;
                     }}
                     .code-info {{
-                        color: #6c757d;
+                        color: 
                         font-size: 14px;
                         margin-top: 20px;
                         font-weight: 500;
                     }}
                     .footer {{
-                        background: #f8f9fa;
+                        background: 
                         padding: 30px;
                         text-align: center;
-                        border-top: 1px solid #e9ecef;
+                        border-top: 1px solid 
                     }}
                     .footer p {{
                         margin: 8px 0;
-                        color: #6c757d;
+                        color: 
                         font-size: 14px;
                     }}
                     .warning {{
                         background: rgba(244, 67, 54, 0.1);
-                        border: 1px solid #F44336;
+                        border: 1px solid 
                         border-radius: 20px;
                         padding: 20px;
                         margin: 25px 0;
-                        color: #F44336;
+                        color: 
                         font-size: 14px;
                         font-weight: 500;
                     }}
@@ -647,15 +612,10 @@ class EmailService:
             """
             text_body = f"""
             Восстановление пароля - cysu
-
             Вы запросили восстановление пароля. Введите следующий код для создания нового пароля:
-
             {reset_code}
-
             Код действителен в течение 15 минут.
-
             Важно: Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.
-
             © 2025 cysu. Все права защищены.
             """
             msg = Message(
@@ -664,8 +624,6 @@ class EmailService:
                 html=html_body,
                 body=text_body,
             )
-
-            # Используем метод с таймаутом
             success = EmailService.send_email_with_timeout(msg, timeout=10)
             if success:
                 logger.info(

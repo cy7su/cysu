@@ -159,7 +159,7 @@ material.title) }}
                         <small class="text-muted d-block mb-1">Тип материала</small>
                         <div>
                             <span class="badge"
-                                style="background-color: {{ '#B595FF' if material.type == 'assignment' else '#4CAF50' }}; font-size: 0.875rem;">
+                                style="background-color: {{ 'var(--primary-color)' if material.type == 'assignment' else '#4CAF50' }}; font-size: 0.875rem;">
                                 {{ 'Практика' if material.type == 'assignment' else 'Лекция' }}
                             </span>
                         </div>
@@ -215,6 +215,142 @@ material.title) }}
             {% endif %}
         </div>
     </div>
+</div>
+</div>
+</div>
+
+<!-- Форма загрузки решения для практик -->
+{% if current_user.is_authenticated and material.type == 'assignment' %}
+{% set my_submission = user_submissions.get(material.id) if user_submissions else None %}
+
+{% if not my_submission or not my_submission.file %}
+<div class="card mt-4 shadow-sm" style="border: 1px solid var(--dp-12);">
+    <div class="card-header"
+        style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%); border-bottom: 1px solid var(--dp-12);">
+        <h5 class="mb-0 text-success"><i class="fas fa-cloud-upload-alt me-2"></i>Загрузить решение</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('main.submit_solution', material_id=material.id) }}"
+            enctype="multipart/form-data" id="uploadForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+                <label for="solution_file" class="form-label">Выберите файл с решением</label>
+                <input type="file" class="form-control" id="solution_file" name="solution_file" required
+                    accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt">
+                <div class="form-text">Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 16
+                    МБ</div>
+            </div>
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-upload me-2"></i>Загрузить решение
+            </button>
+        </form>
+    </div>
+</div>
+{% else %}
+<div class="card mt-4 shadow-sm" style="border: 1px solid var(--dp-12);">
+    <div class="card-header"
+        style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.05) 100%); border-bottom: 1px solid var(--dp-12);">
+        <h5 class="mb-0 text-primary"><i class="fas fa-check-circle me-2"></i>Моё решение</h5>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-success mb-3">
+            <i class="fas fa-info-circle me-2"></i>Ваше решение успешно загружено
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('main.serve_user_file', subject_id=material.subject_id, user_id=my_submission.file | extract_user_id_from_path, filename=my_submission.file | extract_filename) }}"
+                class="btn btn-sm btn-outline-primary mobile-file-btn" target="_blank">
+                <i class="fas fa-download me-1"></i>Скачать
+            </a>
+            <form method="POST" action="{{ url_for('main.delete_solution', submission_id=my_submission.id) }}"
+                style="display: inline; margin: 0;" id="deleteSolutionForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="button" class="btn btn-sm btn-outline-danger mobile-delete-btn"
+                    onclick="customConfirm('Удалить решение и загрузить новое?', function() { document.getElementById('deleteSolutionForm').submit(); })">
+                    <i class="fas fa-trash me-1"></i>Удалить
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+</div>
+
+<div class="col-lg-4">
+    <!-- Информационная панель -->
+    <div class="card shadow-sm mb-3" style="border: 1px solid var(--dp-12);">
+        <div class="card-header" style="background: var(--dp-02); border-bottom: 1px solid var(--dp-12);">
+            <h5 class="mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>Информация</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <small class="text-muted d-block mb-1">Предмет</small>
+                <a href="{{ url_for('main.subject_detail', subject_id=material.subject.id) }}"
+                    class="text-decoration-none">
+                    <strong style="color: var(--primary-color);">{{ material.subject.title }}</strong>
+                </a>
+            </div>
+
+            <div class="mb-3">
+                <small class="text-muted d-block mb-1">Тип материала</small>
+                <div>
+                    <span class="badge"
+                        style="background-color: {{ 'var(--primary-color)' if material.type == 'assignment' else '#4CAF50' }}; font-size: 0.875rem;">
+                        {{ 'Практика' if material.type == 'assignment' else 'Лекция' }}
+                    </span>
+                </div>
+            </div>
+
+            {% if created_by_user %}
+            <div class="mb-3">
+                <small class="text-muted d-block mb-1">Создано</small>
+                <strong style="color: var(--text-primary);">{{ created_by_user.username }}</strong>
+            </div>
+            {% endif %}
+
+            <div class="mb-3">
+                <small class="text-muted d-block mb-1">Дата создания</small>
+                <strong style="color: var(--text-primary);">{{ material.created_at.strftime('%d.%m.%Y %H:%M')
+                    }}</strong>
+            </div>
+
+            {% if material.updated_at and material.updated_at != material.created_at %}
+            <div class="mb-0">
+                <small class="text-muted d-block mb-1">Последнее обновление</small>
+                <strong style="color: var(--text-primary);">{{ material.updated_at.strftime('%d.%m.%Y %H:%M')
+                    }}</strong>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Статистика для практик -->
+    {% if material.type == 'assignment' %}
+    <div class="card shadow-sm" style="border: 1px solid var(--dp-12);">
+        <div class="card-header" style="background: var(--dp-02); border-bottom: 1px solid var(--dp-12);">
+            <h5 class="mb-0"><i class="fas fa-chart-bar me-2 text-success"></i>Статистика</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-muted">Всего решений</span>
+                <span class="badge bg-success" style="font-size: 1rem; padding: 0.5rem 1rem;">{{
+                    total_submissions }}</span>
+            </div>
+
+            {% set my_submission = user_submissions.get(material.id) if user_submissions else None %}
+            <div class="d-flex align-items-center justify-content-between">
+                <span class="text-muted">Ваш статус</span>
+                {% if my_submission and my_submission.file %}
+                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Выполнено</span>
+                {% else %}
+                <span class="badge bg-secondary"><i class="fas fa-clock me-1"></i>Не выполнено</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+</div>
 </div>
 
 {% if current_user.is_authenticated and current_user.can_manage_materials() %}
@@ -292,7 +428,7 @@ material.title) }}
                         <label for="file" class="form-label">Выберите новый файл</label>
                         <input type="file" class="form-control" id="file" name="file" required
                             accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt">
-                        <div class="form-text">Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 200 МБ
+                        <div class="form-text">Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 1 ГБ
                         </div>
                     </div>
 
@@ -352,7 +488,7 @@ material.title) }}
                         <label for="solution_file" class="form-label">Выберите файл решения</label>
                         <input type="file" class="form-control" id="solution_file" name="solution_file" required
                             accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt">
-                        <div class="form-text">Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 200 МБ
+                        <div class="form-text">Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 1 ГБ
                         </div>
                     </div>
 
