@@ -137,23 +137,11 @@ jobs:
 
     - name: Generate test report
       run: |
-        echo "# Test Results & Quality Report" > test_results.md
+        echo "<img src=\"https://capsule-render.vercel.app/api?type=waving&color=A020F0&height=200&section=header&text=cysu&fontSize=80&fontAlignY=50&desc=&descAlignY=70&descAlign=50&animation=twinkling&fontColor=4B0082&borderRadius=20&font=Sono&stroke=A020F0&strokeWidth=2&wave=1&waveOffset=0\" />" > test_results.md
+        echo "" >> test_results.md
+        echo "# Test Results & Quality Report" >> test_results.md
         echo "" >> test_results.md
         echo "_Generated on $(date '+%Y-%m-%d %H:%M:%S UTC')_" >> test_results.md
-        echo "" >> test_results.md
-
-        # Test Status Header
-        if python3 run_tests.py --tb=short --disable-warnings --cov=app --cov-report=xml --junitxml=test-results.xml 2>&1 | tee pytest_output.txt; then
-            TEST_RESULT="✅ PASSED"
-            TEST_STATUS="All tests passed successfully"
-        else
-            TEST_RESULT="❌ FAILED"
-            TEST_STATUS="Some tests failed - please review"
-        fi
-
-        echo "## Test Execution Status: $TEST_RESULT" >> test_results.md
-        echo "" >> test_results.md
-        echo "**$TEST_STATUS**" >> test_results.md
         echo "" >> test_results.md
 
         # Metrics Calculation
@@ -186,44 +174,9 @@ jobs:
         # Results Table
         echo "## Test Metrics" >> test_results.md
         echo "" >> test_results.md
-        echo "| Metric | Count | Status |" >> test_results.md
-        echo "|--------|-------|--------|" >> test_results.md
-        echo "| Total Tests | $TOTAL_TESTS | 📊 |" >> test_results.md
-        echo "| Passed | $PASSED_TESTS | ✅ |" >> test_results.md
-        echo "| Failed | $FAILED_TESTS | ❌ |" >> test_results.md
-        echo "| Errors | $ERROR_TESTS | ⚠️ |" >> test_results.md
-        echo "| Skipped | $SKIPPED_TESTS | ⏭️ |" >> test_results.md
-        echo "| Success Rate | $SUCCESS_RATE | 📈 |" >> test_results.md
-        echo "| Code Coverage | $COVERAGE_RESULT | 🎯 |" >> test_results.md
-        echo "" >> test_results.md
-
-        # Static Analysis
-        echo "## Static Asset Analysis" >> test_results.md
-        echo "" >> test_results.md
-        HTML_COUNT=$(find app/templates -name "*.html" 2>/dev/null | wc -l)
-        JS_COUNT=$(find app/static/js -name "*.js" 2>/dev/null | wc -l)
-        CSS_COUNT=$(find app/static/css -name "*.css" 2>/dev/null | wc -l)
-        PY_COUNT=$(find app/ -name "*.py" 2>/dev/null | wc -l)
-
-        echo "| Asset Type | Count | Status |" >> test_results.md
-        echo "|------------|-------|--------|" >> test_results.md
-        echo "| Python Files | $PY_COUNT | 🐍 |" >> test_results.md
-        echo "| HTML Templates | $HTML_COUNT | 🎨 |" >> test_results.md
-        echo "| JavaScript Files | $JS_COUNT | 📜 |" >> test_results.md
-        echo "| CSS Files | $CSS_COUNT | 🎨 |" >> test_results.md
-        echo "" >> test_results.md
-
-        # Deployment Readiness
-        if [ "$FAILED_TESTS" = "0" ] && [ "$ERROR_TESTS" = "0" ]; then
-            echo "## Deployment Status: ✅ READY FOR PRODUCTION" >> test_results.md
-        else
-            echo "## Deployment Status: ❌ REQUIRES ATTENTION" >> test_results.md
-        fi
-        echo "" >> test_results.md
-        echo "**Build completed at $(date '+%Y-%m-%d %H:%M:%S UTC')**" >> test_results.md
-        echo "" >> test_results.md
-        echo "---" >> test_results.md
-        echo "_Automated testing and quality assurance completed_" >> test_results.md
+        echo "| Total Tests | Passed | Failed | Errors | Skipped | Success Rate | Code Coverage |" >> test_results.md
+        echo "|-------------|--------|--------|--------|---------|--------------|---------------|" >> test_results.md
+        echo "| $TOTAL_TESTS | $PASSED_TESTS | $FAILED_TESTS | $ERROR_TESTS | $SKIPPED_TESTS | $SUCCESS_RATE | $COVERAGE_RESULT |" >> test_results.md
 
         # Output formatted results
         cat test_results.md
