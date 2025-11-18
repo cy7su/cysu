@@ -125,7 +125,7 @@ class YooKassaService:
                 from flask import url_for
 
                 success_url = url_for(
-                    "main.payment_success",
+                    "payment.payment_success",
                     payment_id=payment_id,
                     _external=True,
                 )

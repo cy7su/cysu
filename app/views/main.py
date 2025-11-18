@@ -935,7 +935,8 @@ def redirect_page() -> str:
 def download_redirect() -> Response:
     from flask import make_response
 
-    with open("/root/cysu/app/templates/redirect.html", "r", encoding="utf-8") as f:
+    template_path = os.path.join(current_app.root_path, "templates", "redirect.html")
+    with open(template_path, "r", encoding="utf-8") as f:
         html_content = f.read()
     import re
 
