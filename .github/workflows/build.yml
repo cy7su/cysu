@@ -141,173 +141,39 @@ jobs:
             -czf cysu-v${{ steps.version.outputs.new_version }}.tar.gz .
         ls -lh cysu-v${{ steps.version.outputs.new_version }}.tar.gz
 
-    - name: Create Release Body
-      id: release_body
-      shell: bash
+    - name: Create Release Notes
+      id: release_notes
       run: |
-        # Determine release type and messaging
-        if [ "${{ github.event.inputs.version_type }}" = "major" ]; then
-          RELEASE_TYPE="🚀 Major Release"
-          BADGE_COLOR="red"
-          HIGHLIGHT="Breaking changes ahead! Review migration guide."
-        elif [ "${{ github.event.inputs.version_type }}" = "minor" ]; then
-          RELEASE_TYPE="✨ Feature Release"
-          BADGE_COLOR="green"
-          HIGHLIGHT="New features that will blow your mind! 🎉"
-        else
-          RELEASE_TYPE="🐛 Patch Release"
-          BADGE_COLOR="blue"
-          HIGHLIGHT="Bug fixes and quality improvements. Sleep better tonight!"
-        fi
+        cat << EOF > release_notes.md
+        # Release v${{ steps.version.outputs.new_version }}
 
-        # Create awesome release notes
-        cat << EOF > release_body.md
-        <div align="center">
+        ## CI/CD Results
+        - Tests: PASSED ✅
+        - Build: SUCCESSFUL ✅
+        - Docker Image: BUILT ✅
 
-        ## $RELEASE_TYPE
+        ## Downloads
+        - Source Code: cysu-v${{ steps.version.outputs.new_version }}.tar.gz
+        - Docker: docker.io/***/cysu:latest
 
-        # 🎉 CYSU v${{ steps.version.outputs.new_version }} is available!
-
-        ![Release Badge](https://img.shields.io/badge/release-${{ steps.version.outputs.new_version }}-$BADGE_COLOR?style=for-the-badge&logo=github&logoColor=white)
-
-        > **$HIGHLIGHT**
-
-        ---
-
-        ## 📦 Downloads
-
-        Choose your preferred installation method:
-
-        | Method | Details | Size |
-        |--------|---------|------|
-        | 📦 **Source Code** | \`cysu-v${{ steps.version.outputs.new_version }}.tar.gz\` | Stable & Complete |
-        | 🐳 **Docker Image** | \`docker pull docker.io/***/cysu:latest\` | Ready-to-run |
-
-        ---
-
-        ## 🚀 Quick Start
-
-        ### Docker Deployment (Recommended)
+        ## Installation
         \`\`\`bash
-        # One-liner deployment
-        docker run -d --name cysu \\
-          -p 8001:8001 \\
-          -v \$(pwd)/data:/app/data \\
-          --env-file .env \\
-          docker.io/***/cysu:latest
-
-        # Check if it's running
-        curl http://localhost:8001
-        \`\`\`
-
-        ### Traditional Installation
-        \`\`\`bash
-        # Extract and setup
         tar -xzf cysu-v${{ steps.version.outputs.new_version }}.tar.gz
         cd cysu-v${{ steps.version.outputs.new_version }}
-
-        # Setup environment
-        python3 -m venv venv && source venv/bin/activate
         pip install -r requirements.txt
-
-        # Start serving
         python run.py
         \`\`\`
 
-        ---
+        ## Testing Summary
+        All automated tests passed successfully. Code quality checks completed.
 
-        ## 🔥 Key Improvements in v${{ steps.version.outputs.new_version }}
-
-        ### 🎯 Performance & Reliability
-        - ⚡ **Faster database queries** - Improved SQLAlchemy configurations
-        - 🔒 **Enhanced security** - Updated dependencies and patches
-        - 🐛 **Bug fixes** - Critical issues resolved
-
-        ### 🎨 User Experience
-        - 📱 **Better mobile support** - Responsive design improvements
-        - 🎯 **UI polish** - Smoother interactions and transitions
-        - 💬 **Better messaging** - Clearer error messages and feedback
-
-        ### 🛠️ Developer Experience
-        - 📚 **Improved docs** - Better README and deployment guides
-        - 🔧 **CI/CD enhancements** - Faster builds and automated testing
-        - 📦 **Package management** - Cleaner dependencies
-
-        ---
-
-        ## 📊 Release Stats
-
-        <table>
-          <tr>
-            <td align="center">
-              <strong>📈 Version</strong><br>
-              v${{ steps.version.outputs.new_version }}
-            </td>
-            <td align="center">
-              <strong>🐍 Python</strong><br>
-              3.11+
-            </td>
-            <td align="center">
-              <strong>🖥️ Framework</strong><br>
-              Flask 3.0
-            </td>
-          </tr>
-        </table>
-
-        ---
-
-        ## 🎯 Migration Notes
-
-        ### From v${{ steps.version.outputs.major-1 != 0 && format('{0}.{1}', steps.version.outputs.major-1, steps.version.outputs.minor) || format('0.{0}', steps.version.outputs.minor-1) }}
-
-        **Breaking Changes:**
-        - Environment variable naming consistency
-        - Some internal API changes
-
-        **Migration Steps:**
-        1. Backup your data
-        2. Update environment variables
-        3. Test in staging environment
-        4. Deploy and verify
-
-        ---
-
-        ## 🙏 Acknowledgments
-
-        **Special thanks to our contributors:**
-        - [@cy7su](https://github.com/cy7su) - Lead developer & vision keeper
-        - Open source community for feedback & testing
-        - Users providing real-world usage insights
-
-        > **Star us on GitHub if you find this useful!** ⭐⭐⭐
-        > _Help us grow and improve!_
-
-        ---
-
-        ## 🏁 Deployment Ready
-
-        This release has been:
-        - ✅ Thoroughly tested
-        - ✅ Performance optimized
-        - ✅ Security audited
-        - ✅ Production verified
-
-        **Status: Ready for deployment!** 🚀
-
-        ---
-
-        <details>
-          <summary><strong>📋 Complete Changelog</strong></summary>
-
-        ### Technical Details
-        See the automatically generated release notes below for commit-by-commit changes.
-
-        </details>
+        ## Deployment Status
+        Ready for production deployment.
         EOF
 
-        # Output release body for GitHub Actions
+        # Output the release body for the action
         echo "release_body<<EOF" >> $GITHUB_OUTPUT
-        cat release_body.md >> $GITHUB_OUTPUT
+        cat release_notes.md >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Create GitHub Release
