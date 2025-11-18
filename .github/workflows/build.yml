@@ -151,10 +151,21 @@ jobs:
             FAILED_TESTS=$(grep -c "<failure>" test-results.xml 2>/dev/null || echo "0")
             ERROR_TESTS=$(grep -c "<error>" test-results.xml 2>/dev/null || echo "0")
             SKIPPED_TESTS=$(grep -c "<skipped>" test-results.xml 2>/dev/null || echo "0")
+
+            # Ensure numeric values
+            TOTAL_TESTS=${TOTAL_TESTS:-0}
+            FAILED_TESTS=${FAILED_TESTS:-0}
+            ERROR_TESTS=${ERROR_TESTS:-0}
+            SKIPPED_TESTS=${SKIPPED_TESTS:-0}
+
             PASSED_TESTS=$((TOTAL_TESTS - FAILED_TESTS - ERROR_TESTS - SKIPPED_TESTS))
 
-            SUCCESS_RATE=$([ $TOTAL_TESTS -gt 0 ] && echo "scale=1; ($PASSED_TESTS * 100) / $TOTAL_TESTS" | bc || echo "0")
-            SUCCESS_RATE="${SUCCESS_RATE:-0}%"
+            if [ $TOTAL_TESTS -gt 0 ]; then
+                SUCCESS_RATE=$((PASSED_TESTS * 100 / TOTAL_TESTS))
+                SUCCESS_RATE="${SUCCESS_RATE}%"
+            else
+                SUCCESS_RATE="0%"
+            fi
         else
             TOTAL_TESTS="N/A"
             PASSED_TESTS="N/A"
