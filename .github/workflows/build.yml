@@ -144,6 +144,9 @@ jobs:
         echo "_Generated on $(date '+%Y-%m-%d %H:%M:%S UTC')_" >> test_results.md
         echo "" >> test_results.md
 
+        # Run tests again in release job
+        python -m pytest tests/ --tb=short --disable-warnings -v --cov=app --cov-report=term --cov-report=xml --junitxml=test-results.xml
+
         # Metrics Calculation
         if [ -f test-results.xml ]; then
             TOTAL_TESTS=$(grep -c "<testcase" test-results.xml 2>/dev/null || echo "0")
