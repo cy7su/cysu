@@ -1,4 +1,3 @@
-import logging
 import os
 from datetime import datetime
 
@@ -34,7 +33,9 @@ def create_app():
         raise ValueError("SECRET_KEY environment variable is required")
     app.config["SECRET_KEY"] = secret_key
     app.config["SERVER_NAME"] = os.getenv("SERVER_NAME", "cysu.ru")
-    db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "app.db"))
+    db_path = os.path.abspath(
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "app.db")
+    )
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     db_dir = os.path.dirname(db_path)
     if not os.path.exists(db_dir):
@@ -82,7 +83,7 @@ def create_app():
     app.config["MAX_CONTENT_LENGTH"] = max_content_length
     app.logger.info(
         f"MAX_CONTENT_LENGTH установлен: {max_content_length} байт "
-        f"({max_content_length / (1024*1024):.1f} MB)"
+        f"({max_content_length / (1024 * 1024):.1f} MB)"
     )
     for folder in [app.config["UPLOAD_FOLDER"]]:
         if not os.path.exists(folder):
@@ -93,7 +94,9 @@ def create_app():
     app.config["MAIL_USE_SSL"] = os.getenv("MAIL_USE_SSL", "False").lower() == "true"
     app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
     app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
-    app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_DEFAULT_SENDER", "your-email@gmail.com")
+    app.config["MAIL_DEFAULT_SENDER"] = os.getenv(
+        "MAIL_DEFAULT_SENDER", "your-email@gmail.com"
+    )
     app.config["MAIL_TIMEOUT"] = 10
     app.config["MAIL_CONNECT_TIMEOUT"] = 5
     app.config["SKIP_EMAIL_VERIFICATION"] = (
@@ -101,7 +104,9 @@ def create_app():
     )
     app.config["YOOKASSA_SHOP_ID"] = os.getenv("YOOKASSA_SHOP_ID")
     app.config["YOOKASSA_SECRET_KEY"] = os.getenv("YOOKASSA_SECRET_KEY")
-    app.config["YOOKASSA_TEST_MODE"] = os.getenv("YOOKASSA_TEST_MODE", "True").lower() == "true"
+    app.config["YOOKASSA_TEST_MODE"] = (
+        os.getenv("YOOKASSA_TEST_MODE", "True").lower() == "true"
+    )
     app.config["SUBSCRIPTION_PRICES"] = {
         "1": float(os.getenv("SUBSCRIPTION_PRICE_1", 89.00)),
         "3": float(os.getenv("SUBSCRIPTION_PRICE_3", 199.00)),
@@ -131,7 +136,7 @@ def create_app():
     app_logger.info(f"UPLOAD_FOLDER: {upload_folder}")
     app_logger.info(f"TICKET_FILES_FOLDER: {ticket_folder}")
     app_logger.info(f"DATABASE_URI: {os.path.basename(db_path)}")
-    app_logger.info(f"MAX_CONTENT_LENGTH: {max_content_length / (1024*1024):.1f} MB")
+    app_logger.info(f"MAX_CONTENT_LENGTH: {max_content_length / (1024 * 1024):.1f} MB")
 
     @app.after_request
     def add_cache_headers(response):
@@ -168,7 +173,9 @@ def create_app():
 
     csrf.exempt(telegram_login)
     login_manager.login_view = "auth.login"
-    login_manager.login_message = "Пожалуйста, войдите в систему для доступа к этой странице."
+    login_manager.login_message = (
+        "Пожалуйста, войдите в систему для доступа к этой странице."
+    )
     from .views import (
         admin_bp,
         api_bp,
@@ -243,7 +250,7 @@ def create_app():
                 try:
                     expiry = datetime.fromisoformat(temp_access)
                     has_temp_access = datetime.utcnow() < expiry
-                except:
+                except (ValueError, TypeError):
                     pass
             return dict(has_temp_access=has_temp_access)
         except Exception as e:
@@ -267,7 +274,9 @@ def create_app():
                     "yes",
                     "on",
                 ]
-            app.logger.info(f"Maintenance mode: {maintenance_mode}, Endpoint: {request.endpoint}")
+            app.logger.info(
+                f"Maintenance mode: {maintenance_mode}, Endpoint: {request.endpoint}"
+            )
             if maintenance_mode:
                 if request.endpoint == "main.grant_temp_access":
                     return
@@ -288,7 +297,7 @@ def create_app():
                                     return redirect(url_for("auth.login"))
                             else:
                                 session.pop("temp_access", None)
-                        except:
+                        except (ValueError, TypeError):
                             session.pop("temp_access", None)
         except Exception as e:
             app.logger.error(f"Error checking maintenance mode: {e}")

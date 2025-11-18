@@ -1,6 +1,7 @@
 import secrets
 from datetime import datetime, timedelta
 
+
 from flask_login import UserMixin
 
 from . import db
@@ -54,7 +55,9 @@ class User(UserMixin, db.Model):
     submissions = db.relationship(
         "Submission", backref="user", lazy=True, cascade="all, delete-orphan"
     )
-    payments = db.relationship("Payment", backref="user", lazy=True, cascade="all, delete-orphan")
+    payments = db.relationship(
+        "Payment", backref="user", lazy=True, cascade="all, delete-orphan"
+    )
     tickets = db.relationship(
         "Ticket",
         foreign_keys="Ticket.user_id",
@@ -96,7 +99,9 @@ class User(UserMixin, db.Model):
             from .models import SubjectGroup
 
             return (
-                SubjectGroup.query.filter_by(subject_id=subject.id, group_id=self.group_id).first()
+                SubjectGroup.query.filter_by(
+                    subject_id=subject.id, group_id=self.group_id
+                ).first()
                 is not None
             )
         else:
@@ -136,7 +141,7 @@ class EmailVerification(db.Model):
     )
 
     def __repr__(self) -> str:
-        return f'<EmailVerification {self.id}: {self.user.email if self.user else "Unknown"}>'
+        return f"<EmailVerification {self.id}: {self.user.email if self.user else 'Unknown'}>"
 
     @classmethod
     def generate_code(cls) -> str:
@@ -216,7 +221,9 @@ class Material(db.Model):
     type = db.Column(db.String(20))
     solution_file = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
     subject_id = db.Column(db.Integer, db.ForeignKey("subject.id"), nullable=False)
     submissions = db.relationship(
@@ -225,6 +232,24 @@ class Material(db.Model):
         lazy=True,
         cascade="all, delete-orphan",
     )
+
+    @property
+    def share_url(self):
+        """Генерирует или возвращает короткую ссылку для поделения материалом"""
+        from flask import url_for
+
+        # Ищем существующую короткую ссылку
+        original_url = url_for(
+            "main.material_detail", material_id=self.id, _external=True
+        )
+        short_link = ShortLink.query.filter_by(original_url=original_url).first()
+
+        if not short_link:
+            # Создаем новую короткую ссылку
+            short_link = ShortLink.create_unique(original_url)
+            # Не сохраняем здесь, так как это может быть в середине запроса
+
+        return url_for("main.share_link", code=short_link.code, _external=True)
 
 
 class Submission(db.Model):
@@ -245,7 +270,9 @@ class Payment(db.Model):
     status = db.Column(db.String(20), default="pending")
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     def __repr__(self) -> str:
         return f"<Payment {self.yookassa_payment_id}: {self.status}>"
@@ -265,7 +292,9 @@ class ChatMessage(db.Model):
     )
 
     def __repr__(self) -> str:
-        return f'<ChatMessage {self.id}: {self.user.username if self.user else "Unknown"}>'
+        return (
+            f"<ChatMessage {self.id}: {self.user.username if self.user else 'Unknown'}>"
+        )
 
 
 class Ticket(db.Model):
@@ -275,14 +304,20 @@ class Ticket(db.Model):
     message = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default="pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
     admin_response = db.Column(db.Text)
     admin_response_at = db.Column(db.DateTime)
     admin_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     user_response = db.Column(db.Text)
     user_response_at = db.Column(db.DateTime)
-    files = db.relationship("TicketFile", backref="ticket", lazy=True, cascade="all, delete-orphan")
-    admin = db.relationship("User", foreign_keys=[admin_id], backref="administered_tickets")
+    files = db.relationship(
+        "TicketFile", backref="ticket", lazy=True, cascade="all, delete-orphan"
+    )
+    admin = db.relationship(
+        "User", foreign_keys=[admin_id], backref="administered_tickets"
+    )
 
     def __repr__(self) -> str:
         return f"<Ticket {self.id}: {self.subject}>"
@@ -312,7 +347,7 @@ class TicketMessage(db.Model):
     user = db.relationship("User", backref="ticket_messages")
 
     def __repr__(self) -> str:
-        return f'<TicketMessage {self.id}: {"Admin" if self.is_admin else "User"}>'
+        return f"<TicketMessage {self.id}: {'Admin' if self.is_admin else 'User'}>"
 
 
 class Notification(db.Model):
@@ -382,7 +417,9 @@ class SiteSettings(db.Model):
     key = db.Column(db.String(100), unique=True, nullable=False)
     value = db.Column(db.Text, nullable=False)
     description = db.Column(db.String(255))
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     def __repr__(self) -> str:
         return f"<SiteSettings {self.key}: {self.value}>"

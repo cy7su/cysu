@@ -49,7 +49,9 @@ def validate_username_characters(form, field):
     if "@" in field.data:
         raise ValidationError("Это тебе не почта нихуя")
     if not has_allowed_characters(field.data):
-        raise ValidationError("Имя пользователя может содержать только буквы латиницы и кириллицы")
+        raise ValidationError(
+            "Имя пользователя может содержать только буквы латиницы и кириллицы"
+        )
 
 
 def validate_username_allowed(form, field):
@@ -97,7 +99,9 @@ class RegistrationForm(FlaskForm):
         super(RegistrationForm, self).__init__(*args, **kwargs)
         self.group_id.choices = [("", "Выберите группу")] + [
             (str(group.id), group.name)
-            for group in Group.query.filter_by(is_active=True).order_by(Group.name).all()
+            for group in Group.query.filter_by(is_active=True)
+            .order_by(Group.name)
+            .all()
         ]
 
 
@@ -133,7 +137,9 @@ class AdminUserForm(FlaskForm):
         super(AdminUserForm, self).__init__(*args, **kwargs)
         self.group_id.choices = [("", "Без группы")] + [
             (str(group.id), group.name)
-            for group in Group.query.filter_by(is_active=True).order_by(Group.name).all()
+            for group in Group.query.filter_by(is_active=True)
+            .order_by(Group.name)
+            .all()
         ]
 
 
@@ -188,9 +194,13 @@ class MaterialForm(FlaskForm):
     title = StringField("Название", validators=[DataRequired()])
     description = TextAreaField(
         "Описание",
-        validators=[Length(max=300, message="Описание не должно превышать 300 символов")],
+        validators=[
+            Length(max=300, message="Описание не должно превышать 300 символов")
+        ],
     )
-    type = SelectField("Тип", choices=[("lecture", "Лекция"), ("assignment", "Задание")])
+    type = SelectField(
+        "Тип", choices=[("lecture", "Лекция"), ("assignment", "Задание")]
+    )
     subject_id = SelectField("Предмет", coerce=int, validators=[DataRequired()])
     file = FileField("Файл")
     solution_file = FileField("Готовое решение (только для заданий)")
@@ -219,7 +229,9 @@ class SubmissionForm(FlaskForm):
 
 
 class SubscriptionForm(FlaskForm):
-    agree_terms = BooleanField("Я согласен с условиями подписки", validators=[DataRequired()])
+    agree_terms = BooleanField(
+        "Я согласен с условиями подписки", validators=[DataRequired()]
+    )
     submit = SubmitField("Оформить подписку за 349₽/месяц")
 
 
@@ -294,7 +306,9 @@ class SubjectGroupForm(FlaskForm):
 
 class SiteSettingsForm(FlaskForm):
     maintenance_mode = BooleanField("Технические работы")
-    trial_subscription_enabled = BooleanField("Включить пробную подписку для новых аккаунтов")
+    trial_subscription_enabled = BooleanField(
+        "Включить пробную подписку для новых аккаунтов"
+    )
     trial_subscription_days = IntegerField(
         "Количество дней пробной подписки",
         validators=[

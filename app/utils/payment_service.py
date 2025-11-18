@@ -15,7 +15,9 @@ class YooKassaService:
         self.secret_key = current_app.config["YOOKASSA_SECRET_KEY"]
         self.base_url = "https://api.yookassa.ru/v3"
         if not self.shop_id or not self.secret_key:
-            current_app.logger.warning("Ключи ЮKassa не настроены, используется режим симуляции")
+            current_app.logger.warning(
+                "Ключи ЮKassa не настроены, используется режим симуляции"
+            )
             self.simulation_mode = True
         else:
             self.simulation_mode = False
@@ -36,7 +38,9 @@ class YooKassaService:
         elif amount == prices.get("12", 749.0):
             return 365
         else:
-            current_app.logger.warning(f"Неизвестная сумма платежа: {amount}, используем 30 дней")
+            current_app.logger.warning(
+                f"Неизвестная сумма платежа: {amount}, используем 30 дней"
+            )
             return 30
 
     def _make_api_request(
@@ -56,7 +60,9 @@ class YooKassaService:
             if method == "GET":
                 response = requests.get(url, headers=headers, timeout=timeout)
             elif method == "POST":
-                response = requests.post(url, headers=headers, json=data, timeout=timeout)
+                response = requests.post(
+                    url, headers=headers, json=data, timeout=timeout
+                )
             else:
                 raise ValueError(f"Неподдерживаемый HTTP метод: {method}")
             if response.status_code == 200:
@@ -74,12 +80,16 @@ class YooKassaService:
         self, user: User, return_url: str, price: float = None
     ) -> Dict[str, Any]:
         payment_id = str(uuid.uuid4())
-        current_app.logger.info(f"Получена цена в payment_service: {price} (тип: {type(price)})")
+        current_app.logger.info(
+            f"Получена цена в payment_service: {price} (тип: {type(price)})"
+        )
         if price is not None:
             try:
                 payment_price = float(price)
                 if payment_price > 0:
-                    current_app.logger.info(f"Используем переданную цену: {payment_price}₽")
+                    current_app.logger.info(
+                        f"Используем переданную цену: {payment_price}₽"
+                    )
                 else:
                     payment_price = current_app.config["SUBSCRIPTION_PRICES"]["1"]
                     current_app.logger.warning(
@@ -153,7 +163,9 @@ class YooKassaService:
                                 "quantity": "1",
                                 "amount": {
                                     "value": str(payment_price),
-                                    "currency": current_app.config["SUBSCRIPTION_CURRENCY"],
+                                    "currency": current_app.config[
+                                        "SUBSCRIPTION_CURRENCY"
+                                    ],
                                 },
                                 "vat_code": 1,
                                 "payment_subject": "service",
@@ -168,7 +180,9 @@ class YooKassaService:
                     current_app.logger.warning(
                         f"Receipt не добавлен - у пользователя {user.username} нет email"
                     )
-                current_app.logger.info(f"Отправляем данные платежа в ЮKassa: {payment_data}")
+                current_app.logger.info(
+                    f"Отправляем данные платежа в ЮKassa: {payment_data}"
+                )
                 api_response = self._make_api_request("payments", "POST", payment_data)
                 if "error" in api_response:
                     current_app.logger.error(
@@ -190,7 +204,9 @@ class YooKassaService:
                 )
                 return {
                     "payment_id": api_response.get("id", payment_id),
-                    "payment_url": api_response.get("confirmation", {}).get("confirmation_url"),
+                    "payment_url": api_response.get("confirmation", {}).get(
+                        "confirmation_url"
+                    ),
                     "status": api_response.get("status", "pending"),
                     "amount": payment_price,
                     "currency": current_app.config["SUBSCRIPTION_CURRENCY"],
@@ -202,16 +218,24 @@ class YooKassaService:
     def get_payment_status(self, payment_id: str) -> Dict[str, Any]:
         try:
             current_app.logger.info(f"Получение статуса платежа: {payment_id}")
-            payment_record = Payment.query.filter_by(yookassa_payment_id=payment_id).first()
+            payment_record = Payment.query.filter_by(
+                yookassa_payment_id=payment_id
+            ).first()
             if not payment_record:
                 current_app.logger.error(f"Платеж {payment_id} не найден в базе данных")
                 return {"error": "Платеж не найден"}
             if self.simulation_mode:
-                current_app.logger.info(f"Симуляционный режим: проверяем платеж {payment_id}")
+                current_app.logger.info(
+                    f"Симуляционный режим: проверяем платеж {payment_id}"
+                )
                 current_app.logger.info(f"Время создания: {payment_record.created_at}")
                 current_app.logger.info(f"Текущее время: {datetime.utcnow()}")
-                current_app.logger.info(f"Разница: {datetime.utcnow() - payment_record.created_at}")
-                if (datetime.utcnow() - payment_record.created_at) > timedelta(minutes=5):
+                current_app.logger.info(
+                    f"Разница: {datetime.utcnow() - payment_record.created_at}"
+                )
+                if (datetime.utcnow() - payment_record.created_at) > timedelta(
+                    minutes=5
+                ):
                     payment_record.status = "canceled"
                     payment_record.updated_at = datetime.utcnow()
                     db.session.commit()
@@ -231,7 +255,9 @@ class YooKassaService:
                     payment_record.status = "pending"
                     payment_record.updated_at = datetime.utcnow()
                     db.session.commit()
-                    current_app.logger.info(f"Симуляция: платеж {payment_id} в обработке")
+                    current_app.logger.info(
+                        f"Симуляция: платеж {payment_id} в обработке"
+                    )
                     return {
                         "payment_id": payment_id,
                         "status": "pending",
@@ -267,13 +293,17 @@ class YooKassaService:
                     "paid": api_response.get("paid", False),
                 }
         except Exception as e:
-            current_app.logger.error(f"Ошибка при получении статуса платежа {payment_id}: {str(e)}")
+            current_app.logger.error(
+                f"Ошибка при получении статуса платежа {payment_id}: {str(e)}"
+            )
             return {"error": str(e)}
 
     def process_successful_payment(self, payment_id: str) -> bool:
         try:
             current_app.logger.info(f"Обработка платежа: {payment_id}")
-            payment_record = Payment.query.filter_by(yookassa_payment_id=payment_id).first()
+            payment_record = Payment.query.filter_by(
+                yookassa_payment_id=payment_id
+            ).first()
             if not payment_record:
                 current_app.logger.error(f"Платеж {payment_id} не найден в базе данных")
                 return False
@@ -287,7 +317,9 @@ class YooKassaService:
             if user:
                 user.is_subscribed = True
                 subscription_days = self._get_subscription_days(payment_record.amount)
-                user.subscription_expires = datetime.utcnow() + timedelta(days=subscription_days)
+                user.subscription_expires = datetime.utcnow() + timedelta(
+                    days=subscription_days
+                )
                 payment_record.status = "succeeded"
                 payment_record.updated_at = datetime.utcnow()
                 db.session.commit()
@@ -297,18 +329,25 @@ class YooKassaService:
                 return True
             return False
         except Exception as e:
-            current_app.logger.error(f"Ошибка при обработке платежа {payment_id}: {str(e)}")
+            current_app.logger.error(
+                f"Ошибка при обработке платежа {payment_id}: {str(e)}"
+            )
             return False
 
     def check_user_subscription(self, user: User) -> bool:
         now = datetime.utcnow()
         trial_active = False
         if user.is_trial_subscription:
-            if user.trial_subscription_expires and user.trial_subscription_expires < now:
+            if (
+                user.trial_subscription_expires
+                and user.trial_subscription_expires < now
+            ):
                 user.is_trial_subscription = False
                 user.trial_subscription_expires = None
                 db.session.commit()
-                current_app.logger.info(f"Пробная подписка пользователя {user.username} истекла")
+                current_app.logger.info(
+                    f"Пробная подписка пользователя {user.username} истекла"
+                )
             else:
                 trial_active = True
         regular_active = False
@@ -321,7 +360,9 @@ class YooKassaService:
                     user.is_subscribed = False
                     user.is_manual_subscription = False
                     db.session.commit()
-                    current_app.logger.info(f"Ручная подписка пользователя {user.username} истекла")
+                    current_app.logger.info(
+                        f"Ручная подписка пользователя {user.username} истекла"
+                    )
                 else:
                     regular_active = True
             else:

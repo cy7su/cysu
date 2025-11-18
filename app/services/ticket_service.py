@@ -81,7 +81,9 @@ class TicketService:
                 for file in files:
                     if file and file.filename:
                         try:
-                            success, error_msg = TicketService._upload_ticket_file(ticket.id, file)
+                            success, error_msg = TicketService._upload_ticket_file(
+                                ticket.id, file
+                            )
                             if not success:
                                 file_errors.append(f"{file.filename}: {error_msg}")
                         except Exception as e:
@@ -160,7 +162,9 @@ class TicketService:
                 for file in files:
                     if file and file.filename:
                         try:
-                            success, error_msg = TicketService._upload_ticket_file(ticket_id, file)
+                            success, error_msg = TicketService._upload_ticket_file(
+                                ticket_id, file
+                            )
                             if not success:
                                 file_errors.append(f"{file.filename}: {error_msg}")
                         except Exception as e:
@@ -206,7 +210,9 @@ class TicketService:
             return False, f"Ошибка загрузки файла: {str(e)}"
 
     @staticmethod
-    def delete_ticket_file(ticket_id: int, file_id: int, user_id: int) -> Tuple[bool, str]:
+    def delete_ticket_file(
+        ticket_id: int, file_id: int, user_id: int
+    ) -> Tuple[bool, str]:
         """Удалить файл тикета"""
         try:
             ticket = Ticket.query.get(ticket_id)
@@ -241,7 +247,9 @@ class TicketService:
             admin = User.query.get(admin_id)
             if not (admin and admin.is_admin and admin.admin_mode_enabled):
                 return False, "Недостаточно прав"
-            closed_tickets = Ticket.query.filter(Ticket.status.in_(["closed", "rejected"])).all()
+            closed_tickets = Ticket.query.filter(
+                Ticket.status.in_(["closed", "rejected"])
+            ).all()
             deleted_count = 0
             for ticket in closed_tickets:
                 for ticket_file in ticket.files:
@@ -277,9 +285,13 @@ class TicketService:
                     {
                         "id": ticket_file.id,
                         "name": ticket_file.file_name,
-                        "size": FileStorageManager.format_file_size(ticket_file.file_size),
+                        "size": FileStorageManager.format_file_size(
+                            ticket_file.file_size
+                        ),
                         "type": ticket_file.file_type,
-                        "uploaded_at": ticket_file.uploaded_at.strftime("%d.%m.%Y %H:%M"),
+                        "uploaded_at": ticket_file.uploaded_at.strftime(
+                            "%d.%m.%Y %H:%M"
+                        ),
                         "path": ticket_file.file_path,
                     }
                 )

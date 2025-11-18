@@ -193,7 +193,8 @@ def telegram_login() -> Union[str, Response]:
             }
             auth_data = {k: v for k, v in auth_data.items() if v is not None}
             is_test_data = (
-                str(auth_data.get("id")) == "123456" and str(auth_data.get("hash")) == "test"
+                str(auth_data.get("id")) == "123456"
+                and str(auth_data.get("hash")) == "test"
             )
             is_miniapp_data = str(auth_data.get("hash")) == "miniapp_auth"
             is_widget_data = str(auth_data.get("hash")) == "telegram_widget_auth"

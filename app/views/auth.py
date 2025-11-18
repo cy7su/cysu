@@ -53,7 +53,9 @@ def login() -> Union[str, Response]:
             current_app.logger.info(
                 f"УСПЕШНЫЙ ВХОД: пользователь {user.username} ({user.email}) вошел в систему"
             )
-            return redirect_with_notification("main.index", "Вход выполнен успешно", "success")
+            return redirect_with_notification(
+                "main.index", "Вход выполнен успешно", "success"
+            )
         else:
             current_app.logger.warning(
                 f"НЕУДАЧНАЯ ПОПЫТКА ВХОДА: login={form.username.data}, пароль неверный или пользователь не найден"
@@ -108,10 +110,14 @@ def register() -> Union[str, Response]:
             current_app.logger.info(
                 f"Verification code created for pending registration ({form.email.data}): {' '.join(verification.code)} (type: {type(verification.code)}, length: {len(verification.code)})"
             )
-            current_app.logger.info(f"Attempting to send verification email to {form.email.data}")
+            current_app.logger.info(
+                f"Attempting to send verification email to {form.email.data}"
+            )
             debug_mode = current_app.config.get("DEBUG", False)
             skip_email = current_app.config.get("SKIP_EMAIL_VERIFICATION", False)
-            current_app.logger.info(f"Debug mode: {debug_mode}, Skip email: {skip_email}")
+            current_app.logger.info(
+                f"Debug mode: {debug_mode}, Skip email: {skip_email}"
+            )
             if debug_mode or skip_email:
                 current_app.logger.info(
                     f"Debug mode: skipping email send, code is {verification.code}"
@@ -122,7 +128,9 @@ def register() -> Union[str, Response]:
                     f"Режим разработки: код подтверждения - {verification.code}",
                     "info",
                 )
-            email_sent = EmailService.send_verification_email(form.email.data, verification.code)
+            email_sent = EmailService.send_verification_email(
+                form.email.data, verification.code
+            )
             current_app.logger.info(f"Email send result: {email_sent}")
             if email_sent:
                 session["pending_verification_id"] = verification.id
@@ -179,8 +187,12 @@ def email_verification() -> Union[str, Response]:
         ).first()
         if verification and verification.expires_at > datetime.utcnow():
             try:
-                hashed_password = generate_password_hash(pending_registration["password"])
-                trial_enabled = SiteSettings.get_setting("trial_subscription_enabled", True)
+                hashed_password = generate_password_hash(
+                    pending_registration["password"]
+                )
+                trial_enabled = SiteSettings.get_setting(
+                    "trial_subscription_enabled", True
+                )
                 trial_days = int(SiteSettings.get_setting("trial_subscription_days", 7))
                 user = User(
                     username=pending_registration["username"],
@@ -194,7 +206,9 @@ def email_verification() -> Union[str, Response]:
                     ),
                     is_trial_subscription=trial_enabled,
                     trial_subscription_expires=(
-                        datetime.utcnow() + timedelta(days=trial_days) if trial_enabled else None
+                        datetime.utcnow() + timedelta(days=trial_days)
+                        if trial_enabled
+                        else None
                     ),
                 )
                 db.session.add(user)
@@ -246,7 +260,9 @@ def resend_verification() -> Union[str, Response]:
         return redirect(url_for("auth.register"))
     try:
         EmailVerification.query.filter_by(id=verification_id, is_used=False).delete()
-        verification = EmailVerification.create_verification(email=pending_registration["email"])
+        verification = EmailVerification.create_verification(
+            email=pending_registration["email"]
+        )
         db.session.add(verification)
         db.session.commit()
         current_app.logger.info(

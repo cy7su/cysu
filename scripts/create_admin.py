@@ -28,7 +28,9 @@ def init_database():
         print("✅ Таблицы базы данных созданы")
         admin = User.query.filter_by(username="admin").first()
         if not admin:
-            admin_password = os.getenv("ADMIN_PASSWORD", "change_this_password_immediately")
+            admin_password = os.getenv(
+                "ADMIN_PASSWORD", "change_this_password_immediately"
+            )
             admin = User(
                 username="admin",
                 email="support@cysu.ru",

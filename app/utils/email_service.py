@@ -438,7 +438,9 @@ class EmailService:
                 )
                 return False
         except Exception as e:
-            logger.error(f"Failed to send resend verification email to {user_email}: {str(e)}")
+            logger.error(
+                f"Failed to send resend verification email to {user_email}: {str(e)}"
+            )
             return False
 
     @staticmethod
@@ -637,5 +639,7 @@ class EmailService:
                 )
                 return False
         except Exception as e:
-            logger.error(f"Failed to send password reset email to {user_email}: {str(e)}")
+            logger.error(
+                f"Failed to send password reset email to {user_email}: {str(e)}"
+            )
             return False

@@ -3,7 +3,9 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 from flask import redirect, url_for
 
 
-def redirect_with_notification(endpoint_or_url, message, notification_type="info", **url_params):
+def redirect_with_notification(
+    endpoint_or_url, message, notification_type="info", **url_params
+):
     """
     Редирект с уведомлением через URL параметры
     Args:

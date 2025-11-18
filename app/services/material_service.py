@@ -83,7 +83,9 @@ class MaterialService:
                 return False
         old_file_path = None
         if material.file:
-            old_file_path = os.path.join(current_app.config["UPLOAD_FOLDER"], material.file)
+            old_file_path = os.path.join(
+                current_app.config["UPLOAD_FOLDER"], material.file
+            )
             if os.path.exists(old_file_path):
                 os.remove(old_file_path)
         full_path, relative_path = FileStorageManager.get_material_upload_path(
@@ -107,7 +109,9 @@ class MaterialService:
                 "MAX_CONTENT_LENGTH", 500 * 1024 * 1024
             ):
                 return False
-        full_path, relative_path = FileStorageManager.get_material_upload_path(subject.id, filename)
+        full_path, relative_path = FileStorageManager.get_material_upload_path(
+            subject.id, filename
+        )
         if FileStorageManager.save_file(file_data, full_path):
             material.solution_file = relative_path
             db.session.commit()
@@ -141,7 +145,9 @@ class MaterialService:
         full_path, relative_path = FileStorageManager.get_subject_upload_path(
             material.subject_id, user_id, filename
         )
-        submission = Submission.query.filter_by(user_id=user_id, material_id=material.id).first()
+        submission = Submission.query.filter_by(
+            user_id=user_id, material_id=material.id
+        ).first()
         if not submission:
             submission = Submission(user_id=user_id, material_id=material.id)
             db.session.add(submission)

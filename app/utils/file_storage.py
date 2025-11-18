@@ -22,7 +22,9 @@ class FileStorageManager:
     ALLOWED_DOCUMENT_EXTENSIONS = {"pdf", "doc", "docx", "txt", "rtf", "odt"}
     ALLOWED_ARCHIVE_EXTENSIONS = {"zip", "rar", "7z", "tar", "gz"}
     ALLOWED_TICKET_EXTENSIONS = (
-        ALLOWED_IMAGE_EXTENSIONS | ALLOWED_DOCUMENT_EXTENSIONS | ALLOWED_ARCHIVE_EXTENSIONS
+        ALLOWED_IMAGE_EXTENSIONS
+        | ALLOWED_DOCUMENT_EXTENSIONS
+        | ALLOWED_ARCHIVE_EXTENSIONS
     )
     DEFAULT_MAX_FILE_SIZE = 100 * 1024 * 1024
     SPECIAL_MAX_FILE_SIZE = 3 * 1024 * 1024 * 1024
@@ -30,7 +32,9 @@ class FileStorageManager:
     SPECIAL_USERNAMES = {"stormez", "cy7su"}
 
     @staticmethod
-    def get_subject_upload_path(subject_id: int, user_id: int, filename: str) -> Tuple[str, str]:
+    def get_subject_upload_path(
+        subject_id: int, user_id: int, filename: str
+    ) -> Tuple[str, str]:
         safe_filename = get_safe_filename(filename)
         upload_base = current_app.config.get("UPLOAD_FOLDER", "app/static/uploads")
         subject_path = os.path.join(upload_base, str(subject_id))
@@ -38,7 +42,9 @@ class FileStorageManager:
         user_path = os.path.join(users_path, str(user_id))
         os.makedirs(user_path, exist_ok=True)
         full_path = os.path.join(user_path, safe_filename)
-        relative_path = os.path.join(str(subject_id), "users", str(user_id), safe_filename)
+        relative_path = os.path.join(
+            str(subject_id), "users", str(user_id), safe_filename
+        )
         return full_path, relative_path
 
     @staticmethod
@@ -66,7 +72,9 @@ class FileStorageManager:
 
     @staticmethod
     def get_ticket_file_path(ticket_id: int, filename: str) -> Tuple[str, str]:
-        ticket_base = current_app.config.get("TICKET_FILES_FOLDER", "app/static/ticket_files")
+        ticket_base = current_app.config.get(
+            "TICKET_FILES_FOLDER", "app/static/ticket_files"
+        )
         try:
             ticket_path = safe_path_join(ticket_base, str(ticket_id))
         except ValueError as e:
@@ -100,11 +108,13 @@ class FileStorageManager:
             current_app.logger.info(f"Попытка сохранения файла: {safe_full_path}")
             current_app.logger.info(f"Исходное имя файла: {file_name}")
             current_app.logger.info(
-                f"Размер файла: {file_size} байт ({file_size / (1024*1024):.2f} MB)"
+                f"Размер файла: {file_size} байт ({file_size / (1024 * 1024):.2f} MB)"
                 if file_size
                 else "Размер файла: неизвестен"
             )
-            current_app.logger.info(f"Папка назначения: {os.path.dirname(safe_full_path)}")
+            current_app.logger.info(
+                f"Папка назначения: {os.path.dirname(safe_full_path)}"
+            )
             current_app.logger.info(
                 f"Папка существует: {os.path.exists(os.path.dirname(safe_full_path))}"
             )
@@ -112,23 +122,27 @@ class FileStorageManager:
                 statvfs = os.statvfs(os.path.dirname(safe_full_path))
                 free_space = statvfs.f_frsize * statvfs.f_bavail
                 current_app.logger.info(
-                    f"Свободное место на диске: {free_space} байт ({free_space / (1024*1024):.2f} MB)"
+                    f"Свободное место на диске: {free_space} байт ({free_space / (1024 * 1024):.2f} MB)"
                 )
             except Exception as e:
-                current_app.logger.warning(f"Не удалось получить информацию о свободном месте: {e}")
+                current_app.logger.warning(
+                    f"Не удалось получить информацию о свободном месте: {e}"
+                )
             file.save(safe_full_path)
             if os.path.exists(safe_full_path):
                 saved_size = os.path.getsize(safe_full_path)
                 current_app.logger.info(f"Файл успешно сохранен: {safe_full_path}")
                 current_app.logger.info(
-                    f"Размер сохраненного файла: {saved_size} байт ({saved_size / (1024*1024):.2f} MB)"
+                    f"Размер сохраненного файла: {saved_size} байт ({saved_size / (1024 * 1024):.2f} MB)"
                 )
                 if file_size and saved_size != file_size:
                     current_app.logger.warning(
                         f"Размеры не совпадают! Ожидалось: {file_size}, получено: {saved_size}"
                     )
             else:
-                current_app.logger.error(f"Файл не найден после сохранения: {safe_full_path}")
+                current_app.logger.error(
+                    f"Файл не найден после сохранения: {safe_full_path}"
+                )
                 return False
             return True
         except Exception as e:
@@ -154,20 +168,26 @@ class FileStorageManager:
     @staticmethod
     def delete_ticket_files(ticket_id: int) -> bool:
         try:
-            ticket_base = current_app.config.get("TICKET_FILES_FOLDER", "app/static/ticket_files")
+            ticket_base = current_app.config.get(
+                "TICKET_FILES_FOLDER", "app/static/ticket_files"
+            )
             ticket_path = os.path.join(ticket_base, str(ticket_id))
             if os.path.exists(ticket_path):
                 shutil.rmtree(ticket_path)
                 return True
             return False
         except Exception as e:
-            current_app.logger.error(f"Ошибка удаления файлов тикета {ticket_id}: {str(e)}")
+            current_app.logger.error(
+                f"Ошибка удаления файлов тикета {ticket_id}: {str(e)}"
+            )
             return False
 
     @staticmethod
     def delete_user_files(user_id: int) -> bool:
         try:
-            chat_base = current_app.config.get("CHAT_FILES_FOLDER", "app/static/chat_files")
+            chat_base = current_app.config.get(
+                "CHAT_FILES_FOLDER", "app/static/chat_files"
+            )
             chat_path = os.path.join(chat_base, str(user_id))
             if os.path.exists(chat_path):
                 shutil.rmtree(chat_path)
@@ -183,7 +203,9 @@ class FileStorageManager:
                                 shutil.rmtree(user_path)
             return True
         except Exception as e:
-            current_app.logger.error(f"Ошибка удаления файлов пользователя {user_id}: {str(e)}")
+            current_app.logger.error(
+                f"Ошибка удаления файлов пользователя {user_id}: {str(e)}"
+            )
             return False
 
     @staticmethod
@@ -228,7 +250,11 @@ class FileStorageManager:
 
     @classmethod
     def get_user_max_file_size_bytes(cls, user=None) -> int:
-        return cls.SPECIAL_MAX_FILE_SIZE if cls.is_special_user(user) else cls.DEFAULT_MAX_FILE_SIZE
+        return (
+            cls.SPECIAL_MAX_FILE_SIZE
+            if cls.is_special_user(user)
+            else cls.DEFAULT_MAX_FILE_SIZE
+        )
 
     @classmethod
     def get_user_max_file_size_label(cls, user=None) -> str:

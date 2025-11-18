@@ -60,19 +60,23 @@ class ExportService:
             for subject_data in subjects_dict.values():
                 for file_info in subject_data["files"]:
                     try:
-                        zip_file.write(file_info["file_path"], file_info["archive_path"])
+                        zip_file.write(
+                            file_info["file_path"], file_info["archive_path"]
+                        )
                     except Exception as e:
                         current_app.logger.error(
                             f"Error adding file {file_info['file_path']} to archive: {e}"
                         )
-            readme_content = ExportService._generate_readme_content(username, subjects_dict)
+            readme_content = ExportService._generate_readme_content(
+                username, subjects_dict
+            )
             zip_file.writestr("README.txt", readme_content.encode("utf-8"))
         return temp_zip.name
 
     @staticmethod
     def _generate_readme_content(username: str, subjects_dict: Dict) -> str:
         content = f"""Архив решений пользователя {username}
-Дата создания: {datetime.now().strftime('%d.%m.%Y %H:%M')}
+Дата создания: {datetime.now().strftime("%d.%m.%Y %H:%M")}
 Содержимое архива:
 """
         for subject_data in subjects_dict.values():

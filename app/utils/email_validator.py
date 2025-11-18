@@ -106,7 +106,10 @@ def validate_email_chars(email: str) -> Tuple[bool, str]:
         return False, "Локальная часть email слишком длинная"
 
     if not local_part[0].isalnum() or not local_part[-1].isalnum():
-        return False, "Локальная часть должна начинаться и заканчиваться буквой или цифрой"
+        return (
+            False,
+            "Локальная часть должна начинаться и заканчиваться буквой или цифрой",
+        )
 
     if ".." in local_part:
         return False, "Локальная часть не может содержать двойные точки"

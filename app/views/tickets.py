@@ -33,7 +33,9 @@ def tickets() -> Union[str, Response]:
         )
     else:
         tickets_list = (
-            Ticket.query.filter_by(user_id=current_user.id).order_by(Ticket.created_at.desc()).all()
+            Ticket.query.filter_by(user_id=current_user.id)
+            .order_by(Ticket.created_at.desc())
+            .all()
         )
     return render_template("tickets/tickets.html", tickets=tickets_list)
 
@@ -143,7 +145,9 @@ def upload_ticket_file(ticket_id: int) -> Dict[str, Any]:
             )
         if not FileStorageManager.is_allowed_file(file.filename):
             return jsonify({"success": False, "error": "Неподдерживаемый тип файла"})
-        full_path, relative_path = FileStorageManager.get_ticket_file_path(ticket_id, file.filename)
+        full_path, relative_path = FileStorageManager.get_ticket_file_path(
+            ticket_id, file.filename
+        )
         if FileStorageManager.save_file(file, full_path):
             ticket_file = TicketFile(
                 ticket_id=ticket.id,
@@ -161,7 +165,9 @@ def upload_ticket_file(ticket_id: int) -> Dict[str, Any]:
                     "file": {
                         "id": ticket_file.id,
                         "name": ticket_file.file_name,
-                        "size": FileStorageManager.format_file_size(ticket_file.file_size),
+                        "size": FileStorageManager.format_file_size(
+                            ticket_file.file_size
+                        ),
                         "type": ticket_file.file_type,
                     },
                 }
@@ -173,7 +179,9 @@ def upload_ticket_file(ticket_id: int) -> Dict[str, Any]:
         return jsonify({"success": False, "error": "Ошибка загрузки файла"})
 
 
-@tickets_bp.route("/tickets/<int:ticket_id>/delete_file/<int:file_id>", methods=["POST"])
+@tickets_bp.route(
+    "/tickets/<int:ticket_id>/delete_file/<int:file_id>", methods=["POST"]
+)
 @login_required
 def delete_ticket_file(ticket_id: int, file_id: int) -> Dict[str, Any]:
     try:
@@ -301,7 +309,9 @@ def ticket_response() -> Dict[str, Any]:
                         "rar",
                     }
                     file_extension = (
-                        file.filename.rsplit(".", 1)[1].lower() if "." in file.filename else ""
+                        file.filename.rsplit(".", 1)[1].lower()
+                        if "." in file.filename
+                        else ""
                     )
                     if file_extension not in allowed_extensions:
                         continue
@@ -336,7 +346,9 @@ def delete_all_closed_tickets():
     try:
         if not current_user.is_admin or not current_user.admin_mode_enabled:
             return jsonify({"success": False, "error": "Недостаточно прав"})
-        closed_tickets = Ticket.query.filter(Ticket.status.in_(["closed", "rejected"])).all()
+        closed_tickets = Ticket.query.filter(
+            Ticket.status.in_(["closed", "rejected"])
+        ).all()
         deleted_count = 0
         for ticket in closed_tickets:
             for ticket_file in ticket.files:
