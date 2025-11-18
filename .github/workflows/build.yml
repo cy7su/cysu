@@ -177,8 +177,8 @@ jobs:
         echo "\`\`\`" >> test_results.md
 
         echo "Running unit tests..." >> test_results.md
-        echo "\$ python -m pytest --tb=short --disable-warnings -q" >> test_results.md
-        PYTEST_OUTPUT=$(python -m pytest --tb=short --disable-warnings -q 2>&1)
+        echo "\$ pytest --tb=short --disable-warnings -q" >> test_results.md
+        PYTEST_OUTPUT=$(pytest --tb=short --disable-warnings -q 2>&1)
         PYTEST_CODE=$?
         echo "$PYTEST_OUTPUT" >> test_results.md
         if [ $PYTEST_CODE -eq 0 ]; then
