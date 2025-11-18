@@ -215,10 +215,11 @@ jobs:
         cat release_notes.md
         echo "=== END RELEASE NOTES ==="
 
-        # Output the release body for the action
-        echo "release_body<<EOF" >> $GITHUB_OUTPUT
-        cat release_notes.md >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+        # Create environment variable for release body
+        RELEASE_BODY=$(cat release_notes.md)
+        echo "RELEASE_BODY<<DELIMITER" >> $GITHUB_ENV
+        echo "$RELEASE_BODY" >> $GITHUB_ENV
+        echo "DELIMITER" >> $GITHUB_ENV
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
@@ -227,7 +228,7 @@ jobs:
       with:
         tag_name: v${{ steps.version.outputs.new_version }}
         name: Release v${{ steps.version.outputs.new_version }}
-        body: ${{ steps.release_body.outputs.release_body }}
+        body: ${{ env.RELEASE_BODY }}
         generate_release_notes: false
         files:
           cysu-v${{ steps.version.outputs.new_version }}.tar.gz
