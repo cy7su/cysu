@@ -47,7 +47,7 @@ jobs:
 
     - name: Run tests
       run: |
-        python3 run_tests.py --tb=short --disable-warnings -v --cov=app --cov-report=term --cov-report=xml
+        python -m pytest tests/ --tb=short --disable-warnings -v --cov=app --cov-report=term --cov-report=xml --junitxml=test-results.xml
 
   build:
     name: Build Docker Image
