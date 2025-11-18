@@ -42,6 +42,43 @@ class TelegramBotManager:
             return f"tg://user?id={telegram_user.telegram_id}"
         return "Не указан"
 
+    async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Обработчик команды /help - справка по командам бота"""
+        help_text = "❓ <b>Справка: Бот управления cysu.ru</b>\n\n"
+
+        # Админпанель
+        if update.effective_user.id == ADMIN_TELEGRAM_ID:
+            help_text += "<blockquote>Команды администратора:\n"
+            help_text += "/start - Перезапуск бота\n"
+            help_text += "/help - Эта справка\n"
+            help_text += "/users - Управление пользователями\n"
+            help_text += "/groups - Управление группами\n"
+            help_text += "</blockquote>\n\n"
+
+            help_text += "<b>🎛️ Панель администратора:</b>\n"
+            help_text += "• 👑 Полные права управления пользователями\n"
+            help_text += "• 👥 Создание и управление группами\n"
+            help_text += "• ⭐ Назначение ролей (админ, модератор)\n"
+            help_text += "• 💰 Управление подписками пользователей\n"
+            help_text += "• 🔒 Временные подписки и пробные периоды\n\n"
+        else:
+            help_text += "<blockquote>Основные команды:\n"
+            help_text += "/start - Перезапуск бота\n"
+            help_text += "/help - Эта справка\n"
+            help_text += "</blockquote>\n\n"
+
+            help_text += "<b>🎯 Функции бота:</b>\n"
+            help_text += "• 🌐 Авторизация на сайте cysu.ru\n"
+            help_text += "• 👤 Управление личным профилем\n"
+            help_text += "• 🔐 Безопасная связь с сервером\n\n"
+
+        help_text += "<b>📝 Примечания:</b>\n"
+        help_text += "• Доступ к функциям ограничен вашими правами\n"
+        help_text += "• Для авторизации используйте 'Войти через Telegram'\n"
+        help_text += "• Все данные защищены шифрованием"
+
+        await update.message.reply_text(help_text, parse_mode="HTML")
+
     async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
         with self.app.app_context():
@@ -59,15 +96,23 @@ class TelegramBotManager:
             if user.id == ADMIN_TELEGRAM_ID:
                 await update.message.reply_text(
                     "Добро пожаловать, администратор!\n\n"
-                    "Доступные команды:\n"
+                    "<blockquote>Доступные команды:\n"
                     "/users - Управление пользователями\n"
-                    "/groups - Управление группами"
+                    "/groups - Управление группами\n"
+                    "/help - Справка</blockquote>\n\n"
+                    "<b>🎛️ Панель администратора</b>\n"
+                    "У вас есть полный доступ к системе управления пользователями",
+                    parse_mode="HTML"
                 )
             else:
                 await update.message.reply_text(
                     "Добро пожаловать!\n\n"
-                    "Этот бот предназначен для управления аккаунтом на сайте cysu.ru\n\n"
-                    "Для авторизации на сайте используйте кнопку 'Войти через Telegram'"
+                    "<blockquote>Этот бот предназначен для управления аккаунтом на сайте cysu.ru</blockquote>\n\n"
+                    "<b>🌐 Авторизация</b>\n"
+                    "Для авторизации на сайте используйте кнопку 'Войти через Telegram'".replace(
+                        "</b>\n", "</b>\n\n"
+                    ) + "\n\n<b>Команды:</b> /help - справка",
+                    parse_mode="HTML"
                 )
 
     async def users_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -152,7 +197,7 @@ class TelegramBotManager:
                     except Exception as e:
                         logger.warning(f"Не удалось удалить сообщение: {e}")
                     await update.callback_query.message.chat.send_message(
-                        text, reply_markup=reply_markup
+                        text, reply_markup=reply_markup, parse_mode="HTML"
                     )
                 else:
                     await update.message.reply_text(text, reply_markup=reply_markup)
@@ -212,7 +257,7 @@ class TelegramBotManager:
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка показа деталей группы: {e}")
@@ -235,7 +280,7 @@ class TelegramBotManager:
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка начала создания группы: {e}")
@@ -305,7 +350,7 @@ class TelegramBotManager:
                     except Exception as e:
                         logger.warning(f"Не удалось удалить сообщение: {e}")
                     await update.callback_query.message.chat.send_message(
-                        text, reply_markup=reply_markup
+                        text, reply_markup=reply_markup, parse_mode="HTML"
                     )
                 else:
                     await update.message.reply_text(text, reply_markup=reply_markup)
@@ -348,13 +393,13 @@ class TelegramBotManager:
                 else:
                     email_display = f"Email: {user.email}"
                 text = (
-                    f"Пользователь: {user.username}\n"
+                    f"👤 <b>Пользователь: {user.username}</b>\n\n"
+                    f"<blockquote>ID: {user.id}\n"
                     f"{email_display}\n"
-                    f"Ссылка: {telegram_link}\n"
-                    f"ID: {user.id}\n"
                     f"{created_info}\n"
+                    f"Ссылка: {telegram_link}\n"
                     f"{group_info}\n\n"
-                    "Статус:\n" + "\n".join(status_info)
+                    f"Статус:\n" + "\n".join(status_info) + "</blockquote>"
                 )
                 keyboard = [
                     [
@@ -391,7 +436,7 @@ class TelegramBotManager:
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка показа деталей пользователя: {e}")
@@ -448,7 +493,7 @@ class TelegramBotManager:
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка показа изменения группы: {e}")
@@ -551,7 +596,7 @@ class TelegramBotManager:
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка начала редактирования названия группы: {e}")
@@ -588,7 +633,7 @@ class TelegramBotManager:
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка начала редактирования описания группы: {e}")
@@ -661,8 +706,9 @@ class TelegramBotManager:
                     await update.callback_query.message.delete()
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
+
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка показа управления пользователем: {e}")
@@ -703,7 +749,7 @@ class TelegramBotManager:
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка показа редактирования пользователя: {e}")
@@ -737,7 +783,7 @@ class TelegramBotManager:
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка начала редактирования имени: {e}")
@@ -770,7 +816,7 @@ class TelegramBotManager:
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка начала редактирования пароля: {e}")
@@ -1119,7 +1165,7 @@ class TelegramBotManager:
                 except Exception as e:
                     logger.warning(f"Не удалось удалить сообщение: {e}")
                 await update.callback_query.message.chat.send_message(
-                    text, reply_markup=reply_markup
+                    text, reply_markup=reply_markup, parse_mode="HTML"
                 )
             except Exception as e:
                 logger.error(f"Ошибка подтверждения удаления: {e}")
@@ -1211,6 +1257,7 @@ class TelegramBotManager:
         signal.signal(signal.SIGINT, signal_handler)
         application = Application.builder().token(BOT_TOKEN).build()
         application.add_handler(CommandHandler("start", self.start_command))
+        application.add_handler(CommandHandler("help", self.help_command))
         application.add_handler(CommandHandler("users", self.users_command))
         application.add_handler(CommandHandler("groups", self.groups_command))
         application.add_handler(CallbackQueryHandler(self.handle_callback_query))
@@ -1220,6 +1267,7 @@ class TelegramBotManager:
         application.add_error_handler(self.error_handler)
         commands = [
             BotCommand("start", "Запустить бота"),
+            BotCommand("help", "Справка по командам"),
             BotCommand("users", "Управление пользователями (только для админов)"),
             BotCommand("groups", "Управление группами (только для админов)"),
         ]

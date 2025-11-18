@@ -28,16 +28,18 @@ def init_database():
         print("✅ Таблицы базы данных созданы")
         admin = User.query.filter_by(username="admin").first()
         if not admin:
+            admin_password = os.getenv("ADMIN_PASSWORD", "change_this_password_immediately")
             admin = User(
                 username="admin",
                 email="support@cysu.ru",
-                password=generate_password_hash("admin123"),
+                password=generate_password_hash(admin_password),
                 is_admin=True,
                 is_verified=True,
             )
             db.session.add(admin)
             db.session.commit()
-            print("✅ Администратор создан")
+            print(f"✅ Администратор создан с паролем: {admin_password}")
+            print("⚠️  ОБЯЗАТЕЛЬНО измените пароль администратора после первого входа!")
         else:
             print("✅ Администратор уже существует")
         print("✅ База данных инициализирована успешно!")

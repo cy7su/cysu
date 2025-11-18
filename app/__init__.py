@@ -27,9 +27,11 @@ def create_app():
         static_folder=static_folder_path,
         static_url_path="/static",
     )
-    app.config["SECRET_KEY"] = os.getenv(
-        "SECRET_KEY", "default-secret-key-change-in-production"
-    )
+    # SECRET_KEY обязательно должен быть установлен через переменную окружения
+    secret_key = os.getenv("SECRET_KEY")
+    if not secret_key:
+        raise ValueError("SECRET_KEY environment variable is required")
+    app.config["SECRET_KEY"] = secret_key
     app.config["SERVER_NAME"] = os.getenv("SERVER_NAME", "cysu.ru")
     db_path = os.path.abspath(
         os.path.join(os.path.dirname(os.path.dirname(__file__)), "app.db")
@@ -90,8 +92,8 @@ def create_app():
     app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT", 587))
     app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True").lower() == "true"
     app.config["MAIL_USE_SSL"] = os.getenv("MAIL_USE_SSL", "False").lower() == "true"
-    app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME", "your-email@gmail.com")
-    app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD", "your-app-password")
+    app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+    app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
     app.config["MAIL_DEFAULT_SENDER"] = os.getenv(
         "MAIL_DEFAULT_SENDER", "your-email@gmail.com"
     )
@@ -100,10 +102,8 @@ def create_app():
     app.config["SKIP_EMAIL_VERIFICATION"] = (
         os.getenv("SKIP_EMAIL_VERIFICATION", "False").lower() == "true"
     )
-    app.config["YOOKASSA_SHOP_ID"] = os.getenv("YOOKASSA_SHOP_ID", "your-shop-id")
-    app.config["YOOKASSA_SECRET_KEY"] = os.getenv(
-        "YOOKASSA_SECRET_KEY", "your-secret-key"
-    )
+    app.config["YOOKASSA_SHOP_ID"] = os.getenv("YOOKASSA_SHOP_ID")
+    app.config["YOOKASSA_SECRET_KEY"] = os.getenv("YOOKASSA_SECRET_KEY")
     app.config["YOOKASSA_TEST_MODE"] = (
         os.getenv("YOOKASSA_TEST_MODE", "True").lower() == "true"
     )
