@@ -211,6 +211,34 @@ jobs:
         fi
 
         echo "" >> release_notes.md
+        echo "## 📋 What's Changed" >> release_notes.md
+
+        # Get last tag for comparison
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        if [ -n "$LAST_TAG" ]; then
+            echo "" >> release_notes.md
+            echo "**Full Changelog**: $LAST_TAG...${{ steps.version.outputs.new_version }}" >> release_notes.md
+            echo "" >> release_notes.md
+
+            # Show recent commits between last tag and now
+            git log --oneline --pretty=format:"### %s" "$LAST_TAG..HEAD" | head -10 | while read line; do
+                echo "$line  " >> release_notes.md
+            done
+        else
+            echo "" >> release_notes.md
+            echo "_Initial release_" >> release_notes.md
+        fi
+
+        echo "" >> release_notes.md
+        echo "## 👨‍💻 Contributors" >> release_notes.md
+        echo "" >> release_notes.md
+
+        # Contributors as avatar row
+        echo '<table><tr>' >> release_notes.md
+        git log --format='%ae||%aN' | awk -F'||' '{print $1, $NF}' | sort | uniq -w 1 | awk '{print "<td align=\"center\"><a href=\"https://github.com/" $1 "\"><img src=\"https://avatars.githubusercontent.com/" $1 "?s=64&v=4\" width=\"64\" height=\"64\" alt=\"" $1 "\"/></a><br><sub><b>" $1 "</b></sub></td>"}' | head -6 | xargs echo >> release_notes.md
+        echo '</tr></table>' >> release_notes.md
+
+        echo "" >> release_notes.md
         echo "</div>" >> release_notes.md
 
         # Debug: show final release notes content
