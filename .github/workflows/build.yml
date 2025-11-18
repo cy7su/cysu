@@ -97,9 +97,15 @@ jobs:
       run: |
         set -x  # Debug mode
 
+        echo "Environment variables:"
+        echo "GITHUB_EVENT_NAME=$GITHUB_EVENT_NAME"
+        echo "GITHUB_INPUT_VERSION_TYPE=$GITHUB_INPUT_VERSION_TYPE"
+
         VERSION_TYPE="${{ github.event.inputs.version_type }}"
 
-        echo "Version type requested: $VERSION_TYPE"
+        echo "Raw VERSION_TYPE='${VERSION_TYPE}'"
+        echo "VERSION_TYPE length=${#VERSION_TYPE}"
+        echo "Version type requested: '$VERSION_TYPE'"
 
         # Get latest tag
         if git tag | grep -q .; then
