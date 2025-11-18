@@ -46,7 +46,9 @@ class UserManagementService:
             from ..models import SubjectGroup
 
             return (
-                SubjectGroup.query.filter_by(subject_id=subject.id, group_id=user.group_id).first()
+                SubjectGroup.query.filter_by(
+                    subject_id=subject.id, group_id=user.group_id
+                ).first()
                 is not None
             )
         else:
@@ -161,6 +163,227 @@ class UserManagementService:
 
             current_app.logger.error(f"Ошибка изменения группы: {str(e)}")
             db.session.rollback()
+            return False
+
+    @staticmethod
+    def change_user_email(
+        user: User, new_email: str, is_admin_change: bool = True
+    ) -> bool:
+        """Изменяет email пользователя
+
+        Args:
+            user: Пользователь
+            new_email: Новый email
+            is_admin_change: Является ли изменение от администратора (убирает валидацию)
+        """
+        try:
+            # Проверяем дубликаты (всегда)
+            existing_user = User.query.filter(
+                User.email == new_email, User.id != user.id
+            ).first()
+            if existing_user:
+                return False
+
+            user.email = new_email
+            user.is_verified = False  # Требуется повторная верификация
+            db.session.commit()
+            return True
+        except Exception as e:
+            from flask import current_app
+
+            current_app.logger.error(f"Ошибка изменения email: {str(e)}")
+            db.session.rollback()
+            return False
+
+    @staticmethod
+    def change_user_telegram_id(user: User, new_telegram_id: int) -> bool:
+        """Изменяет привязку к Telegram аккаунту"""
+        try:
+            from app.models import TelegramUser
+
+            # Проверяем, не занят ли telegram_id другим пользователем
+            existing_tg_user = TelegramUser.query.filter(
+                TelegramUser.telegram_id == new_telegram_id,
+                TelegramUser.user_id != user.id,
+            ).first()
+            if existing_tg_user:
+                return False
+
+            # Находим или создаем TelegramUser для нового ID
+            tg_user = TelegramUser.query.filter_by(telegram_id=new_telegram_id).first()
+            if tg_user:
+                # Если уже существует, просто привязываем к нашему пользователю
+                tg_user.user_id = user.id
+            else:
+                # Создаем нового TelegramUser если не существует
+                tg_user = TelegramUser(telegram_id=new_telegram_id, user_id=user.id)
+                db.session.add(tg_user)
+
+            # Отвязываем старого TelegramUser если он был
+            old_tg_user = TelegramUser.query.filter_by(user_id=user.id).first()
+            if old_tg_user and old_tg_user.telegram_id != new_telegram_id:
+                old_tg_user.user_id = None
+
+            db.session.commit()
+            return True
+        except Exception as e:
+            from flask import current_app
+
+            current_app.logger.error(f"Ошибка изменения telegram_id: {str(e)}")
+            db.session.rollback()
+            return False
+
+    @staticmethod
+    def change_user_id(user: User, new_user_id: int) -> bool:
+        """Изменяет основной ID пользователя без ограничений"""
+        try:
+            # Проверяем, не занят ли новый ID
+            existing_user = User.query.filter(User.id == new_user_id).first()
+            if existing_user:
+                return False
+
+            old_id = user.id
+
+            # Используем прямой SQL для изменения primary key и всех foreign keys
+            # Это необходимо из-за ограничений SQLAlchemy с primary keys
+            from flask import current_app
+            from sqlalchemy import text
+
+            # Получаем engine для выполнения raw SQL
+            engine = db.engine
+
+            with engine.connect() as conn:
+                # Начинаем транзакцию
+                trans = conn.begin()
+
+                try:
+                    # Меняем user.id через прямой SQL
+                    conn.execute(
+                        text("UPDATE user SET id = :new_id WHERE id = :old_id"),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # Обновляем все foreign keys связанные с user.id
+                    # submissions
+                    conn.execute(
+                        text(
+                            "UPDATE submission SET user_id = :new_id WHERE user_id = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # payments
+                    conn.execute(
+                        text(
+                            "UPDATE payment SET user_id = :new_id WHERE user_id = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # tickets (user_id)
+                    conn.execute(
+                        text(
+                            "UPDATE ticket SET user_id = :new_id WHERE user_id = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # tickets (admin_id)
+                    conn.execute(
+                        text(
+                            "UPDATE ticket SET admin_id = :new_id WHERE admin_id = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # ticket_messages
+                    conn.execute(
+                        text(
+                            "UPDATE ticket_message SET user_id = :new_id WHERE user_id = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # chat_messages
+                    conn.execute(
+                        text(
+                            "UPDATE chat_message SET user_id = :new_id WHERE user_id = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # materials (created_by)
+                    conn.execute(
+                        text(
+                            "UPDATE material SET created_by = :new_id WHERE created_by = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # subjects (created_by)
+                    conn.execute(
+                        text(
+                            "UPDATE subject SET created_by = :new_id WHERE created_by = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # telegram_user
+                    conn.execute(
+                        text(
+                            "UPDATE telegram_user SET user_id = :new_id WHERE user_id = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # email_verification
+                    conn.execute(
+                        text(
+                            "UPDATE email_verification SET user_id = :new_id WHERE user_id = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # notifications
+                    conn.execute(
+                        text(
+                            "UPDATE notification SET user_id = :new_id WHERE user_id = :old_id"
+                        ),
+                        {"new_id": new_user_id, "old_id": old_id},
+                    )
+
+                    # Обновляем пути к файлам решений пользователей в submission.file
+                    # Пути имеют вид: "subject_id/users/user_id/filename"
+                    conn.execute(
+                        text(
+                            "UPDATE submission SET file = REPLACE(file, :old_path, :new_path) WHERE user_id = :new_id"
+                        ),
+                        {
+                            "old_path": f"/{old_id}/",
+                            "new_path": f"/{new_user_id}/",
+                            "new_id": new_user_id,
+                        },
+                    )
+
+                    # Коммитим транзакцию
+                    trans.commit()
+
+                    current_app.logger.info(
+                        f"User ID изменен: {old_id} -> {new_user_id}"
+                    )
+                    return True
+
+                except Exception as e:
+                    trans.rollback()
+                    current_app.logger.error(f"Ошибка при изменении user ID: {str(e)}")
+                    raise
+
+        except Exception as e:
+            from flask import current_app
+
+            current_app.logger.error(
+                f"Ошибка изменения user ID без ограничений: {str(e)}"
+            )
             return False
 
     @staticmethod
