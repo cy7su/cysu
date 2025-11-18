@@ -92,17 +92,23 @@ jobs:
       run: |
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
         VERSION_NUMBER=${LAST_TAG#v}
-        IFS='.' read -r major minor patch <<< "$VERSION_NUMBER"
+        major=$(echo "$VERSION_NUMBER" | cut -d'.' -f1)
+        minor=$(echo "$VERSION_NUMBER" | cut -d'.' -f2)
+        patch=$(echo "$VERSION_NUMBER" | cut -d'.' -f3)
+
         echo "Current version: $VERSION_NUMBER ($LAST_TAG)"
         echo "Version type: $VERSION_TYPE"
+        echo "Parsed: major=$major, minor=$minor, patch=$patch"
 
         case "$VERSION_TYPE" in
-          "major") ((major++)); minor=0; patch=0;;
-          "minor") ((minor++)); patch=0;;
-          "patch") ((patch++));;
+          "major") major=$((major + 1)); minor=0; patch=0;;
+          "minor") minor=$((minor + 1)); patch=0;;
+          "patch") patch=$((patch + 1));;
           *) echo "Invalid version type: $VERSION_TYPE"; exit 1;;
         esac
+
         NEW_VERSION="$major.$minor.$patch"
+        echo "New version: $NEW_VERSION"
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
     - name: Create GitHub Release
