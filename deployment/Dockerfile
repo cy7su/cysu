@@ -1,40 +1,76 @@
-# Используем официальный Python образ
-FROM python:3.11-slim
+# Multi-stage build для оптимизации размера образа
+
+# Builder stage - для установки зависимостей
+FROM python:3.11-alpine AS builder
+
+# Устанавливаем системные зависимости для компиляции
+RUN apk add --no-cache \
+    gcc \
+    g++ \
+    musl-dev \
+    libffi-dev \
+    postgresql-dev
+
+# Создаем виртуальное окружение
+ENV VIRTUAL_ENV=/opt/venv
+RUN python -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Устанавливаем Python зависимости
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Production stage
+FROM python:3.11-alpine
+
+# Устанавливаем timezone и locale
+RUN apk add --no-cache tzdata && \
+    cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime && \
+    echo "Europe/Moscow" > /etc/timezone
+
+# Создаем пользователя для безопасности
+RUN addgroup -g 1000 -S appuser && \
+    adduser -u 1000 -S appuser -G appuser
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Устанавливаем системные зависимости
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+# Копируем виртуальное окружение из builder stage
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Копируем requirements.txt и устанавливаем Python зависимости
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Копируем код приложения (исключая ненужные файлы)
+COPY --chown=appuser:appuser . .
 
-# Копируем код приложения
-COPY . .
+# Создаем необходимые директории с правильными правами
+RUN mkdir -p app/static/uploads app/static/ticket_files logs && \
+    chown -R appuser:appuser app/static/uploads app/static/ticket_files logs
 
-# Создаем необходимые директории
-RUN mkdir -p app/static/uploads app/static/ticket_files logs
-
-# Устанавливаем права на запись для директорий
-RUN chmod -R 755 app/static/uploads app/static/ticket_files logs
-
-# Создаем пользователя для безопасности
-RUN useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app
+# Переключаемся на пользователя без root прав
 USER appuser
+
+# Устанавливаем переменные окружения
+ENV FLASK_APP=run.py \
+    FLASK_ENV=production \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    TZ=Europe/Moscow
 
 # Открываем порт
 EXPOSE 8001
 
-# Устанавливаем переменные окружения
-ENV FLASK_APP=run.py
-ENV FLASK_ENV=production
-ENV PYTHONPATH=/app
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python -c "
+try:
+    import requests
+    response = requests.get('http://localhost:8001', timeout=10)
+    exit(0 if response.status_code > 0 else 1)
+except:
+    exit(1)
+" || exit 1
 
 # Команда запуска
 CMD ["python", "run.py"]
