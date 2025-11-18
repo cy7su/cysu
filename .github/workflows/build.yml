@@ -128,7 +128,7 @@ jobs:
     - name: Create Release Archive
       run: |
         echo "Creating source archive for v${{ steps.version.outputs.new_version }}"
-        # Exclude unnecessary files for distribution
+        # Exclude unnecessary files for distribution and ignore file changes during reading
         tar --exclude='.git' \
             --exclude='.github' \
             --exclude='__pycache__' \
@@ -138,7 +138,12 @@ jobs:
             --exclude='docs' \
             --exclude='.gitignore' \
             --exclude='deployment' \
-            -czf cysu-v${{ steps.version.outputs.new_version }}.tar.gz .
+            --exclude='*.log' \
+            --exclude='.DS_Store' \
+            --exclude='node_modules' \
+            --ignore-failed-read \
+            -czf cysu-v${{ steps.version.outputs.new_version }}.tar.gz \
+            app scripts requirements.txt run.py pyproject.toml LICENSE .env.example
         ls -lh cysu-v${{ steps.version.outputs.new_version }}.tar.gz
 
     - name: Create Release Notes
