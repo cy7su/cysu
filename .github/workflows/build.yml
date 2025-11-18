@@ -220,7 +220,8 @@ jobs:
 
     - name: Create Release Notes
       run: |
-        cat << EOF > release_notes.md
+        # Combine standard release notes with test results
+        cat << 'MAIN_EOF' > release_notes.md
         # Release v${{ steps.version.outputs.new_version }}
 
         ## Downloads
@@ -228,7 +229,7 @@ jobs:
         - Docker: docker.io/***/cysu:latest
 
         ## Quick Installation
-        \`\`\`bash
+        ```bash
         # Extract source
         tar -xzf cysu-v${{ steps.version.outputs.new_version }}.tar.gz
         cd cysu-v${{ steps.version.outputs.new_version }}
@@ -236,13 +237,27 @@ jobs:
         # Install and run
         pip install -r requirements.txt
         python run.py
-        \`\`\`
+        ```
 
         ---
-        EOF
 
-        # Append test results to release notes
-        cat test_results.md >> release_notes.md
+        MAIN_EOF
+
+        # Append test results to release notes (if file exists)
+        if [ -f test_results.md ]; then
+            echo "Found test_results.md, appending to release notes"
+            cat test_results.md >> release_notes.md
+        else
+            echo "test_results.md not found - appending fallback message"
+            echo '## Test Results: N/A' >> release_notes.md
+            echo '' >> release_notes.md
+            echo 'Test results were not generated properly.' >> release_notes.md
+        fi
+
+        # Debug: show final release notes content
+        echo "=== FINAL RELEASE NOTES ==="
+        cat release_notes.md
+        echo "=== END RELEASE NOTES ==="
 
         # Output the release body for the action
         echo "release_body<<EOF" >> $GITHUB_OUTPUT
