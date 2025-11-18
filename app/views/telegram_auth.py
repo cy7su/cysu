@@ -21,7 +21,7 @@ from werkzeug.security import generate_password_hash
 
 from .. import db
 from ..models import Group, TelegramUser, User
-from ..utils.username_validator import contains_forbidden_word
+from ..utils.username_validator import USERNAME_ALLOWED_PATTERN
 
 telegram_auth_bp = Blueprint("telegram_auth", __name__)
 TELEGRAM_BOT_TOKEN = os.getenv("TG_TOKEN")
@@ -124,14 +124,19 @@ def telegram_login() -> Union[str, Response]:
                 else:
                     tg_user.user_id = None
                     db.session.commit()
-            base_username = username or f"tg_{telegram_id}"
-            # Для телеграм пользователей проверяем только базовые запрещенные слова (если username задан)
-            if username and contains_forbidden_word(base_username):
-                # Если запрещенные слова, используем только tg_id
+            # Генерируем username на основе Telegram данных
+            if username:
+                # Проверяем основные требования к username
+                if 3 <= len(username) <= 14 and USERNAME_ALLOWED_PATTERN.fullmatch(username):
+                    base_username = username
+                else:
+                    # Если username не проходит валидацию, используем tg_id
+                    base_username = f"tg_{telegram_id}"
+                    current_app.logger.warning(
+                        f"Telegram registration - invalid username '{username}' rejected for telegram_id={telegram_id}, using '{base_username}'"
+                    )
+            else:
                 base_username = f"tg_{telegram_id}"
-                current_app.logger.warning(
-                    f"Telegram registration - forbidden username '{username}' rejected for telegram_id={telegram_id}, using '{base_username}'"
-                )
 
             current_app.logger.info(
                 f"Telegram registration - creating user with base_username='{base_username}' for telegram_id={telegram_id}"
@@ -232,14 +237,19 @@ def telegram_login() -> Union[str, Response]:
                 first_name=first_name,
                 last_name=last_name,
             )
-            base_username = username or f"tg_{telegram_id}"
-            # Для телеграм пользователей проверяем только базовые запрещенные слова (GET метод)
-            if username and contains_forbidden_word(base_username):
-                # Если запрещенные слова, используем только tg_id
+            # Генерируем username на основе Telegram данных
+            if username:
+                # Проверяем основные требования к username
+                if 3 <= len(username) <= 14 and USERNAME_ALLOWED_PATTERN.fullmatch(username):
+                    base_username = username
+                else:
+                    # Если username не проходит валидацию, используем tg_id
+                    base_username = f"tg_{telegram_id}"
+                    current_app.logger.warning(
+                        f"Telegram registration (GET) - invalid username '{username}' rejected for telegram_id={telegram_id}, using '{base_username}'"
+                    )
+            else:
                 base_username = f"tg_{telegram_id}"
-                current_app.logger.warning(
-                    f"Telegram registration (GET) - forbidden username '{username}' rejected for telegram_id={telegram_id}, using '{base_username}'"
-                )
 
             current_app.logger.info(
                 f"Telegram registration (GET) - creating user with base_username='{base_username}' for telegram_id={telegram_id}"

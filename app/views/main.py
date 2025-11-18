@@ -334,7 +334,10 @@ def material_detail(material_id: int) -> Union[str, Response]:
     if material.type == "assignment" and current_user.is_authenticated:
         from app.models import Submission
 
-        submission = Submission.query.filter_by(
+        # Загружаем submission с joinedload для material, чтобы избежать lazy loading
+        submission = Submission.query.options(
+            joinedload(Submission.material)
+        ).filter_by(
             user_id=current_user.id, material_id=material_id
         ).first()
         if submission:
@@ -370,6 +373,18 @@ def material_detail(material_id: int) -> Union[str, Response]:
         except Exception as e:
             current_app.logger.error(f"Error getting file info: {e}")
     share_url = get_share_url(material) if material.solution_file else None
+    user_solution_share_url = None
+    my_submission = user_submissions.get(material.id) if user_submissions else None
+    if my_submission and my_submission.file:
+        user_solution_share_url = get_user_solution_share_url(my_submission)
+
+    # Генерируем мета-описание для материалов
+    if material.file:
+        file_name = material.file.split('/')[-1] if '/' in material.file else material.file
+        meta_description = f"Предмет: {material.subject.title} - Задание: {material.title} - Файл: {file_name}"
+    else:
+        meta_description = f"Предмет: {material.subject.title} - Задание: {material.title}"
+
     return render_template(
         "subjects/material_detail.html",
         material=material,
@@ -378,6 +393,8 @@ def material_detail(material_id: int) -> Union[str, Response]:
         created_by_user=created_by_user,
         file_info=file_info,
         share_url=share_url,
+        user_solution_share_url=user_solution_share_url,
+        meta_description=meta_description,
     )
 
 
@@ -1268,6 +1285,7 @@ def export_user_solutions() -> Response:
 def share_link(code: str) -> Response:
     """Обработка коротких ссылок на файлы материалов"""
     from ..models import ShortLink, Material, db
+    from flask import request
 
     short_link = ShortLink.query.filter_by(code=code).first()
     if not short_link:
@@ -1287,6 +1305,11 @@ def share_link(code: str) -> Response:
             and short_link.clicks >= short_link.rule.max_clicks
         ):
             return redirect(url_for("main.not_found"))
+
+    # Для ботов (например, Telegram) возвращаем публичные метаданные без редиректа
+    user_agent = request.headers.get('User-Agent', '').lower()
+    if any(bot in user_agent for bot in ['telegrambot', 'twitterbot', 'facebookexternalhit', 'linkedinbot', 'discordbot', 'slackbot']):
+        return _share_link_meta(short_link)
 
     # Извлекаем ID материала из URL
     original_url = short_link.original_url
@@ -1315,13 +1338,107 @@ def share_link(code: str) -> Response:
     short_link.clicks += 1
     db.session.commit()
 
+    # Проверяем, является ли это пользовательским решением
+    if "/files/" in original_url and "/users/" in original_url:
+        try:
+            # Парсим URL для пользовательских решений: /files/{subject_id}/users/{user_id}/{filename}
+            url_parts = original_url.split("/")
+            subject_id = int(url_parts[-4])  # subject_id
+            user_id = int(url_parts[-2])     # user_id
+            filename = url_parts[-1]         # filename
+
+            # Перенаправляем на serve_user_file
+            file_url = url_for(
+                "main.serve_user_file",
+                subject_id=subject_id,
+                user_id=user_id,
+                filename=filename,
+            )
+            return redirect(file_url)
+        except (ValueError, IndexError) as e:
+            current_app.logger.error(f"Error parsing user solution share link: {e}")
+
     # Fallback - перенаправляем на оригинальный URL
     return redirect(short_link.original_url)
 
 
+def _share_link_meta(short_link: "ShortLink") -> Response:
+    """Возвращает HTML страницу с метаданными для ботов"""
+    from ..models import Material
+
+    original_url = short_link.original_url
+
+    # Дефолтные метаданные
+    title = "cysu - Образовательная платформа"
+    description = "cysu - современная образовательная платформа для изучения программирования и IT."
+    image = request.url_root.rstrip('/') + "/static/icons/og/og-image-1200x630.png"
+
+    # Для материалов генерируем индивидуальные метаданные
+    if "/material/" in original_url:
+        try:
+            material_id = int(original_url.split("/material/")[-1])
+            material = Material.query.get(material_id)
+
+            if material:
+                title = f"{material.subject.title} - {material.title}"
+                if material.file:
+                    file_name = material.file.split('/')[-1] if '/' in material.file else material.file
+                    description = f"Предмет: {material.subject.title} - Задание: {material.title} - Файл: {file_name}"
+                else:
+                    description = f"Предмет: {material.subject.title} - Задание: {material.title}"
+
+                # Для пользовательских решений добавляем дополнительные данные
+                if "/files/" in original_url and "/users/" in original_url:
+                    description += " (Пользовательское решение)"
+        except (ValueError, IndexError) as e:
+            current_app.logger.error(f"Error generating meta for share link: {e}")
+
+    # Возвращаем HTML с Open Graph метками
+    html = f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <meta name="description" content="{description}">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{title}">
+    <meta property="og:description" content="{description}">
+    <meta property="og:image" content="{image}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{request.url}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{title}">
+    <meta name="twitter:description" content="{description}">
+    <meta name="twitter:image" content="{image}">
+
+    <!-- Telegram -->
+    <meta property="telegram:title" content="{title}">
+    <meta property="telegram:description" content="{description}">
+    <meta property="telegram:image" content="{image}">
+
+    <!-- Redirect meta refresh для пользователей -->
+    <meta http-equiv="refresh" content="0; url={short_link.original_url}">
+</head>
+<body>
+    <h1>{title}</h1>
+    <p>{description}</p>
+    <p>Перенаправление...</p>
+    <script>window.location.href="{short_link.original_url}";</script>
+</body>
+</html>"""
+
+    return Response(html, mimetype='text/html')
+
+
 def get_share_url(material) -> str:
     """Получить короткую ссылку для решения материала с ленивой генерацией"""
-    from ..models import ShortLink
+    from ..models import ShortLink, ShortLinkRule
     from datetime import datetime, timedelta
 
     original_url = url_for(
@@ -1330,8 +1447,42 @@ def get_share_url(material) -> str:
     short_link = ShortLink.query.filter_by(original_url=original_url).first()
 
     if not short_link:
-        short_link = ShortLink.create_unique(
-            original_url, expires_at=datetime.utcnow() + timedelta(days=1)
+        short_link = ShortLink.create_unique(original_url)
+        # Создаем правило с ограничением в 1 день
+        rule = ShortLinkRule(
+            short_link_id=short_link.id,
+            expires_at=datetime.utcnow() + timedelta(days=1)
         )
+        db.session.add(rule)
+        db.session.commit()
+
+    return url_for("main.share_link", code=short_link.code, _external=True)
+
+
+def get_user_solution_share_url(submission) -> str:
+    """Получить короткую ссылку для поделения пользовательским решением"""
+    from ..models import ShortLink, ShortLinkRule
+    from datetime import datetime, timedelta
+    from ..utils.template_filters import extract_filename
+
+    filename = extract_filename(submission.file)
+    original_url = url_for(
+        "main.serve_user_file",
+        subject_id=submission.material.subject_id,
+        user_id=submission.user_id,
+        filename=filename,
+        _external=True
+    )
+    short_link = ShortLink.query.filter_by(original_url=original_url).first()
+
+    if not short_link:
+        short_link = ShortLink.create_unique(original_url)
+        # Создаем правило с ограничением в 1 день
+        rule = ShortLinkRule(
+            short_link_id=short_link.id,
+            expires_at=datetime.utcnow() + timedelta(days=1)
+        )
+        db.session.add(rule)
+        db.session.commit()
 
     return url_for("main.share_link", code=short_link.code, _external=True)
