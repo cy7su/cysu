@@ -173,4 +173,7 @@ dmypy.json
 *.crt
 *.p12
 *.pfx
+
+# Test files
+run_tests.py
 test_results.md
