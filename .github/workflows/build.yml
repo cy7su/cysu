@@ -117,12 +117,29 @@ jobs:
 
         NEW_VERSION="$major.$minor.$patch"
         echo "New version: $NEW_VERSION"
+        echo "release_version=v$NEW_VERSION" >> $GITHUB_OUTPUT
         {
           echo "new_version=$NEW_VERSION"
           echo "major=$major"
           echo "minor=$minor"
           echo "patch=$patch"
         } >> $GITHUB_OUTPUT
+
+    - name: Create Release Archive
+      run: |
+        echo "Creating source archive for v${{ steps.version.outputs.new_version }}"
+        # Exclude unnecessary files for distribution
+        tar --exclude='.git' \
+            --exclude='.github' \
+            --exclude='__pycache__' \
+            --exclude='*.pyc' \
+            --exclude='.pytest_cache' \
+            --exclude='logs' \
+            --exclude='docs' \
+            --exclude='.gitignore' \
+            --exclude='deployment' \
+            -czf cysu-v${{ steps.version.outputs.new_version }}.tar.gz .
+        ls -lh cysu-v${{ steps.version.outputs.new_version }}.tar.gz
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
@@ -132,3 +149,5 @@ jobs:
         tag_name: v${{ steps.version.outputs.new_version }}
         name: Release v${{ steps.version.outputs.new_version }}
         generate_release_notes: true
+        files: |
+          cysu-v${{ steps.version.outputs.new_version }}.tar.gz
