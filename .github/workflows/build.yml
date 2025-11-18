@@ -211,16 +211,6 @@ jobs:
         fi
 
         echo "" >> release_notes.md
-        echo "## Contributors" >> release_notes.md
-        echo "" >> release_notes.md
-
-        # Contributors as compact avatar grid
-        echo '<p align="center">' >> release_notes.md
-        git log --format='%ae||%aN' | awk -F'||' '{print $1, $NF}' | sort | uniq -w 1 | awk '{print "<a href=\"https://github.com/" $1 "\"><img src=\"https://avatars.githubusercontent.com/" $1 "?s=32&v=4\" width=\"32\" height=\"32\" alt=\"" $1 "\" style=\"border-radius: 50%; margin: 0 2px;\"/></a>"}' | head -8 | xargs echo >> release_notes.md
-        echo '</p>' >> release_notes.md
-        echo '<p align="center"><small>Thank you to all contributors!</small></p>' >> release_notes.md
-
-        echo "" >> release_notes.md
         echo "</div>" >> release_notes.md
 
         # Debug: show final release notes content
