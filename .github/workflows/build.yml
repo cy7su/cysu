@@ -127,12 +127,10 @@ jobs:
           echo "patch=$patch"
         } >> $GITHUB_OUTPUT
 
-    - name: Install test dependencies
+    - name: Install dependencies
       run: |
-        pip install pytest
-
-    - name: Install test dependencies
-      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
         pip install pytest pytest-cov
 
     - name: Generate test report
