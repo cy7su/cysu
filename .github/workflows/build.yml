@@ -4,7 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       version_type:
-        description: 'Version increment type'
+        description: |
+          Choose version increment type:
+          • Patch: x.x.x → x.x.(x+1)   (bug fixes)
+          • Minor: x.x.x → x.(x+1).0  (new features)
+          • Major: x.x.x → (x+1).0.0 (breaking changes)
         required: true
         default: 'patch'
         type: choice
@@ -91,37 +95,56 @@ jobs:
       id: version
       shell: bash
       run: |
+        set -x  # Debug mode
+
         VERSION_TYPE="${{ github.event.inputs.version_type }}"
 
-        # Get latest tag, fallback to 0.0.0 if no tags exist
+        echo "Version type requested: $VERSION_TYPE"
+
+        # Get latest tag
         if git tag | grep -q .; then
           LAST_TAG=$(git describe --tags --abbrev=0)
+          echo "Found existing tags, latest: $LAST_TAG"
         else
           LAST_TAG="v0.0.0"
+          echo "No tags found, using default: $LAST_TAG"
         fi
 
-        VERSION_NUMBER=${LAST_TAG#v}
+        VERSION_NUMBER="${LAST_TAG#v}"
+        echo "Version number without v: $VERSION_NUMBER"
 
-        echo "Found latest tag: $LAST_TAG"
-        echo "Version number: $VERSION_NUMBER"
-        echo "Version type: $VERSION_TYPE"
+        # Initialize variables with default values
+        major=0
+        minor=0
+        patch=0
 
-        # Split version into parts
+        # Split version into parts safely
         IFS='.' read -r major minor patch <<< "$VERSION_NUMBER"
 
-        echo "Current: major=$major, minor=$minor, patch=$patch"
+        # Ensure numeric values
+        major=${major:-0}
+        minor=${minor:-0}
+        patch=${patch:-0}
 
-        case $VERSION_TYPE in
+        echo "Parsed version parts:"
+        echo "  major=${major}"
+        echo "  minor=${minor}"
+        echo "  patch=${patch}"
+
+        case "$VERSION_TYPE" in
           "major")
+            echo "Incrementing major version"
             major=$((major + 1))
             minor=0
             patch=0
             ;;
           "minor")
+            echo "Incrementing minor version"
             minor=$((minor + 1))
             patch=0
             ;;
           "patch")
+            echo "Incrementing patch version"
             patch=$((patch + 1))
             ;;
           *)
@@ -130,16 +153,15 @@ jobs:
             ;;
         esac
 
-        NEW_VERSION="$major.$minor.$patch"
+        NEW_VERSION="${major}.${minor}.${patch}"
+        echo "Calculated new version: $NEW_VERSION"
 
-        echo "New version will be: $NEW_VERSION"
-
-        echo "release_version=v$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "release_version=v${NEW_VERSION}" >> $GITHUB_OUTPUT
         {
-          echo "new_version=$NEW_VERSION"
-          echo "major=$major"
-          echo "minor=$minor"
-          echo "patch=$patch"
+          echo "new_version=${NEW_VERSION}"
+          echo "major=${major}"
+          echo "minor=${minor}"
+          echo "patch=${patch}"
         } >> $GITHUB_OUTPUT
 
     - name: Install dependencies
