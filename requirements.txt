@@ -14,7 +14,7 @@ pytest==7.4.4
 ruff==0.1.13
 pyright==1.1.280
 flask-migrate==4.0.7
-cryptography==48.0.0
+cryptography>=42.0.0
 yookassa==3.0.0
 psycopg2-binary==2.9.9
 python-telegram-bot==20.7
