@@ -125,6 +125,68 @@ jobs:
           echo "patch=$patch"
         } >> $GITHUB_OUTPUT
 
+    - name: Run Tests & Capture Results
+      id: test_execution
+      run: |
+        echo "# CI/CD Pipeline Test Results" > test_results.md
+        echo "" >> test_results.md
+
+        echo "## 🚀 Test Execution Started" >> test_results.md
+        echo "\`\`\`" >> test_results.md
+
+        # Test 1: Flask App Import
+        echo "🔍 Testing Flask Application Import..." >> test_results.md
+        echo "\$ python -c \"import app; app.create_app().config.from_object('config.env'); print('Flask app imported successfully')\"" >> test_results.md
+        if OUTPUT=$(python -c "import app; app.create_app().config.from_object('config.env'); print('Flask app imported successfully')" 2>&1); then
+          echo "✓ PASSED: $OUTPUT" >> test_results.md
+          TEST_1_RESULT="PASSED"
+        else
+          echo "✗ FAILED: $OUTPUT" >> test_results.md
+          TEST_1_RESULT="FAILED"
+          exit 1
+        fi
+        echo "" >> test_results.md
+
+        # Test 2: Views Import
+        echo "🔍 Testing Views Import..." >> test_results.md
+        echo "\$ python -c \"from app.views.main import main_bp; print('Main views loaded successfully')\"" >> test_results.md
+        if OUTPUT=$(python -c "from app.views.main import main_bp; print('Main views loaded successfully')" 2>&1); then
+          echo "✓ PASSED: $OUTPUT" >> test_results.md
+          TEST_2_RESULT="PASSED"
+        else
+          echo "✗ FAILED: $OUTPUT" >> test_results.md
+          TEST_2_RESULT="FAILED"
+          exit 1
+        fi
+        echo "" >> test_results.md
+
+        # Test 3: Models Import
+        echo "🔍 Testing Models Import..." >> test_results.md
+        echo "\$ python -c \"from app.models import Material; print('Models loaded successfully')\"" >> test_results.md
+        if OUTPUT=$(python -c "from app.models import Material; print('Models loaded successfully')" 2>&1); then
+          echo "✓ PASSED: $OUTPUT" >> test_results.md
+          TEST_3_RESULT="PASSED"
+        else
+          echo "✗ FAILED: $OUTPUT" >> test_results.md
+          TEST_3_RESULT="FAILED"
+          exit 1
+        fi
+        echo "" >> test_results.md
+
+        echo "\`\`\`" >> test_results.md
+
+        echo "## 📊 Test Summary" >> test_results.md
+        echo "| Test | Status |" >> test_results.md
+        echo "|------|--------|" >> test_results.md
+        echo "| Flask App Import | $TEST_1_RESULT |" >> test_results.md
+        echo "| Views Import | $TEST_2_RESULT |" >> test_results.md
+        echo "| Models Import | $TEST_3_RESULT |" >> test_results.md
+        echo "" >> test_results.md
+        echo "## ✅ All Tests Completed Successfully" >> test_results.md
+
+        # Output test results for release
+        cat test_results.md
+
     - name: Create Release Archive
       run: |
         echo "Creating source archive for v${{ steps.version.outputs.new_version }}"
@@ -144,53 +206,15 @@ jobs:
             --ignore-failed-read \
             -czf cysu-v${{ steps.version.outputs.new_version }}.tar.gz \
             app scripts requirements.txt run.py pyproject.toml LICENSE .env.example
-        ls -lh cysu-v${{ steps.version.outputs.new_version }}.tar.gz
-
-    - name: Enhanced Tests
-      id: test_results
-      run: |
-        echo "Running comprehensive tests..."
-        # Test imports
-        echo "Testing Flask app import..."
-        if python -c "import app; app.create_app().config.from_object('config.env'); print('Flask app imported successfully')"; then
-          echo "::set-output name=flask_import::PASSED"
-        else
-          echo "::set-output name=flask_import::FAILED"
-          exit 1
-        fi
-
-        # Test views
-        echo "Testing views import..."
-        if python -c "from app.views.main import main_bp; print('Main views loaded successfully')"; then
-          echo "::set-output name=views_import::PASSED"
-        else
-          echo "::set-output name=views_import::FAILED"
-          exit 1
-        fi
-
-        # Test models
-        echo "Testing models import..."
-        if python -c "from app.models import Material; print('Models loaded successfully')"; then
-          echo "::set-output name=models_import::PASSED"
-        else
-          echo "::set-output name=models_import::FAILED"
-          exit 1
-        fi
+        ARCHIVE_SIZE=$(ls -lh cysu-v${{ steps.version.outputs.new_version }}.tar.gz | awk '{print $5}')
+        echo "Archive created: $ARCHIVE_SIZE"
 
     - name: Create Release Notes
-      id: release_notes
       run: |
         cat << EOF > release_notes.md
         # Release v${{ steps.version.outputs.new_version }}
 
-        ## CI/CD Test Results
-        - Flask App Import: ${{ steps.test_results.outputs.flask_import }}
-        - Views Import: ${{ steps.test_results.outputs.views_import }}
-        - Models Import: ${{ steps.test_results.outputs.models_import }}
-        - Docker Build: SUCCESSFUL
-        - Archive Creation: COMPLETED
-
-        ## Downloads
+        ## 📦 Downloads
         - Source Code: cysu-v${{ steps.version.outputs.new_version }}.tar.gz
         - Docker: docker.io/***/cysu:latest
 
@@ -205,9 +229,11 @@ jobs:
         python run.py
         \`\`\`
 
-        ## Release Readiness
-        All critical components verified. Ready for production deployment.
+        ---
         EOF
+
+        # Append test results to release notes
+        cat test_results.md >> release_notes.md
 
         # Output the release body for the action
         echo "release_body<<EOF" >> $GITHUB_OUTPUT
