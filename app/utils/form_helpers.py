@@ -1,5 +1,6 @@
 import logging
 from typing import Optional, Union
+
 from flask import flash, redirect, request, url_for
 from flask_login import current_user
 from sqlalchemy.exc import SQLAlchemyError

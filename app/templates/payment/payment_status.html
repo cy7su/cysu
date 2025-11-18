@@ -1,13 +1,6 @@
-{% extends "base.html" %}
-{% from 'macros/breadcrumbs.html' import simple_breadcrumb %}
-
-{% block title %}Статус платежа{% endblock %}
-
-{% block breadcrumbs %}
-{{ simple_breadcrumb("Статус платежа") }}
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% from 'macros/breadcrumbs.html' import simple_breadcrumb %} {% block title %}Статус
+платежа{% endblock %} {% block breadcrumbs %} {{ simple_breadcrumb("Статус платежа") }} {% endblock %} {% block content
+%}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -19,14 +12,13 @@
                     <form method="POST">
                         {{ form.hidden_tag() }}
                         <div class="mb-3">
-                            {{ form.payment_id.label(class="form-label") }}
-                            {{ form.payment_id(class="form-control", placeholder="Введите ID платежа") }}
-                            {% if form.payment_id.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.payment_id.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
+                            {{ form.payment_id.label(class="form-label") }} {{ form.payment_id(class="form-control",
+                            placeholder="Введите ID платежа") }} {% if form.payment_id.errors %}
+                            <div class="text-danger">
+                                {% for error in form.payment_id.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
                             {% endif %}
                         </div>
                         <button type="submit" class="btn btn-primary">Проверить статус</button>
@@ -36,4 +28,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

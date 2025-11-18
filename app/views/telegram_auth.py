@@ -4,6 +4,7 @@ import os
 import secrets
 from datetime import datetime, timedelta
 from typing import Union
+
 from flask import (
     Blueprint,
     Response,
@@ -17,9 +18,10 @@ from flask import (
 )
 from flask_login import current_user, login_required, login_user
 from werkzeug.security import generate_password_hash
+
 from .. import db
 from ..models import Group, TelegramUser, User
-from ..utils.username_validator import contains_forbidden_word, has_allowed_characters
+from ..utils.username_validator import contains_forbidden_word
 
 telegram_auth_bp = Blueprint("telegram_auth", __name__)
 TELEGRAM_BOT_TOKEN = os.getenv("TG_TOKEN")
@@ -127,15 +129,21 @@ def telegram_login() -> Union[str, Response]:
             if username and contains_forbidden_word(base_username):
                 # Если запрещенные слова, используем только tg_id
                 base_username = f"tg_{telegram_id}"
-                current_app.logger.warning(f"Telegram registration - forbidden username '{username}' rejected for telegram_id={telegram_id}, using '{base_username}'")
+                current_app.logger.warning(
+                    f"Telegram registration - forbidden username '{username}' rejected for telegram_id={telegram_id}, using '{base_username}'"
+                )
 
-            current_app.logger.info(f"Telegram registration - creating user with base_username='{base_username}' for telegram_id={telegram_id}")
+            current_app.logger.info(
+                f"Telegram registration - creating user with base_username='{base_username}' for telegram_id={telegram_id}"
+            )
             counter = 1
             original_username = base_username
             while User.query.filter_by(username=base_username).first():
                 base_username = f"{original_username}_{counter}"
                 counter += 1
-            current_app.logger.info(f"Telegram registration - final username='{base_username}' after uniqueness check")
+            current_app.logger.info(
+                f"Telegram registration - final username='{base_username}' after uniqueness check"
+            )
             user = User(
                 username=base_username,
                 email=f"{telegram_id}@telegram.org",
@@ -163,7 +171,9 @@ def telegram_login() -> Union[str, Response]:
             flash("✅ Аккаунт создан и вы вошли через Telegram", "success")
             return redirect(url_for("telegram_auth.select_group"))
         except Exception as e:
-            current_app.logger.error(f"Ошибка авторизации через Telegram (POST): telegram_id={auth_data.get('id', 'N/A')}, username={auth_data.get('username', 'N/A')}, error={str(e)}")
+            current_app.logger.error(
+                f"Ошибка авторизации через Telegram (POST): telegram_id={auth_data.get('id', 'N/A')}, username={auth_data.get('username', 'N/A')}, error={str(e)}"
+            )
             if request.is_json:
                 return {
                     "success": False,
@@ -183,8 +193,7 @@ def telegram_login() -> Union[str, Response]:
             }
             auth_data = {k: v for k, v in auth_data.items() if v is not None}
             is_test_data = (
-                str(auth_data.get("id")) == "123456"
-                and str(auth_data.get("hash")) == "test"
+                str(auth_data.get("id")) == "123456" and str(auth_data.get("hash")) == "test"
             )
             is_miniapp_data = str(auth_data.get("hash")) == "miniapp_auth"
             is_widget_data = str(auth_data.get("hash")) == "telegram_widget_auth"
@@ -227,15 +236,21 @@ def telegram_login() -> Union[str, Response]:
             if username and contains_forbidden_word(base_username):
                 # Если запрещенные слова, используем только tg_id
                 base_username = f"tg_{telegram_id}"
-                current_app.logger.warning(f"Telegram registration (GET) - forbidden username '{username}' rejected for telegram_id={telegram_id}, using '{base_username}'")
+                current_app.logger.warning(
+                    f"Telegram registration (GET) - forbidden username '{username}' rejected for telegram_id={telegram_id}, using '{base_username}'"
+                )
 
-            current_app.logger.info(f"Telegram registration (GET) - creating user with base_username='{base_username}' for telegram_id={telegram_id}")
+            current_app.logger.info(
+                f"Telegram registration (GET) - creating user with base_username='{base_username}' for telegram_id={telegram_id}"
+            )
             counter = 1
             original_username = base_username
             while User.query.filter_by(username=base_username).first():
                 base_username = f"{original_username}_{counter}"
                 counter += 1
-            current_app.logger.info(f"Telegram registration (GET) - final username='{base_username}' after uniqueness check")
+            current_app.logger.info(
+                f"Telegram registration (GET) - final username='{base_username}' after uniqueness check"
+            )
             user = User(
                 username=base_username,
                 email=f"{telegram_id}@telegram.org",
@@ -255,7 +270,9 @@ def telegram_login() -> Union[str, Response]:
             else:
                 return redirect(url_for("main.index"))
         except Exception as e:
-            current_app.logger.error(f"Ошибка авторизации через Telegram (GET): telegram_id={auth_data.get('id', 'N/A')}, username={auth_data.get('username', 'N/A')}, error={str(e)}")
+            current_app.logger.error(
+                f"Ошибка авторизации через Telegram (GET): telegram_id={auth_data.get('id', 'N/A')}, username={auth_data.get('username', 'N/A')}, error={str(e)}"
+            )
             flash("❌ Ошибка авторизации. Попробуйте позже", "error")
             return redirect(url_for("auth.login"))
     return render_template("auth/telegram_miniapp.html")

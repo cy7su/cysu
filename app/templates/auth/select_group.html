@@ -1,71 +1,72 @@
-{% extends "base.html" %}
-
-{% block title %}Выбор группы{% endblock %}
-
-{% block extra_css %}
+{% extends "base.html" %} {% block title %}Выбор группы{% endblock %} {% block extra_css %}
 <style>
-.group-item {
-    transition: all 0.2s ease;
-}
+    .group-item {
+        transition: all 0.2s ease;
+    }
 
-.group-option {
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-}
+    .group-option {
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
 
-.group-option::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, var(--primary) 0%, transparent 100%);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    pointer-events: none;
-}
+    .group-option::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, var(--primary) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+    }
 
-.group-option:hover::before {
-    opacity: 0.05;
-}
+    .group-option:hover::before {
+        opacity: 0.05;
+    }
 
-.group-item.selected .group-option {
-    border: 2px solid var(--primary) !important;
-    background: var(--dp-24) !important;
-    transform: scale(1.02) !important;
-    box-shadow: none !important;
-}
+    .group-item.selected .group-option {
+        border: 2px solid var(--primary) !important;
+        background: var(--dp-24) !important;
+        transform: scale(1.02) !important;
+        box-shadow: none !important;
+    }
 
-/* Дополнительная специфичность для принудительного применения */
-.group-item.selected .group-option {
-    background-color: var(--dp-24) !important;
-}
+    /* Дополнительная специфичность для принудительного применения */
+    .group-item.selected .group-option {
+        background-color: var(--dp-24) !important;
+    }
 
-.group-item.selected .group-option h5 {
-    color: var(--primary) !important;
-}
+    .group-item.selected .group-option h5 {
+        color: var(--primary) !important;
+    }
 
-.group-item.selected .group-option .fa-chevron-right {
-    color: var(--primary) !important;
-}
+    .group-item.selected .group-option .fa-chevron-right {
+        color: var(--primary) !important;
+    }
 
-#submitBtn:disabled {
-    background: var(--dp-08) !important;
-    border-color: var(--dp-08) !important;
-    color: var(--text-muted) !important;
-    cursor: not-allowed;
-}
+    #submitBtn:disabled {
+        background: var(--dp-08) !important;
+        border-color: var(--dp-08) !important;
+        color: var(--text-muted) !important;
+        cursor: not-allowed;
+    }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-6 col-12">
-            <div class="card border-0" style="background: var(--dp-02); border: 1px solid var(--border-primary);">
-                <div class="card-header text-center" style="background: var(--dp-03); border-bottom: 1px solid var(--border-secondary); color: var(--text-primary);">
+            <div class="card border-0" style="background: var(--dp-02); border: 1px solid var(--border-primary)">
+                <div
+                    class="card-header text-center"
+                    style="
+                        background: var(--dp-03);
+                        border-bottom: 1px solid var(--border-secondary);
+                        color: var(--text-primary);
+                    "
+                >
                     <h4 class="mb-0">
                         <i class="fab fa-telegram me-2 text-primary"></i>
                         Выберите вашу группу
@@ -74,55 +75,68 @@
                 </div>
                 <div class="card-body">
                     {% if groups %}
-                        <form method="POST">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <div class="mb-4">
-                                {% for group in groups %}
-                                <div class="group-item mb-3" data-group-id="{{ group.id }}" style="cursor: pointer;">
-                                    <div class="p-3 group-option" 
-                                         style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">
-                                        <div class="d-flex align-items-center">
-                                            <div class="flex-grow-1">
-                                                <h5 class="mb-1 text-primary fw-bold">{{ group.name }}</h5>
-                                                {% if group.description %}
-                                                    <p class="mb-0 text-muted small">{{ group.description }}</p>
-                                                {% endif %}
-                                            </div>
-                                            <div class="ms-3">
-                                                <i class="fas fa-chevron-right text-muted"></i>
-                                            </div>
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <div class="mb-4">
+                            {% for group in groups %}
+                            <div class="group-item mb-3" data-group-id="{{ group.id }}" style="cursor: pointer">
+                                <div
+                                    class="p-3 group-option"
+                                    style="
+                                        background: var(--dp-03);
+                                        border: 1px solid var(--border-secondary);
+                                        border-radius: 12px;
+                                        cursor: pointer;
+                                        transition: all 0.2s ease;
+                                    "
+                                >
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1 text-primary fw-bold">{{ group.name }}</h5>
+                                            {% if group.description %}
+                                            <p class="mb-0 text-muted small">{{ group.description }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="ms-3">
+                                            <i class="fas fa-chevron-right text-muted"></i>
                                         </div>
                                     </div>
                                 </div>
-                                {% endfor %}
                             </div>
-                            
-                            <input type="hidden" name="group_id" id="selectedGroupId" value="">
-                            
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
-                                    <i class="fas fa-check me-2"></i>
-                                    Выбрать группу
-                                </button>
-                            </div>
-                        </form>
-                        
-                        <div class="text-center mt-3">
-                            <a href="#" class="text-muted text-decoration-none" data-bs-toggle="modal" data-bs-target="#createGroupModal">
-                                <i class="fas fa-question-circle me-1"></i>
-                                Нет вашей группы?
-                            </a>
+                            {% endfor %}
                         </div>
+
+                        <input type="hidden" name="group_id" id="selectedGroupId" value="" />
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+                                <i class="fas fa-check me-2"></i>
+                                Выбрать группу
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a
+                            href="#"
+                            class="text-muted text-decoration-none"
+                            data-bs-toggle="modal"
+                            data-bs-target="#createGroupModal"
+                        >
+                            <i class="fas fa-question-circle me-1"></i>
+                            Нет вашей группы?
+                        </a>
+                    </div>
                     {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                            <h5>Группы не найдены</h5>
-                            <p class="text-muted">Обратитесь к администратору для настройки групп</p>
-                            <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-home me-2"></i>
-                                На главную
-                            </a>
-                        </div>
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h5>Группы не найдены</h5>
+                        <p class="text-muted">Обратитесь к администратору для настройки групп</p>
+                        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-home me-2"></i>
+                            На главную
+                        </a>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -131,91 +145,110 @@
 </div>
 
 <script>
-// Обработка выбора группы
-document.addEventListener('DOMContentLoaded', function() {
-    const groupItems = document.querySelectorAll('.group-item');
-    const selectedGroupId = document.getElementById('selectedGroupId');
-    const submitBtn = document.getElementById('submitBtn');
-    
-    groupItems.forEach(item => {
-        item.addEventListener('click', function() {
-            // Снимаем выделение с всех групп
-            groupItems.forEach(group => {
-                group.classList.remove('selected');
-                const groupOption = group.querySelector('.group-option');
+    // Обработка выбора группы
+    document.addEventListener('DOMContentLoaded', function () {
+        const groupItems = document.querySelectorAll('.group-item')
+        const selectedGroupId = document.getElementById('selectedGroupId')
+        const submitBtn = document.getElementById('submitBtn')
+
+        groupItems.forEach((item) => {
+            item.addEventListener('click', function () {
+                // Снимаем выделение с всех групп
+                groupItems.forEach((group) => {
+                    group.classList.remove('selected')
+                    const groupOption = group.querySelector('.group-option')
+                    if (groupOption) {
+                        groupOption.style.backgroundColor = ''
+                        groupOption.style.border = ''
+                        groupOption.style.transform = ''
+                        groupOption.style.boxShadow = ''
+                        groupOption.style.backgroundImage = ''
+                        groupOption.style.backgroundPositionX = ''
+                        groupOption.style.backgroundPositionY = ''
+                        groupOption.style.backgroundSize = ''
+                        groupOption.style.backgroundRepeat = ''
+                        groupOption.style.backgroundAttachment = ''
+                        groupOption.style.backgroundOrigin = ''
+                        groupOption.style.backgroundClip = ''
+                    }
+                })
+
+                // Выделяем выбранную группу
+                this.classList.add('selected')
+
+                // Сохраняем ID выбранной группы
+                const groupId = this.getAttribute('data-group-id')
+                selectedGroupId.value = groupId
+
+                // Активируем кнопку отправки
+                submitBtn.disabled = false
+                submitBtn.classList.remove('btn-secondary')
+                submitBtn.classList.add('btn-primary')
+
+                // Принудительно применяем стили
+                const groupOption = this.querySelector('.group-option')
                 if (groupOption) {
-                    groupOption.style.backgroundColor = '';
-                    groupOption.style.border = '';
-                    groupOption.style.transform = '';
-                    groupOption.style.boxShadow = '';
-                    groupOption.style.backgroundImage = '';
-                    groupOption.style.backgroundPositionX = '';
-                    groupOption.style.backgroundPositionY = '';
-                    groupOption.style.backgroundSize = '';
-                    groupOption.style.backgroundRepeat = '';
-                    groupOption.style.backgroundAttachment = '';
-                    groupOption.style.backgroundOrigin = '';
-                    groupOption.style.backgroundClip = '';
+                    groupOption.style.backgroundColor = 'var(--dp-24)'
+                    groupOption.style.border = '2px solid var(--primary)'
+                    groupOption.style.transform = 'scale(1.02)'
+                    groupOption.style.boxShadow = 'none'
+                    groupOption.style.backgroundImage = 'none'
+                    groupOption.style.backgroundPositionX = ''
+                    groupOption.style.backgroundPositionY = ''
+                    groupOption.style.backgroundSize = ''
+                    groupOption.style.backgroundRepeat = ''
+                    groupOption.style.backgroundAttachment = ''
+                    groupOption.style.backgroundOrigin = ''
+                    groupOption.style.backgroundClip = ''
                 }
-            });
-            
-            // Выделяем выбранную группу
-            this.classList.add('selected');
-            
-            // Сохраняем ID выбранной группы
-            const groupId = this.getAttribute('data-group-id');
-            selectedGroupId.value = groupId;
-            
-            // Активируем кнопку отправки
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('btn-secondary');
-            submitBtn.classList.add('btn-primary');
-            
-            // Принудительно применяем стили
-            const groupOption = this.querySelector('.group-option');
-            if (groupOption) {
-                groupOption.style.backgroundColor = 'var(--dp-24)';
-                groupOption.style.border = '2px solid var(--primary)';
-                groupOption.style.transform = 'scale(1.02)';
-                groupOption.style.boxShadow = 'none';
-                groupOption.style.backgroundImage = 'none';
-                groupOption.style.backgroundPositionX = '';
-                groupOption.style.backgroundPositionY = '';
-                groupOption.style.backgroundSize = '';
-                groupOption.style.backgroundRepeat = '';
-                groupOption.style.backgroundAttachment = '';
-                groupOption.style.backgroundOrigin = '';
-                groupOption.style.backgroundClip = '';
-            }
-        });
-    });
-});
+            })
+        })
+    })
 </script>
 
 <div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: var(--dp-02); border: 1px solid var(--border-primary);">
-            <div class="modal-header" style="background: var(--dp-03); border-bottom: 1px solid var(--border-secondary);">
+        <div class="modal-content" style="background: var(--dp-02); border: 1px solid var(--border-primary)">
+            <div
+                class="modal-header"
+                style="background: var(--dp-03); border-bottom: 1px solid var(--border-secondary)"
+            >
                 <h5 class="modal-title text-primary" id="createGroupModalLabel">
                     <i class="fas fa-plus-circle me-2"></i>
                     Создать новую группу
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
             </div>
             <form id="createGroupForm">
                 <div class="modal-body">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="mb-3">
                         <label for="groupName" class="form-label text-primary">Название группы</label>
-                        <input type="text" class="form-control" id="groupName" name="group_name" 
-                               placeholder="Например: ИСП-21" required
-                               style="background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary);">
-                        <div class="form-text text-muted">
-                            Администратор рассмотрит ваш запрос в ближайшее время
-                        </div>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="groupName"
+                            name="group_name"
+                            placeholder="Например: ИСП-21"
+                            required
+                            style="
+                                background: var(--dp-01);
+                                border: 1px solid var(--border-secondary);
+                                color: var(--text-primary);
+                            "
+                        />
+                        <div class="form-text text-muted">Администратор рассмотрит ваш запрос в ближайшее время</div>
                     </div>
                 </div>
-                <div class="modal-footer" style="background: var(--dp-03); border-top: 1px solid var(--border-secondary);">
+                <div
+                    class="modal-footer"
+                    style="background: var(--dp-03); border-top: 1px solid var(--border-secondary)"
+                >
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times me-1"></i>
                         Отмена
@@ -231,65 +264,68 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script>
-// Обработка формы создания группы
-document.getElementById('createGroupForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    const groupName = formData.get('group_name').trim();
-    
-    if (!groupName) {
-        alert('Пожалуйста, введите название группы');
-        return;
-    }
-    
-    // Показываем индикатор загрузки
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Отправка...';
-    submitBtn.disabled = true;
-    
-    fetch('{{ url_for("telegram_auth.request_group") }}', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Закрываем модальное окно
-            const modalElement = document.getElementById('createGroupModal');
-            if (modalElement) {
-                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-                modal.hide();
-            }
-            
-            // Показываем уведомление об успехе
-            showNotification('Запрос на создание группы отправлен! Администратор рассмотрит его в ближайшее время.', 'success');
-            
-            // Перенаправляем на главную страницу
-            setTimeout(() => {
-                window.location.href = '{{ url_for("main.index") }}';
-            }, 2000);
-        } else {
-            alert(data.message || 'Ошибка при отправке запроса');
-        }
-    })
-    .catch(error => {
-        console.error('Ошибка:', error);
-        alert('Ошибка при отправке запроса');
-    })
-    .finally(() => {
-        // Восстанавливаем кнопку
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    });
-});
+    // Обработка формы создания группы
+    document.getElementById('createGroupForm').addEventListener('submit', function (e) {
+        e.preventDefault()
 
-// Функция для показа уведомлений
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type} position-fixed`;
-    notification.style.cssText = `
+        const formData = new FormData(this)
+        const groupName = formData.get('group_name').trim()
+
+        if (!groupName) {
+            alert('Пожалуйста, введите название группы')
+            return
+        }
+
+        // Показываем индикатор загрузки
+        const submitBtn = this.querySelector('button[type="submit"]')
+        const originalText = submitBtn.innerHTML
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Отправка...'
+        submitBtn.disabled = true
+
+        fetch('{{ url_for("telegram_auth.request_group") }}', {
+            method: 'POST',
+            body: formData,
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    // Закрываем модальное окно
+                    const modalElement = document.getElementById('createGroupModal')
+                    if (modalElement) {
+                        const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement)
+                        modal.hide()
+                    }
+
+                    // Показываем уведомление об успехе
+                    showNotification(
+                        'Запрос на создание группы отправлен! Администратор рассмотрит его в ближайшее время.',
+                        'success',
+                    )
+
+                    // Перенаправляем на главную страницу
+                    setTimeout(() => {
+                        window.location.href = '{{ url_for("main.index") }}'
+                    }, 2000)
+                } else {
+                    alert(data.message || 'Ошибка при отправке запроса')
+                }
+            })
+            .catch((error) => {
+                console.error('Ошибка:', error)
+                alert('Ошибка при отправке запроса')
+            })
+            .finally(() => {
+                // Восстанавливаем кнопку
+                submitBtn.innerHTML = originalText
+                submitBtn.disabled = false
+            })
+    })
+
+    // Функция для показа уведомлений
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div')
+        notification.className = `alert alert-${type} position-fixed`
+        notification.style.cssText = `
         top: 20px;
         right: 20px;
         z-index: 9999;
@@ -298,22 +334,22 @@ function showNotification(message, type = 'info') {
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         animation: slideIn 0.3s ease-out;
-    `;
-    notification.innerHTML = `
+    `
+        notification.innerHTML = `
         <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
         ${message}
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease-in';
+    `
+
+        document.body.appendChild(notification)
+
         setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, 5000);
-}
+            notification.style.animation = 'slideOut 0.3s ease-in'
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification)
+                }
+            }, 300)
+        }, 5000)
+    }
 </script>
 {% endblock %}

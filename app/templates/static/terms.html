@@ -1,74 +1,114 @@
-{% extends 'base.html' %}
-{% from 'macros/breadcrumbs.html' import simple_breadcrumb %}
-
-{% block title %}Условия использования - cysu{% endblock %}
-
-{% block breadcrumbs %}
-{{ simple_breadcrumb("Условия использования") }}
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% from 'macros/breadcrumbs.html' import simple_breadcrumb %} {% block title %}Условия
+использования - cysu{% endblock %} {% block breadcrumbs %} {{ simple_breadcrumb("Условия использования") }} {% endblock
+%} {% block content %}
 <div class="container py-5">
     <div class="row">
         <div class="col-lg-3">
-            <div class="card border-0"
-                style="background: var(--dp-02); border: 1px solid var(--border-primary) !important;">
-                <div class="card-header"
-                    style="background: var(--dp-03); border-bottom: 1px solid var(--border-secondary); color: var(--text-primary);">
+            <div
+                class="card border-0"
+                style="background: var(--dp-02); border: 1px solid var(--border-primary) !important"
+            >
+                <div
+                    class="card-header"
+                    style="
+                        background: var(--dp-03);
+                        border-bottom: 1px solid var(--border-secondary);
+                        color: var(--text-primary);
+                    "
+                >
                     <h5 class="mb-0"><i class="fas fa-gavel me-2"></i>Содержание</h5>
                 </div>
                 <div class="card-body p-0">
                     <nav class="nav flex-column">
-                        <a class="nav-link text-light py-2 px-3" href="#general"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#general"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-handshake me-2 text-primary"></i>Общие положения
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#services"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#services"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-graduation-cap me-2 text-primary"></i>Описание услуг
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#groups"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#groups"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-users me-2 text-primary"></i>Система групп
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#registration"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#registration"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-user-plus me-2 text-primary"></i>Регистрация
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#subscription"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#subscription"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-credit-card me-2 text-primary"></i>Подписка
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#rules"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#rules"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-gavel me-2 text-primary"></i>Правила использования
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#copyright"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#copyright"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-copyright me-2 text-primary"></i>Авторские права
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#liability"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#liability"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-exclamation-triangle me-2 text-primary"></i>Ответственность
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#blocking"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#blocking"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-ban me-2 text-primary"></i>Блокировка
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#termination"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#termination"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-stop-circle me-2 text-primary"></i>Прекращение услуг
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#changes"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#changes"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-edit me-2 text-primary"></i>Изменения условий
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#disputes"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#disputes"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-balance-scale me-2 text-primary"></i>Разрешение споров
                         </a>
-                        <a class="nav-link text-light py-2 px-3" href="#contacts"
-                            style="border-bottom: 1px solid var(--border-primary);">
+                        <a
+                            class="nav-link text-light py-2 px-3"
+                            href="#contacts"
+                            style="border-bottom: 1px solid var(--border-primary)"
+                        >
                             <i class="fas fa-address-card me-2 text-primary"></i>Контакты
                         </a>
                     </nav>
@@ -77,10 +117,18 @@
         </div>
 
         <div class="col-lg-9">
-            <div class="card border-0"
-                style="background: var(--dp-02); border: 1px solid var(--border-primary) !important;">
-                <div class="card-header"
-                    style="background: var(--dp-03); border-bottom: 1px solid var(--border-secondary); color: var(--text-primary);">
+            <div
+                class="card border-0"
+                style="background: var(--dp-02); border: 1px solid var(--border-primary) !important"
+            >
+                <div
+                    class="card-header"
+                    style="
+                        background: var(--dp-03);
+                        border-bottom: 1px solid var(--border-secondary);
+                        color: var(--text-primary);
+                    "
+                >
                     <h1 class="h3 mb-0"><i class="fas fa-gavel me-3"></i>Условия использования</h1>
                 </div>
                 <div class="card-body">
@@ -93,8 +141,10 @@
 
                     <section id="general" class="mb-5">
                         <h2 class="text-white mb-4">Общие положения</h2>
-                        <p class="text-light">Настоящие Условия использования регулируют отношения между платформой cysu
-                            и пользователями при использовании образовательных услуг.</p>
+                        <p class="text-light">
+                            Настоящие Условия использования регулируют отношения между платформой cysu и пользователями
+                            при использовании образовательных услуг.
+                        </p>
                         <p class="text-light">Используя платформу, вы соглашаетесь с данными условиями.</p>
                     </section>
 
@@ -104,8 +154,15 @@
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
-                                <div class="p-4"
-                                    style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 20px; height: 250px;">
+                                <div
+                                    class="p-4"
+                                    style="
+                                        background: var(--dp-03);
+                                        border: 1px solid var(--border-secondary);
+                                        border-radius: 20px;
+                                        height: 250px;
+                                    "
+                                >
                                     <h6 class="text-primary mb-3"><i class="fas fa-book me-2"></i>Учебные материалы</h6>
                                     <ul class="text-light small">
                                         <li>Лекции и теоретические материалы</li>
@@ -116,8 +173,15 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="p-4"
-                                    style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 20px; height: 250px;">
+                                <div
+                                    class="p-4"
+                                    style="
+                                        background: var(--dp-03);
+                                        border: 1px solid var(--border-secondary);
+                                        border-radius: 20px;
+                                        height: 250px;
+                                    "
+                                >
                                     <h6 class="text-primary mb-3"><i class="fas fa-upload me-2"></i>Интерактивность</h6>
                                     <ul class="text-light small">
                                         <li>Загрузка решений заданий</li>
@@ -132,29 +196,60 @@
 
                     <section id="groups" class="mb-5">
                         <h2 class="text-white mb-4">Система групп и предметов</h2>
-                        <p class="text-light">Наша платформа использует уникальную систему организации образовательного
-                            контента:</p>
+                        <p class="text-light">
+                            Наша платформа использует уникальную систему организации образовательного контента:
+                        </p>
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-4">
-                                <div class="p-4 text-center"
-                                    style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 20px; height: 200px; display: flex; flex-direction: column; justify-content: center;">
+                                <div
+                                    class="p-4 text-center"
+                                    style="
+                                        background: var(--dp-03);
+                                        border: 1px solid var(--border-secondary);
+                                        border-radius: 20px;
+                                        height: 200px;
+                                        display: flex;
+                                        flex-direction: column;
+                                        justify-content: center;
+                                    "
+                                >
                                     <i class="fas fa-layer-group fa-3x text-primary mb-3"></i>
                                     <h6 class="text-primary mb-2">Группы пользователей</h6>
                                     <p class="text-muted small mb-0">Автоматическое назначение при регистрации</p>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="p-4 text-center"
-                                    style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 20px; height: 200px; display: flex; flex-direction: column; justify-content: center;">
+                                <div
+                                    class="p-4 text-center"
+                                    style="
+                                        background: var(--dp-03);
+                                        border: 1px solid var(--border-secondary);
+                                        border-radius: 20px;
+                                        height: 200px;
+                                        display: flex;
+                                        flex-direction: column;
+                                        justify-content: center;
+                                    "
+                                >
                                     <i class="fas fa-book fa-3x text-primary mb-3"></i>
                                     <h6 class="text-primary mb-2">Предметы по группам</h6>
                                     <p class="text-muted small mb-0">Доступ только к материалам своей группы</p>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="p-4 text-center"
-                                    style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 20px; height: 200px; display: flex; flex-direction: column; justify-content: center;">
+                                <div
+                                    class="p-4 text-center"
+                                    style="
+                                        background: var(--dp-03);
+                                        border: 1px solid var(--border-secondary);
+                                        border-radius: 20px;
+                                        height: 200px;
+                                        display: flex;
+                                        flex-direction: column;
+                                        justify-content: center;
+                                    "
+                                >
                                     <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
                                     <h6 class="text-primary mb-2">Контроль доступа</h6>
                                     <p class="text-muted small mb-0">Защита от несанкционированного доступа</p>
@@ -169,8 +264,10 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <h6 class="text-success"><i class="fas fa-check-circle me-2"></i>Требования</h6>
                                     <ul class="text-light small">
                                         <li>Действительный email адрес</li>
@@ -181,8 +278,10 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <h6 class="text-danger"><i class="fas fa-times-circle me-2"></i>Запрещено</h6>
                                     <ul class="text-light small">
                                         <li>Передача аккаунта третьим лицам</li>
@@ -199,38 +298,43 @@
                         <h2 class="text-white mb-4">Подписка и оплата</h2>
                         <p class="text-light">Для доступа к материалам необходима подписка:</p>
 
-                        <div class="mt-3 p-3"
-                            style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                        <div
+                            class="mt-3 p-3"
+                            style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                        >
                             <h6 class="text-primary"><i class="fas fa-credit-card me-2"></i>Тарифы подписки</h6>
                             <div class="row g-2 text-center">
                                 <div class="col-3">
-                                    <div class="p-2" style="background: #1a1a1a; border-radius: 6px;">
+                                    <div class="p-2" style="background: #1a1a1a; border-radius: 6px">
                                         <div class="text-white fw-bold">89₽</div>
                                         <small class="text-muted">1 месяц</small>
                                     </div>
                                 </div>
                                 <div class="col-3">
-                                    <div class="p-2" style="background: #1a1a1a; border-radius: 6px;">
+                                    <div class="p-2" style="background: #1a1a1a; border-radius: 6px">
                                         <div class="text-white fw-bold">199₽</div>
                                         <small class="text-muted">3 месяца</small>
-                                        <br><span class="badge" style="background: #28a745; color: #ffffff;">Экономия
-                                            68₽</span>
+                                        <br /><span class="badge" style="background: #28a745; color: #ffffff"
+                                            >Экономия 68₽</span
+                                        >
                                     </div>
                                 </div>
                                 <div class="col-3">
-                                    <div class="p-2" style="background: #1a1a1a; border-radius: 6px;">
+                                    <div class="p-2" style="background: #1a1a1a; border-radius: 6px">
                                         <div class="text-white fw-bold">349₽</div>
                                         <small class="text-muted">6 месяцев</small>
-                                        <br><span class="badge" style="background: #28a745; color: #ffffff;">Экономия
-                                            185₽</span>
+                                        <br /><span class="badge" style="background: #28a745; color: #ffffff"
+                                            >Экономия 185₽</span
+                                        >
                                     </div>
                                 </div>
                                 <div class="col-3">
-                                    <div class="p-2" style="background: #1a1a1a; border-radius: 6px;">
+                                    <div class="p-2" style="background: #1a1a1a; border-radius: 6px">
                                         <div class="text-white fw-bold">469₽</div>
                                         <small class="text-muted">1 год</small>
-                                        <br><span class="badge" style="background: #28a745; color: #ffffff;">Экономия
-                                            599₽</span>
+                                        <br /><span class="badge" style="background: #28a745; color: #ffffff"
+                                            >Экономия 599₽</span
+                                        >
                                     </div>
                                 </div>
                             </div>
@@ -238,9 +342,12 @@
 
                         <div class="row g-3 mt-3">
                             <div class="col-md-6">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
-                                    <h6 class="text-primary"><i class="fas fa-shield-alt me-2"></i>Безопасность платежей
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
+                                    <h6 class="text-primary">
+                                        <i class="fas fa-shield-alt me-2"></i>Безопасность платежей
                                     </h6>
                                     <ul class="text-light small">
                                         <li>Защищенный сервис ЮKassa</li>
@@ -251,8 +358,10 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <h6 class="text-primary"><i class="fas fa-undo me-2"></i>Возврат средств</h6>
                                     <ul class="text-light small">
                                         <li>Возврат в течение 14 дней</li>
@@ -271,8 +380,10 @@
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-4">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <div class="text-center">
                                         <i class="fas fa-graduation-cap fa-2x text-primary mb-2"></i>
                                         <h6 class="text-white">Образовательные цели</h6>
@@ -281,8 +392,10 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <div class="text-center">
                                         <i class="fas fa-copyright fa-2x text-primary mb-2"></i>
                                         <h6 class="text-white">Авторские права</h6>
@@ -291,8 +404,10 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <div class="text-center">
                                         <i class="fas fa-users fa-2x text-primary mb-2"></i>
                                         <h6 class="text-white">Уважительное общение</h6>
@@ -302,7 +417,7 @@
                             </div>
                         </div>
 
-                        <div class="p-3" style="background: #dc2626; border: 1px solid #dc2626; border-radius: 8px;">
+                        <div class="p-3" style="background: #dc2626; border: 1px solid #dc2626; border-radius: 8px">
                             <h6 class="text-white"><i class="fas fa-ban me-2"></i>Запрещенные действия</h6>
                             <ul class="text-light small">
                                 <li>Загрузка вредоносных файлов</li>
@@ -322,8 +437,10 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <h6 class="text-primary"><i class="fas fa-lock me-2"></i>Права платформы</h6>
                                     <ul class="text-light small">
                                         <li>Авторские права на контент</li>
@@ -334,8 +451,10 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <h6 class="text-primary"><i class="fas fa-user me-2"></i>Права пользователей</h6>
                                     <ul class="text-light small">
                                         <li>Личное использование материалов</li>
@@ -363,22 +482,28 @@
 
                     <section id="blocking" class="mb-5">
                         <h2 class="text-white mb-4">Блокировка за нарушения</h2>
-                        <p class="text-light">За следующие нарушения аккаунт блокируется <strong>НАВСЕГДА</strong> без
-                            возможности восстановления:</p>
+                        <p class="text-light">
+                            За следующие нарушения аккаунт блокируется <strong>НАВСЕГДА</strong> без возможности
+                            восстановления:
+                        </p>
 
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <ul class="text-light">
-                                    <li><strong>Слив контента</strong> - любое копирование и распространение материалов
+                                    <li>
+                                        <strong>Слив контента</strong> - любое копирование и распространение материалов
                                     </li>
-                                    <li><strong>Скриншоты/видео</strong> - создание изображений или записей для
-                                        распространения</li>
+                                    <li>
+                                        <strong>Скриншоты/видео</strong> - создание изображений или записей для
+                                        распространения
+                                    </li>
                                     <li><strong>Передача аккаунта</strong> - предоставление доступа третьим лицам</li>
                                 </ul>
                             </div>
                             <div class="col-md-6">
                                 <ul class="text-light">
-                                    <li><strong>Попытки обхода</strong> - любые способы получения контента без оплаты
+                                    <li>
+                                        <strong>Попытки обхода</strong> - любые способы получения контента без оплаты
                                     </li>
                                     <li><strong>Массовые нарушения</strong> - систематическое нарушение правил</li>
                                     <li><strong>Повторные нарушения</strong> - после предупреждения</li>
@@ -386,13 +511,14 @@
                             </div>
                         </div>
 
-                        <div class="mt-3 p-3"
-                            style="background: #dc2626; border: 1px solid #dc2626; border-radius: 8px;">
+                        <div
+                            class="mt-3 p-3"
+                            style="background: #dc2626; border: 1px solid #dc2626; border-radius: 8px"
+                        >
                             <h6 class="text-white"><i class="fas fa-times-circle me-2"></i>Важно!</h6>
                             <p class="text-light mb-0">
                                 При блокировке <strong>НЕ ВОЗВРАЩАЮТСЯ</strong> средства за неиспользованный период
-                                подписки.
-                                Блокировка распространяется на все связанные аккаунты и устройства.
+                                подписки. Блокировка распространяется на все связанные аккаунты и устройства.
                             </p>
                         </div>
                     </section>
@@ -403,8 +529,10 @@
 
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <div class="p-3"
-                                    style="background: #dc3545; border: 1px solid #dc3545; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #dc3545; border: 1px solid #dc3545; border-radius: 8px"
+                                >
                                     <div class="text-center">
                                         <i class="fas fa-user-times fa-2x text-white mb-2"></i>
                                         <h6 class="text-white">Нарушение условий</h6>
@@ -413,8 +541,10 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="p-3"
-                                    style="background: #fd7e14; border: 1px solid #fd7e14; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #fd7e14; border: 1px solid #fd7e14; border-radius: 8px"
+                                >
                                     <div class="text-center">
                                         <i class="fas fa-credit-card fa-2x text-white mb-2"></i>
                                         <h6 class="text-white">Неоплата</h6>
@@ -423,8 +553,10 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="p-3"
-                                    style="background: #6c757d; border: 1px solid #6c757d; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #6c757d; border: 1px solid #6c757d; border-radius: 8px"
+                                >
                                     <div class="text-center">
                                         <i class="fas fa-tools fa-2x text-white mb-2"></i>
                                         <h6 class="text-white">Технические работы</h6>
@@ -437,8 +569,10 @@
 
                     <section id="changes" class="mb-5">
                         <h2 class="text-white mb-4">Изменения условий</h2>
-                        <p class="text-light">Мы оставляем за собой право изменять настоящие условия. О значительных
-                            изменениях пользователи будут уведомлены:</p>
+                        <p class="text-light">
+                            Мы оставляем за собой право изменять настоящие условия. О значительных изменениях
+                            пользователи будут уведомлены:
+                        </p>
                         <ul class="text-light">
                             <li>По email за 30 дней до вступления в силу</li>
                             <li>Через уведомления на платформе</li>
@@ -453,8 +587,10 @@
 
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <div class="text-center">
                                         <i class="fas fa-comments fa-2x text-primary mb-2"></i>
                                         <h6 class="text-white">Досудебное урегулирование</h6>
@@ -463,8 +599,10 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <div class="text-center">
                                         <i class="fas fa-gavel fa-2x text-primary mb-2"></i>
                                         <h6 class="text-white">Законодательство РФ</h6>
@@ -473,8 +611,10 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <div class="text-center">
                                         <i class="fas fa-map-marker-alt fa-2x text-primary mb-2"></i>
                                         <h6 class="text-white">Подсудность</h6>
@@ -491,26 +631,33 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
                                     <h6 class="text-primary"><i class="fas fa-headset me-2"></i>Служба поддержки</h6>
                                     <p class="text-muted small mb-0">
-                                        <strong>Email:</strong> <a href="mailto:support@cysu.ru"
-                                            style="color: #007bff;">support@cysu.ru</a><br>
-                                        <strong>Telegram:</strong> <a href="https://t.me/cy7su" target="_blank"
-                                            style="color: #007bff;">@cy7su</a><br>
+                                        <strong>Email:</strong>
+                                        <a href="mailto:support@cysu.ru" style="color: #007bff">support@cysu.ru</a
+                                        ><br />
+                                        <strong>Telegram:</strong>
+                                        <a href="https://t.me/cy7su" target="_blank" style="color: #007bff">@cy7su</a
+                                        ><br />
                                         <strong>Время работы:</strong> Пн-Пт, 9:00-18:00 (МСК)
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="p-3"
-                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
-                                    <h6 class="text-primary"><i class="fas fa-building me-2"></i>Юридическая информация
+                                <div
+                                    class="p-3"
+                                    style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px"
+                                >
+                                    <h6 class="text-primary">
+                                        <i class="fas fa-building me-2"></i>Юридическая информация
                                     </h6>
                                     <p class="text-muted small mb-0">
-                                        <strong>Ответственное лицо:</strong> Вагнер Никита Максимович<br>
-                                        <strong>ИНН:</strong> 645126224659<br>
+                                        <strong>Ответственное лицо:</strong> Вагнер Никита Максимович<br />
+                                        <strong>ИНН:</strong> 645126224659<br />
                                         <strong>Юрисдикция:</strong> Российская Федерация
                                     </p>
                                 </div>
@@ -518,7 +665,7 @@
                         </div>
                     </section>
 
-                    <div class="mt-4 p-3" style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px;">
+                    <div class="mt-4 p-3" style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px">
                         <p class="text-muted mb-0">
                             <i class="fas fa-info-circle me-2"></i>
                             <strong>Важно:</strong> Используя нашу образовательную платформу cysu с системой групп и

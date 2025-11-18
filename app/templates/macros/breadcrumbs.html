@@ -1,165 +1,142 @@
-{# Макросы для навигационных цепочек #}
-
-{# Простая навигация: Главная > Текущая страница #}
-{% macro simple_breadcrumb(title, url=None) %}
+{# Макросы для навигационных цепочек #} {# Простая навигация: Главная > Текущая страница #} {% macro
+simple_breadcrumb(title, url=None) %}
 <nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('main.index') }}" class="text-decoration-none">
-        <i class="fas fa-home me-1"></i>Главная
-      </a>
-    </li>
-    {% if url %}
-      <li class="breadcrumb-item">
-        <a href="{{ url }}" class="text-decoration-none">{{ title }}</a>
-      </li>
-    {% else %}
-      <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-    {% endif %}
-  </ol>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('main.index') }}" class="text-decoration-none">
+                <i class="fas fa-home me-1"></i>Главная
+            </a>
+        </li>
+        {% if url %}
+        <li class="breadcrumb-item">
+            <a href="{{ url }}" class="text-decoration-none">{{ title }}</a>
+        </li>
+        {% else %}
+        <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        {% endif %}
+    </ol>
 </nav>
-{% endmacro %}
-
-{# Многоуровневая навигация #}
-{% macro render_breadcrumbs(items) %}
+{% endmacro %} {# Многоуровневая навигация #} {% macro render_breadcrumbs(items) %}
 <nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb">
-    {% for item in items %}
-      {% if loop.last %}
+    <ol class="breadcrumb">
+        {% for item in items %} {% if loop.last %}
         <li class="breadcrumb-item active" aria-current="page">
-          {% if item.icon %}<i class="{{ item.icon }} me-1"></i>{% endif %}{{ item.title }}
-        </li>
-      {% else %}
-        <li class="breadcrumb-item">
-          <a href="{{ item.url }}" class="text-decoration-none">
             {% if item.icon %}<i class="{{ item.icon }} me-1"></i>{% endif %}{{ item.title }}
-          </a>
         </li>
-      {% endif %}
-    {% endfor %}
-  </ol>
-</nav>
-{% endmacro %}
-
-{# Breadcrumb для предметов #}
-{% macro subject_breadcrumb(subject_title, subject_url=None) %}
-<nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('main.index') }}" class="text-decoration-none">
-        <i class="fas fa-home me-1"></i>Главная
-      </a>
-    </li>
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('main.index') }}" class="text-decoration-none">
-        <i class="fas fa-book me-1"></i>Предметы
-      </a>
-    </li>
-    {% if subject_url %}
-      <li class="breadcrumb-item">
-        <a href="{{ subject_url }}" class="text-decoration-none">{{ subject_title }}</a>
-      </li>
-    {% else %}
-      <li class="breadcrumb-item active" aria-current="page">{{ subject_title }}</li>
-    {% endif %}
-  </ol>
-</nav>
-{% endmacro %}
-
-{# Breadcrumb для материалов предмета #}
-{% macro material_breadcrumb(subject_title, subject_url, material_title) %}
-<nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('main.index') }}" class="text-decoration-none">
-        <i class="fas fa-home me-1"></i>Главная
-      </a>
-    </li>
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('main.index') }}" class="text-decoration-none">
-        <i class="fas fa-book me-1"></i>Предметы
-      </a>
-    </li>
-    <li class="breadcrumb-item">
-      <a href="{{ subject_url }}" class="text-decoration-none">{{ subject_title }}</a>
-    </li>
-    <li class="breadcrumb-item active" aria-current="page">{{ material_title }}</li>
-  </ol>
-</nav>
-{% endmacro %}
-
-{# Breadcrumb для админ панели #}
-{% macro admin_breadcrumb(section_title, section_url=None) %}
-<nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('main.index') }}" class="text-decoration-none">
-        <i class="fas fa-home me-1"></i>Главная
-      </a>
-    </li>
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('admin.admin_users') }}" class="text-decoration-none">
-        <i class="fas fa-cog me-1"></i>Админ панель
-      </a>
-    </li>
-    {% if section_url %}
-      <li class="breadcrumb-item">
-        <a href="{{ section_url }}" class="text-decoration-none">{{ section_title }}</a>
-      </li>
-    {% else %}
-      <li class="breadcrumb-item active" aria-current="page">{{ section_title }}</li>
-    {% endif %}
-  </ol>
-</nav>
-{% endmacro %}
-
-{# Breadcrumb для профиля #}
-{% macro profile_breadcrumb(section_title=None) %}
-<nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('main.index') }}" class="text-decoration-none">
-        <i class="fas fa-home me-1"></i>Главная
-      </a>
-    </li>
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('main.profile') }}" class="text-decoration-none">
-        <i class="fas fa-user me-1"></i>Профиль
-      </a>
-    </li>
-    {% if section_title %}
-      <li class="breadcrumb-item active" aria-current="page">{{ section_title }}</li>
-    {% endif %}
-  </ol>
-</nav>
-{% endmacro %}
-
-{# Breadcrumb для базы знаний #}
-{% macro wiki_breadcrumb(category_title=None, category_url=None, article_title=None) %}
-<nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('main.index') }}" class="text-decoration-none">
-        <i class="fas fa-home me-1"></i>Главная
-      </a>
-    </li>
-    <li class="breadcrumb-item">
-      <a href="{{ url_for('main.wiki') }}" class="text-decoration-none">
-        <i class="fas fa-book-open me-1"></i>База знаний
-      </a>
-    </li>
-    {% if category_title %}
-      {% if category_url %}
+        {% else %}
         <li class="breadcrumb-item">
-          <a href="{{ category_url }}" class="text-decoration-none">{{ category_title }}</a>
+            <a href="{{ item.url }}" class="text-decoration-none">
+                {% if item.icon %}<i class="{{ item.icon }} me-1"></i>{% endif %}{{ item.title }}
+            </a>
         </li>
-      {% else %}
+        {% endif %} {% endfor %}
+    </ol>
+</nav>
+{% endmacro %} {# Breadcrumb для предметов #} {% macro subject_breadcrumb(subject_title, subject_url=None) %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('main.index') }}" class="text-decoration-none">
+                <i class="fas fa-home me-1"></i>Главная
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('main.index') }}" class="text-decoration-none">
+                <i class="fas fa-book me-1"></i>Предметы
+            </a>
+        </li>
+        {% if subject_url %}
+        <li class="breadcrumb-item">
+            <a href="{{ subject_url }}" class="text-decoration-none">{{ subject_title }}</a>
+        </li>
+        {% else %}
+        <li class="breadcrumb-item active" aria-current="page">{{ subject_title }}</li>
+        {% endif %}
+    </ol>
+</nav>
+{% endmacro %} {# Breadcrumb для материалов предмета #} {% macro material_breadcrumb(subject_title, subject_url,
+material_title) %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('main.index') }}" class="text-decoration-none">
+                <i class="fas fa-home me-1"></i>Главная
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('main.index') }}" class="text-decoration-none">
+                <i class="fas fa-book me-1"></i>Предметы
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ subject_url }}" class="text-decoration-none">{{ subject_title }}</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">{{ material_title }}</li>
+    </ol>
+</nav>
+{% endmacro %} {# Breadcrumb для админ панели #} {% macro admin_breadcrumb(section_title, section_url=None) %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('main.index') }}" class="text-decoration-none">
+                <i class="fas fa-home me-1"></i>Главная
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('admin.admin_users') }}" class="text-decoration-none">
+                <i class="fas fa-cog me-1"></i>Админ панель
+            </a>
+        </li>
+        {% if section_url %}
+        <li class="breadcrumb-item">
+            <a href="{{ section_url }}" class="text-decoration-none">{{ section_title }}</a>
+        </li>
+        {% else %}
+        <li class="breadcrumb-item active" aria-current="page">{{ section_title }}</li>
+        {% endif %}
+    </ol>
+</nav>
+{% endmacro %} {# Breadcrumb для профиля #} {% macro profile_breadcrumb(section_title=None) %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('main.index') }}" class="text-decoration-none">
+                <i class="fas fa-home me-1"></i>Главная
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('main.profile') }}" class="text-decoration-none">
+                <i class="fas fa-user me-1"></i>Профиль
+            </a>
+        </li>
+        {% if section_title %}
+        <li class="breadcrumb-item active" aria-current="page">{{ section_title }}</li>
+        {% endif %}
+    </ol>
+</nav>
+{% endmacro %} {# Breadcrumb для базы знаний #} {% macro wiki_breadcrumb(category_title=None, category_url=None,
+article_title=None) %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('main.index') }}" class="text-decoration-none">
+                <i class="fas fa-home me-1"></i>Главная
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('main.wiki') }}" class="text-decoration-none">
+                <i class="fas fa-book-open me-1"></i>База знаний
+            </a>
+        </li>
+        {% if category_title %} {% if category_url %}
+        <li class="breadcrumb-item">
+            <a href="{{ category_url }}" class="text-decoration-none">{{ category_title }}</a>
+        </li>
+        {% else %}
         <li class="breadcrumb-item active" aria-current="page">{{ category_title }}</li>
-      {% endif %}
-    {% endif %}
-    {% if article_title %}
-      <li class="breadcrumb-item active" aria-current="page">{{ article_title }}</li>
-    {% endif %}
-  </ol>
+        {% endif %} {% endif %} {% if article_title %}
+        <li class="breadcrumb-item active" aria-current="page">{{ article_title }}</li>
+        {% endif %}
+    </ol>
 </nav>
 {% endmacro %}

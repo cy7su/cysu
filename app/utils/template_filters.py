@@ -83,32 +83,17 @@ def _shorten_url(url: str) -> str:
     if url.startswith("github.com/"):
         parts = url.split("/")
         if len(parts) >= 3:
-            username = (
-                parts[1]
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace('"', "&quot;")
-            )
+            username = parts[1].replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
             return f"github.com/{username}"
     if url.startswith("gitlab.com/"):
         parts = url.split("/")
         if len(parts) >= 3:
-            username = (
-                parts[1]
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace('"', "&quot;")
-            )
+            username = parts[1].replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
             return f"gitlab.com/{username}"
     if url.startswith("bitbucket.org/"):
         parts = url.split("/")
         if len(parts) >= 3:
-            username = (
-                parts[1]
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace('"', "&quot;")
-            )
+            username = parts[1].replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
             return f"bitbucket.org/{username}"
     if "/" in url:
         return url.split("/")[0]
@@ -180,10 +165,6 @@ def mask_email(email: str) -> str:
         if len(local_part) <= 2:
             return f"{local_part[0]}***@{domain}"
         else:
-            return (
-                f"{local_part[0]}{'*' * (len(local_part) - 2)}{local_part[-1]}@{domain}"
-            )
+            return f"{local_part[0]}{'*' * (len(local_part) - 2)}{local_part[-1]}@{domain}"
     else:
-        return (
-            f"{local_part[:2]}{'*' * (len(local_part) - 4)}{local_part[-2:]}@{domain}"
-        )
+        return f"{local_part[:2]}{'*' * (len(local_part) - 4)}{local_part[-2:]}@{domain}"

@@ -1,9 +1,9 @@
 import logging
-import sys
 import os
-from typing import Optional
-from logging.handlers import RotatingFileHandler
+import sys
 from dataclasses import dataclass
+from logging.handlers import RotatingFileHandler
+from typing import Optional
 
 
 @dataclass
@@ -134,9 +134,7 @@ class CYSULogger:
                 # Модуль с отступом (ограничение до 15 символов)
                 module_name = record.name
                 module_parts = module_name.split(".")
-                display_name = (
-                    module_parts[-1] if len(module_parts) > 1 else module_name
-                )
+                display_name = module_parts[-1] if len(module_parts) > 1 else module_name
                 if len(display_name) > 15:
                     display_name = display_name[:12] + "..."
                 module_str = f"{colors.dim}{display_name:<15}{colors.reset}"

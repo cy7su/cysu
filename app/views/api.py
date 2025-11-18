@@ -1,8 +1,10 @@
 from typing import Any, Dict
+
 from flask import Blueprint, current_app, jsonify, request
 from flask_login import current_user, login_required
 from flask_wtf.csrf import validate_csrf
 from wtforms import ValidationError
+
 from ..models import Notification, Subject
 from ..services import UserManagementService
 

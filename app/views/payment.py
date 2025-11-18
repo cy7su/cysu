@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
 from typing import Tuple, Union
+
 from flask import (
     Blueprint,
     Response,
@@ -12,11 +12,11 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
-from .. import db
+
 from ..forms import PaymentStatusForm
-from ..models import Payment, User
-from ..utils.payment_service import YooKassaService
+from ..models import Payment
 from ..services import PaymentService
+from ..utils.payment_service import YooKassaService
 
 payment_bp = Blueprint("payment", __name__)
 
@@ -24,9 +24,7 @@ payment_bp = Blueprint("payment", __name__)
 @payment_bp.route("/subscription", methods=["GET", "POST"])
 @login_required
 def subscription() -> Union[str, Response]:
-    current_app.logger.info(
-        f"Запрос страницы подписки для пользователя: {current_user.username}"
-    )
+    current_app.logger.info(f"Запрос страницы подписки для пользователя: {current_user.username}")
     current_app.logger.info(f"Все параметры запроса: {dict(request.args)}")
     current_app.logger.info(f"URL запроса: {request.url}")
     current_app.logger.info(f"Метод запроса: {request.method}")
@@ -40,9 +38,7 @@ def subscription() -> Union[str, Response]:
     amount = request.args.get("amount")
     if period and amount:
         try:
-            current_app.logger.info(
-                f"Создание платежа - period: {period}, amount: {amount}"
-            )
+            current_app.logger.info(f"Создание платежа - period: {period}, amount: {amount}")
             payment_service = YooKassaService()
             current_app.logger.info("Сервис платежей создан")
             return_url = url_for("payment.payment_success", _external=True)
@@ -81,9 +77,7 @@ def subscription() -> Union[str, Response]:
                 "Произошла ошибка при создании платежа. Попробуйте позже.",
                 "error",
             )
-            return render_template(
-                "payment/subscription.html", payment_url=None, prices=prices
-            )
+            return render_template("payment/subscription.html", payment_url=None, prices=prices)
     current_app.logger.info("Показываем страницу выбора подписки")
     return render_template(
         "payment/subscription.html",
@@ -107,18 +101,12 @@ def payment_webhook() -> Tuple[str, int]:
         if not payment_id:
             current_app.logger.error("Payment ID не найден в webhook")
             return "OK", 200
-        current_app.logger.info(
-            f"Обработка webhook: event={event}, payment_id={payment_id}"
-        )
+        current_app.logger.info(f"Обработка webhook: event={event}, payment_id={payment_id}")
         success = PaymentService.process_payment_webhook(event, payment_data)
         if success:
-            current_app.logger.info(
-                f"Webhook обработан успешно: payment_id={payment_id}"
-            )
+            current_app.logger.info(f"Webhook обработан успешно: payment_id={payment_id}")
         else:
-            current_app.logger.error(
-                f"Ошибка обработки webhook: payment_id={payment_id}"
-            )
+            current_app.logger.error(f"Ошибка обработки webhook: payment_id={payment_id}")
         return "OK", 200
     except Exception as e:
         current_app.logger.error(f"Ошибка обработки webhook: {str(e)}")
@@ -136,24 +124,16 @@ def payment_success() -> Union[str, Response]:
     current_app.logger.info(f"Обработка платежа: {payment_id}, источник: {source}")
     current_app.logger.info(f"Пользователь: {current_user.username}")
     if source == "yookassa":
-        current_app.logger.info(
-            "Обнаружен возврат от ЮKassa - проверяем статус платежа"
-        )
+        current_app.logger.info("Обнаружен возврат от ЮKassa - проверяем статус платежа")
         payment_service = YooKassaService()
         if payment_id:
             payment_status = payment_service.get_payment_status(payment_id)
             current_app.logger.info(f"Статус платежа от ЮKassa: {payment_status}")
             if payment_status.get("status") == "canceled":
-                current_app.logger.info(
-                    "Платеж отменен - перенаправляем на страницу отмены"
-                )
-                return redirect(
-                    url_for("payment.payment_cancel", payment_id=payment_id)
-                )
+                current_app.logger.info("Платеж отменен - перенаправляем на страницу отмены")
+                return redirect(url_for("payment.payment_cancel", payment_id=payment_id))
             elif payment_status.get("status") == "pending":
-                current_app.logger.info(
-                    "Платеж в обработке - показываем страницу ожидания"
-                )
+                current_app.logger.info("Платеж в обработке - показываем страницу ожидания")
                 flash(
                     "Платеж в обработке. Подписка будет активирована после подтверждения оплаты.",
                     "info",
@@ -200,9 +180,7 @@ def payment_success() -> Union[str, Response]:
             current_app.logger.error(
                 f"Платеж {payment_id} не найден для пользователя {current_user.id}"
             )
-            payment_record = Payment.query.filter_by(
-                yookassa_payment_id=payment_id
-            ).first()
+            payment_record = Payment.query.filter_by(yookassa_payment_id=payment_id).first()
             if payment_record:
                 current_app.logger.warning(
                     f"Платеж найден, но принадлежит другому пользователю: {payment_record.user_id}"
@@ -225,12 +203,8 @@ def payment_success() -> Union[str, Response]:
     current_app.logger.info(f"Статус платежа от ЮKassa: {payment_status}")
     if "error" in payment_status:
         current_app.logger.error(f"Ошибка получения статуса: {payment_status['error']}")
-        if payment_service.simulation_mode or "HTTP 401" in str(
-            payment_status["error"]
-        ):
-            current_app.logger.info(
-                "Обработка платежа в режиме симуляции или при ошибке API"
-            )
+        if payment_service.simulation_mode or "HTTP 401" in str(payment_status["error"]):
+            current_app.logger.info("Обработка платежа в режиме симуляции или при ошибке API")
             if payment_service.process_successful_payment(payment_id):
                 current_app.logger.info("Подписка успешно активирована")
                 flash(
@@ -278,9 +252,7 @@ def payment_success() -> Union[str, Response]:
             "info",
         )
     else:
-        current_app.logger.warning(
-            f"Неизвестный статус: {payment_status.get('status')}"
-        )
+        current_app.logger.warning(f"Неизвестный статус: {payment_status.get('status')}")
         flash(
             f"Статус платежа: {payment_status.get('status', 'неизвестен')}. Обратитесь в поддержку.",
             "error",

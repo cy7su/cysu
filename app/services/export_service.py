@@ -2,11 +2,12 @@ import os
 import tempfile
 import zipfile
 from datetime import datetime
-from typing import List, Dict
+from typing import Dict
+
 from flask import current_app
 from werkzeug.utils import secure_filename
-from ..models import Submission, Material, Subject
-from .material_service import MaterialService
+
+from ..models import Material, Subject, Submission
 
 
 class ExportService:
@@ -59,16 +60,12 @@ class ExportService:
             for subject_data in subjects_dict.values():
                 for file_info in subject_data["files"]:
                     try:
-                        zip_file.write(
-                            file_info["file_path"], file_info["archive_path"]
-                        )
+                        zip_file.write(file_info["file_path"], file_info["archive_path"])
                     except Exception as e:
                         current_app.logger.error(
                             f"Error adding file {file_info['file_path']} to archive: {e}"
                         )
-            readme_content = ExportService._generate_readme_content(
-                username, subjects_dict
-            )
+            readme_content = ExportService._generate_readme_content(username, subjects_dict)
             zip_file.writestr("README.txt", readme_content.encode("utf-8"))
         return temp_zip.name
 

@@ -1,7 +1,5 @@
-import secrets
-import string
-from datetime import datetime, timedelta
 from typing import Union
+
 from flask import (
     Blueprint,
     Response,
@@ -13,10 +11,9 @@ from flask import (
     request,
     url_for,
 )
-from ..utils.notifications import redirect_with_notification
 from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
-from werkzeug.security import generate_password_hash
+
 from .. import db
 from ..forms import (
     AdminUserForm,
@@ -31,7 +28,8 @@ from ..models import (
     SubjectGroup,
     User,
 )
-from ..services import UserService, UserManagementService
+from ..services import UserManagementService, UserService
+from ..utils.notifications import redirect_with_notification
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -244,9 +242,7 @@ def admin_users():
                 group_id = int(request.form.get("group_id"))
                 group = Group.query.get(group_id)
                 if group:
-                    current_app.logger.info(
-                        f"Обновляем группу: {group.name} (ID: {group_id})"
-                    )
+                    current_app.logger.info(f"Обновляем группу: {group.name} (ID: {group_id})")
                     current_app.logger.info(
                         f"Новые данные: name='{request.form.get('name')}', description='{request.form.get('description')}', is_active='{request.form.get('is_active')}'"
                     )
@@ -255,9 +251,7 @@ def admin_users():
                     is_active_value = request.form.get("is_active")
                     if is_active_value is not None:
                         group.is_active = bool(int(is_active_value))
-                        current_app.logger.info(
-                            f"Статус активности обновлен: {group.is_active}"
-                        )
+                        current_app.logger.info(f"Статус активности обновлен: {group.is_active}")
                     db.session.commit()
                     if request.headers.get("Accept") == "application/json":
                         return jsonify(
@@ -297,9 +291,7 @@ def admin_users():
                 else:
                     flash("Ошибка при редактировании группы", "error")
         elif request.form.get("action") == "delete":
-            current_app.logger.info(
-                f"Получен запрос на удаление группы: {request.form}"
-            )
+            current_app.logger.info(f"Получен запрос на удаление группы: {request.form}")
             try:
                 group_id = int(request.form.get("group_id"))
                 current_app.logger.info(f"Попытка удаления группы с ID: {group_id}")
@@ -326,14 +318,10 @@ def admin_users():
                                 "error",
                             )
                     else:
-                        current_app.logger.info(
-                            f"Удаляем группу '{group.name}' (ID: {group_id})"
-                        )
+                        current_app.logger.info(f"Удаляем группу '{group.name}' (ID: {group_id})")
                         db.session.delete(group)
                         db.session.commit()
-                        current_app.logger.info(
-                            f"Группа '{group.name}' успешно удалена"
-                        )
+                        current_app.logger.info(f"Группа '{group.name}' успешно удалена")
                         if request.headers.get("Accept") == "application/json":
                             return jsonify(
                                 {
@@ -429,11 +417,7 @@ def admin_subject_groups() -> Union[str, Response]:
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
     try:
-        subjects = (
-            Subject.query.options(joinedload(Subject.groups))
-            .order_by(Subject.title)
-            .all()
-        )
+        subjects = Subject.query.options(joinedload(Subject.groups)).order_by(Subject.title).all()
         groups = Group.query.filter_by(is_active=True).order_by(Group.name).all()
     except Exception as e:
         current_app.logger.error(f"Error loading subjects or groups: {e}")
@@ -451,18 +435,14 @@ def admin_subject_groups() -> Union[str, Response]:
                     group_ids = form.group_ids.data
                     SubjectGroup.query.filter_by(subject_id=subject_id).delete()
                     for group_id in group_ids:
-                        subject_group = SubjectGroup(
-                            subject_id=subject_id, group_id=group_id
-                        )
+                        subject_group = SubjectGroup(subject_id=subject_id, group_id=group_id)
                         db.session.add(subject_group)
                     db.session.commit()
                     flash("Предмет успешно назначен группам")
                     form.subject_id.data = 0
                     form.group_ids.data = []
                 except Exception as e:
-                    current_app.logger.error(
-                        f"Ошибка назначения предмета группам: {str(e)}"
-                    )
+                    current_app.logger.error(f"Ошибка назначения предмета группам: {str(e)}")
                     db.session.rollback()
                     flash("Ошибка при назначении предмета группам", "error")
         elif request.form.get("edit_subject_id"):
@@ -472,9 +452,7 @@ def admin_subject_groups() -> Union[str, Response]:
                 SubjectGroup.query.filter_by(subject_id=subject_id).delete()
                 for group_id in group_ids:
                     if group_id:
-                        subject_group = SubjectGroup(
-                            subject_id=subject_id, group_id=int(group_id)
-                        )
+                        subject_group = SubjectGroup(subject_id=subject_id, group_id=int(group_id))
                         db.session.add(subject_group)
                 db.session.commit()
                 flash("Группы предмета успешно обновлены")
@@ -502,9 +480,7 @@ def admin_subject_groups() -> Union[str, Response]:
                     db.session.commit()
                     flash(f"Успешно назначено {len(subject_ids)} предметов группам")
             except Exception as e:
-                current_app.logger.error(
-                    f"Ошибка массового назначения предметов группам: {str(e)}"
-                )
+                current_app.logger.error(f"Ошибка массового назначения предметов группам: {str(e)}")
                 db.session.rollback()
                 flash("Ошибка при массовом назначении предметов группам", "error")
         elif request.form.get("action") == "mass_remove":
@@ -519,9 +495,7 @@ def admin_subject_groups() -> Union[str, Response]:
                     db.session.commit()
                     flash(f"Успешно убрано {len(subject_ids)} предметов из всех групп")
             except Exception as e:
-                current_app.logger.error(
-                    f"Ошибка массового удаления предметов из групп: {str(e)}"
-                )
+                current_app.logger.error(f"Ошибка массового удаления предметов из групп: {str(e)}")
                 db.session.rollback()
                 flash("Ошибка при массовом удалении предметов из групп", "error")
         elif request.form.get("action") == "mass_delete_subjects":
@@ -540,9 +514,7 @@ def admin_subject_groups() -> Union[str, Response]:
                     db.session.commit()
                     flash(f"Успешно удалено {deleted_count} предметов")
             except Exception as e:
-                current_app.logger.error(
-                    f"Ошибка массового удаления предметов: {str(e)}"
-                )
+                current_app.logger.error(f"Ошибка массового удаления предметов: {str(e)}")
                 db.session.rollback()
                 flash("Ошибка при массовом удалении предметов", "error")
         elif request.form.get("remove_all_groups"):
@@ -556,9 +528,7 @@ def admin_subject_groups() -> Union[str, Response]:
                 else:
                     flash("Предмет не найден", "error")
             except Exception as e:
-                current_app.logger.error(
-                    f"Ошибка удаления связей предмета с группами: {str(e)}"
-                )
+                current_app.logger.error(f"Ошибка удаления связей предмета с группами: {str(e)}")
                 db.session.rollback()
                 flash("Ошибка при удалении связей предмета с группами", "error")
     return render_template(
@@ -582,9 +552,7 @@ def admin_settings() -> Union[str, Response]:
         form.trial_subscription_enabled.data = SiteSettings.get_setting(
             "trial_subscription_enabled", True
         )
-        form.trial_subscription_days.data = SiteSettings.get_setting(
-            "trial_subscription_days", 14
-        )
+        form.trial_subscription_days.data = SiteSettings.get_setting("trial_subscription_days", 14)
         form.pattern_generation_enabled.data = SiteSettings.get_setting(
             "pattern_generation_enabled", True
         )

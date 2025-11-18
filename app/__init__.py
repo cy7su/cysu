@@ -1,8 +1,9 @@
 import logging
 import os
 from datetime import datetime
+
 from dotenv import load_dotenv
-from flask import Flask, redirect, render_template, request, url_for, session
+from flask import Flask, redirect, render_template, request, session, url_for
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -33,9 +34,7 @@ def create_app():
         raise ValueError("SECRET_KEY environment variable is required")
     app.config["SECRET_KEY"] = secret_key
     app.config["SERVER_NAME"] = os.getenv("SERVER_NAME", "cysu.ru")
-    db_path = os.path.abspath(
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "app.db")
-    )
+    db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "app.db"))
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     db_dir = os.path.dirname(db_path)
     if not os.path.exists(db_dir):
@@ -94,9 +93,7 @@ def create_app():
     app.config["MAIL_USE_SSL"] = os.getenv("MAIL_USE_SSL", "False").lower() == "true"
     app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
     app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
-    app.config["MAIL_DEFAULT_SENDER"] = os.getenv(
-        "MAIL_DEFAULT_SENDER", "your-email@gmail.com"
-    )
+    app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_DEFAULT_SENDER", "your-email@gmail.com")
     app.config["MAIL_TIMEOUT"] = 10
     app.config["MAIL_CONNECT_TIMEOUT"] = 5
     app.config["SKIP_EMAIL_VERIFICATION"] = (
@@ -104,9 +101,7 @@ def create_app():
     )
     app.config["YOOKASSA_SHOP_ID"] = os.getenv("YOOKASSA_SHOP_ID")
     app.config["YOOKASSA_SECRET_KEY"] = os.getenv("YOOKASSA_SECRET_KEY")
-    app.config["YOOKASSA_TEST_MODE"] = (
-        os.getenv("YOOKASSA_TEST_MODE", "True").lower() == "true"
-    )
+    app.config["YOOKASSA_TEST_MODE"] = os.getenv("YOOKASSA_TEST_MODE", "True").lower() == "true"
     app.config["SUBSCRIPTION_PRICES"] = {
         "1": float(os.getenv("SUBSCRIPTION_PRICE_1", 89.00)),
         "3": float(os.getenv("SUBSCRIPTION_PRICE_3", 199.00)),
@@ -124,11 +119,12 @@ def create_app():
         log_level=log_level,
         log_file=log_file,
         console_enabled=not app.testing,  # Отключаем console в тестах
-        file_enabled=True
+        file_enabled=True,
     )
 
     # Получаем настроенный логгер для приложения
     from .utils.logger import get_logger
+
     app_logger = get_logger("app")
 
     # Логируем важную информацию о конфигурации
@@ -172,9 +168,7 @@ def create_app():
 
     csrf.exempt(telegram_login)
     login_manager.login_view = "auth.login"
-    login_manager.login_message = (
-        "Пожалуйста, войдите в систему для доступа к этой странице."
-    )
+    login_manager.login_message = "Пожалуйста, войдите в систему для доступа к этой странице."
     from .views import (
         admin_bp,
         api_bp,
@@ -262,6 +256,7 @@ def create_app():
             return
         try:
             from flask_login import current_user
+
             from .models import SiteSettings
 
             maintenance_mode = SiteSettings.get_setting("maintenance_mode", False)
@@ -272,9 +267,7 @@ def create_app():
                     "yes",
                     "on",
                 ]
-            app.logger.info(
-                f"Maintenance mode: {maintenance_mode}, Endpoint: {request.endpoint}"
-            )
+            app.logger.info(f"Maintenance mode: {maintenance_mode}, Endpoint: {request.endpoint}")
             if maintenance_mode:
                 if request.endpoint == "main.grant_temp_access":
                     return

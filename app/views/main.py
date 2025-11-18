@@ -1,6 +1,6 @@
 import os
-import tempfile
 from typing import Union
+
 from flask import (
     Blueprint,
     Response,
@@ -9,21 +9,22 @@ from flask import (
     redirect,
     render_template,
     request,
-    url_for,
     send_file,
     session,
+    url_for,
 )
-from markupsafe import escape
 from flask_login import current_user, login_required
-from werkzeug.utils import secure_filename
+from markupsafe import escape
 from sqlalchemy.orm import joinedload
+from werkzeug.utils import secure_filename
+
 from ..forms import MaterialForm
-from ..services import UserManagementService
-from ..models import SiteSettings, SubjectGroup, Subject, Material
-from ..services import MaterialService, SubjectService, ExportService
+from ..models import Material, SiteSettings, Subject, SubjectGroup
+from ..services import ExportService, MaterialService, SubjectService, UserManagementService
+from ..utils.file_storage import FileStorageManager
 from ..utils.notifications import redirect_with_notification
 from ..utils.payment_service import YooKassaService
-from ..utils.file_storage import FileStorageManager
+from ..utils.transliteration import get_safe_filename
 from .context_processors import (
     inject_admin_users,
     inject_json_parser,
@@ -31,7 +32,6 @@ from .context_processors import (
     inject_subscription_status,
     inject_timestamp,
 )
-from ..utils.transliteration import get_safe_filename
 
 main_bp = Blueprint("main", __name__)
 main_bp.app_context_processor(inject_json_parser)
@@ -51,11 +51,7 @@ def index() -> Union[str, Response]:
         except Exception as e:
             current_app.logger.error(f"Error checking subscription in index: {e}")
             is_subscribed = False
-        if (
-            current_user.is_admin
-            and request.method == "POST"
-            and request.form.get("title")
-        ):
+        if current_user.is_admin and request.method == "POST" and request.form.get("title"):
             try:
                 pattern_type = request.form.get("pattern_type", "dots")
                 pattern_svg = request.form.get("pattern_svg", "")
@@ -67,13 +63,9 @@ def index() -> Union[str, Response]:
                     pattern_type=pattern_type,
                     pattern_svg=pattern_svg,
                     created_by=current_user.id,
-                    upload_path=current_app.config.get(
-                        "UPLOAD_FOLDER", "app/static/uploads"
-                    ),
+                    upload_path=current_app.config.get("UPLOAD_FOLDER", "app/static/uploads"),
                 )
-                return redirect_with_notification(
-                    "main.index", "Предмет добавлен", "success"
-                )
+                return redirect_with_notification("main.index", "Предмет добавлен", "success")
             except Exception as e:
                 current_app.logger.error(f"Error creating subject: {e}")
                 return redirect_with_notification(
@@ -81,24 +73,18 @@ def index() -> Union[str, Response]:
                 )
     try:
         if current_user.is_authenticated:
-            accessible_subjects = UserManagementService.get_accessible_subjects(
-                current_user
-            )
+            accessible_subjects = UserManagementService.get_accessible_subjects(current_user)
             current_app.logger.info(
                 f"User {current_user.username} has access to {len(accessible_subjects)} subjects"
             )
             if accessible_subjects:
                 subject_ids = [s.id for s in accessible_subjects]
                 subjects = (
-                    Subject.query.options(
-                        joinedload(Subject.materials), joinedload(Subject.groups)
-                    )
+                    Subject.query.options(joinedload(Subject.materials), joinedload(Subject.groups))
                     .filter(Subject.id.in_(subject_ids))
                     .all()
                 )
-                current_app.logger.info(
-                    f"Loaded {len(subjects)} subjects for authenticated user"
-                )
+                current_app.logger.info(f"Loaded {len(subjects)} subjects for authenticated user")
             else:
                 subjects = []
                 current_app.logger.warning(
@@ -108,15 +94,11 @@ def index() -> Union[str, Response]:
             subjects = Subject.query.options(
                 joinedload(Subject.materials), joinedload(Subject.groups)
             ).all()
-            current_app.logger.info(
-                f"Loaded {len(subjects)} subjects for unauthenticated user"
-            )
+            current_app.logger.info(f"Loaded {len(subjects)} subjects for unauthenticated user")
     except Exception as e:
         current_app.logger.error(f"Error querying subjects: {e}")
         subjects = []
-    pattern_generation_enabled = SiteSettings.get_setting(
-        "pattern_generation_enabled", True
-    )
+    pattern_generation_enabled = SiteSettings.get_setting("pattern_generation_enabled", True)
     return render_template(
         "index.html",
         subjects=subjects,
@@ -162,13 +144,9 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         subject = Subject.query.get_or_404(subject_id)
     except Exception as e:
         current_app.logger.error(f"Error loading subject {subject_id}: {e}")
-        return redirect_with_notification(
-            "main.index", "Ошибка загрузки предмета", "error"
-        )
+        return redirect_with_notification("main.index", "Ошибка загрузки предмета", "error")
     if current_user.is_authenticated:
-        accessible_subjects = UserManagementService.get_accessible_subjects(
-            current_user
-        )
+        accessible_subjects = UserManagementService.get_accessible_subjects(current_user)
         if subject not in accessible_subjects:
             return redirect_with_notification(
                 "main.index", "У вас нет доступа к этому предмету", "error"
@@ -198,12 +176,8 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
                         "error",
                     )
         except Exception as e:
-            current_app.logger.error(
-                f"Error checking subscription in subject_detail: {e}"
-            )
-            return redirect_with_notification(
-                "main.index", "Ошибка проверки подписки", "error"
-            )
+            current_app.logger.error(f"Error checking subscription in subject_detail: {e}")
+            return redirect_with_notification("main.index", "Ошибка проверки подписки", "error")
     lectures, assignments = MaterialService.get_subject_materials(subject.id)
     form = None
     user_submissions = {}
@@ -218,9 +192,8 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
             current_app.logger.error(f"Error loading user submissions: {e}")
             user_submissions = {}
     form = None
-    if (
-        current_user.is_authenticated
-        and UserManagementService.can_add_materials_to_subject(current_user, subject)
+    if current_user.is_authenticated and UserManagementService.can_add_materials_to_subject(
+        current_user, subject
     ):
         form = MaterialForm()
         form.subject_id.choices = [(subject.id, subject.title)]
@@ -304,9 +277,7 @@ def delete_subject(subject_id: int) -> Response:
         if os.path.exists(subject_path):
             shutil.rmtree(subject_path)
     except Exception as folder_error:
-        current_app.logger.error(
-            f"Ошибка удаления папки предмета {subject.id}: {folder_error}"
-        )
+        current_app.logger.error(f"Ошибка удаления папки предмета {subject.id}: {folder_error}")
     for material in subject.materials:
         db.session.delete(material)
     db.session.delete(subject)
@@ -387,9 +358,7 @@ def delete_solution(submission_id: int) -> Response:
         try:
             FileStorageManager.delete_file(submission.file)
         except Exception as e:
-            current_app.logger.error(
-                f"Ошибка при удалении файла {submission.file}: {e}"
-            )
+            current_app.logger.error(f"Ошибка при удалении файла {submission.file}: {e}")
     db.session.delete(submission)
     db.session.commit()
     flash("Решение удалено", "success")
@@ -404,9 +373,7 @@ def add_solution_file(material_id: int) -> Response:
         return redirect(url_for("main.index"))
     material = Material.query.get_or_404(material_id)
     if current_user.is_moderator:
-        accessible_subjects = UserManagementService.get_accessible_subjects(
-            current_user
-        )
+        accessible_subjects = UserManagementService.get_accessible_subjects(current_user)
         if material.subject not in accessible_subjects:
             flash("У вас нет доступа к этому предмету.", "error")
             return redirect(url_for("main.index"))
@@ -430,9 +397,7 @@ def add_solution_file(material_id: int) -> Response:
                     f"Файл слишком большой. Максимальный размер: {current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.1f} MB",
                     "error",
                 )
-                return redirect(
-                    url_for("main.subject_detail", subject_id=material.subject_id)
-                )
+                return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
         full_path, relative_path = FileStorageManager.get_material_upload_path(
             subject.id, original_filename
         )
@@ -442,9 +407,7 @@ def add_solution_file(material_id: int) -> Response:
                 db.session.commit()
                 flash("Готовая практика добавлена")
             else:
-                current_app.logger.error(
-                    f"Ошибка сохранения готового решения: {original_filename}"
-                )
+                current_app.logger.error(f"Ошибка сохранения готового решения: {original_filename}")
                 flash("Ошибка при сохранении файла", "error")
         except Exception as e:
             current_app.logger.error(
@@ -485,9 +448,7 @@ def submit_solution(material_id: int) -> Response:
                     f"Файл слишком большой. Максимальный размер: {current_app.config.get('MAX_CONTENT_LENGTH', 0) / (1024*1024):.1f} MB",
                     "error",
                 )
-                return redirect(
-                    url_for("main.subject_detail", subject_id=material.subject_id)
-                )
+                return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
         full_path, relative_path = FileStorageManager.get_subject_upload_path(
             subject.id, current_user.id, original_filename
         )
@@ -499,9 +460,7 @@ def submit_solution(material_id: int) -> Response:
                     user_id=current_user.id, material_id=material.id
                 ).first()
                 if not submission:
-                    submission = Submission(
-                        user_id=current_user.id, material_id=material.id
-                    )
+                    submission = Submission(user_id=current_user.id, material_id=material.id)
                     db.session.add(submission)
                 submission.file = relative_path
                 db.session.commit()
@@ -553,9 +512,7 @@ def replace_material_file(material_id: int) -> Response:
         return redirect(url_for("main.index"))
     material = Material.query.get_or_404(material_id)
     if current_user.is_moderator:
-        accessible_subjects = UserManagementService.get_accessible_subjects(
-            current_user
-        )
+        accessible_subjects = UserManagementService.get_accessible_subjects(current_user)
         if material.subject not in accessible_subjects:
             flash("У вас нет доступа к этому предмету.", "error")
             return redirect(url_for("main.index"))
@@ -581,9 +538,7 @@ def replace_material_solution_file(material_id: int) -> Response:
         flash("Файл решения можно заменить только для практик", "error")
         return redirect(url_for("main.material_detail", material_id=material.id))
     if current_user.is_moderator:
-        accessible_subjects = UserManagementService.get_accessible_subjects(
-            current_user
-        )
+        accessible_subjects = UserManagementService.get_accessible_subjects(current_user)
         if material.subject not in accessible_subjects:
             flash("У вас нет доступа к этому предмету.", "error")
             return redirect(url_for("main.index"))
@@ -607,9 +562,7 @@ def delete_material(material_id: int) -> Response:
     material = Material.query.get_or_404(material_id)
     subject_id = material.subject_id
     if current_user.is_moderator:
-        accessible_subjects = UserManagementService.get_accessible_subjects(
-            current_user
-        )
+        accessible_subjects = UserManagementService.get_accessible_subjects(current_user)
         if material.subject not in accessible_subjects:
             flash("У вас нет доступа к этому предмету.", "error")
             return redirect(url_for("main.index"))
@@ -880,8 +833,9 @@ def grant_temp_access() -> Response:
 @main_bp.route("/static/<path:filename>")
 def static_files(filename: str) -> Response:
     """Обработчик статических файлов с кэшированием"""
-    from flask import send_from_directory, make_response
     import os
+
+    from flask import make_response, send_from_directory
 
     static_dir = os.path.join(current_app.root_path, "static")
     response = make_response(send_from_directory(static_dir, filename))
@@ -936,9 +890,7 @@ def download_redirect() -> Response:
         html_content,
         flags=re.DOTALL,
     )
-    html_content = re.sub(
-        r"\.btn-download\s*\{[^}]*\}", "", html_content, flags=re.DOTALL
-    )
+    html_content = re.sub(r"\.btn-download\s*\{[^}]*\}", "", html_content, flags=re.DOTALL)
     response = make_response(html_content)
     response.headers["Content-Type"] = "text/html; charset=utf-8"
     response.headers["Content-Disposition"] = 'attachment; filename="cysu.html"'
@@ -949,6 +901,7 @@ def download_redirect() -> Response:
 def serve_file(subject_id: int, filename: str) -> Response:
     import os
     import time
+
     from flask import Response, abort, request
 
     start_time = time.time()
@@ -963,18 +916,14 @@ def serve_file(subject_id: int, filename: str) -> Response:
     except Exception:
         pass
     try:
-        path2 = os.path.normpath(
-            os.path.join(upload_folder, str(subject_id), safe_filename)
-        )
+        path2 = os.path.normpath(os.path.join(upload_folder, str(subject_id), safe_filename))
         if path2.startswith(os.path.normpath(upload_folder)):
             possible_paths.append(path2)
     except Exception:
         pass
     try:
         path3 = os.path.normpath(
-            os.path.join(
-                upload_folder, str(subject_id), os.path.basename(safe_filename)
-            )
+            os.path.join(upload_folder, str(subject_id), os.path.basename(safe_filename))
         )
         if path3.startswith(os.path.normpath(upload_folder)):
             possible_paths.append(path3)
@@ -985,9 +934,7 @@ def serve_file(subject_id: int, filename: str) -> Response:
         if os.path.isdir(users_dir):
             for user_folder in os.listdir(users_dir):
                 if os.path.isdir(os.path.join(users_dir, user_folder)):
-                    path4 = os.path.normpath(
-                        os.path.join(users_dir, user_folder, safe_filename)
-                    )
+                    path4 = os.path.normpath(os.path.join(users_dir, user_folder, safe_filename))
                     if path4.startswith(os.path.normpath(upload_folder)):
                         possible_paths.append(path4)
     except (OSError, Exception):
@@ -998,9 +945,7 @@ def serve_file(subject_id: int, filename: str) -> Response:
             for user_folder in os.listdir(users_dir):
                 if os.path.isdir(os.path.join(users_dir, user_folder)):
                     path5 = os.path.normpath(
-                        os.path.join(
-                            users_dir, user_folder, os.path.basename(safe_filename)
-                        )
+                        os.path.join(users_dir, user_folder, os.path.basename(safe_filename))
                     )
                     if path5.startswith(os.path.normpath(upload_folder)):
                         possible_paths.append(path5)
@@ -1012,9 +957,7 @@ def serve_file(subject_id: int, filename: str) -> Response:
             file_path = path
             break
     if not file_path:
-        current_app.logger.error(
-            f"Файл не найден: {filename} для subject_id {subject_id}"
-        )
+        current_app.logger.error(f"Файл не найден: {filename} для subject_id {subject_id}")
         current_app.logger.error(f"Проверенные пути: {possible_paths}")
         abort(404)
     if filename.lower().endswith(".pdf"):
@@ -1024,9 +967,7 @@ def serve_file(subject_id: int, filename: str) -> Response:
     elif filename.lower().endswith(".png"):
         mimetype = "image/png"
     elif filename.lower().endswith(".docx"):
-        mimetype = (
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
+        mimetype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     elif filename.lower().endswith(".doc"):
         mimetype = "application/msword"
     elif filename.lower().endswith(".txt"):
@@ -1089,10 +1030,9 @@ def serve_file(subject_id: int, filename: str) -> Response:
         abort(500)
 
 
-def _handle_range_request(
-    file_path: str, file_size: int, mimetype: str, filename: str
-) -> Response:
+def _handle_range_request(file_path: str, file_size: int, mimetype: str, filename: str) -> Response:
     import re
+
     from flask import Response, request
 
     range_match = re.match(r"bytes=(\d+)-(\d*)", request.headers.get("Range", ""))
@@ -1133,9 +1073,7 @@ def _handle_range_request(
             "X-Frame-Options": "SAMEORIGIN",
         },
     )
-    response.headers["Content-Disposition"] = (
-        f'attachment; filename="{os.path.basename(filename)}"'
-    )
+    response.headers["Content-Disposition"] = f'attachment; filename="{os.path.basename(filename)}"'
     return response
 
 
@@ -1146,16 +1084,14 @@ def _handle_range_request(
 def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
     """Специальный маршрут для файлов решений пользователей"""
     import os
-    import time
-    from flask import Response, abort, request
+
+    from flask import Response, abort
     from werkzeug.utils import secure_filename
 
     upload_folder = current_app.config["UPLOAD_FOLDER"]
     safe_filename = secure_filename(filename)
     file_path = os.path.normpath(
-        os.path.join(
-            upload_folder, str(subject_id), "users", str(user_id), safe_filename
-        )
+        os.path.join(upload_folder, str(subject_id), "users", str(user_id), safe_filename)
     )
     if not file_path.startswith(os.path.normpath(upload_folder)):
         # Path traversal attempt
@@ -1171,9 +1107,7 @@ def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
     elif filename.lower().endswith(".png"):
         mimetype = "image/png"
     elif filename.lower().endswith(".docx"):
-        mimetype = (
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
+        mimetype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     elif filename.lower().endswith(".doc"):
         mimetype = "application/msword"
     elif filename.lower().endswith(".txt"):
@@ -1220,9 +1154,7 @@ def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
 def export_user_solutions() -> Response:
     from urllib.parse import quote
 
-    temp_file = ExportService.export_user_solutions(
-        current_user.id, current_user.username
-    )
+    temp_file = ExportService.export_user_solutions(current_user.id, current_user.username)
     if not temp_file:
         flash("У вас нет загруженных решений для экспорта", "info")
         return redirect(url_for("main.profile"))
@@ -1248,7 +1180,5 @@ def export_user_solutions() -> Response:
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
-    response.call_on_close(
-        lambda: os.unlink(temp_file) if os.path.exists(temp_file) else None
-    )
+    response.call_on_close(lambda: os.unlink(temp_file) if os.path.exists(temp_file) else None)
     return response

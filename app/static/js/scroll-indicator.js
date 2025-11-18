@@ -1,31 +1,31 @@
 // Индикатор прокрутки - заполняет полосу прокрутки фиолетовым цветом
 document.addEventListener('DOMContentLoaded', function () {
     // Создаем стили для скролл-бара с прогрессом
-    const style = document.createElement('style');
-    style.id = 'scroll-indicator-styles';
-    document.head.appendChild(style);
+    const style = document.createElement('style')
+    style.id = 'scroll-indicator-styles'
+    document.head.appendChild(style)
 
     // Функция обновления цвета скролл-бара
     function updateScrollIndicator() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const scrollPercent = Math.min(100, Math.max(0, (scrollTop / scrollHeight) * 100));
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
+        const scrollPercent = Math.min(100, Math.max(0, (scrollTop / scrollHeight) * 100))
 
         // Определяем целевой цвет на основе активной темы
-        let targetColor;
+        let targetColor
         if (document.body.classList.contains('peach-theme-active')) {
             // Персиковая тема
-            targetColor = { r: 255, g: 140, b: 105 }; // #FF8C69
+            targetColor = { r: 255, g: 140, b: 105 } // #FF8C69
         } else {
             // Фиолетовая тема (стандартная)
-            targetColor = { r: 181, g: 149, b: 255 }; // #B595FF
+            targetColor = { r: 181, g: 149, b: 255 } // #B595FF
         }
 
         // Вычисляем цвет на основе прогресса прокрутки
         // От темно-серого (0%) до целевого цвета (100%)
-        const r = Math.round(44 + (targetColor.r - 44) * (scrollPercent / 100));
-        const g = Math.round(44 + (targetColor.g - 44) * (scrollPercent / 100));
-        const b = Math.round(44 + (targetColor.b - 44) * (scrollPercent / 100));
+        const r = Math.round(44 + (targetColor.r - 44) * (scrollPercent / 100))
+        const g = Math.round(44 + (targetColor.g - 44) * (scrollPercent / 100))
+        const b = Math.round(44 + (targetColor.b - 44) * (scrollPercent / 100))
 
         // Обновляем CSS для скролл-бара
         style.textContent = `
@@ -78,13 +78,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 scrollbar-width: thin;
                 scrollbar-color: rgb(${r}, ${g}, ${b}) var(--dp-01);
             }
-        `;
+        `
     }
 
     // Обработчики событий
-    window.addEventListener('scroll', updateScrollIndicator, { passive: true });
-    window.addEventListener('resize', updateScrollIndicator, { passive: true });
+    window.addEventListener('scroll', updateScrollIndicator, { passive: true })
+    window.addEventListener('resize', updateScrollIndicator, { passive: true })
 
     // Инициализация
-    updateScrollIndicator();
-});
+    updateScrollIndicator()
+})

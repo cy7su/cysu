@@ -1,8 +1,8 @@
-import secrets
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
+
 from .. import db
-from ..models import Group, User, Subject, SubjectGroup
+from ..models import Group, Subject, SubjectGroup, User
 
 
 class UserManagementService:
@@ -46,9 +46,7 @@ class UserManagementService:
             from ..models import SubjectGroup
 
             return (
-                SubjectGroup.query.filter_by(
-                    subject_id=subject.id, group_id=user.group_id
-                ).first()
+                SubjectGroup.query.filter_by(subject_id=subject.id, group_id=user.group_id).first()
                 is not None
             )
         else:
@@ -62,7 +60,6 @@ class UserManagementService:
     @staticmethod
     def has_active_subscription(user: User) -> bool:
         """Проверяет, имеет ли пользователь активную подписку"""
-        from .payment_service import PaymentService
 
         if (
             user.is_manual_subscription

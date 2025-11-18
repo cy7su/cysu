@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+
 from telegram import (
     BotCommand,
     InlineKeyboardButton,
@@ -15,6 +16,7 @@ from telegram.ext import (
     filters,
 )
 from werkzeug.security import generate_password_hash
+
 from app import create_app, db
 from app.models import TelegramUser, User
 from app.utils.logger import get_logger
@@ -102,7 +104,7 @@ class TelegramBotManager:
                     "/help - Справка</blockquote>\n\n"
                     "<b>🎛️ Панель администратора</b>\n"
                     "У вас есть полный доступ к системе управления пользователями",
-                    parse_mode="HTML"
+                    parse_mode="HTML",
                 )
             else:
                 await update.message.reply_text(
@@ -111,16 +113,15 @@ class TelegramBotManager:
                     "<b>🌐 Авторизация</b>\n"
                     "Для авторизации на сайте используйте кнопку 'Войти через Telegram'".replace(
                         "</b>\n", "</b>\n\n"
-                    ) + "\n\n<b>Команды:</b> /help - справка",
-                    parse_mode="HTML"
+                    )
+                    + "\n\n<b>Команды:</b> /help - справка",
+                    parse_mode="HTML",
                 )
 
     async def users_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
         if user.id != ADMIN_TELEGRAM_ID:
-            await update.message.reply_text(
-                "У вас нет прав для выполнения этой команды"
-            )
+            await update.message.reply_text("У вас нет прав для выполнения этой команды")
             return
         with self.app.app_context():
             await self.show_users_page(update, context, page=0)
@@ -128,9 +129,7 @@ class TelegramBotManager:
     async def groups_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
         if user.id != ADMIN_TELEGRAM_ID:
-            await update.message.reply_text(
-                "У вас нет прав для выполнения этой команды"
-            )
+            await update.message.reply_text("У вас нет прав для выполнения этой команды")
             return
         with self.app.app_context():
             await self.show_groups_page(update, context, page=0)
@@ -172,9 +171,7 @@ class TelegramBotManager:
                         InlineKeyboardButton("←", callback_data=f"groups_page_{page-1}")
                     )
                 nav_buttons.append(
-                    InlineKeyboardButton(
-                        "Обновить", callback_data=f"groups_page_{page}"
-                    )
+                    InlineKeyboardButton("Обновить", callback_data=f"groups_page_{page}")
                 )
                 if page < total_pages - 1:
                     nav_buttons.append(
@@ -183,11 +180,7 @@ class TelegramBotManager:
                 if nav_buttons:
                     keyboard.append(nav_buttons)
                 keyboard.append(
-                    [
-                        InlineKeyboardButton(
-                            "Создать группу", callback_data="create_group"
-                        )
-                    ]
+                    [InlineKeyboardButton("Создать группу", callback_data="create_group")]
                 )
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 text = f"Группы (стр. {page + 1}/{total_pages})\nВсего: {total_groups}"
@@ -245,11 +238,7 @@ class TelegramBotManager:
                             callback_data=f"delete_group_{group_id}",
                         )
                     ],
-                    [
-                        InlineKeyboardButton(
-                            "← Назад к списку", callback_data="groups_page_0"
-                        )
-                    ],
+                    [InlineKeyboardButton("← Назад к списку", callback_data="groups_page_0")],
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
@@ -263,17 +252,13 @@ class TelegramBotManager:
                 logger.error(f"Ошибка показа деталей группы: {e}")
                 await update.callback_query.answer("Ошибка при загрузке данных")
 
-    async def start_create_group(
-        self, update: Update, context: ContextTypes.DEFAULT_TYPE
-    ):
+    async def start_create_group(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         with self.app.app_context():
             try:
                 user_id = update.effective_user.id
                 self.editing_users[user_id] = {"action": "create_group", "step": "name"}
                 text = "Создание новой группы\n\nВведите название группы:"
-                keyboard = [
-                    [InlineKeyboardButton("Отмена", callback_data="groups_page_0")]
-                ]
+                keyboard = [[InlineKeyboardButton("Отмена", callback_data="groups_page_0")]]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
                     await update.callback_query.message.delete()
@@ -336,11 +321,7 @@ class TelegramBotManager:
                 if nav_buttons:
                     keyboard.append(nav_buttons)
                 keyboard.append(
-                    [
-                        InlineKeyboardButton(
-                            "Обновить", callback_data=f"users_page_{page}"
-                        )
-                    ]
+                    [InlineKeyboardButton("Обновить", callback_data=f"users_page_{page}")]
                 )
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 text = f"Пользователи сайта (стр. {page + 1}/{total_pages})\nВсего: {total_users}"
@@ -382,9 +363,7 @@ class TelegramBotManager:
                     status_info.append("✓ Email подтвержден")
                 else:
                     status_info.append("✗ Email не подтвержден")
-                group_info = (
-                    f"Группа: {user.group.name if user.group else 'Не назначена'}"
-                )
+                group_info = f"Группа: {user.group.name if user.group else 'Не назначена'}"
                 created_info = f"Создан: {user.created_at.strftime('%d.%m.%Y %H:%M') if user.created_at else 'Не указано'}"
                 telegram_link = self.get_telegram_link(user)
                 if user.email.endswith("@telegram.org"):
@@ -414,21 +393,9 @@ class TelegramBotManager:
                             callback_data=f"change_group_{user_id}",
                         )
                     ],
-                    [
-                        InlineKeyboardButton(
-                            "Удалить", callback_data=f"user_delete_{user_id}"
-                        )
-                    ],
-                    [
-                        InlineKeyboardButton(
-                            "Изменить", callback_data=f"user_edit_{user_id}"
-                        )
-                    ],
-                    [
-                        InlineKeyboardButton(
-                            "← Назад к списку", callback_data="users_page_0"
-                        )
-                    ],
+                    [InlineKeyboardButton("Удалить", callback_data=f"user_delete_{user_id}")],
+                    [InlineKeyboardButton("Изменить", callback_data=f"user_edit_{user_id}")],
+                    [InlineKeyboardButton("← Назад к списку", callback_data="users_page_0")],
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
@@ -453,9 +420,7 @@ class TelegramBotManager:
                 if not user:
                     await update.callback_query.answer("Пользователь не найден")
                     return
-                groups = (
-                    Group.query.filter_by(is_active=True).order_by(Group.name).all()
-                )
+                groups = Group.query.filter_by(is_active=True).order_by(Group.name).all()
                 text = f"Изменение группы для пользователя {user.username}\n\n"
                 text += f"Текущая группа: {user.group.name if user.group else 'Не назначена'}\n\n"
                 text += "Выберите новую группу:"
@@ -469,9 +434,7 @@ class TelegramBotManager:
                     ]
                 )
                 for group in groups:
-                    current_mark = (
-                        " (текущая)" if user.group and user.group.id == group.id else ""
-                    )
+                    current_mark = " (текущая)" if user.group and user.group.id == group.id else ""
                     keyboard.append(
                         [
                             InlineKeyboardButton(
@@ -481,11 +444,7 @@ class TelegramBotManager:
                         ]
                     )
                 keyboard.append(
-                    [
-                        InlineKeyboardButton(
-                            "← Назад", callback_data=f"user_detail_{user_id}"
-                        )
-                    ]
+                    [InlineKeyboardButton("← Назад", callback_data=f"user_detail_{user_id}")]
                 )
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
@@ -508,7 +467,7 @@ class TelegramBotManager:
     ):
         with self.app.app_context():
             try:
-                from app.models import User, Group
+                from app.models import Group, User
 
                 user = User.query.get(user_id)
                 group = Group.query.get(group_id)
@@ -584,11 +543,7 @@ class TelegramBotManager:
                 }
                 text = f"Изменение названия группы\n\nТекущее название: {group.name}\n\nВведите новое название:"
                 keyboard = [
-                    [
-                        InlineKeyboardButton(
-                            "Отмена", callback_data=f"group_detail_{group_id}"
-                        )
-                    ]
+                    [InlineKeyboardButton("Отмена", callback_data=f"group_detail_{group_id}")]
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
@@ -621,11 +576,7 @@ class TelegramBotManager:
                 }
                 text = f"Изменение описания группы\n\nТекущее описание: {group.description or 'Не указано'}\n\nВведите новое описание (или отправьте '-' для удаления):"
                 keyboard = [
-                    [
-                        InlineKeyboardButton(
-                            "Отмена", callback_data=f"group_detail_{group_id}"
-                        )
-                    ]
+                    [InlineKeyboardButton("Отмена", callback_data=f"group_detail_{group_id}")]
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
@@ -639,9 +590,7 @@ class TelegramBotManager:
                 logger.error(f"Ошибка начала редактирования описания группы: {e}")
                 await update.callback_query.answer("Ошибка при загрузке данных")
 
-    async def delete_group(
-        self, update: Update, context: ContextTypes.DEFAULT_TYPE, group_id: int
-    ):
+    async def delete_group(self, update: Update, context: ContextTypes.DEFAULT_TYPE, group_id: int):
         with self.app.app_context():
             try:
                 from app.models import Group
@@ -667,9 +616,7 @@ class TelegramBotManager:
                 if not user:
                     await update.callback_query.answer("Пользователь не найден")
                     return
-                text = (
-                    f"Управление пользователем: {user.username}\n\nВыберите действие:"
-                )
+                text = f"Управление пользователем: {user.username}\n\nВыберите действие:"
                 keyboard = [
                     [
                         InlineKeyboardButton(
@@ -695,11 +642,7 @@ class TelegramBotManager:
                             callback_data=f"toggle_trial_{user_id}",
                         )
                     ],
-                    [
-                        InlineKeyboardButton(
-                            "← Назад", callback_data=f"user_detail_{user_id}"
-                        )
-                    ],
+                    [InlineKeyboardButton("← Назад", callback_data=f"user_detail_{user_id}")],
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
@@ -737,11 +680,7 @@ class TelegramBotManager:
                             callback_data=f"edit_password_{user_id}",
                         )
                     ],
-                    [
-                        InlineKeyboardButton(
-                            "← Назад", callback_data=f"user_detail_{user_id}"
-                        )
-                    ],
+                    [InlineKeyboardButton("← Назад", callback_data=f"user_detail_{user_id}")],
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
@@ -770,13 +709,7 @@ class TelegramBotManager:
                     "current_username": user.username,
                 }
                 text = f"Изменение имени пользователя\n\nТекущий ник: {user.username}\n\nВведите новый ник:"
-                keyboard = [
-                    [
-                        InlineKeyboardButton(
-                            "Отмена", callback_data=f"user_edit_{user_id}"
-                        )
-                    ]
-                ]
+                keyboard = [[InlineKeyboardButton("Отмена", callback_data=f"user_edit_{user_id}")]]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
                     await update.callback_query.message.delete()
@@ -803,13 +736,7 @@ class TelegramBotManager:
                     "user_id": user_id,
                 }
                 text = f"Изменение пароля пользователя\n\nПользователь: {user.username}\n\nВведите новый пароль:"
-                keyboard = [
-                    [
-                        InlineKeyboardButton(
-                            "Отмена", callback_data=f"user_edit_{user_id}"
-                        )
-                    ]
-                ]
+                keyboard = [[InlineKeyboardButton("Отмена", callback_data=f"user_edit_{user_id}")]]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
                     await update.callback_query.message.delete()
@@ -864,9 +791,7 @@ class TelegramBotManager:
                 elif action == "edit_password":
                     new_password = update.message.text.strip()
                     if len(new_password) < 6:
-                        await update.message.reply_text(
-                            "Пароль должен быть не менее 6 символов"
-                        )
+                        await update.message.reply_text("Пароль должен быть не менее 6 символов")
                         return
                     user = User.query.get(target_user_id)
                     if user:
@@ -914,9 +839,7 @@ class TelegramBotManager:
                         )
                         db.session.add(group)
                         db.session.commit()
-                        await update.message.reply_text(
-                            f"Группа '{group.name}' успешно создана!"
-                        )
+                        await update.message.reply_text(f"Группа '{group.name}' успешно создана!")
                         del self.editing_users[user_id]
                         await self.show_groups_page(update, context, page=0)
                 elif action == "edit_group_name":
@@ -932,21 +855,15 @@ class TelegramBotManager:
                         Group.name == new_name, Group.id != editing_data["group_id"]
                     ).first()
                     if existing_group:
-                        await update.message.reply_text(
-                            "Группа с таким названием уже существует"
-                        )
+                        await update.message.reply_text("Группа с таким названием уже существует")
                         return
                     group = Group.query.get(editing_data["group_id"])
                     if group:
                         group.name = new_name
                         db.session.commit()
-                        await update.message.reply_text(
-                            f"Название группы изменено на: {new_name}"
-                        )
+                        await update.message.reply_text(f"Название группы изменено на: {new_name}")
                         del self.editing_users[user_id]
-                        await self.show_group_detail(
-                            update, context, editing_data["group_id"]
-                        )
+                        await self.show_group_detail(update, context, editing_data["group_id"])
                     else:
                         await update.message.reply_text("Группа не найдена")
                         del self.editing_users[user_id]
@@ -959,27 +876,19 @@ class TelegramBotManager:
                         group.description = new_desc
                         db.session.commit()
                         desc_text = "удалено" if new_desc is None else new_desc
-                        await update.message.reply_text(
-                            f"Описание группы изменено на: {desc_text}"
-                        )
+                        await update.message.reply_text(f"Описание группы изменено на: {desc_text}")
                         del self.editing_users[user_id]
-                        await self.show_group_detail(
-                            update, context, editing_data["group_id"]
-                        )
+                        await self.show_group_detail(update, context, editing_data["group_id"])
                     else:
                         await update.message.reply_text("Группа не найдена")
                         del self.editing_users[user_id]
             except Exception as e:
                 logger.error(f"Ошибка обработки сообщения: {e}", exc_info=True)
-                await update.message.reply_text(
-                    f"Ошибка при обработке данных: {str(e)}"
-                )
+                await update.message.reply_text(f"Ошибка при обработке данных: {str(e)}")
                 if user_id in self.editing_users:
                     del self.editing_users[user_id]
 
-    async def handle_callback_query(
-        self, update: Update, context: ContextTypes.DEFAULT_TYPE
-    ):
+    async def handle_callback_query(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
         await query.answer()
         data = query.data
@@ -1055,9 +964,7 @@ class TelegramBotManager:
             logger.error(f"Ошибка обработки callback: {e}")
             await query.answer("Ошибка при обработке запроса")
 
-    async def toggle_admin(
-        self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int
-    ):
+    async def toggle_admin(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -1132,9 +1039,7 @@ class TelegramBotManager:
                 await self.show_user_management(update, context, user_id)
             except Exception as e:
                 logger.error(f"Ошибка переключения пробной подписки: {e}")
-                await update.callback_query.answer(
-                    "Ошибка при изменении пробной подписки"
-                )
+                await update.callback_query.answer("Ошибка при изменении пробной подписки")
 
     async def confirm_delete_user(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int
@@ -1153,11 +1058,7 @@ class TelegramBotManager:
                             callback_data=f"confirm_delete_{user_id}",
                         )
                     ],
-                    [
-                        InlineKeyboardButton(
-                            "Отмена", callback_data=f"user_detail_{user_id}"
-                        )
-                    ],
+                    [InlineKeyboardButton("Отмена", callback_data=f"user_detail_{user_id}")],
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 try:
@@ -1171,9 +1072,7 @@ class TelegramBotManager:
                 logger.error(f"Ошибка подтверждения удаления: {e}")
                 await update.callback_query.answer("Ошибка при загрузке данных")
 
-    async def delete_user(
-        self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int
-    ):
+    async def delete_user(self, update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
         with self.app.app_context():
             try:
                 user = User.query.get(user_id)
@@ -1193,9 +1092,7 @@ class TelegramBotManager:
     async def error_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"Ошибка при обработке обновления: {context.error}")
         if update and update.effective_message:
-            await update.effective_message.reply_text(
-                "Произошла ошибка. Попробуйте позже."
-            )
+            await update.effective_message.reply_text("Произошла ошибка. Попробуйте позже.")
 
     def run_bot(self):
         if not BOT_TOKEN:
@@ -1206,8 +1103,8 @@ class TelegramBotManager:
             return
 
         # Prevent multiple bot instances
-        import os
         import atexit
+        import os
         import signal
 
         pid_file = "/tmp/telegram_bot.pid"

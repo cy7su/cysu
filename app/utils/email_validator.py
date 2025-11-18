@@ -49,11 +49,34 @@ EMAIL_DOMAIN_PATTERN = re.compile(r"^[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
 # Запрещенные слова в email
 FORBIDDEN_EMAIL_PATTERNS = [
-    r"admin", r"administrator", r"root", r"support", r"bot", r"test", r"demo",
-    r"noreply", r"no-reply", r"donotreply", r"bounce", r"mailer", r"mail",
-    r"contact", r"info", r"webmaster", r"abuse", r"postmaster", r"hostmaster",
-    r"system", r"sysadmin", r"server", r"api", r"smtp", r"pop", r"imap",
+    r"admin",
+    r"administrator",
+    r"root",
+    r"support",
+    r"bot",
+    r"test",
+    r"demo",
+    r"noreply",
+    r"no-reply",
+    r"donotreply",
+    r"bounce",
+    r"mailer",
+    r"mail",
+    r"contact",
+    r"info",
+    r"webmaster",
+    r"abuse",
+    r"postmaster",
+    r"hostmaster",
+    r"system",
+    r"sysadmin",
+    r"server",
+    r"api",
+    r"smtp",
+    r"pop",
+    r"imap",
 ]
+
 
 def validate_email_chars(email: str) -> Tuple[bool, str]:
     """

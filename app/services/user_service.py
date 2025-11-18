@@ -2,8 +2,10 @@ import secrets
 import string
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple
+
 from flask import current_app
 from werkzeug.security import generate_password_hash
+
 from .. import db
 from ..models import (
     ChatMessage,
@@ -53,9 +55,7 @@ class UserService:
             )
             db.session.add(user)
             db.session.commit()
-            current_app.logger.info(
-                f"Пользователь {username} успешно создан с ID: {user.id}"
-            )
+            current_app.logger.info(f"Пользователь {username} успешно создан с ID: {user.id}")
             return user, f"Пользователь {username} успешно создан"
         except Exception as e:
             current_app.logger.error(f"Ошибка создания пользователя {username}: {e}")
@@ -72,25 +72,23 @@ class UserService:
             if not user:
                 return False, "Пользователь не найден"
             if username:
-                existing = User.query.filter(
-                    User.username == username, User.id != user_id
-                ).first()
+                existing = User.query.filter(User.username == username, User.id != user_id).first()
                 if existing:
                     return False, f'Пользователь с именем "{username}" уже существует'
                 user.username = username
             if email:
-                existing = User.query.filter(
-                    User.email == email, User.id != user_id
-                ).first()
+                existing = User.query.filter(User.email == email, User.id != user_id).first()
                 if existing:
                     return False, f'Пользователь с email "{email}" уже существует'
                 user.email = email
             db.session.commit()
             if username:
-                current_app.logger.info(f"Пользователю {user.username} изменено имя на '{username}'")
+                current_app.logger.info(
+                    f"Пользователю {user.username} изменено имя на '{username}'"
+                )
             if email:
                 current_app.logger.info(f"Пользователю {user.username} изменен email на '{email}'")
-            return True, f"Пользователь успешно обновлен"
+            return True, "Пользователь успешно обновлен"
         except Exception as e:
             current_app.logger.error(f"Ошибка обновления пользователя {user_id}: {e}")
             db.session.rollback()
@@ -109,9 +107,7 @@ class UserService:
                 return False, "Нельзя удалить администратора"
             UserService._delete_user_related_data(user_id, user.username)
             if not FileStorageManager.delete_user_files(user_id):
-                current_app.logger.warning(
-                    f"Ошибка удаления файлов пользователя {user_id}"
-                )
+                current_app.logger.warning(f"Ошибка удаления файлов пользователя {user_id}")
             db.session.delete(user)
             db.session.commit()
             current_app.logger.info(f"Пользователь {user.username} успешно удален")
@@ -129,33 +125,21 @@ class UserService:
             current_app.logger.info(
                 f"Удалено уведомлений пользователя {username}: {notifications_count}"
             )
-            ticket_messages_count = TicketMessage.query.filter_by(
-                user_id=user_id
-            ).delete()
+            ticket_messages_count = TicketMessage.query.filter_by(user_id=user_id).delete()
             current_app.logger.info(
                 f"Удалено сообщений тикетов пользователя {username}: {ticket_messages_count}"
             )
             tickets_count = Ticket.query.filter_by(user_id=user_id).delete()
-            current_app.logger.info(
-                f"Удалено тикетов пользователя {username}: {tickets_count}"
-            )
-            email_verifications_count = EmailVerification.query.filter_by(
-                user_id=user_id
-            ).delete()
+            current_app.logger.info(f"Удалено тикетов пользователя {username}: {tickets_count}")
+            email_verifications_count = EmailVerification.query.filter_by(user_id=user_id).delete()
             current_app.logger.info(
                 f"Удалено кодов подтверждения email пользователя {username}: {email_verifications_count}"
             )
             payments_count = Payment.query.filter_by(user_id=user_id).delete()
-            current_app.logger.info(
-                f"Удалено платежей пользователя {username}: {payments_count}"
-            )
-            submissions_count = (
-                db.session.query(Submission).filter_by(user_id=user_id).count()
-            )
+            current_app.logger.info(f"Удалено платежей пользователя {username}: {payments_count}")
+            submissions_count = db.session.query(Submission).filter_by(user_id=user_id).count()
             db.session.query(Submission).filter_by(user_id=user_id).delete()
-            current_app.logger.info(
-                f"Удалено решений пользователя {username}: {submissions_count}"
-            )
+            current_app.logger.info(f"Удалено решений пользователя {username}: {submissions_count}")
             chat_messages_count = ChatMessage.query.filter_by(user_id=user_id).delete()
             current_app.logger.info(
                 f"Удалено сообщений чата пользователя {username}: {chat_messages_count}"
@@ -177,14 +161,10 @@ class UserService:
             )
             user.password = generate_password_hash(new_password)
             db.session.commit()
-            current_app.logger.info(
-                f"Пароль пользователя {user.username} успешно сброшен"
-            )
+            current_app.logger.info(f"Пароль пользователя {user.username} успешно сброшен")
             return new_password, f"Пароль пользователя {user.username} успешно сброшен"
         except Exception as e:
-            current_app.logger.error(
-                f"Ошибка сброса пароля пользователя {user_id}: {e}"
-            )
+            current_app.logger.error(f"Ошибка сброса пароля пользователя {user_id}: {e}")
             db.session.rollback()
             return None, "Ошибка при сбросе пароля"
 
@@ -213,14 +193,10 @@ class UserService:
             else:
                 user.group_id = None
                 db.session.commit()
-                current_app.logger.info(
-                    f"Пользователь {user.username} успешно убран из группы"
-                )
+                current_app.logger.info(f"Пользователь {user.username} успешно убран из группы")
                 return True, f"Пользователь {user.username} убран из группы"
         except Exception as e:
-            current_app.logger.error(
-                f"Ошибка изменения группы пользователя {user_id}: {e}"
-            )
+            current_app.logger.error(f"Ошибка изменения группы пользователя {user_id}: {e}")
             db.session.rollback()
             return False, "Ошибка при изменении группы пользователя"
 
@@ -255,9 +231,7 @@ class UserService:
             current_app.logger.info(message)
             return True, message
         except Exception as e:
-            current_app.logger.error(
-                f"Ошибка изменения статуса пользователя {user_id}: {e}"
-            )
+            current_app.logger.error(f"Ошибка изменения статуса пользователя {user_id}: {e}")
             db.session.rollback()
             return False, "Ошибка при изменении статуса пользователя"
 
@@ -274,9 +248,7 @@ class UserService:
             current_app.logger.info(f"Пользователь {user.username} переключен в режим {mode}")
             return True, f"Переключен в режим {mode}"
         except Exception as e:
-            current_app.logger.error(
-                f"Ошибка переключения режима админа {user_id}: {e}"
-            )
+            current_app.logger.error(f"Ошибка переключения режима админа {user_id}: {e}")
             db.session.rollback()
             return False, "Ошибка при переключении режима"
 
@@ -293,22 +265,16 @@ class UserService:
                 user.is_manual_subscription = False
                 status = "отозвана"
             else:
-                trial_days = int(
-                    SiteSettings.get_setting("trial_subscription_days", 14)
-                )
+                trial_days = int(SiteSettings.get_setting("trial_subscription_days", 14))
                 user.is_subscribed = True
-                user.subscription_expires = datetime.utcnow() + timedelta(
-                    days=trial_days
-                )
+                user.subscription_expires = datetime.utcnow() + timedelta(days=trial_days)
                 user.is_manual_subscription = True
                 status = f"выдана на {trial_days} дней"
             db.session.commit()
             current_app.logger.info(f"Подписка для пользователя {user.username} {status}")
             return True, f"Подписка для пользователя {user.username} {status}"
         except Exception as e:
-            current_app.logger.error(
-                f"Ошибка изменения подписки пользователя {user_id}: {e}"
-            )
+            current_app.logger.error(f"Ошибка изменения подписки пользователя {user_id}: {e}")
             db.session.rollback()
             return False, "Ошибка при изменении подписки"
 
@@ -322,9 +288,7 @@ class UserService:
                 if user and user.id != current_user_id and not user.is_admin:
                     UserService._delete_user_related_data(user_id, user.username)
                     if not FileStorageManager.delete_user_files(user_id):
-                        current_app.logger.warning(
-                            f"Ошибка удаления файлов пользователя {user_id}"
-                        )
+                        current_app.logger.warning(f"Ошибка удаления файлов пользователя {user_id}")
                     db.session.delete(user)
                     deleted_count += 1
             db.session.commit()
@@ -352,9 +316,7 @@ class UserService:
             if group_id:
                 group = Group.query.get(group_id)
                 group_name = group.name if group else "неизвестная"
-                message = (
-                    f"Группа '{group_name}' назначена {updated_count} пользователям"
-                )
+                message = f"Группа '{group_name}' назначена {updated_count} пользователям"
             else:
                 message = f"Убрано из групп {updated_count} пользователей"
             current_app.logger.info(message)

@@ -1,8 +1,8 @@
 import os
 import shutil
+
 from .. import db
-from ..models import Subject, SubjectGroup, Material
-from ..utils.transliteration import get_safe_filename
+from ..models import Subject
 
 
 class SubjectService:

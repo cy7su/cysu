@@ -1,56 +1,82 @@
-{% extends "base.html" %}
-{% from 'macros/breadcrumbs.html' import profile_breadcrumb %}
-
-{% block title %}Профиль - {{ user.username }}{% endblock %}
-
-{% block breadcrumbs %}
-{{ profile_breadcrumb() }}
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% from 'macros/breadcrumbs.html' import profile_breadcrumb %} {% block title %}Профиль - {{
+user.username }}{% endblock %} {% block breadcrumbs %} {{ profile_breadcrumb() }} {% endblock %} {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-12">
-            <div class="card border-0" style="background: var(--dp-02); border: 1px solid var(--border-primary);">
-                <div class="card-header" style="background: var(--dp-03); border-bottom: 1px solid var(--border-secondary); color: var(--text-primary);">
+            <div class="card border-0" style="background: var(--dp-02); border: 1px solid var(--border-primary)">
+                <div
+                    class="card-header"
+                    style="
+                        background: var(--dp-03);
+                        border-bottom: 1px solid var(--border-secondary);
+                        color: var(--text-primary);
+                    "
+                >
                     <h5 class="mb-0"><i class="fas fa-user me-2"></i>Профиль пользователя</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4 col-12 text-center mb-4 mb-md-0">
                             <div class="mb-3">
-                                <div class="bg-dark rounded-circle d-inline-flex align-items-center justify-content-center" 
-                                     style="width: 80px; height: 80px; border: 2px solid var(--border-secondary); background: var(--dp-03);">
+                                <div
+                                    class="bg-dark rounded-circle d-inline-flex align-items-center justify-content-center"
+                                    style="
+                                        width: 80px;
+                                        height: 80px;
+                                        border: 2px solid var(--border-secondary);
+                                        background: var(--dp-03);
+                                    "
+                                >
                                     <i class="fas fa-user fa-2x text-white"></i>
                                 </div>
                             </div>
                             <h5 class="text-white mb-2">{{ user.username }}</h5>
                             {% if user.is_admin %}
-                                <span class="badge bg-danger mb-3" style="background: var(--error) !important;">Администратор</span>
+                            <span class="badge bg-danger mb-3" style="background: var(--error) !important"
+                                >Администратор</span
+                            >
                             {% else %}
-                                <span class="badge bg-secondary mb-3" style="background: var(--dp-08) !important;">Пользователь</span>
+                            <span class="badge bg-secondary mb-3" style="background: var(--dp-08) !important"
+                                >Пользователь</span
+                            >
                             {% endif %}
                         </div>
-                        
+
                         <div class="col-md-8 col-12">
                             <div class="row g-3">
                                 <div class="col-12">
-                                    <div class="p-3" style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 8px;">
+                                    <div
+                                        class="p-3"
+                                        style="
+                                            background: var(--dp-03);
+                                            border: 1px solid var(--border-secondary);
+                                            border-radius: 8px;
+                                        "
+                                    >
                                         <div class="d-flex align-items-center mb-2">
                                             {% set contact = user | format_user_contact %}
-                                            <i class="{{ contact.icon }} me-3 text-primary" style="width: 20px;"></i>
+                                            <i class="{{ contact.icon }} me-3 text-primary" style="width: 20px"></i>
                                             <div class="flex-grow-1">
-                                                <small class="text-muted d-block">{{ 'Telegram' if contact.type == 'telegram' else 'Email' }}</small>
+                                                <small class="text-muted d-block"
+                                                    >{{ 'Telegram' if contact.type == 'telegram' else 'Email' }}</small
+                                                >
                                                 <span class="text-primary">{{ contact.display }}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-12">
-                                    <div class="p-3" style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 8px;">
+                                    <div
+                                        class="p-3"
+                                        style="
+                                            background: var(--dp-03);
+                                            border: 1px solid var(--border-secondary);
+                                            border-radius: 8px;
+                                        "
+                                    >
                                         <div class="d-flex align-items-center mb-2">
-                                            <i class="fas fa-id-card me-3 text-primary" style="width: 20px;"></i>
+                                            <i class="fas fa-id-card me-3 text-primary" style="width: 20px"></i>
                                             <div class="flex-grow-1">
                                                 <small class="text-muted d-block">ID пользователя</small>
                                                 <span class="text-primary">{{ user.id }}</span>
@@ -58,77 +84,121 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-12">
-                                    <div class="p-3" style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 8px;">
+                                    <div
+                                        class="p-3"
+                                        style="
+                                            background: var(--dp-03);
+                                            border: 1px solid var(--border-secondary);
+                                            border-radius: 8px;
+                                        "
+                                    >
                                         <div class="d-flex align-items-center mb-2">
-                                            <i class="fas fa-calendar me-3 text-primary" style="width: 20px;"></i>
+                                            <i class="fas fa-calendar me-3 text-primary" style="width: 20px"></i>
                                             <div class="flex-grow-1">
                                                 <small class="text-muted d-block">Дата регистрации</small>
-                                                <span class="text-primary">{{ user.created_at.strftime('%d.%m.%Y') if user.created_at else 'Не указано' }}</span>
+                                                <span class="text-primary"
+                                                    >{{ user.created_at.strftime('%d.%m.%Y') if user.created_at else 'Не
+                                                    указано' }}</span
+                                                >
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-12">
-                                    <div class="p-3" style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 8px;">
+                                    <div
+                                        class="p-3"
+                                        style="
+                                            background: var(--dp-03);
+                                            border: 1px solid var(--border-secondary);
+                                            border-radius: 8px;
+                                        "
+                                    >
                                         <div class="d-flex align-items-center mb-2">
-                                            <i class="fas fa-layer-group me-3 text-primary" style="width: 20px;"></i>
+                                            <i class="fas fa-layer-group me-3 text-primary" style="width: 20px"></i>
                                             <div class="flex-grow-1">
                                                 <small class="text-muted d-block">Группа</small>
                                                 {% if user.group %}
-                                                    <span class="text-primary">{{ user.group.name }}</span>
-                                                    {% if user.group.description %}
-                                                        <br><small class="text-muted">{{ user.group.description }}</small>
-                                                    {% endif %}
-                                                {% else %}
-                                                    <span class="text-muted">Не назначена</span>
+                                                <span class="text-primary">{{ user.group.name }}</span>
+                                                {% if user.group.description %}
+                                                <br /><small class="text-muted">{{ user.group.description }}</small>
+                                                {% endif %} {% else %}
+                                                <span class="text-muted">Не назначена</span>
                                                 {% endif %}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-12">
-                                    <div class="p-3" style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 8px;">
+                                    <div
+                                        class="p-3"
+                                        style="
+                                            background: var(--dp-03);
+                                            border: 1px solid var(--border-secondary);
+                                            border-radius: 8px;
+                                        "
+                                    >
                                         <div class="d-flex align-items-center mb-2">
-                                            <i class="fas fa-crown me-3 text-primary" style="width: 20px;"></i>
+                                            <i class="fas fa-crown me-3 text-primary" style="width: 20px"></i>
                                             <div class="flex-grow-1">
                                                 <small class="text-muted d-block">Статус подписки</small>
                                                 {% if subscription_type == "trial" %}
-                                                    <span class="text-info">Пробная</span>
-                                                    <br><small class="text-muted">Действует до: {{ subscription_expires.strftime('%d.%m.%Y') if subscription_expires else 'Не указано' }}</small>
+                                                <span class="text-info">Пробная</span>
+                                                <br /><small class="text-muted"
+                                                    >Действует до: {{ subscription_expires.strftime('%d.%m.%Y') if
+                                                    subscription_expires else 'Не указано' }}</small
+                                                >
                                                 {% elif subscription_type == "active" %}
-                                                    <span class="text-success">Активна</span>
-                                                    <br><small class="text-muted">Действует до: {{ subscription_expires.strftime('%d.%m.%Y') if subscription_expires else 'Не указано' }}</small>
+                                                <span class="text-success">Активна</span>
+                                                <br /><small class="text-muted"
+                                                    >Действует до: {{ subscription_expires.strftime('%d.%m.%Y') if
+                                                    subscription_expires else 'Не указано' }}</small
+                                                >
                                                 {% else %}
-                                                    <span class="text-warning">Неактивна</span>
-                                                    <br><small class="text-muted">Для доступа ко всем материалам необходима активная подписка</small>
+                                                <span class="text-warning">Неактивна</span>
+                                                <br /><small class="text-muted"
+                                                    >Для доступа ко всем материалам необходима активная подписка</small
+                                                >
                                                 {% endif %}
                                             </div>
                                         </div>
                                         {% if not is_subscribed %}
-                                            <div class="mt-3">
-                                                <a href="{{ url_for('payment.subscription') }}" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-crown me-1"></i>Оформить подписку
-                                                </a>
-                                            </div>
+                                        <div class="mt-3">
+                                            <a
+                                                href="{{ url_for('payment.subscription') }}"
+                                                class="btn btn-primary btn-sm"
+                                            >
+                                                <i class="fas fa-crown me-1"></i>Оформить подписку
+                                            </a>
+                                        </div>
                                         {% endif %}
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-12">
-                                    <div class="p-3" style="background: var(--dp-03); border: 1px solid var(--border-secondary); border-radius: 8px;">
+                                    <div
+                                        class="p-3"
+                                        style="
+                                            background: var(--dp-03);
+                                            border: 1px solid var(--border-secondary);
+                                            border-radius: 8px;
+                                        "
+                                    >
                                         <div class="d-flex align-items-center justify-content-between mb-2">
                                             <div class="d-flex align-items-center flex-grow-1">
-                                                <i class="fas fa-download me-3 text-primary" style="width: 20px;"></i>
+                                                <i class="fas fa-download me-3 text-primary" style="width: 20px"></i>
                                                 <div>
                                                     <small class="text-muted d-block">Экспорт решений</small>
                                                     <span class="text-primary">Скачать все загруженные практики</span>
                                                 </div>
                                             </div>
-                                            <a href="{{ url_for('main.export_user_solutions') }}?t={{ moment().timestamp() }}" class="btn btn-outline-primary btn-sm">
+                                            <a
+                                                href="{{ url_for('main.export_user_solutions') }}?t={{ moment().timestamp() }}"
+                                                class="btn btn-outline-primary btn-sm"
+                                            >
                                                 <i class="fas fa-file-archive me-1"></i>Скачать архив
                                             </a>
                                         </div>
@@ -139,7 +209,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

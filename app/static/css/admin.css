@@ -1,902 +1,902 @@
 /* Сдержанная админ панель - Профессиональный дизайн */
 :root {
-  /* Основные цвета */
-    --primary-color: #B595FF;
-    --primary-hover: #9A7FE6;
-    
-  /* Цветовая палитра */
-  --primary: #B595FF;
-  --primary-dark: #9A7FE6;
-  --primary-light: #C4A8FF;
-  --secondary: #64748b;
-  --success: #059669;
-  --warning: #d97706;
-  --danger: #dc2626;
-  --info: #0891b2;
-  
-  /* Темная тема - ваши цвета */
-  --dp-00: #121212;
-  --dp-01: #1E1E1E;
-  --dp-02: #222222;
-  --dp-03: #242424;
-  --dp-04: #272727;
-  --dp-06: #2C2C2C;
-  --dp-08: #2E2E2E;
-  --dp-12: #333333;
-  --dp-16: #343434;
-  --dp-24: #383838;
-  
-  /* Фоны */
-  --bg-primary: var(--dp-00);
-  --bg-secondary: var(--dp-01);
-  --bg-tertiary: var(--dp-02);
-  --bg-card: var(--dp-02);
-  --bg-hover: var(--dp-03);
-  
-  /* Текст */
-  --text-primary: #ffffff;
-  --text-secondary: #b3b3b3;
-  --text-muted: #808080;
-  
-  /* Границы */
-  --border: var(--dp-12);
-  --border-light: var(--dp-16);
-  
-  /* Тени */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-  
-  /* Радиусы */
-  --radius-sm: 4px;
-  --radius: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  
-  /* Анимации */
-  --transition: all 0.2s ease;
+    /* Основные цвета */
+    --primary-color: #b595ff;
+    --primary-hover: #9a7fe6;
+
+    /* Цветовая палитра */
+    --primary: #b595ff;
+    --primary-dark: #9a7fe6;
+    --primary-light: #c4a8ff;
+    --secondary: #64748b;
+    --success: #059669;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --info: #0891b2;
+
+    /* Темная тема - ваши цвета */
+    --dp-00: #121212;
+    --dp-01: #1e1e1e;
+    --dp-02: #222222;
+    --dp-03: #242424;
+    --dp-04: #272727;
+    --dp-06: #2c2c2c;
+    --dp-08: #2e2e2e;
+    --dp-12: #333333;
+    --dp-16: #343434;
+    --dp-24: #383838;
+
+    /* Фоны */
+    --bg-primary: var(--dp-00);
+    --bg-secondary: var(--dp-01);
+    --bg-tertiary: var(--dp-02);
+    --bg-card: var(--dp-02);
+    --bg-hover: var(--dp-03);
+
+    /* Текст */
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --text-muted: #808080;
+
+    /* Границы */
+    --border: var(--dp-12);
+    --border-light: var(--dp-16);
+
+    /* Тени */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+
+    /* Радиусы */
+    --radius-sm: 4px;
+    --radius: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+
+    /* Анимации */
+    --transition: all 0.2s ease;
 }
 
 /* Базовые стили */
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: var(--bg-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-primary);
     color: var(--text-primary);
-  line-height: 1.5;
-  margin: 0;
-  padding: 0;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
 }
 
 /* Главная страница админки */
 .admin-page {
     min-height: 100vh;
-  background: var(--bg-primary);
+    background: var(--bg-primary);
 }
 
 /* Заголовок */
 .admin-header {
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border);
-  padding: 1rem 0;
-  border-radius: 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+    border-radius: 20px;
 }
 
 .admin-header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .admin-title-section {
-  flex: 1;
+    flex: 1;
 }
 
 .admin-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 0 0.25rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .admin-title-icon {
-  font-size: 1.25rem;
-  color: var(--primary);
+    font-size: 1.25rem;
+    color: var(--primary);
 }
 
 .admin-subtitle {
-  color: var(--text-secondary);
-  margin: 0;
-  font-size: 0.875rem;
-  font-weight: 400;
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 400;
 }
 
 .admin-stats {
-  display: flex;
-  gap: 0.75rem;
+    display: flex;
+    gap: 0.75rem;
 }
 
 .stat-card {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.75rem 1rem;
-  text-align: center;
-  min-width: 80px;
-  transition: var(--transition);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    text-align: center;
+    min-width: 80px;
+    transition: var(--transition);
 }
 
 .stat-card:hover {
-  background: var(--bg-hover);
+    background: var(--bg-hover);
 }
 
 .stat-number {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: 0.125rem;
-  line-height: 1;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.125rem;
+    line-height: 1;
 }
 
 .stat-label {
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Контент */
 .admin-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1rem;
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
 }
 
 /* Левое меню */
 .admin-left-menu {
-  width: 240px;
-  position: sticky;
-  top: 1rem;
-  height: fit-content;
+    width: 240px;
+    position: sticky;
+    top: 1rem;
+    height: fit-content;
 }
 
 .admin-menu-card {
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  margin-bottom: 0.75rem;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 0.75rem;
 }
 
 .admin-menu-card:hover {
-  box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-md);
 }
 
 .admin-menu-card-header {
-  background: var(--dp-03);
-  border-bottom: 1px solid var(--dp-12);
-  padding: 0.75rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    background: var(--dp-03);
+    border-bottom: 1px solid var(--dp-12);
+    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .admin-menu-card-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
 }
 
 .admin-menu-card-body {
-  padding: 0.75rem;
+    padding: 0.75rem;
 }
 
 .admin-menu-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .admin-menu-form .form-group {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .admin-menu-form .form-label {
-  font-size: 0.75rem;
-  margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
 }
 
 .admin-menu-form .admin-input,
 .admin-menu-form .admin-textarea {
-  padding: 0.375rem;
-  font-size: 0.75rem;
+    padding: 0.375rem;
+    font-size: 0.75rem;
 }
 
 .admin-menu-form .admin-btn-primary {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.75rem;
-  width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    width: 100%;
 }
 
 .admin-layout {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 2rem;
-  align-items: start;
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 2rem;
+    align-items: start;
 }
 
 .admin-sidebar {
-  position: sticky;
-  top: 2rem;
+    position: sticky;
+    top: 2rem;
 }
 
 .admin-main {
-  min-height: 600px;
-  flex: 1;
+    min-height: 600px;
+    flex: 1;
 }
 
 /* Карточки */
 .admin-card {
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
 }
 
 .admin-card:hover {
-  box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-md);
 }
 
 .admin-card-header {
-  background: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border);
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .admin-card-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .admin-card-actions {
-  display: flex;
-  gap: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
 }
 
 .admin-card-body {
-  padding: 1rem;
-  background: var(--dp-01);
+    padding: 1rem;
+    background: var(--dp-01);
 }
 
 /* Формы */
 .admin-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .form-label {
-  font-weight: 500;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8rem;
 }
 
 .admin-input,
 .admin-textarea {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.5rem;
-  color: var(--text-primary);
-  font-size: 0.8rem;
-  transition: var(--transition);
-  font-family: inherit;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    transition: var(--transition);
+    font-family: inherit;
 }
 
 .admin-input:focus,
 .admin-textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .admin-input::placeholder,
 .admin-textarea::placeholder {
-  color: var(--text-muted);
+    color: var(--text-muted);
 }
 
 .admin-textarea {
-  resize: vertical;
-  min-height: 80px;
+    resize: vertical;
+    min-height: 80px;
 }
 
 /* Кнопки */
 .admin-btn-primary {
-  background: var(--primary);
-  border: 1px solid var(--primary);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  font-weight: 500;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  transition: var(--transition);
-  cursor: pointer;
-  text-decoration: none;
+    background: var(--primary);
+    border: 1px solid var(--primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    transition: var(--transition);
+    cursor: pointer;
+    text-decoration: none;
 }
 
 .admin-btn-primary:hover {
-  background: var(--primary-dark);
-  border-color: var(--primary-dark);
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
 }
 
 .admin-btn-primary:active {
-  transform: translateY(1px);
+    transform: translateY(1px);
 }
 
 /* Действия */
 .admin-btn-action {
-  padding: 0.375rem;
-  border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  transition: var(--transition);
-  cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.75rem;
-  flex-shrink: 0;
+    padding: 0.375rem;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.75rem;
+    flex-shrink: 0;
 }
 
 .admin-btn-action:hover {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
 }
 
 /* Таблицы */
 .admin-table-container {
-  overflow-x: auto;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
 }
 
 .admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--bg-card);
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-card);
 }
 
 .admin-table-th {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  font-weight: 600;
-  padding: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .admin-table-row {
-  border-bottom: 1px solid var(--border);
-  transition: var(--transition);
-  height: 60px;
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+    height: 60px;
 }
 
 .admin-table-row:hover {
-  background: var(--bg-hover);
+    background: var(--bg-hover);
 }
 
 .admin-table-td {
-  padding: 0.75rem;
-  color: var(--text-primary);
-  font-size: 0.8rem;
-  vertical-align: middle;
-  height: 60px;
+    padding: 0.75rem;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    vertical-align: middle;
+    height: 60px;
 }
 
 .admin-table-cell-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  justify-content: center;
-  height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    justify-content: center;
+    height: 100%;
 }
 
 .admin-table-cell-title {
-  font-weight: 500;
-  color: var(--text-primary);
-  font-size: 0.8rem;
-  line-height: 1.2;
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    line-height: 1.2;
 }
 
 .admin-table-cell-description {
-  color: var(--text-secondary);
-  font-size: 0.7rem;
-  line-height: 1.2;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    line-height: 1.2;
 }
 
 .admin-table-actions {
-  display: flex;
-  gap: 0.25rem;
-  align-items: center;
-  flex-wrap: nowrap;
-  justify-content: center;
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: center;
 }
 
 /* Бейджи */
 .admin-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--radius);
-  font-size: 0.7rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border: 1px solid transparent;
-  min-width: 60px;
-  justify-content: center;
-  white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius);
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid transparent;
+    min-width: 60px;
+    justify-content: center;
+    white-space: nowrap;
 }
 
 .admin-badge-primary {
-  background: var(--dp-06);
-  color: var(--primary);
-  border-color: var(--dp-12);
+    background: var(--dp-06);
+    color: var(--primary);
+    border-color: var(--dp-12);
 }
 
 .admin-badge-secondary {
-  background: var(--dp-06);
-  color: var(--text-secondary);
-  border-color: var(--dp-12);
+    background: var(--dp-06);
+    color: var(--text-secondary);
+    border-color: var(--dp-12);
 }
 
 .admin-badge-success {
-  background: var(--dp-06);
-  color: var(--success);
-  border-color: var(--dp-12);
+    background: var(--dp-06);
+    color: var(--success);
+    border-color: var(--dp-12);
 }
 
 .admin-badge-warning {
-  background: var(--dp-06);
-  color: var(--warning);
-  border-color: var(--dp-12);
+    background: var(--dp-06);
+    color: var(--warning);
+    border-color: var(--dp-12);
 }
 
 .admin-badge-danger {
-  background: var(--dp-06);
-  color: var(--danger);
-  border-color: var(--dp-12);
+    background: var(--dp-06);
+    color: var(--danger);
+    border-color: var(--dp-12);
 }
 
 .admin-badge-info {
     background: var(--dp-06);
-  color: var(--info);
-  border-color: var(--dp-12);
+    color: var(--info);
+    border-color: var(--dp-12);
 }
 
 /* Переключатели */
 .admin-switch-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: var(--dp-03);
-  border: 1px solid var(--dp-12);
-  border-radius: var(--radius);
-  transition: var(--transition);
-  min-height: 50px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--dp-03);
+    border: 1px solid var(--dp-12);
+    border-radius: var(--radius);
+    transition: var(--transition);
+    min-height: 50px;
 }
 
 .admin-switch-item:hover {
-  background: var(--dp-04);
+    background: var(--dp-04);
 }
 
 .admin-switch {
-  width: 36px;
-  height: 20px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  position: relative;
-  cursor: pointer;
-  transition: var(--transition);
-  appearance: none;
-  outline: none;
-  flex-shrink: 0;
+    width: 36px;
+    height: 20px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: var(--transition);
+    appearance: none;
+    outline: none;
+    flex-shrink: 0;
 }
 
 .admin-switch:checked {
-  background: var(--primary);
-  border-color: var(--primary);
+    background: var(--primary);
+    border-color: var(--primary);
 }
 
 .admin-switch::before {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 14px;
-  height: 14px;
-  background: white;
-  border-radius: 50%;
-  transition: var(--transition);
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+    transition: var(--transition);
 }
 
 .admin-switch:checked::before {
-  transform: translateX(16px);
+    transform: translateX(16px);
 }
 
 .admin-switch-label {
-  cursor: pointer;
-  flex: 1;
+    cursor: pointer;
+    flex: 1;
 }
 
 .admin-switch-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 .admin-switch-description {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  line-height: 1.4;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.4;
 }
 
 /* Чекбоксы */
 .admin-checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .admin-checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: var(--dp-03);
-  border: 1px solid var(--dp-12);
-  border-radius: var(--radius);
-  transition: var(--transition);
-  min-height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--dp-03);
+    border: 1px solid var(--dp-12);
+    border-radius: var(--radius);
+    transition: var(--transition);
+    min-height: 40px;
 }
 
 .admin-checkbox-item:hover {
-  background: var(--dp-04);
+    background: var(--dp-04);
 }
 
 .admin-checkbox {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--primary);
-  cursor: pointer;
-  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
 .admin-checkbox-label {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--text-primary);
-  font-weight: 500;
-  flex: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    flex: 1;
 }
 
 /* Пустое состояние */
 .admin-empty-state {
-  text-align: center;
-  padding: 3rem 2rem;
-  color: var(--text-secondary);
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
 }
 
 .admin-empty-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  opacity: 0.5;
-  color: var(--primary);
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+    color: var(--primary);
 }
 
 .admin-empty-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
 }
 
 .admin-empty-description {
-  font-size: 1rem;
+    font-size: 1rem;
     margin: 0;
-  line-height: 1.5;
+    line-height: 1.5;
 }
 
 /* Ссылки */
 .admin-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  transition: var(--transition);
-  font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    transition: var(--transition);
+    font-weight: 500;
 }
 
 .admin-link:hover {
-  color: var(--primary);
+    color: var(--primary);
 }
 
 .admin-link-primary {
-  color: var(--primary);
+    color: var(--primary);
 }
 
 .admin-link-primary:hover {
-  color: var(--primary-dark);
+    color: var(--primary-dark);
 }
 
 .admin-text-muted {
-  color: var(--text-muted);
-  font-size: 0.8rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
 }
 
 /* Уведомления */
 .admin-notification {
-  position: fixed;
-  top: 2rem;
-  right: 2rem;
-  z-index: 9999;
-  padding: 1rem 1.5rem;
-  border-radius: var(--radius-md);
-  color: white;
-  font-weight: 500;
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-md);
+    color: white;
+    font-weight: 500;
     display: flex;
     align-items: center;
-  gap: 0.5rem;
-  box-shadow: var(--shadow-lg);
-  animation: slideInRight 0.3s ease;
-  max-width: 400px;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-lg);
+    animation: slideInRight 0.3s ease;
+    max-width: 400px;
 }
 
 .admin-notification-success {
-  background: var(--success);
-  border: 1px solid rgba(5, 150, 105, 0.3);
+    background: var(--success);
+    border: 1px solid rgba(5, 150, 105, 0.3);
 }
 
 .admin-notification-error {
-  background: var(--danger);
-  border: 1px solid rgba(220, 38, 38, 0.3);
+    background: var(--danger);
+    border: 1px solid rgba(220, 38, 38, 0.3);
 }
 
 @keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
-  .admin-left-menu {
+.admin-left-menu {
     width: 100%;
     position: static;
-  }
-  
-  .admin-layout {
+}
+
+.admin-layout {
     grid-template-columns: 1fr;
     gap: 1.5rem;
-  }
-  
-  .admin-sidebar {
+}
+
+.admin-sidebar {
     position: static;
-  }
-  
-  .admin-header-content {
+}
+
+.admin-header-content {
     flex-direction: column;
     gap: 1.5rem;
     text-align: center;
-  }
-  
-  .admin-stats {
-    justify-content: center;
-  }
+}
 
-  .admin-header {
+.admin-stats {
+    justify-content: center;
+}
+
+.admin-header {
     padding: 0.75rem 0;
-  }
-  
-  .admin-header-content {
+}
+
+.admin-header-content {
     padding: 0 0.75rem;
-  }
-  
-  .admin-title {
+}
+
+.admin-title {
     font-size: 1.25rem;
-  }
-  
-  .admin-card-header {
+}
+
+.admin-card-header {
     padding: 0.75rem;
-  }
-  
-  .admin-card-body {
+}
+
+.admin-card-body {
     padding: 0.75rem;
-  }
-  
-  .admin-table-th,
-  .admin-table-td {
+}
+
+.admin-table-th,
+.admin-table-td {
     padding: 0.5rem 0.375rem;
-  }
-  
-  .admin-table-actions {
+}
+
+.admin-table-actions {
     gap: 0.25rem;
-  }
-  
-  .admin-table-actions-vertical {
+}
+
+.admin-table-actions-vertical {
     flex-direction: row;
     flex-wrap: wrap;
     gap: 0.25rem;
-  }
-  
-  .admin-table-actions-vertical .admin-btn-action {
+}
+
+.admin-table-actions-vertical .admin-btn-action {
     min-width: 24px;
     height: 24px;
     padding: 0.25rem;
-  }
-  
-  .stat-card {
+}
+
+.stat-card {
     min-width: 70px;
     padding: 0.5rem;
-  }
-  
-  .stat-number {
+}
+
+.stat-number {
     font-size: 1rem;
-  }
+}
 
 /* Дополнительные утилиты */
 .form-error {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 .error-message {
-  color: var(--danger);
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-weight: 500;
+    color: var(--danger);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 500;
 }
 
 .form-help {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  line-height: 1.4;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    line-height: 1.4;
 }
 
 .form-actions {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
 }
 
 .admin-form-inline {
-  display: inline;
+    display: inline;
 }
 
 /* Скроллбар */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--dp-01);
-  border-radius: var(--radius);
+    background: var(--dp-01);
+    border-radius: var(--radius);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--dp-12);
-  border-radius: var(--radius);
+    background: var(--dp-12);
+    border-radius: var(--radius);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+    background: var(--primary);
 }
 
 /* Выделение текста */
 ::selection {
-  background: rgba(181, 149, 255, 0.2);
+    background: rgba(181, 149, 255, 0.2);
     color: var(--text-primary);
 }
 
 /* Фокус */
 *:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 /* Скролл-бар */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--dp-01);
-  border-radius: 4px;
+    background: var(--dp-01);
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--dp-12);
-  border-radius: 4px;
-  transition: background 0.2s ease;
+    background: var(--dp-12);
+    border-radius: 4px;
+    transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
+    background: var(--primary-color);
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background: var(--primary-hover);
+    background: var(--primary-hover);
 }
 
 /* Для Firefox */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: var(--dp-12) var(--dp-01);
+    scrollbar-width: thin;
+    scrollbar-color: var(--dp-12) var(--dp-01);
 }

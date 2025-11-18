@@ -1,164 +1,174 @@
-{% extends 'base.html' %}
-{% block title %}Вход через Telegram{% endblock %}
-{% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
-  <div class="card p-4 mx-3" style="min-width:280px; max-width: 400px; width:100%; border-radius: 12px;">
-    <div class="text-center mb-4">
-      <i class="fab fa-telegram fa-3x text-primary mb-3"></i>
-      <h2 class="mb-0" style="font-size: 1.5rem;">Вход через Telegram</h2>
-    </div>
-    
-    <div class="text-center">
-      <p class="mb-4">Нажмите кнопку ниже для авторизации через Telegram</p>
-      
-      <!-- Telegram Login Widget -->
-      <div id="telegram-widget-container">
-        <script async src="https://telegram.org/js/telegram-widget.js?22" 
-                data-telegram-login="authcysubot" 
-                data-size="large" 
-                data-onauth="onTelegramAuth(user)" 
-                data-request-access="write">
-        </script>
-      </div>
-      
-      <!-- Альтернативная кнопка, если виджет не загрузился -->
-      <div id="fallback-button" style="display: none; margin-top: 15px;">
-        <a href="https://oauth.telegram.org/auth?bot_id=8102415932&origin={{ request.url_root }}&embed=1&request_access=write&return_to={{ request.url }}" 
-           class="btn btn-primary btn-lg" 
-           style="padding: 12px 24px; font-size: 1rem; border-radius: 8px; min-height: 50px; width: 100%; text-decoration: none; display: inline-block;">
-          <i class="fab fa-telegram me-2"></i>
-          Войти через Telegram
-        </a>
-      </div>
-      
-      <div id="loading" class="mt-3" style="display: none;">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Загрузка...</span>
+{% extends 'base.html' %} {% block title %}Вход через Telegram{% endblock %} {% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 60vh">
+    <div class="card p-4 mx-3" style="min-width: 280px; max-width: 400px; width: 100%; border-radius: 12px">
+        <div class="text-center mb-4">
+            <i class="fab fa-telegram fa-3x text-primary mb-3"></i>
+            <h2 class="mb-0" style="font-size: 1.5rem">Вход через Telegram</h2>
         </div>
-        <p class="mt-2 text-muted">Обработка авторизации...</p>
-      </div>
-      
-      <div id="error-message" class="alert alert-danger mt-3" style="display: none;">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <span id="error-text"></span>
-      </div>
+
+        <div class="text-center">
+            <p class="mb-4">Нажмите кнопку ниже для авторизации через Telegram</p>
+
+            <!-- Telegram Login Widget -->
+            <div id="telegram-widget-container">
+                <script
+                    async
+                    src="https://telegram.org/js/telegram-widget.js?22"
+                    data-telegram-login="authcysubot"
+                    data-size="large"
+                    data-onauth="onTelegramAuth(user)"
+                    data-request-access="write"
+                ></script>
+            </div>
+
+            <!-- Альтернативная кнопка, если виджет не загрузился -->
+            <div id="fallback-button" style="display: none; margin-top: 15px">
+                <a
+                    href="https://oauth.telegram.org/auth?bot_id=8102415932&origin={{ request.url_root }}&embed=1&request_access=write&return_to={{ request.url }}"
+                    class="btn btn-primary btn-lg"
+                    style="
+                        padding: 12px 24px;
+                        font-size: 1rem;
+                        border-radius: 8px;
+                        min-height: 50px;
+                        width: 100%;
+                        text-decoration: none;
+                        display: inline-block;
+                    "
+                >
+                    <i class="fab fa-telegram me-2"></i>
+                    Войти через Telegram
+                </a>
+            </div>
+
+            <div id="loading" class="mt-3" style="display: none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+                <p class="mt-2 text-muted">Обработка авторизации...</p>
+            </div>
+
+            <div id="error-message" class="alert alert-danger mt-3" style="display: none">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="error-text"></span>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
-// Глобальная функция для обработки авторизации через Telegram Widget
-window.onTelegramAuth = function(user) {
-    const loading = document.getElementById('loading');
-    const errorMessage = document.getElementById('error-message');
-    const errorText = document.getElementById('error-text');
-    
-    if (user) {
-        loading.style.display = 'block';
-        
-        // Отправляем данные на сервер
-        fetch('{{ url_for("telegram_auth.telegram_login") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                id: user.id,
-                first_name: user.first_name || '',
-                last_name: user.last_name || '',
-                username: user.username || '',
-                photo_url: user.photo_url || '',
-                auth_date: Math.floor(Date.now() / 1000),
-                hash: 'telegram_widget_auth'
+    // Глобальная функция для обработки авторизации через Telegram Widget
+    window.onTelegramAuth = function (user) {
+        const loading = document.getElementById('loading')
+        const errorMessage = document.getElementById('error-message')
+        const errorText = document.getElementById('error-text')
+
+        if (user) {
+            loading.style.display = 'block'
+
+            // Отправляем данные на сервер
+            fetch('{{ url_for("telegram_auth.telegram_login") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({
+                    id: user.id,
+                    first_name: user.first_name || '',
+                    last_name: user.last_name || '',
+                    username: user.username || '',
+                    photo_url: user.photo_url || '',
+                    auth_date: Math.floor(Date.now() / 1000),
+                    hash: 'telegram_widget_auth',
+                }),
             })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Успешная авторизация - перенаправляем
-                window.location.href = data.redirect_url || '{{ url_for("main.index") }}';
-            } else {
-                showError(data.message || 'Ошибка авторизации через Telegram');
-            }
-        })
-        .catch(error => {
-            showError('Ошибка авторизации через Telegram: ' + error.message);
-        });
-    } else {
-        showError('Не удалось получить данные пользователя');
-    }
-};
-
-function showError(message) {
-    const loading = document.getElementById('loading');
-    const errorMessage = document.getElementById('error-message');
-    const errorText = document.getElementById('error-text');
-    
-    loading.style.display = 'none';
-    errorMessage.style.display = 'block';
-    errorText.textContent = message;
-}
-
-// Проверяем, есть ли параметры OAuth в URL (возврат из OAuth)
-document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, загрузился ли виджет
-    setTimeout(function() {
-        const widgetContainer = document.getElementById('telegram-widget-container');
-        const fallbackButton = document.getElementById('fallback-button');
-        
-        // Если виджет не загрузился (нет iframe), показываем альтернативную кнопку
-        if (widgetContainer && !widgetContainer.querySelector('iframe')) {
-            fallbackButton.style.display = 'block';
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+                    }
+                    return response.json()
+                })
+                .then((data) => {
+                    if (data.success) {
+                        // Успешная авторизация - перенаправляем
+                        window.location.href = data.redirect_url || '{{ url_for("main.index") }}'
+                    } else {
+                        showError(data.message || 'Ошибка авторизации через Telegram')
+                    }
+                })
+                .catch((error) => {
+                    showError('Ошибка авторизации через Telegram: ' + error.message)
+                })
+        } else {
+            showError('Не удалось получить данные пользователя')
         }
-    }, 3000); // Ждем 3 секунды
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('id') && urlParams.get('hash')) {
-        // Это возврат из OAuth - обрабатываем автоматически
-        const loading = document.getElementById('loading');
-        loading.style.display = 'block';
-        
-        const authData = {
-            id: urlParams.get('id'),
-            first_name: urlParams.get('first_name') || '',
-            last_name: urlParams.get('last_name') || '',
-            username: urlParams.get('username') || '',
-            photo_url: urlParams.get('photo_url') || '',
-            auth_date: urlParams.get('auth_date'),
-            hash: urlParams.get('hash')
-        };
-        
-        fetch('{{ url_for("telegram_auth.telegram_login") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify(authData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                window.location.href = data.redirect_url || '{{ url_for("main.index") }}';
-            } else {
-                showError(data.message || 'Ошибка авторизации через Telegram');
-            }
-        })
-        .catch(error => {
-            showError('Ошибка авторизации через Telegram: ' + error.message);
-        });
     }
-});
+
+    function showError(message) {
+        const loading = document.getElementById('loading')
+        const errorMessage = document.getElementById('error-message')
+        const errorText = document.getElementById('error-text')
+
+        loading.style.display = 'none'
+        errorMessage.style.display = 'block'
+        errorText.textContent = message
+    }
+
+    // Проверяем, есть ли параметры OAuth в URL (возврат из OAuth)
+    document.addEventListener('DOMContentLoaded', function () {
+        // Проверяем, загрузился ли виджет
+        setTimeout(function () {
+            const widgetContainer = document.getElementById('telegram-widget-container')
+            const fallbackButton = document.getElementById('fallback-button')
+
+            // Если виджет не загрузился (нет iframe), показываем альтернативную кнопку
+            if (widgetContainer && !widgetContainer.querySelector('iframe')) {
+                fallbackButton.style.display = 'block'
+            }
+        }, 3000) // Ждем 3 секунды
+
+        const urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.get('id') && urlParams.get('hash')) {
+            // Это возврат из OAuth - обрабатываем автоматически
+            const loading = document.getElementById('loading')
+            loading.style.display = 'block'
+
+            const authData = {
+                id: urlParams.get('id'),
+                first_name: urlParams.get('first_name') || '',
+                last_name: urlParams.get('last_name') || '',
+                username: urlParams.get('username') || '',
+                photo_url: urlParams.get('photo_url') || '',
+                auth_date: urlParams.get('auth_date'),
+                hash: urlParams.get('hash'),
+            }
+
+            fetch('{{ url_for("telegram_auth.telegram_login") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify(authData),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+                    }
+                    return response.json()
+                })
+                .then((data) => {
+                    if (data.success) {
+                        window.location.href = data.redirect_url || '{{ url_for("main.index") }}'
+                    } else {
+                        showError(data.message || 'Ошибка авторизации через Telegram')
+                    }
+                })
+                .catch((error) => {
+                    showError('Ошибка авторизации через Telegram: ' + error.message)
+                })
+        }
+    })
 </script>
 {% endblock %}

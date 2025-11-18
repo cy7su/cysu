@@ -1,6 +1,6 @@
-import os
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple
+
 from .. import db
 from ..models import Payment, User
 
@@ -14,7 +14,8 @@ class PaymentService:
     ) -> Tuple[Optional[str], str]:
         """Создать платеж для подписки"""
         try:
-            from flask import url_for, current_app
+            from flask import current_app, url_for
+
             from ..utils.payment_service import YooKassaService
 
             if not period or not amount:
@@ -28,9 +29,7 @@ class PaymentService:
             payment_service = YooKassaService()
             return_url = url_for("payment.payment_success", _external=True)
             return_url += "?source=yookassa"
-            payment_info = payment_service.create_smart_payment(
-                user, return_url, amount_float
-            )
+            payment_info = payment_service.create_smart_payment(user, return_url, amount_float)
             if payment_info.get("payment_url"):
                 return (
                     payment_info["payment_url"],
@@ -53,23 +52,17 @@ class PaymentService:
             paid = payment_data.get("paid", False)
             if not payment_id:
                 return False
-            payment_record = Payment.query.filter_by(
-                yookassa_payment_id=payment_id
-            ).first()
+            payment_record = Payment.query.filter_by(yookassa_payment_id=payment_id).first()
             if not payment_record:
                 return False
             payment_record.status = status
             payment_record.updated_at = datetime.utcnow()
             if status == "succeeded" and paid:
-                success = PaymentService._activate_subscription_for_payment(
-                    payment_record
-                )
+                success = PaymentService._activate_subscription_for_payment(payment_record)
                 if success:
                     from flask import current_app
 
-                    current_app.logger.info(
-                        f"Подписка активирована для платежа {payment_id}"
-                    )
+                    current_app.logger.info(f"Подписка активирована для платежа {payment_id}")
                 else:
                     from flask import current_app
 
@@ -77,15 +70,11 @@ class PaymentService:
                         f"Ошибка активации подписки для платежа {payment_id}"
                     )
             elif status == "canceled":
-                success = PaymentService._deactivate_subscription_for_payment(
-                    payment_record
-                )
+                success = PaymentService._deactivate_subscription_for_payment(payment_record)
                 if success:
                     from flask import current_app
 
-                    current_app.logger.info(
-                        f"Подписка деактивирована для платежа {payment_id}"
-                    )
+                    current_app.logger.info(f"Подписка деактивирована для платежа {payment_id}")
             db.session.commit()
             return True
         except Exception as e:
@@ -106,12 +95,8 @@ class PaymentService:
             from ..utils.payment_service import YooKassaService
 
             payment_service = YooKassaService()
-            subscription_days = payment_service._get_subscription_days(
-                payment_record.amount
-            )
-            user.subscription_expires = datetime.utcnow() + timedelta(
-                days=subscription_days
-            )
+            subscription_days = payment_service._get_subscription_days(payment_record.amount)
+            user.subscription_expires = datetime.utcnow() + timedelta(days=subscription_days)
             db.session.commit()
             return True
         except Exception as e:
@@ -147,9 +132,7 @@ class PaymentService:
                 yookassa_payment_id=payment_id, user_id=user.id
             ).first()
             if not payment_record:
-                payment_record = Payment.query.filter_by(
-                    yookassa_payment_id=payment_id
-                ).first()
+                payment_record = Payment.query.filter_by(yookassa_payment_id=payment_id).first()
                 if payment_record:
                     return "error", "Платеж не принадлежит вам"
                 else:
@@ -157,9 +140,7 @@ class PaymentService:
             payment_service = YooKassaService()
             status_info = payment_service.get_payment_status(payment_id)
             if "error" in status_info:
-                if payment_service.simulation_mode or "HTTP 401" in str(
-                    status_info["error"]
-                ):
+                if payment_service.simulation_mode or "HTTP 401" in str(status_info["error"]):
                     if payment_service.process_successful_payment(payment_id):
                         return "succeeded", "Платеж успешно обработан"
                     else:
@@ -180,9 +161,7 @@ class PaymentService:
     def cancel_payment(payment_id: str, user: User) -> Tuple[bool, str]:
         """Отменить платеж"""
         try:
-            payment_record = Payment.query.filter_by(
-                yookassa_payment_id=payment_id
-            ).first()
+            payment_record = Payment.query.filter_by(yookassa_payment_id=payment_id).first()
             if payment_record:
                 if payment_record.user_id != user.id:
                     return False, "Платеж не принадлежит вам"

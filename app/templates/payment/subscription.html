@@ -1,13 +1,6 @@
-{% extends "base.html" %}
-{% from 'macros/breadcrumbs.html' import simple_breadcrumb %}
-
-{% block title %}Оформление подписки{% endblock %}
-
-{% block breadcrumbs %}
-{{ simple_breadcrumb("Оформление подписки") }}
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% from 'macros/breadcrumbs.html' import simple_breadcrumb %} {% block title %}Оформление
+подписки{% endblock %} {% block breadcrumbs %} {{ simple_breadcrumb("Оформление подписки") }} {% endblock %} {% block
+content %}
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-10">
@@ -91,8 +84,6 @@
         background: var(--dp-03);
     }
 
-
-
     .text-primary {
         color: var(--primary-color) !important;
     }
@@ -163,57 +154,57 @@
 </style>
 
 <script>
-    let selectedPeriod = '1';
+    let selectedPeriod = '1'
 
     function selectPeriod(period) {
         // Убираем выделение со всех карточек
-        document.querySelectorAll('.subscription-card').forEach(card => {
-            card.classList.remove('selected');
-        });
+        document.querySelectorAll('.subscription-card').forEach((card) => {
+            card.classList.remove('selected')
+        })
 
         // Выделяем выбранную карточку
-        document.getElementById(`period-${period}`).classList.add('selected');
+        document.getElementById(`period-${period}`).classList.add('selected')
 
         // Обновляем выбранный период
-        selectedPeriod = period;
+        selectedPeriod = period
 
         // Обновляем цену
-        updatePrice(period);
+        updatePrice(period)
     }
 
     function updatePrice(period) {
         const prices = {
-            '1': '89₽',
-            '3': '199₽',
-            '6': '349₽',
-            '12': '469₽'
-        };
+            1: '89₽',
+            3: '199₽',
+            6: '349₽',
+            12: '469₽',
+        }
 
-        document.getElementById('price-text').textContent = prices[period];
+        document.getElementById('price-text').textContent = prices[period]
     }
 
     function createPayment() {
         // Получаем цену для выбранного периода
         const prices = {
-            '1': '89',
-            '3': '199',
-            '6': '349',
-            '12': '469'
-        };
+            1: '89',
+            3: '199',
+            6: '349',
+            12: '469',
+        }
 
-        const selectedPrice = prices[selectedPeriod];
+        const selectedPrice = prices[selectedPeriod]
 
         // Перенаправляем на страницу подписки с параметрами для создания платежа
-        const url = new URL(window.location.href);
-        url.searchParams.set('period', selectedPeriod);
-        url.searchParams.set('amount', selectedPrice);
+        const url = new URL(window.location.href)
+        url.searchParams.set('period', selectedPeriod)
+        url.searchParams.set('amount', selectedPrice)
 
-        window.location.href = url.toString();
+        window.location.href = url.toString()
     }
 
     // Инициализация
     document.addEventListener('DOMContentLoaded', function () {
-        selectPeriod('1');
-    });
+        selectPeriod('1')
+    })
 </script>
 {% endblock %}

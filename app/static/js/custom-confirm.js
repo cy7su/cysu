@@ -3,8 +3,8 @@
  */
 
 function customConfirm(message, onConfirm, onCancel = null) {
-    const modalId = 'customConfirmModal-' + Date.now();
-    
+    const modalId = 'customConfirmModal-' + Date.now()
+
     const modalHtml = `
         <div class="modal fade" id="${modalId}" tabindex="-1" data-bs-backdrop="static">
             <div class="modal-dialog modal-dialog-centered">
@@ -30,55 +30,54 @@ function customConfirm(message, onConfirm, onCancel = null) {
                 </div>
             </div>
         </div>
-    `;
-    
+    `
+
     // Удаляем старое модальное окно если есть
-    const oldModal = document.getElementById(modalId);
+    const oldModal = document.getElementById(modalId)
     if (oldModal) {
-        oldModal.remove();
+        oldModal.remove()
     }
-    
+
     // Добавляем новое
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    const modalElement = document.getElementById(modalId);
-    const modal = new bootstrap.Modal(modalElement);
-    
+    document.body.insertAdjacentHTML('beforeend', modalHtml)
+
+    const modalElement = document.getElementById(modalId)
+    const modal = new bootstrap.Modal(modalElement)
+
     // Обработчик подтверждения
-    document.getElementById(`${modalId}-confirm`).addEventListener('click', function() {
-        modal.hide();
+    document.getElementById(`${modalId}-confirm`).addEventListener('click', function () {
+        modal.hide()
         if (onConfirm && typeof onConfirm === 'function') {
-            onConfirm();
+            onConfirm()
         }
-    });
-    
+    })
+
     // Обработчик отмены
-    document.getElementById(`${modalId}-cancel`).addEventListener('click', function() {
-        modal.hide();
+    document.getElementById(`${modalId}-cancel`).addEventListener('click', function () {
+        modal.hide()
         if (onCancel && typeof onCancel === 'function') {
-            onCancel();
+            onCancel()
         }
-    });
-    
+    })
+
     // Удаляем модальное окно после закрытия
-    modalElement.addEventListener('hidden.bs.modal', function() {
-        this.remove();
-    });
-    
-    modal.show();
+    modalElement.addEventListener('hidden.bs.modal', function () {
+        this.remove()
+    })
+
+    modal.show()
 }
 
 // Экспортируем для использования
-window.customConfirm = customConfirm;
+window.customConfirm = customConfirm
 
 // Переопределяем стандартный confirm для совместимости
-window.confirmDelete = function(message, formId) {
-    customConfirm(message, function() {
+window.confirmDelete = function (message, formId) {
+    customConfirm(message, function () {
         if (formId) {
-            document.getElementById(formId).submit();
+            document.getElementById(formId).submit()
         }
-        return true;
-    });
-    return false; // Предотвращаем стандартную отправку
-};
-
+        return true
+    })
+    return false // Предотвращаем стандартную отправку
+}

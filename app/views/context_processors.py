@@ -2,11 +2,13 @@ import json
 import locale
 from datetime import datetime
 from typing import Any, Dict
+
 from flask import current_app
 from flask_login import current_user
+
 from ..models import SiteSettings, User
-from ..utils.payment_service import YooKassaService
 from ..services import UserManagementService
+from ..utils.payment_service import YooKassaService
 
 
 def inject_json_parser() -> Dict[str, Any]:
@@ -78,21 +80,15 @@ def inject_subscription_status() -> Dict[str, Any]:
     subscription_info = None
     if current_user.is_authenticated:
         try:
-            current_app.logger.info(
-                f"Проверяем подписку для пользователя: {current_user.username}"
-            )
-            current_app.logger.info(
-                f"is_trial_subscription: {current_user.is_trial_subscription}"
-            )
+            current_app.logger.info(f"Проверяем подписку для пользователя: {current_user.username}")
+            current_app.logger.info(f"is_trial_subscription: {current_user.is_trial_subscription}")
             current_app.logger.info(
                 f"trial_subscription_expires: {current_user.trial_subscription_expires}"
             )
             payment_service = YooKassaService()
             is_subscribed = UserManagementService.has_active_subscription(current_user)
             subscription_info = payment_service.get_subscription_info(current_user)
-            current_app.logger.info(
-                f"Получена информация о подписке: {subscription_info}"
-            )
+            current_app.logger.info(f"Получена информация о подписке: {subscription_info}")
         except Exception as e:
             current_app.logger.error(f"Error in inject_subscription_status: {e}")
             is_subscribed = False
