@@ -135,63 +135,74 @@ jobs:
 
     - name: Generate test report
       run: |
-        echo "<img src=\"https://capsule-render.vercel.app/api?type=waving&color=A020F0&height=200&section=header&text=cysu&fontSize=80&fontAlignY=50&desc=&descAlignY=70&descAlign=50&animation=twinkling&fontColor=4B0082&borderRadius=20&font=Sono&stroke=A020F0&strokeWidth=2&wave=1&waveOffset=0\" />" > test_results.md
-        echo "" >> test_results.md
-        echo "# Test Results & Quality Report" >> test_results.md
-        echo "" >> test_results.md
-        echo "_Generated on $(date '+%Y-%m-%d %H:%M:%S UTC')_" >> test_results.md
-        echo "" >> test_results.md
-
         # Run tests again in release job
         python -m pytest tests/ --tb=short --disable-warnings -v --cov=app --cov-report=term --cov-report=xml --junitxml=test-results.xml
 
-        # Metrics Calculation
-        if [ -f test-results.xml ]; then
-            TOTAL_TESTS=$(grep -c "<testcase" test-results.xml 2>/dev/null || echo "0")
-            FAILED_TESTS=$(grep -c "<failure>" test-results.xml 2>/dev/null || echo "0")
-            ERROR_TESTS=$(grep -c "<error>" test-results.xml 2>/dev/null || echo "0")
-            SKIPPED_TESTS=$(grep -c "<skipped>" test-results.xml 2>/dev/null || echo "0")
+        # Generate report using python script
+        cat > generate_report.py << 'EOF'
+import xml.etree.ElementTree as ET
+import datetime
 
-            # Ensure numeric values
-            TOTAL_TESTS=${TOTAL_TESTS:-0}
-            FAILED_TESTS=${FAILED_TESTS:-0}
-            ERROR_TESTS=${ERROR_TESTS:-0}
-            SKIPPED_TESTS=${SKIPPED_TESTS:-0}
+# Parse test results
+def parse_xml_results(xml_file):
+    try:
+        tree = ET.parse(xml_file)
+        root = tree.getroot()
 
-            PASSED_TESTS=$((TOTAL_TESTS - FAILED_TESTS - ERROR_TESTS - SKIPPED_TESTS))
+        total = int(root.attrib.get('tests', 0))
+        failures = int(root.attrib.get('failures', 0))
+        errors = int(root.attrib.get('errors', 0))
+        skipped = int(root.attrib.get('skipped', 0))
 
-            if [ $TOTAL_TESTS -gt 0 ]; then
-                SUCCESS_RATE=$((PASSED_TESTS * 100 / TOTAL_TESTS))
-                SUCCESS_RATE="${SUCCESS_RATE}%"
-            else
-                SUCCESS_RATE="0%"
-            fi
-        else
-            TOTAL_TESTS="N/A"
-            PASSED_TESTS="N/A"
-            FAILED_TESTS="N/A"
-            ERROR_TESTS="N/A"
-            SKIPPED_TESTS="N/A"
-            SUCCESS_RATE="N/A"
-        fi
+        return total, failures, errors, skipped
+    except:
+        return 0, 0, 0, 0
 
-        # Coverage
-        if [ -f coverage.xml ]; then
-            COVERAGE_PERCENT=$(grep -E '^<coverage.*line-rate=' coverage.xml | sed 's/.*line-rate="\([^"]*\)".*/\1/' | awk '{print int($1 * 100)}' 2>/dev/null || echo "0")
-            COVERAGE_RESULT="${COVERAGE_PERCENT}%"
-        else
-            COVERAGE_RESULT="N/A"
-        fi
+# Parse coverage
+def parse_coverage(xml_file):
+    try:
+        with open(xml_file, 'r') as f:
+            content = f.read()
+            import re
+            match = re.search(r'line-rate="([^"]+)"', content)
+            if match:
+                return round(float(match.group(1)) * 100)
+    except:
+        pass
+    return 0
 
-        # Results Table
-        echo "## Test Metrics" >> test_results.md
-        echo "" >> test_results.md
-        echo "| Total Tests | Passed | Failed | Errors | Skipped | Success Rate | Code Coverage |" >> test_results.md
-        echo "|-------------|--------|--------|--------|---------|--------------|---------------|" >> test_results.md
-        echo "| $TOTAL_TESTS | $PASSED_TESTS | $FAILED_TESTS | $ERROR_TESTS | $SKIPPED_TESTS | $SUCCESS_RATE | $COVERAGE_RESULT |" >> test_results.md
+total_tests, failed_tests, error_tests, skipped_tests = parse_xml_results('test-results.xml')
+passed_tests = total_tests - failed_tests - error_tests - skipped_tests
 
-        # Output formatted results
-        cat test_results.md
+if total_tests > 0:
+    success_rate = round((passed_tests / total_tests) * 100)
+else:
+    success_rate = 0
+
+coverage_percent = parse_coverage('coverage.xml')
+
+# Generate beautiful report
+report = f'''<img src="https://capsule-render.vercel.app/api?type=waving&color=A020F0&height=200&section=header&text=cysu&fontSize=80&fontAlignY=50&desc=&descAlignY=70&descAlign=50&animation=twinkling&fontColor=4B0082&borderRadius=20&font=Sono&stroke=A020F0&strokeWidth=2&wave=1&waveOffset=0" />
+
+# Test Results & Quality Report
+
+_Generated on {datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}_
+
+## Test Metrics
+
+| Total Tests | Passed | Failed | Errors | Skipped | Success Rate | Code Coverage |
+|-------------|--------|--------|--------|--------|--------------|---------------|
+| {total_tests} | {passed_tests} | {failed_tests} | {error_tests} | {skipped_tests} | {success_rate}% | {coverage_percent}% |
+
+'''
+
+with open('test_results.md', 'w') as f:
+    f.write(report)
+
+print(report)
+EOF
+
+        python3 generate_report.py
 
     - name: Create Release Archive
       run: |
