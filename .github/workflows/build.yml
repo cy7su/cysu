@@ -138,22 +138,21 @@ jobs:
         # Run tests again in release job
         python -m pytest tests/ --tb=short --disable-warnings -v --cov=app --cov-report=term --cov-report=xml --junitxml=test-results.xml
 
-        # Generate report using python script
-        cat > generate_report.py << 'EOF'
+        # Create simple python report generator
+        python3 -c "
 import xml.etree.ElementTree as ET
 import datetime
+import re
 
 # Parse test results
-def parse_xml_results(xml_file):
+def parse_junit(xml_file):
     try:
         tree = ET.parse(xml_file)
         root = tree.getroot()
-
         total = int(root.attrib.get('tests', 0))
         failures = int(root.attrib.get('failures', 0))
         errors = int(root.attrib.get('errors', 0))
         skipped = int(root.attrib.get('skipped', 0))
-
         return total, failures, errors, skipped
     except:
         return 0, 0, 0, 0
@@ -163,46 +162,37 @@ def parse_coverage(xml_file):
     try:
         with open(xml_file, 'r') as f:
             content = f.read()
-            import re
-            match = re.search(r'line-rate="([^"]+)"', content)
+            match = re.search(r'line-rate=\"([^\"]+)\"', content)
             if match:
                 return round(float(match.group(1)) * 100)
     except:
         pass
     return 0
 
-total_tests, failed_tests, error_tests, skipped_tests = parse_xml_results('test-results.xml')
+total_tests, failed_tests, error_tests, skipped_tests = parse_junit('test-results.xml')
 passed_tests = total_tests - failed_tests - error_tests - skipped_tests
-
-if total_tests > 0:
-    success_rate = round((passed_tests / total_tests) * 100)
-else:
-    success_rate = 0
-
+success_rate = round((passed_tests / total_tests * 100) if total_tests > 0 else 0)
 coverage_percent = parse_coverage('coverage.xml')
 
-# Generate beautiful report
-report = f'''<img src="https://capsule-render.vercel.app/api?type=waving&color=A020F0&height=200&section=header&text=cysu&fontSize=80&fontAlignY=50&desc=&descAlignY=70&descAlign=50&animation=twinkling&fontColor=4B0082&borderRadius=20&font=Sono&stroke=A020F0&strokeWidth=2&wave=1&waveOffset=0" />
+# Generate report
+report = '''<img src=\"https://capsule-render.vercel.app/api?type=waving&color=A020F0&height=200&section=header&text=cysu&fontSize=80&fontAlignY=50&desc=&descAlignY=70&descAlign=50&animation=twinkling&fontColor=4B0082&borderRadius=20&font=Sono&stroke=A020F0&strokeWidth=2&wave=1&waveOffset=0\" />
 
 # Test Results & Quality Report
 
-_Generated on {datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}_
+_Generated on ''' + datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC') + '''_
 
 ## Test Metrics
 
 | Total Tests | Passed | Failed | Errors | Skipped | Success Rate | Code Coverage |
-|-------------|--------|--------|--------|--------|--------------|---------------|
-| {total_tests} | {passed_tests} | {failed_tests} | {error_tests} | {skipped_tests} | {success_rate}% | {coverage_percent}% |
-
+|-------------|--------|--------|--------|---------|--------------|---------------|
+| ''' + str(total_tests) + ' | ' + str(passed_tests) + ' | ' + str(failed_tests) + ' | ' + str(error_tests) + ' | ' + str(skipped_tests) + ' | ' + str(success_rate) + '% | ' + str(coverage_percent) + '''% |
 '''
 
 with open('test_results.md', 'w') as f:
     f.write(report)
 
-print(report)
-EOF
-
-        python3 generate_report.py
+print('Test report generated successfully')
+"
 
     - name: Create Release Archive
       run: |

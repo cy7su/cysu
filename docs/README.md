@@ -3,6 +3,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 [![Flask](https://img.shields.io/badge/flask-3.0+-black.svg)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![.github/workflows/build.yml](https://github.com/cy7su/cysu/actions/workflows/build.yml/badge.svg)](https://github.com/cy7su/cysu/actions/workflows/build.yml)
 
 Educational content management system with subscription-based access.
 
