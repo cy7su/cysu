@@ -63,14 +63,7 @@ EXPOSE 8001
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD python -c "
-try:
-    import requests
-    response = requests.get('http://localhost:8001', timeout=10)
-    exit(0 if response.status_code > 0 else 1)
-except:
-    exit(1)
-" || exit 1
+  CMD python -c "import requests; response = requests.get('http://localhost:8001', timeout=10); exit(0 if response.status_code == 200 else 1)"
 
 # Команда запуска
 CMD ["python", "run.py"]
