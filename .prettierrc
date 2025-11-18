@@ -1,8 +1,1 @@
-{
-  "semi": false,
-  "singleQuote": true,
-  "tabWidth": 4,
-  "useTabs": false,
-  "bracketSpacing": true,
-  "printWidth": 120
-}
+.configs/.prettierrc

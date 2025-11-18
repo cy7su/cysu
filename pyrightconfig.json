@@ -1,15 +1,1 @@
-{
-  "include": ["app", "scripts"],
-  "exclude": ["__pycache__/", "env/", ".venv/", "*.egg-info/"],
-  "typeCheckingMode": "basic",
-  "pythonPlatform": "Linux",
-  "pythonVersion": "3.11",
-  "reportMissingImports": true,
-  "reportImportCycles": false,
-  "reportUnusedImport": true,
-  "reportUnusedClass": false,
-  "reportUnusedFunction": false,
-  "reportUnusedVariable": false,
-  "reportDuplicateImport": true,
-  "extraPaths": ["."]
-}
+.configs/pyrightconfig.json
