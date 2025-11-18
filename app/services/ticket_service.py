@@ -298,3 +298,52 @@ class TicketService:
             return files_info
         except Exception:
             return []
+
+    @staticmethod
+    def set_ticket_priority(ticket_id: int, priority: str) -> bool:
+        """Установить приоритет тикета."""
+        try:
+            ticket = Ticket.query.get(ticket_id)
+            if not ticket:
+                return False
+
+            valid_priorities = ["low", "normal", "high", "urgent"]
+            if priority not in valid_priorities:
+                return False
+
+            ticket.priority = priority
+            ticket.updated_at = datetime.utcnow()
+            db.session.commit()
+
+            return True
+        except Exception as e:
+            from flask import current_app
+
+            current_app.logger.error(f"Error setting ticket priority: {e}")
+            db.session.rollback()
+            return False
+
+    @staticmethod
+    def mass_update_status(ticket_ids: List[int], new_status: str) -> int:
+        """Массово обновить статус тикетов."""
+        try:
+            valid_statuses = ["open", "closed", "pending", "in_progress"]
+            if new_status not in valid_statuses:
+                return 0
+
+            updated_count = 0
+            for ticket_id in ticket_ids:
+                ticket = Ticket.query.get(ticket_id)
+                if ticket:
+                    ticket.status = new_status
+                    ticket.updated_at = datetime.utcnow()
+                    updated_count += 1
+
+            db.session.commit()
+            return updated_count
+        except Exception as e:
+            from flask import current_app
+
+            current_app.logger.error(f"Error mass updating tickets status: {e}")
+            db.session.rollback()
+            return 0

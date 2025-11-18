@@ -173,4 +173,4 @@ dmypy.json
 *.crt
 *.p12
 *.pfx
-test/
+test_results.md

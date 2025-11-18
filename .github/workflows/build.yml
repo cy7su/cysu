@@ -41,11 +41,13 @@ jobs:
         pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Install test dependencies
+      run: |
+        pip install pytest pytest-cov
+
     - name: Run tests
       run: |
-        python -c "import app; print('App imports successfully')"
-        python -c "from app.views.main import main_bp; print('Main views loaded')"
-        python -c "from app.models import Material; print('Models loaded')"
+        python3 run_tests.py --tb=short --disable-warnings -v --cov=app --cov-report=term --cov-report=xml
 
   build:
     name: Build Docker Image
@@ -125,116 +127,105 @@ jobs:
           echo "patch=$patch"
         } >> $GITHUB_OUTPUT
 
-    - name: Code Quality Tests
+    - name: Install test dependencies
       run: |
-        echo "# Code Quality Test Results" > test_results.md
-        echo "" >> test_results.md
-        echo "## CI/CD Pipeline Results - $(date)" >> test_results.md
-        echo "" >> test_results.md
+        pip install pytest
 
-        # Basic Application Tests
-        echo "## Application Bootstrap Test" >> test_results.md
-        echo "\`\`\`" >> test_results.md
+    - name: Install test dependencies
+      run: |
+        pip install pytest pytest-cov
 
-        echo "Running Flask application import test..." >> test_results.md
-        echo "\$ python -c \"import app; print('App imported successfully')\"" >> test_results.md
-        if OUTPUT=$(python -c "import app; print('App imported successfully')" 2>&1); then
-          echo "PASSED: $OUTPUT" >> test_results.md
-          APP_TEST_1="PASSED"
-        else
-          echo "FAILED: $OUTPUT" >> test_results.md
-          APP_TEST_1="FAILED"
-          exit 1
-        fi
+    - name: Generate test report
+      run: |
+        echo "# Test Results & Quality Report" > test_results.md
+        echo "" >> test_results.md
+        echo "_Generated on $(date '+%Y-%m-%d %H:%M:%S UTC')_" >> test_results.md
         echo "" >> test_results.md
 
-        echo "Running views import test..." >> test_results.md
-        echo "\$ python -c \"from app.views.main import main_bp; print('Views imported successfully')\"" >> test_results.md
-        if OUTPUT=$(python -c "from app.views.main import main_bp; print('Views imported successfully')" 2>&1); then
-          echo "PASSED: $OUTPUT" >> test_results.md
-          APP_TEST_2="PASSED"
+        # Test Status Header
+        if python3 run_tests.py --tb=short --disable-warnings --cov=app --cov-report=xml --junitxml=test-results.xml 2>&1 | tee pytest_output.txt; then
+            TEST_RESULT="✅ PASSED"
+            TEST_STATUS="All tests passed successfully"
         else
-          echo "FAILED: $OUTPUT" >> test_results.md
-          APP_TEST_2="FAILED"
-          exit 1
+            TEST_RESULT="❌ FAILED"
+            TEST_STATUS="Some tests failed - please review"
         fi
+
+        echo "## Test Execution Status: $TEST_RESULT" >> test_results.md
+        echo "" >> test_results.md
+        echo "**$TEST_STATUS**" >> test_results.md
         echo "" >> test_results.md
 
-        echo "Running models import test..." >> test_results.md
-        echo "\$ python -c \"from app.models import Material; print('Models imported successfully')\"" >> test_results.md
-        if OUTPUT=$(python -c "from app.models import Material; print('Models imported successfully')" 2>&1); then
-          echo "PASSED: $OUTPUT" >> test_results.md
-          APP_TEST_3="PASSED"
+        # Metrics Calculation
+        if [ -f test-results.xml ]; then
+            TOTAL_TESTS=$(grep -c "<testcase" test-results.xml 2>/dev/null || echo "0")
+            FAILED_TESTS=$(grep -c "<failure>" test-results.xml 2>/dev/null || echo "0")
+            ERROR_TESTS=$(grep -c "<error>" test-results.xml 2>/dev/null || echo "0")
+            SKIPPED_TESTS=$(grep -c "<skipped>" test-results.xml 2>/dev/null || echo "0")
+            PASSED_TESTS=$((TOTAL_TESTS - FAILED_TESTS - ERROR_TESTS - SKIPPED_TESTS))
+
+            SUCCESS_RATE=$([ $TOTAL_TESTS -gt 0 ] && echo "scale=1; ($PASSED_TESTS * 100) / $TOTAL_TESTS" | bc || echo "0")
+            SUCCESS_RATE="${SUCCESS_RATE:-0}%"
         else
-          echo "FAILED: $OUTPUT" >> test_results.md
-          APP_TEST_3="FAILED"
-          exit 1
+            TOTAL_TESTS="N/A"
+            PASSED_TESTS="N/A"
+            FAILED_TESTS="N/A"
+            ERROR_TESTS="N/A"
+            SKIPPED_TESTS="N/A"
+            SUCCESS_RATE="N/A"
         fi
-        echo "\`\`\`" >> test_results.md
 
-        # Basic Unit Tests
-        echo "## pytest Unit Test Execution" >> test_results.md
-        echo "\`\`\`" >> test_results.md
-
-        echo "Running unit tests..." >> test_results.md
-        echo "\$ pytest --tb=short --disable-warnings -q" >> test_results.md
-        PYTEST_OUTPUT=$(pytest --tb=short --disable-warnings -q 2>&1)
-        PYTEST_CODE=$?
-        echo "$PYTEST_OUTPUT" >> test_results.md
-        if [ $PYTEST_CODE -eq 0 ]; then
-          PYTEST_RESULT="PASSED"
-          echo "PASSED: All unit tests completed" >> test_results.md
+        # Coverage
+        if [ -f coverage.xml ]; then
+            COVERAGE_PERCENT=$(grep -E '^<coverage.*line-rate=' coverage.xml | sed 's/.*line-rate="\([^"]*\)".*/\1/' | awk '{print int($1 * 100)}' 2>/dev/null || echo "0")
+            COVERAGE_RESULT="${COVERAGE_PERCENT}%"
         else
-          PYTEST_RESULT="FAILED"
-          echo "FAILED: Unit tests had issues" >> test_results.md
+            COVERAGE_RESULT="N/A"
         fi
-        echo "\`\`\`" >> test_results.md
 
-        # Basic Frontend Checks
-        echo "## Frontend Static Analysis" >> test_results.md
-        echo "\`\`\`" >> test_results.md
+        # Results Table
+        echo "## Test Metrics" >> test_results.md
+        echo "" >> test_results.md
+        echo "| Metric | Count | Status |" >> test_results.md
+        echo "|--------|-------|--------|" >> test_results.md
+        echo "| Total Tests | $TOTAL_TESTS | 📊 |" >> test_results.md
+        echo "| Passed | $PASSED_TESTS | ✅ |" >> test_results.md
+        echo "| Failed | $FAILED_TESTS | ❌ |" >> test_results.md
+        echo "| Errors | $ERROR_TESTS | ⚠️ |" >> test_results.md
+        echo "| Skipped | $SKIPPED_TESTS | ⏭️ |" >> test_results.md
+        echo "| Success Rate | $SUCCESS_RATE | 📈 |" >> test_results.md
+        echo "| Code Coverage | $COVERAGE_RESULT | 🎯 |" >> test_results.md
+        echo "" >> test_results.md
 
-        echo "HTML file structure check..." >> test_results.md
+        # Static Analysis
+        echo "## Static Asset Analysis" >> test_results.md
+        echo "" >> test_results.md
         HTML_COUNT=$(find app/templates -name "*.html" 2>/dev/null | wc -l)
-        echo "Found $HTML_COUNT HTML template files" >> test_results.md
-
-        echo "JavaScript file structure check..." >> test_results.md
         JS_COUNT=$(find app/static/js -name "*.js" 2>/dev/null | wc -l)
-        echo "Found $JS_COUNT JavaScript files" >> test_results.md
-
-        echo "CSS file structure check..." >> test_results.md
         CSS_COUNT=$(find app/static/css -name "*.css" 2>/dev/null | wc -l)
-        echo "Found $CSS_COUNT CSS files" >> test_results.md
+        PY_COUNT=$(find app/ -name "*.py" 2>/dev/null | wc -l)
 
-        echo "PASSED: Static file structure verified" >> test_results.md
-        FRONTEND_RESULT="PASSED"
-        echo "\`\`\`" >> test_results.md
-
-        # Test Summary
-        echo "## Test Execution Summary" >> test_results.md
+        echo "| Asset Type | Count | Status |" >> test_results.md
+        echo "|------------|-------|--------|" >> test_results.md
+        echo "| Python Files | $PY_COUNT | 🐍 |" >> test_results.md
+        echo "| HTML Templates | $HTML_COUNT | 🎨 |" >> test_results.md
+        echo "| JavaScript Files | $JS_COUNT | 📜 |" >> test_results.md
+        echo "| CSS Files | $CSS_COUNT | 🎨 |" >> test_results.md
         echo "" >> test_results.md
 
-        echo "### Application Components" >> test_results.md
-        echo "| Component | Status |" >> test_results.md
-        echo "|-----------|--------|" >> test_results.md
-        echo "| Flask app import | $APP_TEST_1 |" >> test_results.md
-        echo "| Views import | $APP_TEST_2 |" >> test_results.md
-        echo "| Models import | $APP_TEST_3 |" >> test_results.md
+        # Deployment Readiness
+        if [ "$FAILED_TESTS" = "0" ] && [ "$ERROR_TESTS" = "0" ]; then
+            echo "## Deployment Status: ✅ READY FOR PRODUCTION" >> test_results.md
+        else
+            echo "## Deployment Status: ❌ REQUIRES ATTENTION" >> test_results.md
+        fi
         echo "" >> test_results.md
-
-        echo "### Testing Metrics" >> test_results.md
-        echo "| Test Type | Result | Count |" >> test_results.md
-        echo "|-----------|--------|-------|" >> test_results.md
-        echo "| Unit tests | $PYTEST_RESULT | N/A |" >> test_results.md
-        echo "| Frontend files | $FRONTEND_RESULT | HTML: $HTML_COUNT, JS: $JS_COUNT, CSS: $CSS_COUNT |" >> test_results.md
+        echo "**Build completed at $(date '+%Y-%m-%d %H:%M:%S UTC')**" >> test_results.md
         echo "" >> test_results.md
+        echo "---" >> test_results.md
+        echo "_Automated testing and quality assurance completed_" >> test_results.md
 
-        echo "## Deployment Readiness" >> test_results.md
-        echo "" >> test_results.md
-        echo "All critical application components have been tested and verified." >> test_results.md
-        echo "The release is ready for production deployment." >> test_results.md
-
-        # Output test results for release
+        # Output formatted results
         cat test_results.md
 
     - name: Create Release Archive

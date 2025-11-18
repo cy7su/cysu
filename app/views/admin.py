@@ -43,9 +43,6 @@ def admin_users():
     password_map = {}
     message = ""
     current_app.logger.info(f"Форма создана: {form}")
-    current_app.logger.info(
-        f"CSRF токен: {form.csrf_token.current_token if form.csrf_token else 'Нет токена'}"
-    )
     current_app.logger.info(f"Метод запроса: {request.method}")
     current_app.logger.info(f"Данные формы: {request.form}")
     current_app.logger.info(f"Значение submit: {request.form.get('submit')}")

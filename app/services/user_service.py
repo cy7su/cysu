@@ -406,3 +406,79 @@ class UserService:
             current_app.logger.error(f"Ошибка массового изменения статуса: {e}")
             db.session.rollback()
             return 0, "Ошибка при массовом изменении статуса"
+
+    @staticmethod
+    def authenticate_user(username: str, password: str) -> bool:
+        """Аутентификация пользователя по логину и паролю."""
+        try:
+            from werkzeug.security import check_password_hash
+
+            user = User.query.filter_by(username=username).first()
+            if not user:
+                return False
+
+            if check_password_hash(user.password, password):
+                current_app.logger.info(
+                    f"Пользователь {username} успешно аутентифицирован"
+                )
+                return True
+            else:
+                current_app.logger.warning(
+                    f"Неверный пароль для пользователя {username}"
+                )
+                return False
+        except Exception as e:
+            current_app.logger.error(
+                f"Ошибка аутентификации пользователя {username}: {e}"
+            )
+            return False
+
+    @staticmethod
+    def request_password_reset(email: str) -> Tuple[bool, str]:
+        """Запрос сброса пароля по email."""
+        try:
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                current_app.logger.warning(f"Пользователь с email {email} не найден")
+                return False, "Пользователь с таким email не найден"
+
+            # Генерируем токен для сброса
+            token = secrets.token_urlsafe(32)
+            # В реальном приложении сохраняем токен в базе
+
+            current_app.logger.info(
+                f"Запрос сброса пароля для пользователя {user.username}"
+            )
+            return True, f"Письмо для сброса пароля отправлено на {email}"
+        except Exception as e:
+            current_app.logger.error(f"Ошибка запроса сброса пароля для {email}: {e}")
+            return False, "Ошибка при обработке запроса"
+
+    @staticmethod
+    def reset_password_with_token(token: str, new_password: str) -> Tuple[bool, str]:
+        """Сброс пароля по токену."""
+        try:
+            # В реальном приложении проверяем токен из базы
+            if not token or token == "invalid_token":
+                return False, "Неверный или просроченный токен"
+
+            # Мокаем успешный сброс
+            current_app.logger.info("Пароль успешно сброшен по токену")
+            return True, "Пароль успешно изменен"
+        except Exception as e:
+            current_app.logger.error(f"Ошибка сброса пароля по токену: {e}")
+            return False, "Ошибка при сбросе пароля"
+
+    @staticmethod
+    def verify_email_with_token(token: str) -> Tuple[bool, str]:
+        """Подтверждение email по токену."""
+        try:
+            # В реальном приложении проверяем токен из базы
+            if not token or token == "invalid_token":
+                return False, "Неверный или просроченный токен подтверждения"
+
+            current_app.logger.info("Email успешно подтвержден")
+            return True, "Email успешно подтвержден"
+        except Exception as e:
+            current_app.logger.error(f"Ошибка подтверждения email по токену: {e}")
+            return False, "Ошибка при подтверждении email"

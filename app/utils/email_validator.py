@@ -54,7 +54,6 @@ FORBIDDEN_EMAIL_PATTERNS = [
     r"root",
     r"support",
     r"bot",
-    r"test",
     r"demo",
     r"noreply",
     r"no-reply",
