@@ -147,14 +147,10 @@ jobs:
         passed_tests = total_tests - failed_tests - error_tests - skipped_tests
         success_rate = round((passed_tests / total_tests * 100) if total_tests > 0 else 0)
 
-        cap_img = '<img src="https://capsule-render.vercel.app/api?type=waving&color=A020F0&height=200&section=header&text=cysu&fontSize=80&fontAlignY=50&desc=&descAlignY=70&descAlign=50&animation=twinkling&fontColor=4B0082&borderRadius=20&font=Sono&stroke=A020F0&strokeWidth=2&wave=1&waveOffset=0" />'
+        cap_img = '<img src="https://capsule-render.vercel.app/api?type=waving&color=A020F0&height=200&width=800&section=header&text=cysu&fontSize=80&fontAlignY=50&desc=&descAlignY=70&descAlign=50&animation=twinkling&fontColor=4B0082&borderRadius=20&font=Sono&stroke=A020F0&strokeWidth=2&wave=1&waveOffset=0" />'
         timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
 
         report = f"""{cap_img}
-
-        # Test Results & Quality Report
-
-        _Generated on {timestamp}_
 
         ## Test Metrics
 
