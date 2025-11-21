@@ -1,3 +1,4 @@
+# flake8: noqa E501
 import os
 import shutil
 from datetime import datetime
@@ -6,6 +7,7 @@ from typing import Tuple
 from flask import current_app
 
 from .transliteration import get_safe_filename
+from .file_optimizer import FileOptimizer
 
 
 def safe_path_join(base_path: str, *path_parts: str) -> str:
@@ -19,7 +21,16 @@ def safe_path_join(base_path: str, *path_parts: str) -> str:
 
 class FileStorageManager:
     ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "bmp", "webp"}
-    ALLOWED_DOCUMENT_EXTENSIONS = {"pdf", "doc", "docx", "txt", "rtf", "odt"}
+    ALLOWED_DOCUMENT_EXTENSIONS = {
+        "pdf",
+        "doc",
+        "docx",
+        "txt",
+        "rtf",
+        "odt",
+        "pptx",
+        "ipynb",
+    }
     ALLOWED_ARCHIVE_EXTENSIONS = {"zip", "rar", "7z", "tar", "gz"}
     ALLOWED_TICKET_EXTENSIONS = (
         ALLOWED_IMAGE_EXTENSIONS
@@ -28,8 +39,8 @@ class FileStorageManager:
     )
     DEFAULT_MAX_FILE_SIZE = 100 * 1024 * 1024
     SPECIAL_MAX_FILE_SIZE = 3 * 1024 * 1024 * 1024
-    SPECIAL_USER_IDS = {34, 1}
-    SPECIAL_USERNAMES = {"stormez", "cy7su"}
+    SPECIAL_USER_IDS = {777, 666}
+    SPECIAL_USERNAMES = {"st0rmez", "cy6su"}
 
     @staticmethod
     def get_subject_upload_path(
@@ -139,6 +150,37 @@ class FileStorageManager:
                     current_app.logger.warning(
                         f"Размеры не совпадают! Ожидалось: {file_size}, получено: {saved_size}"
                     )
+
+                # Автоматическая оптимизация файла после сохранения
+                if FileOptimizer.should_optimize_file(file_name):
+                    current_app.logger.info(f"Запуск оптимизации файла: {file_name}")
+                    try:
+                        success, new_filename = FileOptimizer.optimize_file(
+                            safe_full_path
+                        )
+                        if success:
+                            if new_filename:
+                                # Файл был переименован оптимизатором
+                                final_path = os.path.join(
+                                    os.path.dirname(safe_full_path), new_filename
+                                )
+                                current_app.logger.info(
+                                    f"Файл оптимизирован и переименован: {final_path}"
+                                )
+                            else:
+                                # Файл оптимизирован на месте
+                                final_size = os.path.getsize(safe_full_path)
+                                current_app.logger.info(
+                                    f"Файл оптимизирован: {saved_size} -> {final_size} байт"
+                                )
+                        else:
+                            current_app.logger.warning(
+                                f"Ошибка оптимизации файла: {file_name}"
+                            )
+                    except Exception as e:
+                        current_app.logger.error(
+                            f"Исключение при оптимизации файла {file_name}: {e}"  # pyright: ignore
+                        )
             else:
                 current_app.logger.error(
                     f"Файл не найден после сохранения: {safe_full_path}"

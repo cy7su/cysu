@@ -1,5 +1,60 @@
-{% extends "base.html" %} {% from 'macros/breadcrumbs.html' import material_breadcrumb %} {% block title %}{{
-material.title }}{% endblock %} {% block breadcrumbs %} {{ material_breadcrumb(material.subject.title,
+{% extends "base.html" %} {% from 'macros/breadcrumbs.html' import material_breadcrumb %} {% block title %}{{ material.title }}{% endblock %}
+
+{% block meta_description %}
+{{ material.description or 'Предмет: ' + material.subject.title + ' - Задание: ' + material.title }}
+{% endblock %}
+
+{% block og_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %}
+
+{% block og_description %}
+{% if material.description %}
+{{ material.description }}
+{% else %}
+Предмет: {{ material.subject.title }} - Задание: {{ material.title }}
+{% endif %}
+{% endblock %}
+
+{% block twitter_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %}
+
+{% block twitter_description %}
+{% if material.description %}
+{{ material.description }}
+{% else %}
+Предмет: {{ material.subject.title }} - Задание: {{ material.title }}
+{% endif %}
+{% endblock %}
+
+{% block linkedin_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %}
+
+{% block linkedin_description %}
+{% if material.description %}
+{{ material.description }}
+{% else %}
+Предмет: {{ material.subject.title }} - Задание: {{ material.title }}
+{% endif %}
+{% endblock %}
+
+{% block vk_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %}
+
+{% block vk_description %}
+{% if material.description %}
+{{ material.description }}
+{% else %}
+Предмет: {{ material.subject.title }} - Задание: {{ material.title }}
+{% endif %}
+{% endblock %}
+
+{% block telegram_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %}
+
+{% block telegram_description %}
+{% if material.description %}
+{{ material.description }}
+{% else %}
+Предмет: {{ material.subject.title }} - Задание: {{ material.title }}
+{% endif %}
+{% endblock %}
+
+{% block breadcrumbs %} {{ material_breadcrumb(material.subject.title,
 url_for('main.subject_detail', subject_id=material.subject.id), material.title) }} {% endblock %} {% block content %}
 <div class="container py-4">
     <div class="row">
@@ -124,7 +179,8 @@ url_for('main.subject_detail', subject_id=material.subject.id), material.title) 
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
                         <a href="{{ url_for('main.serve_user_file', subject_id=material.subject_id, user_id=my_submission.file | extract_user_id_from_path, filename=my_submission.file | extract_filename) }}"
-                            class="btn btn-sm btn-outline-primary mobile-file-btn" target="_blank">
+                            class="btn btn-sm btn-outline-primary mobile-file-btn"
+                            target="_blank">
                             <i class="fas fa-download me-1"></i>Скачать
                         </a>
                         {% if user_solution_share_url %}
@@ -396,6 +452,8 @@ url_for('main.subject_detail', subject_id=material.subject.id), material.title) 
     </div>
 </div>
 {% endif %} {% endif %}
+{% endblock %}
+
 {% block scripts %}
 <script>
     function shareSolution() {
@@ -461,4 +519,4 @@ url_for('main.subject_detail', subject_id=material.subject.id), material.title) 
         document.body.removeChild(textArea);
     }
 </script>
-{% endblock %} {% endblock %}
+{% endblock %}

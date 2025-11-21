@@ -761,6 +761,8 @@ h6 {
     transition: all 0.3s ease;
     border: 0px solid var(--border-secondary);
     text-decoration: none;
+    display: flex !important;
+    align-items: baseline !important;
 }
 
 .btn-primary {
