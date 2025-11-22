@@ -2,7 +2,7 @@ import os
 import tempfile
 import zipfile
 from datetime import datetime
-from typing import Dict
+from typing import Dict, Optional
 
 from flask import current_app
 from werkzeug.utils import secure_filename
@@ -39,7 +39,7 @@ class ExportService:
         return name
 
     @staticmethod
-    def export_user_solutions(user_id: int, username: str) -> str:
+    def export_user_solutions(user_id: int, username: str) -> Optional[str]:
         submissions = Submission.query.filter_by(user_id=user_id).all()
         if not submissions:
             return None

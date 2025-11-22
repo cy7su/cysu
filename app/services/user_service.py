@@ -68,7 +68,6 @@ class UserService:
     def update_user(
         user_id: int, username: Optional[str] = None, email: Optional[str] = None
     ) -> Tuple[bool, str]:
-        """Обновление данных пользователя"""
         try:
             user = User.query.get(user_id)
             if not user:
