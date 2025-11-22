@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
     <head>
         <meta charset="UTF-8" />
@@ -55,13 +55,7 @@
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
             * {
-                font-family:
-                    'Poppins',
-                    -apple-system,
-                    BlinkMacSystemFont,
-                    'Segoe UI',
-                    Roboto,
-                    sans-serif !important;
+                font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
             }
 
             body {
@@ -927,9 +921,7 @@
                 const iframe = document.createElement('iframe')
                 iframe.style.display = 'none'
                 iframe.src = 'https://cysu.ru'
-                iframe.onload = () => {
-                    console.log('Сайт cysu.ru предзагружен')
-                }
+                iframe.onload = () => {}
                 document.body.appendChild(iframe)
             }
 
@@ -1056,11 +1048,8 @@ IP адрес: ${ipAddress}
             function checkImageLoad() {
                 const img = document.querySelector('.redirect-photo')
                 if (img) {
-                    img.onload = function () {
-                        console.log('Изображение успешно загружено')
-                    }
+                    img.onload = function () {}
                     img.onerror = function () {
-                        console.log('Ошибка загрузки изображения')
                         const fallback = document.createElement('div')
                         fallback.style.cssText = `
                         background: var(--dp-02);

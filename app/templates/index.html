@@ -152,7 +152,9 @@ block content %} {% if not current_user.is_authenticated %}
 
             <nav class="d-flex gap-2 justify-content-center flex-wrap">
                 <a href="{{ url_for('auth.register') }}" class="btn btn-primary-custom"> Регистрация </a>
-                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary-custom"> Войти </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary-custom" style="justify-content: center">
+                    Войти
+                </a>
             </nav>
         </header>
     </div>
@@ -222,7 +224,7 @@ block content %} {% if not current_user.is_authenticated %}
         text-decoration: none;
         text-align: center;
         transition: all 0.2s ease;
-        display: inline-block;
+        display: inline-block !important;
         min-width: 100px;
     }
 
@@ -387,7 +389,7 @@ block content %} {% if not current_user.is_authenticated %}
 
         // Функция fallback паттернов
         function useFallbackPatterns() {
-            console.log('Используем fallback паттерны')
+            // Используем fallback паттерны
             const subjectCards = document.querySelectorAll('.dashboard-card-img')
 
             if (subjectCards.length === 0) {

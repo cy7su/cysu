@@ -87,13 +87,7 @@
                                         class="border-0"
                                         style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem"
                                     >
-                                        <button
-                                            class="btn btn-link p-0 text-decoration-none"
-                                            onclick="sortTable('username')"
-                                            style="color: var(--text-primary)"
-                                        >
-                                            Пользователь <i class="fas fa-sort ms-1"></i>
-                                        </button>
+                                        Пользователь
                                     </th>
                                     <th
                                         class="border-0"
@@ -180,11 +174,16 @@
                                         <span class="badge bg-secondary">{{ user.id }}</span>
                                     </td>
                                     <td style="color: var(--text-primary)">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <strong>{{ user.username }}</strong>
-                                            {% if user.id == current_user.id %}
-                                            <span class="badge bg-warning" style="font-size: 0.6rem">Вы</span>
-                                            {% endif %}
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <strong>{{ user.username }}</strong>
+                                                {% if user.id == current_user.id %}
+                                                <span class="badge bg-warning" style="font-size: 0.6rem">Вы</span>
+                                                {% endif %}
+                                            </div>
+                                            <small class="text-muted"
+                                                >{{ submissions_count.get(user.id, 0) }} заданий</small
+                                            >
                                         </div>
                                     </td>
                                     <td style="color: var(--text-primary)">
@@ -918,8 +917,6 @@
             })
                 .then((response) => response.text())
                 .then((html) => {
-                    console.log('Получен HTML ответ от сервера')
-
                     // Парсим HTML ответ для поиска нового пароля
                     const parser = new DOMParser()
                     const doc = parser.parseFromString(html, 'text/html')
@@ -927,18 +924,11 @@
                     // Ищем элемент с новым паролем (если он есть в password_map)
                     const passwordElement = doc.querySelector(`[data-password-for="${userId}"]`)
 
-                    console.log('Поиск элемента пароля для userId:', userId)
-                    console.log('Найден элемент:', passwordElement)
-
                     if (passwordElement) {
                         const newPassword = passwordElement.dataset.password
-                        console.log('Новый пароль найден:', newPassword)
-                        console.log('Вызов showPasswordNotification')
-                        console.log('window.notificationManager:', window.notificationManager)
                         showPasswordNotification(username, newPassword)
                     } else {
                         // Если не нашли в password_map, просто перезагружаем
-                        console.log('Пароль не найден в HTML, показываем стандартное уведомление')
                         window.showSuccess('Пароль сброшен')
                         setTimeout(() => location.reload(), 1500)
                     }
@@ -951,11 +941,7 @@
     }
 
     function showPasswordNotification(username, password) {
-        console.log('showPasswordNotification вызвана с:', { username, password })
-        console.log('Проверка window.notificationManager:', window.notificationManager)
-
         if (!window.notificationManager) {
-            console.error('window.notificationManager не найден!')
             alert(`Пароль для ${username}: ${password}`)
             location.reload()
             return
@@ -978,8 +964,6 @@
             </div>
         </div>
     `
-
-        console.log('Показываем уведомление через notificationManager')
 
         // Показываем уведомление с увеличенным временем (30 секунд)
         window.notificationManager.show(notificationContent, 'success', 30000)
@@ -1235,7 +1219,9 @@
 
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div')
-        notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show`
+        notification.className = `alert alert-${
+            type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'
+        } alert-dismissible fade show`
         notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;'
         notification.innerHTML = `
     ${message}

@@ -15,16 +15,13 @@ const STATIC_RESOURCES = [
 
 // Установка Service Worker
 self.addEventListener('install', (event) => {
-    console.log('Service Worker: Установка...')
     event.waitUntil(
         caches
             .open(STATIC_CACHE)
             .then((cache) => {
-                console.log('Service Worker: Кэширование статических ресурсов')
                 return cache.addAll(STATIC_RESOURCES)
             })
             .then(() => {
-                console.log('Service Worker: Установка завершена')
                 return self.skipWaiting()
             }),
     )
@@ -32,7 +29,6 @@ self.addEventListener('install', (event) => {
 
 // Активация Service Worker
 self.addEventListener('activate', (event) => {
-    console.log('Service Worker: Активация...')
     event.waitUntil(
         caches
             .keys()
@@ -40,14 +36,12 @@ self.addEventListener('activate', (event) => {
                 return Promise.all(
                     cacheNames.map((cacheName) => {
                         if (cacheName !== STATIC_CACHE && cacheName !== CACHE_NAME) {
-                            console.log('Service Worker: Удаление старого кэша', cacheName)
                             return caches.delete(cacheName)
                         }
                     }),
                 )
             })
             .then(() => {
-                console.log('Service Worker: Активация завершена')
                 return self.clients.claim()
             }),
     )
@@ -69,7 +63,6 @@ self.addEventListener('fetch', (event) => {
         caches.match(event.request).then((response) => {
             // Если ресурс в кэше, возвращаем его
             if (response) {
-                console.log('Service Worker: Загружено из кэша', event.request.url)
                 return response
             }
 

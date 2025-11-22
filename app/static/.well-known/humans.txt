@@ -1,30 +1,16 @@
-# humanstxt.org/
-# The humans responsible & technology colophon
-
-# TEAM
-
-    Developer: cysu Team
-    Contact: cysu.ru
-    From: Russia
-
-# THANKS
-
-    Font Awesome: https://fontawesome.com/
-    Bootstrap: https://getbootstrap.com/
-    Flask: https://flask.palletsprojects.com/
-
-# TECHNOLOGY COLOPHON
-
-    HTML5, CSS3, JavaScript
-    Python, Flask
-    Bootstrap 5
-    Font Awesome 6
-    SQLite
-    Linux, Nginx
-
-# SITE
-
-    Last update: 2025/01/15
-    Language: Russian
-    Doctype: HTML5
-    IDE: VS Code
+Developer: cysu
+Contact: cysu.ru
+From: Russia
+Font Awesome: https://fontawesome.com/
+Bootstrap: https://getbootstrap.com/
+Flask: https://flask.palletsprojects.com/
+HTML5, CSS3, JavaScript
+Python, Flask
+Bootstrap 5
+Font Awesome 6
+SQLite
+Linux, Nginx
+Last update: 2025-09-13
+Language: Russian
+Doctype: HTML5
+IDE: VS Code

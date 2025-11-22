@@ -14,11 +14,11 @@
                 <p class="error-description">{{ error_description }}</p>
 
                 <div class="error-actions">
-                    <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-sm px-3 me-2">
+                    <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-sm">
                         <i class="fas fa-home me-2"></i>
                         На главную
                     </a>
-                    <button onclick="history.back()" class="btn btn-outline-primary btn-sm px-3">
+                    <button onclick="history.back()" class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-arrow-left me-2"></i>
                         Назад
                     </button>
@@ -137,12 +137,16 @@
 
     .error-actions {
         margin-bottom: 2rem;
+        text-align: center;
     }
 
     .error-actions .btn {
         border-radius: 20px;
         font-weight: 500;
         transition: all 0.3s ease;
+        max-width: max-content !important;
+        margin: 0 0.5rem;
+        display: ruby !important;
     }
 
     .error-actions .btn:hover {
@@ -196,12 +200,12 @@
 
         .error-actions .btn {
             display: block;
-            width: 100%;
-            margin-bottom: 1rem;
+            margin: 0.5rem auto;
+            width: max-content;
         }
 
-        .error-actions .btn:last-child {
-            margin-bottom: 0;
+        .error-actions .btn {
+            width: max-content;
         }
     }
 

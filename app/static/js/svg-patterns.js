@@ -1354,7 +1354,45 @@ class SVGPatternGenerator {
 
     generatePattern(patternType) {
         try {
-            return this.generateCirclesPattern()
+            switch (patternType) {
+                case 'dots':
+                case 'circles':
+                    return this.generateCirclesPattern()
+                case 'waves':
+                    return this.generateWavesPattern()
+                case 'diamonds':
+                    return this.generateDiamondsPattern()
+                case 'chevrons':
+                    return this.generateChevronsPattern()
+                case 'quilt':
+                    return this.generateQuiltPattern()
+                case 'flowers':
+                    return this.generateFlowersPattern()
+                case 'geometric':
+                    return this.generateGeometricPattern()
+                case 'spiral':
+                    return this.generateSpiralPattern()
+                case 'concentric':
+                    return this.generateConcentricPattern()
+                case 'brick':
+                    return this.generateBrickPattern()
+                case 'diamond-grid':
+                    return this.generateDiamondGridPattern()
+                case 'mandala':
+                    return this.generateMandalaPattern()
+                case 'tessellation':
+                    return this.generateTessellationPattern()
+                case 'fractal':
+                    return this.generateFractalPattern()
+                case 'optical':
+                    return this.generateOpticalPattern()
+                case 'mosaic':
+                    return this.generateMosaicPattern()
+                case 'celtic':
+                    return this.generateCelticPattern()
+                default:
+                    return this.generateCirclesPattern()
+            }
         } catch (error) {
             return this.generateCirclesPattern()
         }
@@ -2818,7 +2856,7 @@ class SVGPatternGenerator {
         return points.join(' ')
     }
 
-    generateStarPoints(centerX, centerY, size) {
+    generateStarPointsFive(centerX, centerY, size) {
         const points = []
         const outerRadius = size
         const innerRadius = size * 0.4

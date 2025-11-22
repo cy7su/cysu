@@ -154,7 +154,15 @@
                                         {% endif %}
                                     </td>
                                     <td style="color: var(--text-primary)">
-                                        <span class="badge bg-info">{{ subject.materials|length }}</span>
+                                        {% set material_count = subjects_materials_count.get(subject.id, {'lectures': 0,
+                                        'practices': 0}) %} {% if material_count.lectures > 0 or
+                                        material_count.practices > 0 %} {% if material_count.lectures > 0 %}
+                                        <span class="badge bg-info">{{ material_count.lectures }} лекций</span>
+                                        {% endif %} {% if material_count.practices > 0 %}
+                                        <span class="badge bg-warning">{{ material_count.practices }} практик</span>
+                                        {% endif %} {% else %}
+                                        <span class="badge bg-secondary">Нет материалов</span>
+                                        {% endif %}
                                     </td>
                                     <td style="color: var(--text-primary)">
                                         <div class="d-flex gap-1">

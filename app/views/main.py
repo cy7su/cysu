@@ -685,69 +685,6 @@ def security_policy() -> str:
     return render_template("static/security_policy.html")
 
 
-@main_bp.route("/.well-known/security.txt")
-def security_txt() -> Response:
-    """Возвращает файл security.txt для исследователей безопасности"""
-    return Response(
-        """Contact: mailto:support@cysu.ru
-            Expires: 2026-01-15T00:00:00.000Z
-            Preferred-Languages: ru, en
-            Canonical: https://cysu.ru/.well-known/security.txt
-            Policy: https://cysu.ru/security-policy""",
-        mimetype="text/plain",
-    )
-
-
-@main_bp.route("/.well-known/humans.txt")
-def humans_txt() -> Response:
-    """Возвращает файл humans.txt с информацией о команде разработки"""
-    return Response(
-        """Developer: cysu
-    Contact: cysu.ru
-    From: Russia
-    Font Awesome: https://fontawesome.com/
-    Bootstrap: https://getbootstrap.com/
-    Flask: https://flask.palletsprojects.com/
-    HTML5, CSS3, JavaScript
-    Python, Flask
-    Bootstrap 5
-    Font Awesome 6
-    SQLite
-    Linux, Nginx
-    Last update: 2025-09-13
-    Language: Russian
-    Doctype: HTML5
-    IDE: VS Code
-""",
-        mimetype="text/plain",
-    )
-
-
-@main_bp.route("/.well-known/robots.txt")
-def robots_txt() -> Response:
-    """Возвращает файл robots.txt для поисковых роботов"""
-    return Response(
-        """User-agent: *
-Allow: /
-Sitemap: https://cysu.ru/sitemap.xml
-Crawl-delay: 1
-Disallow: /admin/
-Disallow: /api/
-Disallow: /static/logs/
-Disallow: /static/temp/
-Allow: /
-Allow: /subjects/
-Allow: /materials/
-Allow: /profile/
-Allow: /about/
-Allow: /contact/
-Allow: /wiki/
-Allow: /privacy/
-Allow: /terms/""",
-        mimetype="text/plain",
-    )
-
-
 @main_bp.route("/robots.txt")
 def robots_txt_redirect() -> Response:
     """Редирект с /robots.txt на /.well-known/robots.txt"""

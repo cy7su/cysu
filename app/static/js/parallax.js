@@ -28,7 +28,6 @@ class ParallaxController {
 
         if (isSlowConnection || isLowEnd || window.innerWidth < 768) {
             this.isEnabled = false
-            console.log('Parallax disabled for performance')
         }
     }
 

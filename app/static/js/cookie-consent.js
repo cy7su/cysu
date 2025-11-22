@@ -62,32 +62,6 @@ class CookieConsentManager {
         this.showSuccessMessage('Использование куки отклонено')
     }
 
-    enableAnalytics() {
-        // Включаем аналитику и другие куки
-        console.log('Аналитика включена')
-
-        // Здесь можно добавить код для включения Google Analytics, Yandex Metrica и т.д.
-        // Например:
-        // if (typeof gtag !== 'undefined') {
-        //     gtag('consent', 'update', {
-        //         'analytics_storage': 'granted'
-        //     });
-        // }
-    }
-
-    disableAnalytics() {
-        // Отключаем аналитику
-        console.log('Аналитика отключена')
-
-        // Здесь можно добавить код для отключения аналитики
-        // Например:
-        // if (typeof gtag !== 'undefined') {
-        //     gtag('consent', 'update', {
-        //         'analytics_storage': 'denied'
-        //     });
-        // }
-    }
-
     showSuccessMessage(message) {
         // Показываем уведомление о принятом решении
         const toast = document.createElement('div')
@@ -151,7 +125,6 @@ class CookieConsentManager {
     static resetConsent() {
         const manager = new CookieConsentManager()
         manager.setCookie(manager.consentKey, '', -1)
-        console.log('Согласие на куки сброшено')
     }
 }
 

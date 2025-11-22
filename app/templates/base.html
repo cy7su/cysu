@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
     <head>
         {% if request.endpoint in ['main.shorten_page', 'main.resolve_shortlink', 'main.shortlink_expired',
@@ -58,7 +58,6 @@
         <meta name="twitter:image" content="{{ request.url_root }}static/icons/og/og-image-1200x630.png" />
         <meta name="twitter:image:alt" content="cysu - Образовательная платформа" />
 
-        <!-- LinkedIn -->
         <meta
             property="linkedin:title"
             content="{% block linkedin_title %}cysu - Образовательная платформа{% endblock %}"
@@ -69,12 +68,13 @@
         />
         <meta property="linkedin:image" content="{{ request.url_root }}static/icons/og/og-image-1200x630.png" />
 
-        <!-- VKontakte -->
         <meta property="vk:title" content="{% block vk_title %}cysu - Образовательная платформа{% endblock %}" />
         <meta
             property="vk:description"
             content="{% block vk_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}"
         />
+        <meta property="vk:image" content="{{ request.url_root }}static/icons/og/og-image-1200x630.png" />
+
         <meta property="vk:image" content="{{ request.url_root }}static/icons/og/og-image-1200x630.png" />
 
         <!-- Telegram -->
@@ -135,6 +135,42 @@
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />
         <meta name="yandex-verification" content="9385f11dab91d75e" />
+
+        <!-- Yandex.Metrika counter -->
+        <script type="text/javascript">
+            ;(function (m, e, t, r, i, k, a) {
+                m[i] =
+                    m[i] ||
+                    function () {
+                        ;(m[i].a = m[i].a || []).push(arguments)
+                    }
+                m[i].l = 1 * new Date()
+                for (var j = 0; j < document.scripts.length; j++) {
+                    if (document.scripts[j].src === r) {
+                        return
+                    }
+                }
+                ;(k = e.createElement(t)),
+                    (a = e.getElementsByTagName(t)[0]),
+                    (k.async = 1),
+                    (k.src = r),
+                    a.parentNode.insertBefore(k, a)
+            })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=105449117', 'ym')
+
+            ym(105449117, 'init', {
+                ssr: true,
+                webvisor: true,
+                clickmap: true,
+                ecommerce: 'dataLayer',
+                accurateTrackBounce: true,
+                trackLinks: true,
+            })
+        </script>
+        <noscript
+            ><div>
+                <img src="https://mc.yandex.ru/watch/105449117" style="position: absolute; left: -9999px" alt="" /></div
+        ></noscript>
+        <!-- /Yandex.Metrika counter -->
 
         <!-- Favicon - только основные -->
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico', v=timestamp) }}" />
@@ -1569,9 +1605,7 @@
 
             /* Ховер эффект для карточек предметов */
             .subject-card {
-                transition:
-                    border-color 0.3s ease,
-                    box-shadow 0.3s ease;
+                transition: border-color 0.3s ease, box-shadow 0.3s ease;
                 border: 1px solid transparent;
             }
 
@@ -2011,6 +2045,26 @@
         {% if current_user.is_authenticated and current_user.is_admin %} {% endif %}
 
         <script>
+            // Глобальные функции для всего приложения
+            // Функция для переключения режима админа с анимацией
+            window.toggleAdminMode = function () {
+                const icon = document.getElementById('adminToggleIcon')
+                if (icon) {
+                    // Добавляем класс анимации
+                    icon.classList.add('admin-toggle-rotating')
+
+                    // Убираем класс анимации после завершения
+                    setTimeout(() => {
+                        icon.classList.remove('admin-toggle-rotating')
+                    }, 600)
+
+                    // Отправляем форму
+                    setTimeout(() => {
+                        document.getElementById('adminToggleForm').submit()
+                    }, 300)
+                }
+            }
+
             // Принудительное обновление иконок при загрузке страницы
             document.addEventListener('DOMContentLoaded', function () {
                 // Обновляем все иконки с новым параметром версии
@@ -2028,7 +2082,7 @@
             // Предотвращение зума на iOS при фокусе на input
             document.addEventListener('DOMContentLoaded', function () {
                 const inputs = document.querySelectorAll(
-                    'input[type="text"], input[type="email"], input[type="password"], textarea',
+                    'input[type="text"], input[type="email"], input[type="password"], textarea'
                 )
                 inputs.forEach((input) => {
                     input.addEventListener('focus', function () {
@@ -2136,8 +2190,6 @@
 
             // Функция для замены названий языков программирования на иконки
             function replaceLanguageNamesWithIcons() {
-                console.log('🔄 Запуск функции замены языков на иконки...')
-
                 // 45 языков программирования + HTML/CSS (только доступные в Devicon)
                 const languageIcons = {
                     python: 'devicon-python-plain colored',
@@ -2209,25 +2261,20 @@
 
                 // Находим все элементы с классами text-muted mb-1 и text-muted mb-0
                 let cardTextElements = document.querySelectorAll('.card-text.text-muted.mb-1, .text-muted.mb-0')
-                console.log(`📋 Найдено элементов для обработки: ${cardTextElements.length}`)
 
                 // Если не найдены, пробуем альтернативные селекторы
                 if (cardTextElements.length === 0) {
                     cardTextElements = document.querySelectorAll('.card-text, .text-muted')
-                    console.log(`📋 Альтернативный поиск - найдено элементов: ${cardTextElements.length}`)
                 }
 
                 if (cardTextElements.length === 0) {
                     cardTextElements = document.querySelectorAll('[class*="card-text"], [class*="text-muted"]')
-                    console.log(`📋 Поиск по частичному совпадению - найдено элементов: ${cardTextElements.length}`)
                 }
 
                 cardTextElements.forEach((element, index) => {
                     let text = element.innerHTML
                     let hasReplacement = false
                     const originalText = text
-
-                    console.log(`🔍 Обрабатываем элемент ${index + 1}:`, text)
 
                     // Заменяем :название: на иконки
                     Object.keys(languageIcons).forEach((language) => {
@@ -2249,25 +2296,17 @@
                                 const iconHtml = `<i class="${iconClass}" title="${language}" style="${iconStyle}"></i>`
                                 text = text.replace(regex, iconHtml)
                                 hasReplacement = true
-                                console.log(
-                                    `✅ Заменен :${language}: на иконку (${isFontAwesome ? 'Font Awesome' : 'Devicon'})`,
-                                )
                             }
                         } catch (error) {
-                            console.error(`❌ Ошибка при обработке языка "${language}":`, error)
+                            // Игнорируем ошибки для отдельных языков
                         }
                     })
 
-                    // Если были замены, обновляем содержимое элемента
-                    if (hasReplacement) {
+                    // Обновляем содержимое элемента только при наличии замен
+                    if (hasReplacement && text !== originalText) {
                         element.innerHTML = text
-                        console.log(`🎨 Элемент ${index + 1} обновлен:`, originalText, '→', text)
-                    } else {
-                        console.log(`⏭️ Элемент ${index + 1} не требует замены`)
                     }
                 })
-
-                console.log('✅ Функция замены языков завершена')
             }
 
             // Глобальная функция для ручного вызова (для отладки)
@@ -2277,679 +2316,679 @@
         {% if not maintenance_mode %}
         <script>
             // Класс для управления уведомлениями
-            class NotificationManager {
-                constructor() {
-                    this.container = document.getElementById('notifications-container');
-                    this.notifications = new Map();
-                    this.counter = 0;
-                    this.init();
-                }
-
-                init() {
-                    this.handleUrlParams();
-                    this.cleanUrl();
-                }
-
-                handleUrlParams() {
-                    const params = new URLSearchParams(window.location.search);
-                    const message = params.get('notify');
-                    const type = params.get('notify_type') || 'info';
-
-                    if (message) {
-                        this.show(decodeURIComponent(message), type);
+                class NotificationManager {
+                    constructor() {
+                        this.container = document.getElementById('notifications-container');
+                        this.notifications = new Map();
+                        this.counter = 0;
+                        this.init();
                     }
-                }
 
-                cleanUrl() {
-                    const params = new URLSearchParams(window.location.search);
-                    if (params.has('notify') || params.has('notify_type')) {
-                        params.delete('notify');
-                        params.delete('notify_type');
-                        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
-                        window.history.replaceState({}, '', newUrl);
+                    init() {
+                        this.handleUrlParams();
+                        this.cleanUrl();
                     }
-                }
 
-                /**
-                 * Показывает уведомление
-                 * @param {string} message - Текст сообщения
-                 * @param {string} type - Тип уведомления (success, error, warning, info)
-                 * @param {number} duration - Длительность показа в миллисекундах (по умолчанию 8000)
-                 */
-                show(message, type = 'info', duration = 8000) {
-                    const id = `notification-${++this.counter}`;
-                    const notification = this.createNotification(id, message, type);
+                    handleUrlParams() {
+                        const params = new URLSearchParams(window.location.search);
+                        const message = params.get('notify');
+                        const type = params.get('notify_type') || 'info';
 
-                    this.container.appendChild(notification);
-                    this.notifications.set(id, {
-                        element: notification,
-                        timer: null,
-                        progressTimer: null,
-                        startTime: Date.now(),
-                        duration: duration,
-                        isPaused: false
-                    });
-
-                    // Анимация появления
-                    setTimeout(() => {
-                        notification.classList.add('show');
-                    }, 10);
-
-                    // Запускаем таймер
-                    this.startTimer(id);
-
-                    return id;
-                }
-
-                /**
-                 * Создает элемент уведомления
-                 */
-                createNotification(id, message, type) {
-                    const notification = document.createElement('div');
-                    notification.id = id;
-                    notification.className = `notification ${type}`;
-
-                    const title = this.getTitleByType(type);
-
-                    notification.innerHTML = `
-                <div class="notification-header">
-                    <div class="notification-title">${title}</div>
-                    <button class="notification-close" onclick="window.notificationManager.close('${id}')">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="notification-content">${message}</div>
-                <div class="notification-timer"></div>
-            `;
-
-                    // Обработчики для приостановки таймера при наведении
-                    notification.addEventListener('mouseenter', () => this.pauseTimer(id));
-                    notification.addEventListener('mouseleave', () => this.resumeTimer(id));
-
-                    return notification;
-                }
-
-                /**
-                 * Получает заголовок по типу уведомления
-                 */
-                getTitleByType(type) {
-                    const titles = {
-                        'success': 'Успешно',
-                        'error': 'Ошибка',
-                        'warning': 'Предупреждение',
-                        'info': 'Информация',
-                        'persistent': 'Важно',
-                        'auth-notification': 'Важно',
-                        'answer': 'Ответ'
-                    };
-                    return titles[type] || 'Уведомление';
-                }
-
-                /**
-                 * Запускает таймер уведомления
-                 */
-                startTimer(id) {
-                    const notification = this.notifications.get(id);
-                    if (!notification) return;
-
-                    const { element, duration } = notification;
-                    const timerElement = element.querySelector('.notification-timer');
-
-                    notification.startTime = Date.now();
-                    notification.isPaused = false;
-
-                    // Если duration = 0, уведомление показывается бесконечно
-                    if (duration > 0) {
-                        // Таймер для скрытия
-                        notification.timer = setTimeout(() => {
-                            this.close(id);
-                        }, duration);
-
-                        // Таймер для прогресс-бара
-                        this.updateProgress(id);
-                    } else {
-                        // Для бесконечных уведомлений скрываем прогресс-бар
-                        timerElement.style.display = 'none';
-                    }
-                }
-
-                /**
-                 * Обновляет прогресс-бар
-                 */
-                updateProgress(id) {
-                    const notification = this.notifications.get(id);
-                    if (!notification || notification.isPaused) return;
-
-                    const { element, startTime, duration } = notification;
-                    const timerElement = element.querySelector('.notification-timer');
-
-                    // Для бесконечных уведомлений не обновляем прогресс
-                    if (duration === 0) return;
-
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.max(0, 100 - (elapsed / duration) * 100);
-
-                    timerElement.style.width = `${progress}%`;
-
-                    if (progress > 0) {
-                        notification.progressTimer = setTimeout(() => {
-                            this.updateProgress(id);
-                        }, 50);
-                    }
-                }
-
-                /**
-                 * Приостанавливает таймер
-                 */
-                pauseTimer(id) {
-                    const notification = this.notifications.get(id);
-                    if (!notification || notification.isPaused) return;
-
-                    // Для бесконечных уведомлений не приостанавливаем таймер
-                    if (notification.duration === 0) return;
-
-                    notification.isPaused = true;
-                    notification.pauseTime = Date.now();
-
-                    if (notification.timer) {
-                        clearTimeout(notification.timer);
-                    }
-                    if (notification.progressTimer) {
-                        clearTimeout(notification.progressTimer);
-                    }
-                }
-
-                /**
-                 * Возобновляет таймер
-                 */
-                resumeTimer(id) {
-                    const notification = this.notifications.get(id);
-                    if (!notification || !notification.isPaused) return;
-
-                    const pauseDuration = Date.now() - notification.pauseTime;
-                    notification.startTime += pauseDuration;
-                    notification.isPaused = false;
-
-                    // Для бесконечных уведомлений (duration = 0) ничего не делаем
-                    if (notification.duration === 0) return;
-
-                    const remainingTime = notification.duration - (Date.now() - notification.startTime);
-
-                    if (remainingTime > 0) {
-                        notification.timer = setTimeout(() => {
-                            this.close(id);
-                        }, remainingTime);
-
-                        this.updateProgress(id);
-                    } else {
-                        this.close(id);
-                    }
-                }
-
-                /**
-                 * Закрывает уведомление
-                 */
-                close(id) {
-                    const notification = this.notifications.get(id);
-                    if (!notification) return;
-
-                    const { element, timer, progressTimer } = notification;
-
-                    // Очищаем таймеры
-                    if (timer) clearTimeout(timer);
-                    if (progressTimer) clearTimeout(progressTimer);
-
-                    // Анимация скрытия
-                    element.classList.add('hide');
-
-                    setTimeout(() => {
-                        if (element.parentNode) {
-                            element.parentNode.removeChild(element);
+                        if (message) {
+                            this.show(decodeURIComponent(message), type);
                         }
-                        this.notifications.delete(id);
-                    }, 300);
-                }
-
-                /**
-                 * Закрывает все уведомления
-                 */
-                closeAll() {
-                    for (const [id] of this.notifications) {
-                        this.close(id);
                     }
-                }
-            }
 
-            // Создаем глобальный экземпляр менеджера уведомлений
-            window.notificationManager = new NotificationManager();
+                    cleanUrl() {
+                        const params = new URLSearchParams(window.location.search);
+                        if (params.has('notify') || params.has('notify_type')) {
+                            params.delete('notify');
+                            params.delete('notify_type');
+                            const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                            window.history.replaceState({}, '', newUrl);
+                        }
+                    }
 
-            // Глобальная функция для показа уведомлений (можно вызывать из других скриптов)
-            window.showNotification = function (message, type = 'info', duration = 8000) {
-                return window.notificationManager.show(message, type, duration);
-            }
+                    /**
+                     * Показывает уведомление
+                     * @param {string} message - Текст сообщения
+                     * @param {string} type - Тип уведомления (success, error, warning, info)
+                     * @param {number} duration - Длительность показа в миллисекундах (по умолчанию 8000)
+                     */
+                    show(message, type = 'info', duration = 8000) {
+                        const id = `notification-${++this.counter}`;
+                        const notification = this.createNotification(id, message, type);
 
-            // Функции для удобного вызова разных типов уведомлений
-            window.showSuccess = function (message, duration = 5000) {
-                return window.notificationManager.show(message, 'success', duration);
-            }
-
-            window.showError = function (message, duration = 5000) {
-                return window.notificationManager.show(message, 'error', duration);
-            }
-
-            window.showWarning = function (message, duration = 3000) {
-                return window.notificationManager.show(message, 'warning', duration);
-            }
-
-            window.showInfo = function (message, duration = 3000) {
-                return window.notificationManager.show(message, 'info', duration);
-            }
-
-            // Глобальная обработка ошибок AJAX
-            document.addEventListener('DOMContentLoaded', function () {
-                // Перехватываем ошибки fetch запросов
-                const originalFetch = window.fetch;
-                window.fetch = function (...args) {
-                    return originalFetch.apply(this, args)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                            }
-                            return response;
-                        })
-                        .catch(error => {
-                            showError(`Ошибка сети: ${error.message}`, 5000);
-                            throw error;
+                        this.container.appendChild(notification);
+                        this.notifications.set(id, {
+                            element: notification,
+                            timer: null,
+                            progressTimer: null,
+                            startTime: Date.now(),
+                            duration: duration,
+                            isPaused: false
                         });
-                };
 
-                // Перехватываем ошибки XMLHttpRequest
-                const originalXHROpen = XMLHttpRequest.prototype.open;
-                XMLHttpRequest.prototype.open = function (...args) {
-                    this.addEventListener('error', function () {
-                        showError('Ошибка при выполнении запроса', 5000);
-                    });
-                    this.addEventListener('timeout', function () {
-                        showError('Превышено время ожидания запроса', 5000);
-                    });
-                    return originalXHROpen.apply(this, args);
-                };
+                        // Анимация появления
+                        setTimeout(() => {
+                            notification.classList.add('show');
+                        }, 10);
 
-                // Постоянные уведомления для пользователей
-                {% if not current_user.is_authenticated %}
-                // Для неавторизованных пользователей только на главной странице
-                {% if request.endpoint == 'main.index' %}
-                window.notificationManager.show('Для просмотра материалов необходимо авторизоваться', 'auth-notification', 17000); // 17 секунд
-                {% endif %}
-                {% elif not is_subscribed %}
-                // Для авторизованных пользователей без подписки (только на главной странице)
-                {% if request.endpoint == 'main.index' %}
-                window.notificationManager.show('Для доступа к предметам необходима активная подписка. <a href="{{ url_for("payment.subscription") }}" style="color: #ff6b35 !important; text-decoration: none; font-weight: bold;">Оформить подписку</a>', 'persistent', 0); // 0 = бесконечно
-                {% endif %}
-                {% endif %}
+                        // Запускаем таймер
+                        this.startTimer(id);
 
-                // Уведомление о пробной подписке (показывается на всех страницах)
-                {% if current_user.is_authenticated and subscription_info and subscription_info.is_trial %}
-                {% if request.endpoint == 'main.index' %}
-                setTimeout(function () {
-                    window.notificationManager.show('Пробная подписка активна!', 'info', 1000); // 2 секунды
-                }, 100); // Показываем через 1 секунду после загрузки страницы
-                {% endif %}
-                {% endif %}
-
-
-            });
-
-            // ==================== СИСТЕМА ТИКЕТОВ ====================
-
-            // Функция для открытия модального окна создания тикета
-            function openTicketModal() {
-                const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
-                modal.show();
-            }
-
-            // Функция для создания тикета
-            function createTicket() {
-                const form = document.getElementById('ticketForm');
-                const formData = new FormData(form);
-
-                // Показываем индикатор загрузки
-                const submitBtn = document.getElementById('ticketSubmitBtn');
-                const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
-                submitBtn.disabled = true;
-
-                fetch('/api/ticket/create', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showSuccess(data.message);
-                            // Закрываем модальное окно
-                            const modalElement = document.getElementById('ticketModal');
-                            if (modalElement) {
-                                const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-                                modal.hide();
-                            }
-                            // Очищаем форму
-                            form.reset();
-                            // Очищаем список файлов
-                            document.getElementById('fileList').innerHTML = '';
-
-                            // Переходим на страницу тикета
-                            setTimeout(() => {
-                                window.location.href = '/tickets/' + data.ticket_id;
-                            }, 1500);
-                        } else {
-                            showError(data.error || 'Ошибка создания тикета');
-                        }
-                    })
-                    .catch(error => {
-                        if (error.message.includes('413')) {
-                            showError('Файл слишком большой. Максимальный размер: 1 ГБ на файл');
-                        } else {
-                            showError('Ошибка сети при создании тикета');
-                        }
-                        console.error('Error:', error);
-                    })
-                    .finally(() => {
-                        // Восстанавливаем кнопку
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.disabled = false;
-                    });
-            }
-
-            // Функция для отображения выбранных файлов
-            function updateFileList() {
-                const fileInput = document.getElementById('ticketFiles');
-                const fileList = document.getElementById('fileList');
-                fileList.innerHTML = '';
-
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    const file = fileInput.files[i];
-                    const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Размер в МБ
-
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'd-flex align-items-center justify-content-between p-2 mb-1 rounded';
-                    fileItem.style.cssText = 'background-color: #2a2a2a; border: 1px solid #3a3a3a;';
-
-                    fileItem.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-file me-2 text-primary"></i>
-                    <span class="text-white">${file.name}</span>
-                </div>
-                <span class="text-muted small">${fileSize} МБ</span>
-            `;
-
-                    fileList.appendChild(fileItem);
-                }
-            }
-
-            // Инициализация при загрузке страницы
-            document.addEventListener('DOMContentLoaded', function () {
-                // Обработчик изменения файлов в форме тикета
-                const fileInput = document.getElementById('ticketFiles');
-                if (fileInput) {
-                    fileInput.addEventListener('change', updateFileList);
-                }
-
-                // Обработчик изменения файлов в форме ответа пользователя
-                const userResponseFileInput = document.getElementById('userResponseFiles');
-                if (userResponseFileInput) {
-                    userResponseFileInput.addEventListener('change', updateUserResponseFileList);
-                }
-
-                // Загружаем уведомления для авторизованных пользователей
-                {% if current_user.is_authenticated %}
-                loadNotifications();
-
-                // Проверяем уведомления только когда страница видима
-                let notificationInterval;
-
-                function startNotificationCheck() {
-                    if (document.visibilityState === 'visible') {
-                        notificationInterval = setInterval(loadNotifications, 120000); // 2 минуты
+                        return id;
                     }
-                }
 
-                function stopNotificationCheck() {
-                    if (notificationInterval) {
-                        clearInterval(notificationInterval);
-                        notificationInterval = null;
-                    }
-                }
+                    /**
+                     * Создает элемент уведомления
+                     */
+                    createNotification(id, message, type) {
+                        const notification = document.createElement('div');
+                        notification.id = id;
+                        notification.className = `notification ${type}`;
 
-                // Запускаем проверку при загрузке
-                startNotificationCheck();
+                        const title = this.getTitleByType(type);
 
-                // Останавливаем/запускаем при изменении видимости страницы
-                document.addEventListener('visibilitychange', function () {
-                    if (document.visibilityState === 'visible') {
-                        loadNotifications(); // Сразу проверяем при возвращении на страницу
-                        startNotificationCheck();
-                    } else {
-                        stopNotificationCheck();
-                    }
-                });
-                {% endif %}
-            });
-
-            // Функция для отправки ответа пользователя на тикет
-            function sendUserResponse() {
-                const form = document.getElementById('userResponseForm');
-                const formData = new FormData(form);
-
-                // Показываем индикатор загрузки
-                const submitBtn = document.getElementById('userResponseSubmitBtn');
-                const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
-                submitBtn.disabled = true;
-
-                fetch('/api/ticket/user_response', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            if (response.status === 413) {
-                                throw new Error('413');
-                            }
-                            throw new Error(`HTTP ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            showSuccess('Ответ отправлен!');
-                            // Очищаем форму
-                            form.reset();
-                            document.getElementById('userResponseFileList').innerHTML = '';
-                            // Перезагружаем страницу для отображения нового ответа
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1500);
-                        } else {
-                            showError(data.error || 'Ошибка отправки ответа');
-                        }
-                    })
-                    .catch(error => {
-                        if (error.message.includes('413')) {
-                            showError('Файл слишком большой. Максимальный размер: 1 ГБ на файл');
-                        } else {
-                            showError('Ошибка сети при отправке ответа');
-                        }
-                        console.error('Error:', error);
-                    })
-                    .finally(() => {
-                        // Восстанавливаем кнопку
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.disabled = false;
-                    });
-            }
-
-            // Функция для прокрутки чата вниз
-            function scrollChatToBottom() {
-                const chatMessages = document.getElementById('chatMessages');
-                if (chatMessages) {
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-            }
-
-            // Прокручиваем чат вниз при загрузке страницы
-            document.addEventListener('DOMContentLoaded', function () {
-                scrollChatToBottom();
-            });
-
-            // Функция для отображения списка выбранных файлов в ответе пользователя
-            function updateUserResponseFileList() {
-                const fileInput = document.getElementById('userResponseFiles');
-                const fileList = document.getElementById('userResponseFileList');
-                const files = fileInput.files;
-
-                fileList.innerHTML = '';
-
-                if (files.length > 0) {
-                    const list = document.createElement('ul');
-                    list.className = 'list-unstyled mb-0';
-
-                    for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
-                        const listItem = document.createElement('li');
-                        listItem.className = 'text-white-50 small';
-                        listItem.innerHTML = `<i class="fas fa-file me-1"></i>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} МБ)`;
-                        list.appendChild(listItem);
-                    }
-                }
-            }
-
-            // Функция для загрузки уведомлений с кэшированием
-            let lastNotificationCheck = 0;
-            const NOTIFICATION_CACHE_TIME = 60000; // 1 минута кэш
-
-            function loadNotifications() {
-                const now = Date.now();
-
-                // Проверяем кэш - не делаем запрос чаще чем раз в минуту
-                if (now - lastNotificationCheck < NOTIFICATION_CACHE_TIME) {
-                    return;
-                }
-
-                lastNotificationCheck = now;
-
-                fetch('/api/notifications', {
-                    method: 'GET',
-                    headers: {
-                        'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.notifications.length > 0) {
-                            // Показываем все непрочитанные уведомления через NotificationManager
-                            data.notifications.forEach(notification => {
-                                showTicketNotification(notification);
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Ошибка загрузки уведомлений:', error);
-                    });
-            }
-
-            // Функция для показа уведомления о тикете через NotificationManager
-            function showTicketNotification(notification) {
-                // Проверяем, не было ли уже показано это уведомление
-                const dismissedNotifications = JSON.parse(localStorage.getItem('dismissedTicketNotifications') || '[]');
-                if (dismissedNotifications.includes(notification.id)) {
-                    return;
-                }
-
-                // Создаем HTML для уведомления с кнопкой
-                const notificationHtml = `
-            <div class="d-flex align-items-center justify-content-between">
-                <div class="flex-grow-1">
-                    <div class="mb-2">
-                        Администратор ответил на ваш тикет
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <button type="button" class="btn btn-sm btn-outline-success" onclick="goToTicket('${notification.link}', ${notification.id})" style="font-size: 0.75rem; padding: 2px 8px;">
-                            Перейти
+                        notification.innerHTML = `
+                    <div class="notification-header">
+                        <div class="notification-title">${title}</div>
+                        <button class="notification-close" onclick="window.notificationManager.close('${id}')">
+                            <i class="fas fa-times"></i>
                         </button>
                     </div>
-                </div>
-            </div>
-        `;
+                    <div class="notification-content">${message}</div>
+                    <div class="notification-timer"></div>
+                `;
 
-                // Показываем уведомление через NotificationManager (7 минут = 420000 мс)
-                const notificationId = window.notificationManager.show(notificationHtml, 'answer', 420000);
+                        // Обработчики для приостановки таймера при наведении
+                        notification.addEventListener('mouseenter', () => this.pauseTimer(id));
+                        notification.addEventListener('mouseleave', () => this.resumeTimer(id));
 
-                // Сохраняем информацию о уведомлении для последующего закрытия
-                if (!window.ticketNotifications) {
-                    window.ticketNotifications = new Map();
-                }
-                window.ticketNotifications.set(notificationId, {
-                    originalId: notification.id,
-                    link: notification.link
-                });
+                        return notification;
+                    }
 
-                // Добавляем обработчик закрытия
-                setTimeout(() => {
-                    const notificationElement = document.getElementById(notificationId);
-                    if (notificationElement) {
-                        const closeButton = notificationElement.querySelector('.notification-close');
-                        if (closeButton) {
-                            closeButton.onclick = function () {
-                                markTicketNotificationRead(notification.id, notificationId);
-                            };
+                    /**
+                     * Получает заголовок по типу уведомления
+                     */
+                    getTitleByType(type) {
+                        const titles = {
+                            'success': 'Успешно',
+                            'error': 'Ошибка',
+                            'warning': 'Предупреждение',
+                            'info': 'Информация',
+                            'persistent': 'Важно',
+                            'auth-notification': 'Важно',
+                            'answer': 'Ответ'
+                        };
+                        return titles[type] || 'Уведомление';
+                    }
+
+                    /**
+                     * Запускает таймер уведомления
+                     */
+                    startTimer(id) {
+                        const notification = this.notifications.get(id);
+                        if (!notification) return;
+
+                        const { element, duration } = notification;
+                        const timerElement = element.querySelector('.notification-timer');
+
+                        notification.startTime = Date.now();
+                        notification.isPaused = false;
+
+                        // Если duration = 0, уведомление показывается бесконечно
+                        if (duration > 0) {
+                            // Таймер для скрытия
+                            notification.timer = setTimeout(() => {
+                                this.close(id);
+                            }, duration);
+
+                            // Таймер для прогресс-бара
+                            this.updateProgress(id);
+                        } else {
+                            // Для бесконечных уведомлений скрываем прогресс-бар
+                            timerElement.style.display = 'none';
                         }
                     }
-                }, 100);
-            }
 
-            // Функция для перехода к тикету
-            function goToTicket(link, notificationId) {
-                // Отмечаем уведомление как прочитанное
-                const dismissedNotifications = JSON.parse(localStorage.getItem('dismissedTicketNotifications') || '[]');
-                if (!dismissedNotifications.includes(notificationId)) {
-                    dismissedNotifications.push(notificationId);
-                    localStorage.setItem('dismissedTicketNotifications', JSON.stringify(dismissedNotifications));
-                }
+                    /**
+                     * Обновляет прогресс-бар
+                     */
+                    updateProgress(id) {
+                        const notification = this.notifications.get(id);
+                        if (!notification || notification.isPaused) return;
 
-                // Переходим к тикету
-                window.location.href = link;
-            }
+                        const { element, startTime, duration } = notification;
+                        const timerElement = element.querySelector('.notification-timer');
 
-            // Функция для отметки уведомления о тикете как прочитанного
-            function markTicketNotificationRead(notificationId, managerNotificationId) {
-                // Сохраняем ID уведомления в localStorage как закрытое
-                const dismissedNotifications = JSON.parse(localStorage.getItem('dismissedTicketNotifications') || '[]');
-                if (!dismissedNotifications.includes(notificationId)) {
-                    dismissedNotifications.push(notificationId);
-                    localStorage.setItem('dismissedTicketNotifications', JSON.stringify(dismissedNotifications));
-                }
+                        // Для бесконечных уведомлений не обновляем прогресс
+                        if (duration === 0) return;
 
-                // Закрываем уведомление через NotificationManager
-                if (window.notificationManager) {
-                    window.notificationManager.close(managerNotificationId);
-                }
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.max(0, 100 - (elapsed / duration) * 100);
 
-                // Отправляем запрос на сервер
-                fetch(`/api/notifications/${notificationId}/read`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                        timerElement.style.width = `${progress}%`;
+
+                        if (progress > 0) {
+                            notification.progressTimer = setTimeout(() => {
+                                this.updateProgress(id);
+                            }, 50);
+                        }
                     }
-                })
-                    .catch(error => {
-                        console.error('Ошибка отметки уведомления как прочитанного:', error);
+
+                    /**
+                     * Приостанавливает таймер
+                     */
+                    pauseTimer(id) {
+                        const notification = this.notifications.get(id);
+                        if (!notification || notification.isPaused) return;
+
+                        // Для бесконечных уведомлений не приостанавливаем таймер
+                        if (notification.duration === 0) return;
+
+                        notification.isPaused = true;
+                        notification.pauseTime = Date.now();
+
+                        if (notification.timer) {
+                            clearTimeout(notification.timer);
+                        }
+                        if (notification.progressTimer) {
+                            clearTimeout(notification.progressTimer);
+                        }
+                    }
+
+                    /**
+                     * Возобновляет таймер
+                     */
+                    resumeTimer(id) {
+                        const notification = this.notifications.get(id);
+                        if (!notification || !notification.isPaused) return;
+
+                        const pauseDuration = Date.now() - notification.pauseTime;
+                        notification.startTime += pauseDuration;
+                        notification.isPaused = false;
+
+                        // Для бесконечных уведомлений (duration = 0) ничего не делаем
+                        if (notification.duration === 0) return;
+
+                        const remainingTime = notification.duration - (Date.now() - notification.startTime);
+
+                        if (remainingTime > 0) {
+                            notification.timer = setTimeout(() => {
+                                this.close(id);
+                            }, remainingTime);
+
+                            this.updateProgress(id);
+                        } else {
+                            this.close(id);
+                        }
+                    }
+
+                    /**
+                     * Закрывает уведомление
+                     */
+                    close(id) {
+                        const notification = this.notifications.get(id);
+                        if (!notification) return;
+
+                        const { element, timer, progressTimer } = notification;
+
+                        // Очищаем таймеры
+                        if (timer) clearTimeout(timer);
+                        if (progressTimer) clearTimeout(progressTimer);
+
+                        // Анимация скрытия
+                        element.classList.add('hide');
+
+                        setTimeout(() => {
+                            if (element.parentNode) {
+                                element.parentNode.removeChild(element);
+                            }
+                            this.notifications.delete(id);
+                        }, 300);
+                    }
+
+                    /**
+                     * Закрывает все уведомления
+                     */
+                    closeAll() {
+                        for (const [id] of this.notifications) {
+                            this.close(id);
+                        }
+                    }
+                }
+
+                // Создаем глобальный экземпляр менеджера уведомлений
+                window.notificationManager = new NotificationManager();
+
+                // Глобальная функция для показа уведомлений (можно вызывать из других скриптов)
+                window.showNotification = function (message, type = 'info', duration = 8000) {
+                    return window.notificationManager.show(message, type, duration);
+                }
+
+                // Функции для удобного вызова разных типов уведомлений
+                window.showSuccess = function (message, duration = 5000) {
+                    return window.notificationManager.show(message, 'success', duration);
+                }
+
+                window.showError = function (message, duration = 5000) {
+                    return window.notificationManager.show(message, 'error', duration);
+                }
+
+                window.showWarning = function (message, duration = 3000) {
+                    return window.notificationManager.show(message, 'warning', duration);
+                }
+
+                window.showInfo = function (message, duration = 3000) {
+                    return window.notificationManager.show(message, 'info', duration);
+                }
+
+                // Глобальная обработка ошибок AJAX
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Перехватываем ошибки fetch запросов
+                    const originalFetch = window.fetch;
+                    window.fetch = function (...args) {
+                        return originalFetch.apply(this, args)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                                }
+                                return response;
+                            })
+                            .catch(error => {
+                                showError(`Ошибка сети: ${error.message}`, 5000);
+                                throw error;
+                            });
+                    };
+
+                    // Перехватываем ошибки XMLHttpRequest
+                    const originalXHROpen = XMLHttpRequest.prototype.open;
+                    XMLHttpRequest.prototype.open = function (...args) {
+                        this.addEventListener('error', function () {
+                            showError('Ошибка при выполнении запроса', 5000);
+                        });
+                        this.addEventListener('timeout', function () {
+                            showError('Превышено время ожидания запроса', 5000);
+                        });
+                        return originalXHROpen.apply(this, args);
+                    };
+
+                    // Постоянные уведомления для пользователей
+                    {% if not current_user.is_authenticated %}
+                    // Для неавторизованных пользователей только на главной странице
+                    {% if request.endpoint == 'main.index' %}
+                    window.notificationManager.show('Для просмотра материалов необходимо авторизоваться', 'auth-notification', 17000); // 17 секунд
+                    {% endif %}
+                    {% elif not is_subscribed %}
+                    // Для авторизованных пользователей без подписки (только на главной странице)
+                    {% if request.endpoint == 'main.index' %}
+                    window.notificationManager.show('Для доступа к предметам необходима активная подписка. <a href="{{ url_for("payment.subscription") }}" style="color: #ff6b35 !important; text-decoration: none; font-weight: bold;">Оформить подписку</a>', 'persistent', 0); // 0 = бесконечно
+                    {% endif %}
+                    {% endif %}
+
+                    // Уведомление о пробной подписке (показывается на всех страницах)
+                    {% if current_user.is_authenticated and subscription_info and subscription_info.is_trial %}
+                    {% if request.endpoint == 'main.index' %}
+                    setTimeout(function () {
+                        window.notificationManager.show('Пробная подписка активна!', 'info', 1000); // 2 секунды
+                    }, 100); // Показываем через 1 секунду после загрузки страницы
+                    {% endif %}
+                    {% endif %}
+
+
+                });
+
+                // ==================== СИСТЕМА ТИКЕТОВ ====================
+
+                // Функция для открытия модального окна создания тикета
+                function openTicketModal() {
+                    const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
+                    modal.show();
+                }
+
+                // Функция для создания тикета
+                function createTicket() {
+                    const form = document.getElementById('ticketForm');
+                    const formData = new FormData(form);
+
+                    // Показываем индикатор загрузки
+                    const submitBtn = document.getElementById('ticketSubmitBtn');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+                    submitBtn.disabled = true;
+
+                    fetch('/api/ticket/create', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showSuccess(data.message);
+                                // Закрываем модальное окно
+                                const modalElement = document.getElementById('ticketModal');
+                                if (modalElement) {
+                                    const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                                    modal.hide();
+                                }
+                                // Очищаем форму
+                                form.reset();
+                                // Очищаем список файлов
+                                document.getElementById('fileList').innerHTML = '';
+
+                                // Переходим на страницу тикета
+                                setTimeout(() => {
+                                    window.location.href = '/tickets/' + data.ticket_id;
+                                }, 1500);
+                            } else {
+                                showError(data.error || 'Ошибка создания тикета');
+                            }
+                        })
+                        .catch(error => {
+                            if (error.message.includes('413')) {
+                                showError('Файл слишком большой. Максимальный размер: 1 ГБ на файл');
+                            } else {
+                                showError('Ошибка сети при создании тикета');
+                            }
+                            console.error('Error:', error);
+                        })
+                        .finally(() => {
+                            // Восстанавливаем кнопку
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        });
+                }
+
+                // Функция для отображения выбранных файлов
+                function updateFileList() {
+                    const fileInput = document.getElementById('ticketFiles');
+                    const fileList = document.getElementById('fileList');
+                    fileList.innerHTML = '';
+
+                    for (let i = 0; i < fileInput.files.length; i++) {
+                        const file = fileInput.files[i];
+                        const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Размер в МБ
+
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'd-flex align-items-center justify-content-between p-2 mb-1 rounded';
+                        fileItem.style.cssText = 'background-color: #2a2a2a; border: 1px solid #3a3a3a;';
+
+                        fileItem.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file me-2 text-primary"></i>
+                        <span class="text-white">${file.name}</span>
+                    </div>
+                    <span class="text-muted small">${fileSize} МБ</span>
+                `;
+
+                        fileList.appendChild(fileItem);
+                    }
+                }
+
+                // Инициализация при загрузке страницы
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Обработчик изменения файлов в форме тикета
+                    const fileInput = document.getElementById('ticketFiles');
+                    if (fileInput) {
+                        fileInput.addEventListener('change', updateFileList);
+                    }
+
+                    // Обработчик изменения файлов в форме ответа пользователя
+                    const userResponseFileInput = document.getElementById('userResponseFiles');
+                    if (userResponseFileInput) {
+                        userResponseFileInput.addEventListener('change', updateUserResponseFileList);
+                    }
+
+                    // Загружаем уведомления для авторизованных пользователей
+                    {% if current_user.is_authenticated %}
+                    loadNotifications();
+
+                    // Проверяем уведомления только когда страница видима
+                    let notificationInterval;
+
+                    function startNotificationCheck() {
+                        if (document.visibilityState === 'visible') {
+                            notificationInterval = setInterval(loadNotifications, 120000); // 2 минуты
+                        }
+                    }
+
+                    function stopNotificationCheck() {
+                        if (notificationInterval) {
+                            clearInterval(notificationInterval);
+                            notificationInterval = null;
+                        }
+                    }
+
+                    // Запускаем проверку при загрузке
+                    startNotificationCheck();
+
+                    // Останавливаем/запускаем при изменении видимости страницы
+                    document.addEventListener('visibilitychange', function () {
+                        if (document.visibilityState === 'visible') {
+                            loadNotifications(); // Сразу проверяем при возвращении на страницу
+                            startNotificationCheck();
+                        } else {
+                            stopNotificationCheck();
+                        }
                     });
-            }
+                    {% endif %}
+                });
+
+                // Функция для отправки ответа пользователя на тикет
+                function sendUserResponse() {
+                    const form = document.getElementById('userResponseForm');
+                    const formData = new FormData(form);
+
+                    // Показываем индикатор загрузки
+                    const submitBtn = document.getElementById('userResponseSubmitBtn');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+                    submitBtn.disabled = true;
+
+                    fetch('/api/ticket/user_response', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                if (response.status === 413) {
+                                    throw new Error('413');
+                                }
+                                throw new Error(`HTTP ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                showSuccess('Ответ отправлен!');
+                                // Очищаем форму
+                                form.reset();
+                                document.getElementById('userResponseFileList').innerHTML = '';
+                                // Перезагружаем страницу для отображения нового ответа
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1500);
+                            } else {
+                                showError(data.error || 'Ошибка отправки ответа');
+                            }
+                        })
+                        .catch(error => {
+                            if (error.message.includes('413')) {
+                                showError('Файл слишком большой. Максимальный размер: 1 ГБ на файл');
+                            } else {
+                                showError('Ошибка сети при отправке ответа');
+                            }
+                            console.error('Error:', error);
+                        })
+                        .finally(() => {
+                            // Восстанавливаем кнопку
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        });
+                }
+
+                // Функция для прокрутки чата вниз
+                function scrollChatToBottom() {
+                    const chatMessages = document.getElementById('chatMessages');
+                    if (chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+
+                // Прокручиваем чат вниз при загрузке страницы
+                document.addEventListener('DOMContentLoaded', function () {
+                    scrollChatToBottom();
+                });
+
+                // Функция для отображения списка выбранных файлов в ответе пользователя
+                function updateUserResponseFileList() {
+                    const fileInput = document.getElementById('userResponseFiles');
+                    const fileList = document.getElementById('userResponseFileList');
+                    const files = fileInput.files;
+
+                    fileList.innerHTML = '';
+
+                    if (files.length > 0) {
+                        const list = document.createElement('ul');
+                        list.className = 'list-unstyled mb-0';
+
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            const listItem = document.createElement('li');
+                            listItem.className = 'text-white-50 small';
+                            listItem.innerHTML = `<i class="fas fa-file me-1"></i>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} МБ)`;
+                            list.appendChild(listItem);
+                        }
+                    }
+                }
+
+                // Функция для загрузки уведомлений с кэшированием
+                let lastNotificationCheck = 0;
+                const NOTIFICATION_CACHE_TIME = 60000; // 1 минута кэш
+
+                function loadNotifications() {
+                    const now = Date.now();
+
+                    // Проверяем кэш - не делаем запрос чаще чем раз в минуту
+                    if (now - lastNotificationCheck < NOTIFICATION_CACHE_TIME) {
+                        return;
+                    }
+
+                    lastNotificationCheck = now;
+
+                    fetch('/api/notifications', {
+                        method: 'GET',
+                        headers: {
+                            'Cache-Control': 'no-cache',
+                            'Pragma': 'no-cache'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.notifications.length > 0) {
+                                // Показываем все непрочитанные уведомления через NotificationManager
+                                data.notifications.forEach(notification => {
+                                    showTicketNotification(notification);
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Ошибка загрузки уведомлений:', error);
+                        });
+                }
+
+                // Функция для показа уведомления о тикете через NotificationManager
+                function showTicketNotification(notification) {
+                    // Проверяем, не было ли уже показано это уведомление
+                    const dismissedNotifications = JSON.parse(localStorage.getItem('dismissedTicketNotifications') || '[]');
+                    if (dismissedNotifications.includes(notification.id)) {
+                        return;
+                    }
+
+                    // Создаем HTML для уведомления с кнопкой
+                    const notificationHtml = `
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="flex-grow-1">
+                        <div class="mb-2">
+                            Администратор ответил на ваш тикет
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <button type="button" class="btn btn-sm btn-outline-success" onclick="goToTicket('${notification.link}', ${notification.id})" style="font-size: 0.75rem; padding: 2px 8px;">
+                                Перейти
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                    // Показываем уведомление через NotificationManager (7 минут = 420000 мс)
+                    const notificationId = window.notificationManager.show(notificationHtml, 'answer', 420000);
+
+                    // Сохраняем информацию о уведомлении для последующего закрытия
+                    if (!window.ticketNotifications) {
+                        window.ticketNotifications = new Map();
+                    }
+                    window.ticketNotifications.set(notificationId, {
+                        originalId: notification.id,
+                        link: notification.link
+                    });
+
+                    // Добавляем обработчик закрытия
+                    setTimeout(() => {
+                        const notificationElement = document.getElementById(notificationId);
+                        if (notificationElement) {
+                            const closeButton = notificationElement.querySelector('.notification-close');
+                            if (closeButton) {
+                                closeButton.onclick = function () {
+                                    markTicketNotificationRead(notification.id, notificationId);
+                                };
+                            }
+                        }
+                    }, 100);
+                }
+
+                // Функция для перехода к тикету
+                function goToTicket(link, notificationId) {
+                    // Отмечаем уведомление как прочитанное
+                    const dismissedNotifications = JSON.parse(localStorage.getItem('dismissedTicketNotifications') || '[]');
+                    if (!dismissedNotifications.includes(notificationId)) {
+                        dismissedNotifications.push(notificationId);
+                        localStorage.setItem('dismissedTicketNotifications', JSON.stringify(dismissedNotifications));
+                    }
+
+                    // Переходим к тикету
+                    window.location.href = link;
+                }
+
+                // Функция для отметки уведомления о тикете как прочитанного
+                function markTicketNotificationRead(notificationId, managerNotificationId) {
+                    // Сохраняем ID уведомления в localStorage как закрытое
+                    const dismissedNotifications = JSON.parse(localStorage.getItem('dismissedTicketNotifications') || '[]');
+                    if (!dismissedNotifications.includes(notificationId)) {
+                        dismissedNotifications.push(notificationId);
+                        localStorage.setItem('dismissedTicketNotifications', JSON.stringify(dismissedNotifications));
+                    }
+
+                    // Закрываем уведомление через NotificationManager
+                    if (window.notificationManager) {
+                        window.notificationManager.close(managerNotificationId);
+                    }
+
+                    // Отправляем запрос на сервер
+                    fetch(`/api/notifications/${notificationId}/read`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                        }
+                    })
+                        .catch(error => {
+                            console.error('Ошибка отметки уведомления как прочитанного:', error);
+                        });
+                }
         </script>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
@@ -2959,14 +2998,7 @@
         <script>
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker
-                        .register('/static/js/sw.js')
-                        .then(function (registration) {
-                            console.log('Service Worker зарегистрирован:', registration.scope)
-                        })
-                        .catch(function (error) {
-                            console.log('Ошибка регистрации Service Worker:', error)
-                        })
+                    navigator.serviceWorker.register('/static/js/sw.js')
                 })
             }
         </script>
@@ -2988,7 +3020,6 @@
         <script>
             // Инициализация dropdown меню админки (только для десктопных устройств)
             document.addEventListener('DOMContentLoaded', function () {
-                console.log('DOM загружен, инициализируем dropdown меню...')
 
                 // Ждем загрузки Bootstrap
                 let attempts = 0
@@ -2996,10 +3027,7 @@
 
                 function initDropdown() {
                     if (typeof bootstrap !== 'undefined') {
-                        console.log('Bootstrap загружен, инициализируем dropdown...')
-
                         const adminDropdown = document.getElementById('adminDropdown')
-                        console.log('adminDropdown элемент:', adminDropdown)
 
                         if (adminDropdown && adminDropdown !== null) {
                             try {
@@ -3009,32 +3037,10 @@
                                     boundary: 'viewport',
                                 })
 
-                                console.log('Dropdown админки успешно инициализирован')
-
-                                // Добавляем дополнительную обработку для отладки
-                                adminDropdown.addEventListener('click', function (e) {
-                                    console.log('Клик по adminDropdown')
-                                })
-
-                                // Проверяем, что dropdown работает
-                                const dropdownMenu = adminDropdown.nextElementSibling
-                                if (dropdownMenu) {
-                                    console.log('Dropdown меню найдено:', dropdownMenu)
-                                    console.log('Классы dropdown меню:', dropdownMenu.className)
-                                }
-                            } catch (error) {
-                                console.error('Ошибка инициализации dropdown админки:', error)
-                            }
-                        } else {
-                            console.warn('adminDropdown элемент не найден')
-                        }
                     } else {
                         attempts++
                         if (attempts < maxAttempts) {
-                            console.log(`Bootstrap еще не загружен, попытка ${attempts}/${maxAttempts}...`)
                             setTimeout(initDropdown, 100)
-                        } else {
-                            console.error('Bootstrap не загрузился за отведенное время')
                         }
                     }
                 }
@@ -3042,24 +3048,7 @@
                 initDropdown()
             })
 
-            // Функция для переключения режима админа с анимацией
-            function toggleAdminMode() {
-                const icon = document.getElementById('adminToggleIcon')
-                if (icon) {
-                    // Добавляем класс анимации
-                    icon.classList.add('admin-toggle-rotating')
-
-                    // Убираем класс анимации после завершения
-                    setTimeout(() => {
-                        icon.classList.remove('admin-toggle-rotating')
-                    }, 600)
-
-                    // Отправляем форму
-                    setTimeout(() => {
-                        document.getElementById('adminToggleForm').submit()
-                    }, 300)
-                }
-            }
+            // Функция для переключения режима админа с анимацией - дубликат удален
         </script>
 
         {% if current_user.is_authenticated %}
@@ -3137,7 +3126,7 @@
         {% endif %}
 
         <!-- Плашка согласия на куки (только на главной странице) -->
-        {% if request.endpoint == 'main.index' %} {% include 'macros/cookie_consent.html' %} {% endif %} {% block
-        scripts %}{% endblock %}
+        {% if request.endpoint == 'main.index' %} {% include 'macros/cookie_consent.html'%} {% endif %} {% block scripts
+        %}{% endblock %} {% endif %}
     </body>
 </html>
