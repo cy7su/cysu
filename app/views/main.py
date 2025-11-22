@@ -950,6 +950,15 @@ def serve_file(subject_id: int, filename: str) -> Response:
     except Exception:
         pass
     try:
+        # Path for material solutions in materials subfolder
+        path6 = os.path.normpath(
+            os.path.join(upload_folder, str(subject_id), "materials", safe_filename)
+        )
+        if path6.startswith(os.path.normpath(upload_folder)):
+            possible_paths.append(path6)
+    except Exception:
+        pass
+    try:
         users_dir = os.path.join(upload_folder, str(subject_id), "users")
         if os.path.isdir(users_dir):
             for user_folder in os.listdir(users_dir):
@@ -957,15 +966,6 @@ def serve_file(subject_id: int, filename: str) -> Response:
                     path4 = os.path.normpath(
                         os.path.join(users_dir, user_folder, safe_filename)
                     )
-                    if path4.startswith(os.path.normpath(upload_folder)):
-                        possible_paths.append(path4)
-    except (OSError, Exception):
-        pass
-    try:
-        users_dir = os.path.join(upload_folder, str(subject_id), "users")
-        if os.path.isdir(users_dir):
-            for user_folder in os.listdir(users_dir):
-                if os.path.isdir(os.path.join(users_dir, user_folder)):
                     path5 = os.path.normpath(
                         os.path.join(
                             users_dir, user_folder, os.path.basename(safe_filename)
