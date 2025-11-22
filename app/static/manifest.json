@@ -10,7 +10,11 @@
     "scope": "/",
     "lang": "ru",
     "dir": "ltr",
-    "categories": ["education", "productivity", "utilities"],
+    "categories": [
+        "education",
+        "productivity",
+        "utilities"
+    ],
     "icons": [
         {
             "src": "/static/icons/android-chrome-192x192.png",

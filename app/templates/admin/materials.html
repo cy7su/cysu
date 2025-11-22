@@ -76,9 +76,8 @@
                                         </td>
                                         <td class="admin-table-td">
                                             <div class="admin-table-cell-content">
-                                                <span class="admin-badge admin-badge-primary"
-                                                    >{{ material.subject.title }}</span
-                                                >
+                                                <span class="admin-badge admin-badge-primary">{{ material.subject.title
+                                                    }}</span>
                                             </div>
                                         </td>
                                         <td class="admin-table-td">
@@ -89,11 +88,8 @@
                                         <td class="admin-table-td">
                                             <div class="admin-table-cell-content">
                                                 {% if material.file %}
-                                                <a
-                                                    href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}"
-                                                    class="admin-link admin-link-primary"
-                                                    target="_blank"
-                                                >
+                                                <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}"
+                                                    class="admin-link admin-link-primary" target="_blank">
                                                     <i class="fas fa-download"></i>
                                                     <span>Скачать</span>
                                                 </a>
@@ -105,29 +101,20 @@
                                         <td class="admin-table-td">
                                             <div class="admin-table-actions">
                                                 {% if material.file %}
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-outline-primary admin-btn-action"
-                                                    title="Заменить файл"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#replaceFileModal{{ material.id }}"
-                                                >
+                                                <button type="button" class="btn btn-outline-primary admin-btn-action"
+                                                    title="Заменить файл" data-bs-toggle="modal"
+                                                    data-bs-target="#replaceFileModal{{ material.id }}">
                                                     <i class="fas fa-exchange-alt"></i>
                                                 </button>
                                                 {% endif %}
-                                                <form
-                                                    method="post"
+                                                <form method="post"
                                                     action="{{ url_for('main.delete_material', material_id=material.id) }}"
                                                     class="admin-form-inline"
-                                                    id="deleteMaterialAdminForm{{ material.id }}"
-                                                >
+                                                    id="deleteMaterialAdminForm{{ material.id }}">
                                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                                    <button
-                                                        type="button"
-                                                        class="btn btn-outline-danger admin-btn-action"
-                                                        title="Удалить"
-                                                        onclick="customConfirm('Удалить материал?', function() { document.getElementById('deleteMaterialAdminForm{{ material.id }}').submit(); })"
-                                                    >
+                                                    <button type="button"
+                                                        class="btn btn-outline-danger admin-btn-action" title="Удалить"
+                                                        onclick="customConfirm('Удалить материал?', function() { document.getElementById('deleteMaterialAdminForm{{ material.id }}').submit(); })">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -160,13 +147,8 @@
 
 <!-- Модальные окна замены файлов для каждого материала -->
 {% for material in materials %} {% if material.file %}
-<div
-    class="modal fade"
-    id="replaceFileModal{{ material.id }}"
-    tabindex="-1"
-    aria-labelledby="replaceFileModalLabel{{ material.id }}"
-    aria-hidden="true"
->
+<div class="modal fade" id="replaceFileModal{{ material.id }}" tabindex="-1"
+    aria-labelledby="replaceFileModalLabel{{ material.id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -175,11 +157,8 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form
-                method="POST"
-                action="{{ url_for('main.replace_material_file', material_id=material.id) }}"
-                enctype="multipart/form-data"
-            >
+            <form method="POST" action="{{ url_for('main.replace_material_file', material_id=material.id) }}"
+                enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
@@ -190,14 +169,8 @@
 
                     <div class="mb-3">
                         <label for="file{{ material.id }}" class="form-label">Выберите новый файл</label>
-                        <input
-                            type="file"
-                            class="form-control"
-                            id="file{{ material.id }}"
-                            name="file"
-                            required
-                            accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt"
-                        />
+                        <input type="file" class="form-control" id="file{{ material.id }}" name="file" required
+                            accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt" />
                         <div class="form-text">
                             Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 1 ГБ
                         </div>
@@ -207,10 +180,8 @@
                         <div class="card-body">
                             <h6 class="card-title">Текущий файл</h6>
                             <p class="card-text mb-0">
-                                <a
-                                    href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}"
-                                    target="_blank"
-                                >
+                                <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}"
+                                    target="_blank">
                                     <i class="fas fa-file me-1"></i>{{ material.file | extract_filename }}
                                 </a>
                             </p>

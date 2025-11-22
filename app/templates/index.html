@@ -4,10 +4,8 @@
 программирование, обучение, лекции, практика, IT, разработка, Python, JavaScript, Java, C++, веб-разработка, базы
 данных, алгоритмы, информационные технологии, электронное обучение, дистанционное образование, cysu{% endblock %} {%
 block content %} {% if not current_user.is_authenticated %}
-<section
-    class="hero-container"
-    style="min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center"
->
+<section class="hero-container"
+    style="min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center">
     <div class="container">
         <header class="text-center">
             <div class="mb-5">
@@ -19,13 +17,9 @@ block content %} {% if not current_user.is_authenticated %}
                 </p>
 
                 <!-- Декоративные элементы с parallax -->
-                <div
-                    class="parallax-elements position-absolute"
-                    style="top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1"
-                >
-                    <div
-                        class="floating-circle"
-                        style="
+                <div class="parallax-elements position-absolute"
+                    style="top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1">
+                    <div class="floating-circle" style="
                             position: absolute;
                             top: 20%;
                             left: 10%;
@@ -34,12 +28,8 @@ block content %} {% if not current_user.is_authenticated %}
                             background: linear-gradient(45deg, var(--primary-color), var(--primary-hover));
                             border-radius: 50%;
                             opacity: 0.3;
-                        "
-                        data-parallax='{"speed": 0.5, "direction": "vertical"}'
-                    ></div>
-                    <div
-                        class="floating-circle"
-                        style="
+                        " data-parallax='{"speed": 0.5, "direction": "vertical"}'></div>
+                    <div class="floating-circle" style="
                             position: absolute;
                             top: 60%;
                             right: 15%;
@@ -48,12 +38,8 @@ block content %} {% if not current_user.is_authenticated %}
                             background: linear-gradient(45deg, #7c3aed, var(--primary-color));
                             border-radius: 50%;
                             opacity: 0.4;
-                        "
-                        data-parallax='{"speed": 0.3, "direction": "vertical"}'
-                    ></div>
-                    <div
-                        class="floating-circle"
-                        style="
+                        " data-parallax='{"speed": 0.3, "direction": "vertical"}'></div>
+                    <div class="floating-circle" style="
                             position: absolute;
                             top: 30%;
                             right: 25%;
@@ -62,9 +48,7 @@ block content %} {% if not current_user.is_authenticated %}
                             background: linear-gradient(45deg, #9a7fe6, #7c3aed);
                             border-radius: 50%;
                             opacity: 0.2;
-                        "
-                        data-parallax='{"speed": 0.7, "direction": "vertical"}'
-                    ></div>
+                        " data-parallax='{"speed": 0.7, "direction": "vertical"}'></div>
                 </div>
             </div>
 
@@ -250,28 +234,20 @@ block content %} {% if not current_user.is_authenticated %}
 <div class="row g-4" style="column-gap: 110px">
     {% for subject in subjects %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-        <div
-            class="card shadow-sm subject-card position-relative"
-            id="subject-card-{{ subject.id }}"
-            data-subject-id="{{ subject.id }}"
-            data-url="{{ url_for('main.subject_detail', subject_id=subject.id) }}"
-            onclick="window.location.href=this.getAttribute('data-url')"
-        >
+        <div class="card shadow-sm subject-card position-relative" id="subject-card-{{ subject.id }}"
+            data-subject-id="{{ subject.id }}" data-url="{{ url_for('main.subject_detail', subject_id=subject.id) }}"
+            onclick="window.location.href=this.getAttribute('data-url')">
             {% if current_user.is_effective_admin() and pattern_generation_enabled %}
-            <button
-                class="admin-pattern-btn"
+            <button class="admin-pattern-btn"
                 onclick="event.stopPropagation(); generateNewPattern('subject-card-{{ subject.id }}')"
-                title="Сгенерировать новый паттерн"
-            >
+                title="Сгенерировать новый паттерн">
                 <i class="fas fa-palette"></i>
             </button>
             {% endif %}
 
-            <div
-                class="card-img dashboard-card-img pattern-container"
+            <div class="card-img dashboard-card-img pattern-container"
                 data-pattern-type="{{ subject.pattern_type or 'dots' }}"
-                data-pattern-svg="{{ subject.pattern_svg or '' }}"
-            >
+                data-pattern-svg="{{ subject.pattern_svg or '' }}">
                 <span class="sr-only">Изображение предмета</span>
             </div>
 
@@ -298,12 +274,8 @@ block content %} {% if not current_user.is_authenticated %}
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addSubjectModalLabel">Добавить предмет</h5>
-                <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                ></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <form method="post">
                 <div class="modal-body">
@@ -315,11 +287,8 @@ block content %} {% if not current_user.is_authenticated %}
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Описание</label>
-                        <textarea
-                            name="description"
-                            class="form-control"
-                            style="min-height: 80px; resize: vertical"
-                        ></textarea>
+                        <textarea name="description" class="form-control"
+                            style="min-height: 80px; resize: vertical"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Фон предмета</label>
