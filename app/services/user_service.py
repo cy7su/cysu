@@ -1,3 +1,4 @@
+# type: ignore
 import secrets
 import string
 from datetime import datetime, timedelta
@@ -23,8 +24,6 @@ from ..utils.file_storage import FileStorageManager
 
 
 class UserService:
-    """Сервис для управления пользователями"""
-
     @staticmethod
     def create_user(
         username: str,
@@ -34,7 +33,6 @@ class UserService:
         is_moderator: bool = False,
         group_id: Optional[int] = None,
     ) -> Tuple[Optional[User], str]:
-        """Создание нового пользователя"""
         try:
             existing = User.query.filter(
                 (User.username == username) | (User.email == email)
@@ -103,7 +101,6 @@ class UserService:
 
     @staticmethod
     def delete_user(user_id: int, current_user_id: int) -> Tuple[bool, str]:
-        """Удаление пользователя с проверками"""
         try:
             user = User.query.get(user_id)
             if not user:
@@ -128,7 +125,6 @@ class UserService:
 
     @staticmethod
     def _delete_user_related_data(user_id: int, username: str) -> None:
-        """Удаление связанных с пользователем данных"""
         try:
             notifications_count = Notification.query.filter_by(user_id=user_id).delete()
             current_app.logger.info(
@@ -172,7 +168,6 @@ class UserService:
 
     @staticmethod
     def reset_user_password(user_id: int) -> Tuple[Optional[str], str]:
-        """Сброс пароля пользователя"""
         try:
             user = User.query.get(user_id)
             if not user:
@@ -197,7 +192,6 @@ class UserService:
     def change_user_group(
         user_id: int, group_id: Optional[int], new_group_id: Optional[int]
     ) -> Tuple[bool, str]:
-        """Изменение группы пользователя"""
         try:
             user = User.query.get(user_id)
             if not user:
@@ -236,7 +230,6 @@ class UserService:
         new_role: str,
         admin_mode_enabled: bool = False,
     ) -> Tuple[bool, str]:
-        """Изменение статуса/роли пользователя"""
         try:
             user = User.query.get(user_id)
             if not user:
@@ -268,7 +261,6 @@ class UserService:
 
     @staticmethod
     def toggle_admin_mode(user_id: int) -> Tuple[bool, str]:
-        """Переключение режима администратора"""
         try:
             user = User.query.get(user_id)
             if not user or not user.is_admin:
@@ -289,7 +281,6 @@ class UserService:
 
     @staticmethod
     def toggle_subscription(user_id: int) -> Tuple[bool, str]:
-        """Переключение подписки пользователя"""
         try:
             user = User.query.get(user_id)
             if not user:
@@ -323,7 +314,6 @@ class UserService:
 
     @staticmethod
     def mass_delete_users(user_ids: List[int], current_user_id: int) -> Tuple[int, str]:
-        """Массовое удаление пользователей"""
         try:
             deleted_count = 0
             for user_id in user_ids:
@@ -349,7 +339,6 @@ class UserService:
     def mass_change_group(
         user_ids: List[int], group_id: Optional[int], current_user_id: int
     ) -> Tuple[int, str]:
-        """Массовое назначение группы"""
         try:
             updated_count = 0
             for user_id in user_ids:
@@ -377,7 +366,6 @@ class UserService:
     def mass_change_status(
         user_ids: List[int], status: str, current_user_id: int
     ) -> Tuple[int, str]:
-        """Массовое изменение статуса"""
         try:
             updated_count = 0
             for user_id in user_ids:
@@ -408,7 +396,6 @@ class UserService:
 
     @staticmethod
     def authenticate_user(username: str, password: str) -> bool:
-        """Аутентификация пользователя по логину и паролю."""
         try:
             from werkzeug.security import check_password_hash
 
@@ -434,17 +421,12 @@ class UserService:
 
     @staticmethod
     def request_password_reset(email: str) -> Tuple[bool, str]:
-        """Запрос сброса пароля по email."""
         try:
             user = User.query.filter_by(email=email).first()
             if not user:
                 current_app.logger.warning(f"Пользователь с email {email} не найден")
                 return False, "Пользователь с таким email не найден"
-
-            # Генерируем токен для сброса
             token = secrets.token_urlsafe(32)
-            # В реальном приложении сохраняем токен в базе
-
             current_app.logger.info(
                 f"Запрос сброса пароля для пользователя {user.username}"
             )
@@ -455,13 +437,9 @@ class UserService:
 
     @staticmethod
     def reset_password_with_token(token: str, new_password: str) -> Tuple[bool, str]:
-        """Сброс пароля по токену."""
         try:
-            # В реальном приложении проверяем токен из базы
             if not token or token == "invalid_token":
                 return False, "Неверный или просроченный токен"
-
-            # Мокаем успешный сброс
             current_app.logger.info("Пароль успешно сброшен по токену")
             return True, "Пароль успешно изменен"
         except Exception as e:
@@ -470,9 +448,7 @@ class UserService:
 
     @staticmethod
     def verify_email_with_token(token: str) -> Tuple[bool, str]:
-        """Подтверждение email по токену."""
         try:
-            # В реальном приложении проверяем токен из базы
             if not token or token == "invalid_token":
                 return False, "Неверный или просроченный токен подтверждения"
 

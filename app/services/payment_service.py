@@ -6,13 +6,12 @@ from ..models import Payment, User
 
 
 class PaymentService:
-    """Сервис для управления платежами и подписками"""
 
     @staticmethod
     def create_subscription_payment(
         user: User, period: str, amount: float
     ) -> Tuple[Optional[str], str]:
-        """Создать платеж для подписки"""
+
         try:
             from flask import current_app, url_for
 
@@ -47,7 +46,7 @@ class PaymentService:
 
     @staticmethod
     def process_payment_webhook(event: str, payment_data: Dict) -> bool:
-        """Обработать webhook от платежной системы"""
+
         try:
             payment_id = payment_data.get("id")
             status = payment_data.get("status", "pending")
@@ -98,7 +97,7 @@ class PaymentService:
 
     @staticmethod
     def _activate_subscription_for_payment(payment_record: Payment) -> bool:
-        """Активировать подписку для успешного платежа"""
+
         try:
             user = User.query.get(payment_record.user_id)
             if not user:
@@ -123,7 +122,7 @@ class PaymentService:
 
     @staticmethod
     def _deactivate_subscription_for_payment(payment_record: Payment) -> bool:
-        """Деактивировать подписку для отмененного платежа"""
+
         try:
             user = User.query.get(payment_record.user_id)
             if not user:
@@ -140,7 +139,7 @@ class PaymentService:
 
     @staticmethod
     def check_payment_status(payment_id: str, user: User) -> Tuple[str, str]:
-        """Проверить статус платежа для пользователя"""
+
         try:
             from ..utils.payment_service import YooKassaService
 
@@ -179,7 +178,7 @@ class PaymentService:
 
     @staticmethod
     def cancel_payment(payment_id: str, user: User) -> Tuple[bool, str]:
-        """Отменить платеж"""
+
         try:
             payment_record = Payment.query.filter_by(
                 yookassa_payment_id=payment_id
@@ -203,7 +202,7 @@ class PaymentService:
 
     @staticmethod
     def get_subscription_prices() -> Dict:
-        """Получить цены подписок"""
+
         try:
             from flask import current_app
 
