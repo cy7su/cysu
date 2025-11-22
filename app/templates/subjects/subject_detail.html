@@ -96,7 +96,7 @@ subject.description or 'Изучайте программирование и и�
                             <small class="text-muted" id="uploadStatus">Загрузка файла...</small>
                         </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3" id="type-group"{% if is_practice_only %} style="display: none;" {% endif %}>
                         <label class="form-label">{{ form.type.label }}</label>
                         {{ form.type(class_='form-select', id='type-select') }}
                     </div>
@@ -209,6 +209,14 @@ subject.description or 'Изучайте программирование и и�
 {{ subject.description or '' }}</textarea>
                         <div class="form-text"><span id="edit-char-count">0</span>/500 символов</div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Режим предмета</label>
+                        <select name="mode" class="form-select">
+                            <option value="1" {% if subject.mode == 1 %}selected{% endif %}>Полный (лекции + практики)</option>
+                            <option value="2" {% if subject.mode == 2 %}selected{% endif %}>Только практики</option>
+                        </select>
+                        <div class="form-text">В режиме "Только практики" не отображается блок лекций</div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
@@ -220,6 +228,7 @@ subject.description or 'Изучайте программирование и и�
 </div>
 {% endif %}
 
+{% if not is_practice_only %}
 <div class="row">
     <div class="col-md-6">
         <div class="card">
@@ -249,7 +258,7 @@ subject.description or 'Изучайте программирование и и�
                                 style="flex-shrink: 0">
                                 {% if material.file %}
                                 <a href="{{ url_for('main.serve_file', subject_id=subject.id, filename=material.file | extract_filename) }}"
-                                    class="btn btn-sm btn-outline-primary mobile-file-btn" target="_blank">
+                                    class="btn btn-sm btn-outline-primary mobile-file-btn">
                                     <i class="fas fa-download me-1"></i>Файл
                                 </a>
                                 {% endif %} {% if can_manage_materials %}
@@ -279,6 +288,11 @@ subject.description or 'Изучайте программирование и и�
     </div>
 
     <div class="col-md-6">
+    {% endif %}
+    {% if is_practice_only %}
+    <div class="row">
+    <div class="col-md-12">
+    {% endif %}
         <div class="card">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
@@ -313,13 +327,13 @@ subject.description or 'Изучайте программирование и и�
                                 style="flex-shrink: 0">
                                 {% if material.file %}
                                 <a href="{{ url_for('main.serve_file', subject_id=subject.id, filename=material.file | extract_filename) }}"
-                                    class="btn btn-sm btn-outline-primary mobile-file-btn" target="_blank">
+                                    class="btn btn-sm btn-outline-primary mobile-file-btn">
                                     <i class="fas fa-download me-1"></i>Файл
                                 </a>
                                 {% endif %} {% if current_user.is_authenticated %} {% set my_submission =
                                 user_submissions.get(material.id) %} {% if my_submission and my_submission.file %}
                                 <a href="{{ url_for('main.serve_user_file', subject_id=subject.id, user_id=my_submission.file | extract_user_id_from_path, filename=my_submission.file | extract_filename) }}"
-                                    class="btn btn-sm btn-success mobile-solution-btn" target="_blank">
+                                    class="btn btn-sm btn-success mobile-solution-btn">
                                     <i class="fas fa-check me-1"></i> Решение
                                 </a>
                                 {% else %}

@@ -30,7 +30,9 @@ class SubjectService:
         return subject
 
     @staticmethod
-    def update_subject(subject_id: int, title: str, description: str) -> bool:
+    def update_subject(
+        subject_id: int, title: str, description: str, mode: int = None
+    ) -> bool:
         subject = Subject.query.get_or_404(subject_id)
         if not title or len(title) > 255:
             return False
@@ -38,6 +40,8 @@ class SubjectService:
             return False
         subject.title = title
         subject.description = description if description else None
+        if mode is not None:
+            subject.mode = mode
         db.session.commit()
         return True
 

@@ -234,14 +234,17 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         form.subject_id.choices = [(subject.id, subject.title)]
         form.subject_id.data = subject.id
         if form and form.validate_on_submit():
+            material_type = form.type.data
+            if subject.mode == 2:
+                material_type = "assignment"
             material = MaterialService.create_material(
                 subject_id=subject_id,
                 title=form.title.data,
                 description=form.description.data,
-                material_type=form.type.data,
+                material_type=material_type,
                 file_data=form.file.data,
                 solution_file_data=(
-                    form.solution_file.data if form.type.data == "assignment" else None
+                    form.solution_file.data if material_type == "assignment" else None
                 ),
                 created_by=current_user.id,
             )
@@ -281,6 +284,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         assignments_completion_percent=assignments_completion_percent,
         upload_limit_message=upload_limit_message,
         upload_max_size_bytes=upload_max_size_bytes,
+        is_practice_only=subject.mode == 2,
     )
 
 
@@ -292,7 +296,8 @@ def edit_subject(subject_id: int) -> Response:
         return redirect(url_for("main.index"))
     new_title = request.form.get("title", "").strip()
     new_description = request.form.get("description", "").strip()
-    if SubjectService.update_subject(subject_id, new_title, new_description):
+    new_mode = int(request.form.get("mode", 1))
+    if SubjectService.update_subject(subject_id, new_title, new_description, new_mode):
         flash("Предмет успешно обновлён")
     else:
         flash("Ошибка при обновлении предмета", "error")

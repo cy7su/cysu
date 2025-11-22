@@ -17,7 +17,7 @@ class MaterialService:
     def get_subject_materials(subject_id: int) -> Tuple[List[Material], List[Material]]:
         lectures = Material.query.filter_by(subject_id=subject_id, type="lecture").all()
         assignments = (
-            Material.query.options(selectinload('submissions'))
+            Material.query.options(selectinload(Material.submissions))
             .filter_by(subject_id=subject_id, type="assignment")
             .all()
         )
@@ -61,7 +61,9 @@ class MaterialService:
         return material
 
     @staticmethod
-    def update_material(material_id: int, title: str, description: Optional[str]) -> bool:
+    def update_material(
+        material_id: int, title: str, description: Optional[str]
+    ) -> bool:
         material = Material.query.get_or_404(material_id)
         if len(title) > 255:
             return False
@@ -150,9 +152,7 @@ class MaterialService:
             user_id=user_id, material_id=material.id
         ).first()
         if not submission:
-            submission = Submission(
-                user_id=user_id, material_id=material.id
-            )
+            submission = Submission(user_id=user_id, material_id=material.id)
             db.session.add(submission)
         submission.file = relative_path
         db.session.commit()

@@ -201,6 +201,7 @@ class Subject(db.Model):
     description = db.Column(db.Text)
     pattern_type = db.Column(db.String(50), default="dots")
     pattern_svg = db.Column(db.Text)
+    mode = db.Column(db.Integer, default=1)  # 1 - full, 2 - practices only
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
     materials = db.relationship(
         "Material", backref="subject", lazy=True, cascade="all, delete-orphan"
@@ -251,7 +252,7 @@ class Material(db.Model):
             # Создаем правило с ограничением в 1 день
             rule = ShortLinkRule(
                 short_link_id=short_link.id,
-                expires_at=datetime.utcnow() + timedelta(days=1)
+                expires_at=datetime.utcnow() + timedelta(days=1),
             )
             db.session.add(rule)
             db.session.commit()
