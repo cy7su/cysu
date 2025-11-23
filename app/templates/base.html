@@ -2886,12 +2886,12 @@
         document.addEventListener('DOMContentLoaded', function () {
 
             // Ждем загрузки Bootstrap
-            let attempts = 0
-            const maxAttempts = 50 // 5 секунд максимум
+            let attempts = 0;
+            const maxAttempts = 50; // 5 секунд максимум
 
             function initDropdown() {
                 if (typeof bootstrap !== 'undefined') {
-                    const adminDropdown = document.getElementById('adminDropdown')
+                    const adminDropdown = document.getElementById('adminDropdown');
 
                     if (adminDropdown && adminDropdown !== null) {
                         try {
@@ -2899,19 +2899,29 @@
                             const dropdown = new bootstrap.Dropdown(adminDropdown, {
                                 autoClose: true,
                                 boundary: 'viewport',
-                            })
-
-                        } else {
-                            attempts++
+                            });
+                        } catch (error) {
+                            attempts++;
                             if (attempts < maxAttempts) {
-                                setTimeout(initDropdown, 100)
+                                setTimeout(initDropdown, 100);
                             }
                         }
+                    } else {
+                        attempts++;
+                        if (attempts < maxAttempts) {
+                            setTimeout(initDropdown, 100);
+                        }
                     }
+                } else {
+                    attempts++;
+                    if (attempts < maxAttempts) {
+                        setTimeout(initDropdown, 100);
+                    }
+                }
 
-                    initDropdown()
-                })
-
+                initDropdown();
+            }
+        });
         // Функция для переключения режима админа с анимацией - дубликат удален
     </script>
 

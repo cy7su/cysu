@@ -27,12 +27,7 @@ material.title) }} {% endblock %} {% block content %}
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <h2 class="mb-0" style="font-size: 1.5rem; color: var(--text-primary)">{{ material.title }}</h2>
                     </div>
-                    {% if current_user.is_authenticated and current_user.can_manage_materials() %}
-                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#replaceFileModal" style="max-width: max-content !important">
-                        <i class="fas fa-exchange-alt me-1"></i>Заменить файл
-                    </button>
-                    {% endif %}
+
                 </div>
                 <div class="card-body" style="padding: 1.5rem">
                     {% if material.description %}
@@ -57,8 +52,8 @@ material.title) }} {% endblock %} {% block content %}
                             <span>Скачать материал</span>
                         </a>
                         {% if current_user.is_authenticated and current_user.can_manage_materials() %}
-                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#replaceFileModal" style="max-width: max-content !important">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('replaceFileInput').click()"
+                            style="max-width: max-content !important">
                             <i class="fas fa-exchange-alt me-1"></i>Заменить файл
                         </button>
                         {% endif %} {% endif %} {% if material.solution_file %}
@@ -74,13 +69,7 @@ material.title) }} {% endblock %} {% block content %}
                             data-bs-target="#replaceSolutionFileModal" style="max-width: max-content !important">
                             <i class="fas fa-exchange-alt me-1"></i>Заменить решение
                         </button>
-                        {% endif %} {% elif current_user.is_authenticated and current_user.can_manage_materials() and
-                        material.type == 'assignment' %}
-                        <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#replaceSolutionFileModal" style="max-width: max-content !important">
-                            <i class="fas fa-plus me-1"></i>Добавить решение
-                        </button>
-                        {% endif %} {% if file_info %}
+                        {% endif %} {% endif %} {% if file_info %}
                         <div class="d-flex align-items-center gap-3 text-muted" style="font-size: 0.875rem">
                             <span><i class="fas fa-file me-1"></i>{{ file_info.extension }}</span>
                             <span><i class="fas fa-hdd me-1"></i>{{ file_info.size_formatted }}</span>
@@ -93,6 +82,7 @@ material.title) }} {% endblock %} {% block content %}
                         </button>
                         {% endif %}
                     </div>
+<input type="file" id="replaceFileInput" style="display:none" onchange="replaceFile(this);" accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt" />
                 </div>
             </div>
 
@@ -295,63 +285,6 @@ material.title) }} {% endblock %} {% block content %}
         </div>
     </div>
 
-    <!-- Модальное окно замены основного файла -->
-    <div class="modal fade" id="replaceFileModal" tabindex="-1" aria-labelledby="replaceFileModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="replaceFileModalLabel">
-                        <i class="fas fa-exchange-alt me-2"></i>Замена файла материала
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" action="{{ url_for('main.replace_material_file', material_id=material.id) }}"
-                    enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <strong>Внимание!</strong> Старый файл будет удален и заменен новым.
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="file" class="form-label">Выберите новый файл</label>
-                            <input type="file" class="form-control" id="file" name="file" required
-                                accept=".pdf,.docx,.doc,.zip,.ipynb,.py,.txt" />
-                            <div class="form-text">
-                                Допустимые форматы: PDF, DOCX, ZIP, IPYNB, PY, TXT. Макс. размер: 1 ГБ
-                            </div>
-                        </div>
-
-                        {% if material.file %}
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h6 class="card-title">Текущий файл</h6>
-                                <p class="card-text mb-0">
-                                    <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}"
-                                        target="_blank">
-                                        <i class="fas fa-file me-1"></i>{{ material.file | extract_filename }}
-                                    </a>
-                                </p>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-1"></i>Отмена
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload me-1"></i>Заменить файл
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Модальное окно замены файла решения -->
     {% if material.type == 'assignment' %}
     <div class="modal fade" id="replaceSolutionFileModal" tabindex="-1" aria-labelledby="replaceSolutionFileModalLabel"
@@ -483,6 +416,29 @@ material.title) }} {% endblock %} {% block content %}
             }
 
             document.body.removeChild(textArea)
+        }
+
+        function replaceFile(input) {
+            if (input.files.length > 0) {
+                const form = new FormData();
+                form.append('file', input.files[0]);
+                form.append('csrf_token', '{{ csrf_token() }}');
+                fetch('{{ url_for("main.replace_material_file", material_id=material.id) }}', {
+                    method: 'POST',
+                    body: form
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        showError('Ошибка замены файла. Проверьте размер и тип файла.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Ошибка загрузки файла.');
+                });
+            }
         }
     </script>
     {% endblock %}
