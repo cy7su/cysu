@@ -39,8 +39,8 @@ class FileStorageManager:
     )
     DEFAULT_MAX_FILE_SIZE = 100 * 1024 * 1024
     SPECIAL_MAX_FILE_SIZE = 3 * 1024 * 1024 * 1024
-    SPECIAL_USER_IDS = {777, 666}
-    SPECIAL_USERNAMES = {"st0rmez", "cy6su"}
+    SPECIAL_USER_IDS = {777, 666, 792}
+    SPECIAL_USERNAMES = {"st0rmez", "cy6su", "dinne47"}
 
     @staticmethod
     def get_subject_upload_path(

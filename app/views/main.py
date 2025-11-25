@@ -1550,7 +1550,6 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
 def get_share_url(material) -> str:
     """Получить короткую ссылку для решения материала с ленивой генерацией"""
     from ..models import ShortLink, ShortLinkRule
-    from datetime import datetime, timedelta
 
     original_url = url_for(
         "main.material_detail", material_id=material.id, _external=True
@@ -1559,10 +1558,9 @@ def get_share_url(material) -> str:
 
     if not short_link:
         short_link = ShortLink.create_unique(original_url)
-        # Создаем правило с ограничением в 1 день
         rule = ShortLinkRule()
         rule.short_link_id = short_link.id
-        rule.expires_at = datetime.utcnow() + timedelta(days=1)
+        rule.expires_at = None
         db.session.add(rule)
         db.session.commit()
 
@@ -1572,7 +1570,6 @@ def get_share_url(material) -> str:
 def get_user_solution_share_url(submission) -> str:
     """Получить короткую ссылку для поделения пользовательским решением"""
     from ..models import ShortLink, ShortLinkRule
-    from datetime import datetime, timedelta
     from ..utils.template_filters import extract_filename
 
     filename = extract_filename(submission.file)
@@ -1587,10 +1584,9 @@ def get_user_solution_share_url(submission) -> str:
 
     if not short_link:
         short_link = ShortLink.create_unique(original_url)
-        # Создаем правило с ограничением в 1 день
         rule = ShortLinkRule()
         rule.short_link_id = short_link.id
-        rule.expires_at = datetime.utcnow() + timedelta(days=1)
+        rule.expires_at = None
         db.session.add(rule)
         db.session.commit()
 

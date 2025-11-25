@@ -27,12 +27,13 @@ def create_app():
         static_folder=static_folder_path,
         static_url_path="/static",
     )
-    # SECRET_KEY обязательно должен быть установлен через переменную окружения
+    
     secret_key = os.getenv("SECRET_KEY")
     if not secret_key:
         raise ValueError("SECRET_KEY environment variable is required")
     app.config["SECRET_KEY"] = secret_key
     app.config["SERVER_NAME"] = os.getenv("SERVER_NAME", "cysu.ru")
+    app.config["PREFERRED_URL_SCHEME"] = "https"
     db_path = os.path.abspath(
         os.path.join(os.path.dirname(os.path.dirname(__file__)), "app.db")
     )

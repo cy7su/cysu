@@ -238,7 +238,6 @@ class Material(db.Model):
     def share_url(self):
         """Генерирует или возвращает короткую ссылку для поделения материалом"""
         from flask import url_for
-        from datetime import datetime, timedelta
 
         # Ищем существующую короткую ссылку
         original_url = url_for(
@@ -249,10 +248,9 @@ class Material(db.Model):
         if not short_link:
             # Создаем новую короткую ссылку
             short_link = ShortLink.create_unique(original_url)
-            # Создаем правило с ограничением в 1 день
             rule = ShortLinkRule(
                 short_link_id=short_link.id,
-                expires_at=datetime.utcnow() + timedelta(days=1),
+                expires_at=None,
             )
             db.session.add(rule)
             db.session.commit()
