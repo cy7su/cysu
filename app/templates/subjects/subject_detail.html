@@ -406,13 +406,10 @@ subject.description or 'Изучайте программирование и и�
 {% endfor %} {% endif %}
 
 <script>
-    // Дополнительная проверка работы модальных окон
     document.addEventListener('DOMContentLoaded', function () {
-        // Убеждаемся, что модальные окна правильно инициализированы
         var modals = document.querySelectorAll('.modal');
         modals.forEach(function (modal) {
             modal.addEventListener('show.bs.modal', function () {
-                // Устанавливаем правильный z-index при открытии
                 this.style.zIndex = '1050';
                 var backdrop = document.querySelector('.modal-backdrop');
                 if (backdrop) {
@@ -421,20 +418,17 @@ subject.description or 'Изучайте программирование и и�
             });
         });
 
-        // Заменяем языки программирования на иконки на странице детального просмотра
         if (typeof replaceLanguageIcons === 'function') {
             replaceLanguageIcons();
         }
     });
 
-    // Переменные для отслеживания статуса загрузки файлов
     let isFileUploading = false;
     let isSolutionUploading = false;
 
     const uploadMaxSizeBytes = {{ upload_max_size_bytes | int }};
     const uploadLimitMessage = {{ upload_limit_message | tojson }};
 
-    // Функция для обработки загрузки файла
     function handleFileUpload() {
         const fileInput = document.getElementById('materialFile');
         const progressDiv = document.getElementById('fileUploadProgress');
@@ -446,7 +440,7 @@ subject.description or 'Изучайте программирование и и�
             const file = fileInput.files[0];
             const maxSize = uploadMaxSizeBytes;
 
-            // Проверяем размер файла
+
             if (file.size > maxSize) {
                 alert(uploadLimitMessage);
                 fileInput.value = '';
@@ -455,14 +449,11 @@ subject.description or 'Изучайте программирование и и�
                 return;
             }
 
-            // Показываем прогресс загрузки
             progressDiv.style.display = 'block';
             progressBar.style.width = '0%';
             statusText.textContent = 'Подготовка к загрузке...';
             saveBtn.disabled = true;
             isFileUploading = true;
-
-            // Симулируем загрузку файла (в реальном приложении здесь был бы XMLHttpRequest с отслеживанием прогресса)
             simulateFileUpload(file, progressBar, statusText, saveBtn);
         } else {
             progressDiv.style.display = 'none';
@@ -471,7 +462,6 @@ subject.description or 'Изучайте программирование и и�
         }
     }
 
-    // Функция для симуляции загрузки файла
     function simulateFileUpload(file, progressBar, statusText, saveBtn) {
         let progress = 0;
         const interval = setInterval(() => {
@@ -496,7 +486,6 @@ subject.description or 'Изучайте программирование и и�
         }, 200);
     }
 
-    // Функция для обработки загрузки файла решения
     function handleSolutionFileUpload(input) {
         const progressDiv = input.parentElement.querySelector('.solution-upload-progress');
         const progressBar = progressDiv.querySelector('.solution-progress-bar');
@@ -507,7 +496,6 @@ subject.description or 'Изучайте программирование и и�
             const file = input.files[0];
             const maxSize = 1 * 1024 * 1024 * 1024;
 
-            // Проверяем размер файла
             if (file.size > maxSize) {
                 alert('Файл слишком большой. Максимальный размер: 1 ГБ');
                 input.value = '';
@@ -516,14 +504,12 @@ subject.description or 'Изучайте программирование и и�
                 return;
             }
 
-            // Показываем прогресс загрузки
             progressDiv.style.display = 'block';
             progressBar.style.width = '0%';
             statusText.textContent = 'Подготовка к загрузке...';
             submitBtn.disabled = true;
             isSolutionUploading = true;
 
-            // Симулируем загрузку файла
             simulateSolutionFileUpload(file, progressBar, statusText, submitBtn);
         } else {
             progressDiv.style.display = 'none';
@@ -532,7 +518,6 @@ subject.description or 'Изучайте программирование и и�
         }
     }
 
-    // Функция для симуляции загрузки файла решения
     function simulateSolutionFileUpload(file, progressBar, statusText, submitBtn) {
         let progress = 0;
         const interval = setInterval(() => {
