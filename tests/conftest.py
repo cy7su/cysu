@@ -8,10 +8,9 @@ from app.models import db as database
 @pytest.fixture(scope="function")
 def app():
     """Создание тестового Flask приложения с чистой базой данных."""
-    # Создаем временную базу данных в памяти для полной изоляции
+
     db_fd, db_path = tempfile.mkstemp()
 
-    # Гарантированно перезаписываем файл базы данных
     try:
         os.close(db_fd)
         if os.path.exists(db_path):
@@ -19,7 +18,6 @@ def app():
     except:
         pass
 
-    # Устанавливаем переменные окружения для тестов
     original_env = {}
     test_env = {
         "SECRET_KEY": "test_secret_key",
@@ -30,15 +28,13 @@ def app():
         "MAIL_PASSWORD": "test_password",
         "MAIL_DEFAULT_SENDER": "test@gmail.com",
         "SKIP_EMAIL_VERIFICATION": "True",
-        "LOG_FILE": "/dev/null",  # Отключаем логирование в тестах
+        "LOG_FILE": "/dev/null",
         "SERVER_NAME": "localhost",
     }
 
-    # Сохраняем оригинальные значения
     for key in test_env:
         original_env[key] = os.environ.get(key)
 
-    # Устанавливаем тестовые значения
     for key, value in test_env.items():
         os.environ[key] = value
 
@@ -51,27 +47,26 @@ def app():
         app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
         with app.app_context():
-            # Гарантированно чистая база данных для каждого теста
+
             database.create_all()
 
         yield app
     finally:
-        # Восстанавливаем оригинальные переменные окружения
+
         for key, value in original_env.items():
             if value is not None:
                 os.environ[key] = value
             else:
                 os.environ.pop(key, None)
 
-        # Очищаем сессию перед удалением
         try:
             with app.app_context():
                 database.session.remove()
-                database.drop_all()  # Удаляем все таблицы
+                database.drop_all()
+
         except:
             pass
 
-        # Удаляем временные файлы и каталоги
         cleanup_paths = [
             db_path,
             test_env["UPLOAD_FOLDER"],

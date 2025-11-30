@@ -27,7 +27,7 @@ def create_app():
         static_folder=static_folder_path,
         static_url_path="/static",
     )
-    
+
     secret_key = os.getenv("SECRET_KEY")
     if not secret_key:
         raise ValueError("SECRET_KEY environment variable is required")
@@ -115,7 +115,7 @@ def create_app():
         "12": float(os.getenv("SUBSCRIPTION_PRICE_12", 469.00)),
     }
     app.config["SUBSCRIPTION_CURRENCY"] = os.getenv("SUBSCRIPTION_CURRENCY", "RUB")
-    # Простая настройка централизованного логирования
+
     from .utils.logger import setup_logging
 
     log_file = os.getenv("LOG_FILE", "/root/logs/cysu.log")
@@ -124,16 +124,14 @@ def create_app():
     setup_logging(
         log_level=log_level,
         log_file=log_file,
-        console_enabled=not app.testing,  # Отключаем console в тестах
+        console_enabled=not app.testing,
         file_enabled=True,
     )
 
-    # Получаем настроенный логгер для приложения
     from .utils.logger import get_logger
 
     app_logger = get_logger("app")
 
-    # Логируем важную информацию о конфигурации
     app_logger.info(f"UPLOAD_FOLDER: {upload_folder}")
     app_logger.info(f"TICKET_FILES_FOLDER: {ticket_folder}")
     app_logger.info(f"DATABASE_URI: {os.path.basename(db_path)}")
@@ -147,9 +145,6 @@ def create_app():
                 response.cache_control.max_age = 31536000
                 response.cache_control.public = True
         return response
-
-    # Удален мертвый код логирования файлов в static
-    # that would never execute after return statement
 
     db.init_app(app)
     try:

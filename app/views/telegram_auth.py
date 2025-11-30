@@ -124,13 +124,15 @@ def telegram_login() -> Union[str, Response]:
                 else:
                     tg_user.user_id = None
                     db.session.commit()
-            # Генерируем username на основе Telegram данных
+
             if username:
-                # Проверяем основные требования к username
-                if 3 <= len(username) <= 14 and USERNAME_ALLOWED_PATTERN.fullmatch(username):
+
+                if 3 <= len(username) <= 14 and USERNAME_ALLOWED_PATTERN.fullmatch(
+                    username
+                ):
                     base_username = username
                 else:
-                    # Если username не проходит валидацию, используем tg_id
+
                     base_username = f"tg_{telegram_id}"
                     current_app.logger.warning(
                         f"Telegram registration - invalid username '{username}' rejected for telegram_id={telegram_id}, using '{base_username}'"
@@ -237,13 +239,15 @@ def telegram_login() -> Union[str, Response]:
                 first_name=first_name,
                 last_name=last_name,
             )
-            # Генерируем username на основе Telegram данных
+
             if username:
-                # Проверяем основные требования к username
-                if 3 <= len(username) <= 14 and USERNAME_ALLOWED_PATTERN.fullmatch(username):
+
+                if 3 <= len(username) <= 14 and USERNAME_ALLOWED_PATTERN.fullmatch(
+                    username
+                ):
                     base_username = username
                 else:
-                    # Если username не проходит валидацию, используем tg_id
+
                     base_username = f"tg_{telegram_id}"
                     current_app.logger.warning(
                         f"Telegram registration (GET) - invalid username '{username}' rejected for telegram_id={telegram_id}, using '{base_username}'"

@@ -1,4 +1,3 @@
-# flake8: noqa E501
 import os
 import shutil
 from typing import Union
@@ -59,7 +58,6 @@ def get_user_solution_share_url(submission):
     from ..models import ShortLink
     from ..utils.template_filters import extract_filename
 
-    # Формируем оригинальный URL для поделения
     filename_to_share = extract_filename(submission.file)
     original_url = url_for(
         "main.serve_user_file",
@@ -69,13 +67,13 @@ def get_user_solution_share_url(submission):
         _external=True,
     )
 
-    # Ищем существующую короткую ссылку
     short_link = ShortLink.query.filter_by(original_url=original_url).first()
 
     if not short_link:
-        # Создаем новую короткую ссылку
+
         import secrets
-        code = secrets.token_urlsafe(8)  # Генерируем уникальный код
+
+        code = secrets.token_urlsafe(8)
 
         short_link = ShortLink(
             code=code,
@@ -85,7 +83,6 @@ def get_user_solution_share_url(submission):
         db.session.add(short_link)
         db.session.commit()
 
-    # Возвращаем полный URL короткой ссылки
     return url_for("main.share_link", code=short_link.code, _external=True)
 
 
@@ -99,7 +96,6 @@ def get_share_url(material):
     from ..models import ShortLink
     from ..utils.template_filters import extract_filename
 
-    # Формируем оригинальный URL для поделения
     filename_to_share = extract_filename(material.solution_file)
     original_url = url_for(
         "main.serve_file",
@@ -108,13 +104,13 @@ def get_share_url(material):
         _external=True,
     )
 
-    # Ищем существующую короткую ссылку
     short_link = ShortLink.query.filter_by(original_url=original_url).first()
 
     if not short_link:
-        # Создаем новую короткую ссылку
+
         import secrets
-        code = secrets.token_urlsafe(8)  # Генерируем уникальный код
+
+        code = secrets.token_urlsafe(8)
 
         short_link = ShortLink(
             code=code,
@@ -124,7 +120,6 @@ def get_share_url(material):
         db.session.add(short_link)
         db.session.commit()
 
-    # Возвращаем полный URL короткой ссылки
     return url_for("main.share_link", code=short_link.code, _external=True)
 
 
@@ -420,7 +415,6 @@ def material_detail(material_id: int) -> Union[str, Response]:
     if material.type == "assignment" and current_user.is_authenticated:
         from app.models import Submission
 
-        # Загружаем submission с joinedload для material, чтобы избежать lazy loading
         submission = (
             Submission.query.options(joinedload(Submission.material))
             .filter_by(user_id=current_user.id, material_id=material_id)
@@ -464,7 +458,6 @@ def material_detail(material_id: int) -> Union[str, Response]:
     if my_submission and my_submission.file:
         user_solution_share_url = get_user_solution_share_url(my_submission)
 
-    # Генерируем мета-описание для материалов
     if material.file:
         file_name = (
             material.file.split("/")[-1] if "/" in material.file else material.file
@@ -774,8 +767,8 @@ def robots_txt():
     """
     Serve robots.txt from the static folder so url_for("main.robots_txt") can be built.
     """
-    # если current_app.send_static_file не используется в проекте, можно заменить на send_from_directory
-    return current_app.send_static_file('.well-known/robots.txt')
+
+    return current_app.send_static_file(".well-known/robots.txt")
 
 
 @main_bp.route("/robots.txt")
@@ -1020,7 +1013,7 @@ def serve_file(subject_id: int, filename: str) -> Response:
     safe_filename = secure_filename(filename)
     possible_paths = []
     try:
-        # Safely construct paths using os.path.join and os.path.normpath
+
         path1 = os.path.normpath(os.path.join(upload_folder, safe_filename))
         if path1.startswith(os.path.normpath(upload_folder)):
             possible_paths.append(path1)
@@ -1045,7 +1038,7 @@ def serve_file(subject_id: int, filename: str) -> Response:
     except Exception:
         pass
     try:
-        # Path for material solutions in materials subfolder
+
         path6 = os.path.normpath(
             os.path.join(upload_folder, str(subject_id), "materials", safe_filename)
         )
@@ -1223,7 +1216,7 @@ def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
         )
     )
     if not file_path.startswith(os.path.normpath(upload_folder)):
-        # Path traversal attempt
+
         current_app.logger.error(f" Path traversal attempt: {file_path}")
         abort(404)
     if not os.path.exists(file_path):
@@ -1325,7 +1318,6 @@ def share_link(code: str) -> Response:
     from ..models import ShortLink, Material, db
     from flask import request
 
-    # Логируем все запросы к коротким ссылкам
     current_app.logger.info(
         f"Share link accessed: /s/{code}, User-Agent: {request.headers.get('User-Agent', 'No UA')}, IP: {request.remote_addr}"
     )
@@ -1335,7 +1327,6 @@ def share_link(code: str) -> Response:
         current_app.logger.warning(f"Short link not found: {code}")
         return redirect(url_for("main.not_found"))
 
-    # Проверяем правила ссылки (если есть)
     if short_link.rule:
         from datetime import datetime
 
@@ -1356,9 +1347,8 @@ def share_link(code: str) -> Response:
         f"Processing share link: {code}, original_url: {short_link.original_url}"
     )
 
-    # Для ботов (например, Telegram) возвращаем публичные метаданные без редиректа
     user_agent = request.headers.get("User-Agent", "").lower()
-    # Расширенная detection ботов
+
     bot_indicators = [
         "telegrambot",
         "telegram",
@@ -1387,10 +1377,11 @@ def share_link(code: str) -> Response:
         or "crawler" in user_agent
     )
 
-    # Всегда возвращаем страницу с мета-тегами и автоматической загрузкой через 1 секунду
-    # Для ботов это позволяет прочитать метаданные, для пользователей - показать красивую страницу перед загрузкой
-    current_app.logger.info(f"Serving share page for: {code}, UA: {request.headers.get('User-Agent')}")
+    current_app.logger.info(
+        f"Serving share page for: {code}, UA: {request.headers.get('User-Agent')}"
+    )
     return _share_link_meta(short_link)
+
 
 def _share_link_meta(short_link: "ShortLink") -> Response:
     """Возвращает HTML страницу с метаданными для ботов и страницу с JS-загрузкой для пользователей"""
@@ -1400,17 +1391,14 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
 
     original_url = short_link.original_url
 
-    # Дефолтные метаданные
     title = "cysu - Образовательная платформа"
     description = "cysu - современная образовательная платформа для изучения программирования и IT."
     image = "https://cysu.ru/static/icons/og/og-image-1200x630.png"
-    # Маленькое лого для предпросмотра в Telegram (32x32)
+
     small_image = "https://cysu.ru/static/icons/og/og-icon-32x32.png"
 
-    # Целевой URL файла для JS-скачивания (если можно определить)
     file_url = None
 
-    # Для материалов генерируем индивидуальные метаданные и целевой файл
     if "/material/" in original_url:
         try:
             material_id = int(original_url.split("/material/")[-1])
@@ -1430,7 +1418,6 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
                         f"Предмет: {material.subject.title} - Задание: {material.title}"
                     )
 
-                # Если есть solution_file — отдаём именно его
                 if getattr(material, "solution_file", None):
                     filename_to_share = extract_filename(material.solution_file)
                     file_url = url_for(
@@ -1442,16 +1429,14 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
         except (ValueError, IndexError) as e:
             current_app.logger.error(f"Error generating meta for share link: {e}")
 
-    # Для пользовательских решений
     elif "/files/" in original_url and "/users/" in original_url:
         try:
-            # Парсим URL: .../files/{subject_id}/users/{user_id}/{filename}
+
             from urllib.parse import urlparse
 
             parsed_url = urlparse(original_url)
             path_parts = parsed_url.path.split("/")
 
-            # Находим индексы ключевых элементов пути
             files_index = -1
             users_index = -1
             for i, part in enumerate(path_parts):
@@ -1469,7 +1454,6 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
                     else ""
                 )
 
-                # Находим submissions пользователя для данного subject
                 submissions = (
                     Submission.query.join(Material)
                     .filter(
@@ -1478,7 +1462,6 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
                     .all()
                 )
 
-                # Ищем submission с соответствующим filename
                 matching_submission = None
                 for sub in submissions:
                     if sub.file and extract_filename(sub.file) == filename:
@@ -1505,7 +1488,6 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
 
                     image = "https://cysu.ru/static/icons/og/telegram-400x400.png"
 
-                    # Формируем ссылку на serve_user_file
                     file_url = url_for(
                         "main.serve_user_file",
                         subject_id=subject_id,
@@ -1514,24 +1496,23 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
                         _external=True,
                     )
 
-                    current_app.logger.info(f"Generated meta for user solution: {title}")
+                    current_app.logger.info(
+                        f"Generated meta for user solution: {title}"
+                    )
         except (ValueError, IndexError, AttributeError) as e:
             current_app.logger.error(
                 f"Error generating meta for user solution share link: {e}"
             )
 
-    # Если не удалось определить внутренний маршрут — используем оригинальный URL
     if not file_url:
         file_url = original_url if original_url else request.url
 
-    # Подготовим безопасные JS-литералы
     import json as _json
+
     _js_title = _json.dumps(title)
     _js_description = _json.dumps(description)
     _js_file_url = _json.dumps(file_url)
 
-    # Возвращаем HTML с Open Graph метками и красивой страницей с анимацией лого и автоматической загрузкой через 1 секунду.
-    # Боты не выполняют JS, поэтому увидят только метаданные.
     html = f"""<!DOCTYPE html>
 <html lang="ru">
 <head>

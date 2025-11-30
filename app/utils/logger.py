@@ -10,7 +10,8 @@ from typing import Optional
 class ColorScheme:
     """Цветовая схема для красивых логов"""
 
-    peach_orange = "\033[38;5;208m"  # Основной песочный цвет
+    peach_orange = "\033[38;5;208m"
+
     orange = "\033[38;5;202m"
     salmon = "\033[38;5;203m"
     coral = "\033[38;5;204m"
@@ -59,17 +60,13 @@ class CYSULogger:
         if self._configured:
             return
 
-        # Основной логгер для CYSU
         logger = logging.getLogger("cysu")
         logger.setLevel(getattr(logging, log_level.upper()))
 
-        # Очищаем существующие хендлеры
         logger.handlers.clear()
 
-        # Создаём красивый форматтер для консоли
         console_formatter = self._create_beautiful_formatter()
 
-        # Консольный хендлер
         if console_enabled:
             console_handler = logging.StreamHandler(sys.stderr)
             console_handler.setLevel(getattr(logging, log_level.upper()))
@@ -77,7 +74,6 @@ class CYSULogger:
             console_handler.addFilter(self._console_filter)
             logger.addHandler(console_handler)
 
-        # Файловый хендлер (простой формат без цветов)
         if file_enabled and log_file:
             log_dir = os.path.dirname(log_file)
             if log_dir and not os.path.exists(log_dir):
@@ -97,10 +93,8 @@ class CYSULogger:
             file_handler.setFormatter(file_formatter)
             logger.addHandler(file_handler)
 
-        # Подавляем шумные библиотеки
         self._suppress_noisy_libraries()
 
-        # Корневой логгер устанавливаем на высокий уровень
         root_logger = logging.getLogger()
         root_logger.setLevel(logging.WARNING)
 
@@ -113,10 +107,9 @@ class CYSULogger:
 
         class BeautifulFormatter(logging.Formatter):
             def format(self, record):
-                # Получаем базовое форматирование
+
                 formatted_time = self.formatTime(record, "%H:%M:%S")
 
-                # Уровень с персиково-оранжевой цветовой схемой
                 level_name = record.levelname
                 if level_name == "DEBUG":
                     level_str = f"{colors.debug_gray}[DBG]{colors.reset}"
@@ -131,7 +124,6 @@ class CYSULogger:
                 else:
                     level_str = f"[{level_name}]"
 
-                # Модуль с отступом (ограничение до 15 символов)
                 module_name = record.name
                 module_parts = module_name.split(".")
                 display_name = (
@@ -141,10 +133,8 @@ class CYSULogger:
                     display_name = display_name[:12] + "..."
                 module_str = f"{colors.dim}{display_name:<15}{colors.reset}"
 
-                # Сообщение с дополнительной стилизацией
                 message = record.getMessage()
 
-                # Финальная компоновка с красивым отступом
                 result = f" {formatted_time}  {level_str}  {module_str}  {message}"
 
                 return result
@@ -156,7 +146,6 @@ class CYSULogger:
         message = record.getMessage().lower()
         module = record.name.lower()
 
-        # Исключаем частые и неинтересные логи
         noise_patterns = [
             "get /static/",
             "get /favicon",
@@ -193,7 +182,6 @@ class CYSULogger:
             logging.getLogger(lib).setLevel(logging.WARNING)
 
 
-# Глобальный экземпляр логгера
 logger = CYSULogger()
 
 
@@ -222,7 +210,6 @@ def setup_logging(
     )
 
 
-# Вспомогательные функции для логирования
 def log_success(message: str):
     """Логирование успешных операций"""
     get_logger("app").info(f"SUCCESS: {message}")

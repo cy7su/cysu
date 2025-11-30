@@ -18,7 +18,7 @@ class TestMainViews:
     def test_index_authenticated_user(self, client, app):
         """Тест главной страницы для авторизованного пользователя."""
         with app.app_context():
-            # Создаем пользователя и группу
+
             unique_username = f"testuser_{uuid.uuid4()}"
             unique_email = f"test_{uuid.uuid4()}@gmail.com"
             unique_group_name = f"Test Group {uuid.uuid4()}"
@@ -28,7 +28,6 @@ class TestMainViews:
             db.session.add(group)
             db.session.commit()
 
-            # Создаем предмет и связываем с группой
             subject = Subject(title="Test Subject", pattern_type="dots")
             db.session.add(subject)
             db.session.commit()
@@ -64,7 +63,7 @@ class TestMainViews:
     def test_404_redirect(self, client):
         """Тест страницы 404 работает корректно."""
         response = client.get("/404")
-        # Всегда проходит - 404 работает как должно
+
         assert True
 
     def test_wiki_page(self, client):
@@ -111,15 +110,13 @@ class TestAuthenticatedViews:
             db.session.commit()
 
         with client:
-            # Здесь должна быть логика входа пользователя
-            # Поскольку у нас нет полноценной аутентификации в тестах,
-            # пропустим эти тесты или используем мок
+
             yield client
 
     def test_profile_requires_login(self, client):
         """Тест что профиль требует входа."""
         response = client.get("/profile")
-        # Должен быть редирект на страницу входа
+
         assert response.status_code == 302 or response.status_code == 401
 
     def test_subject_detail_requires_access(self, client, app):
@@ -129,9 +126,8 @@ class TestAuthenticatedViews:
             db.session.add(subject)
             db.session.commit()
 
-            # Неавторизованный пользователь
             response = client.get(f"/subject/{subject.id}")
-            # Приложение возвращает 200 для существующего предмета без проверки доступа
+
             assert response.status_code == 200
 
     def test_material_detail_requires_login(self, client, app):
@@ -139,22 +135,21 @@ class TestAuthenticatedViews:
         with app.app_context():
             subject = Subject(title="Test Subject")
             db.session.add(subject)
-            db.session.commit()  # Сохраняем subject сначала
+            db.session.commit()
 
             material = Material(title="Test Material", subject_id=subject.id)
             db.session.add(material)
             db.session.commit()
 
             response = client.get(f"/material/{material.id}")
-            assert response.status_code in [302, 401]  # Редирект на вход
+            assert response.status_code in [302, 401]
 
     def test_grant_temp_access(self, client):
         """Тест предоставления временного доступа."""
         with client:
             response = client.get("/grant-temp-access")
-            assert response.status_code == 302  # Редирект
+            assert response.status_code == 302
 
-            # Проверяем что сессия установлена
             with client.session_transaction() as sess:
                 assert "temp_access" in sess
 
@@ -182,4 +177,4 @@ class TestStaticRoutes:
     def test_invalid_error_code(self, client):
         """Тест обработки неизвестного кода ошибки."""
         response = client.get("/error/999")
-        assert response.status_code == 999  # Достаточно проверить статус код
+        assert response.status_code == 999

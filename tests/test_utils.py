@@ -4,7 +4,7 @@ import pytest
 from app.utils.transliteration import get_safe_filename
 from app.utils.file_storage import FileStorageManager
 
-# Импортируем функции email валидации
+
 try:
     from app.utils.email_validator import is_allowed_email_domain, validate_email_chars
 
@@ -34,11 +34,10 @@ class TestEmailValidator:
     def test_domain_check(self, app):
         """Тест проверки доменов."""
         with app.app_context():
-            # Проверяем что функции работают
+
             valid, msg = validate_email_chars("test@gmail.com")
             assert valid
 
-            # Проверяем что mailinator проходит валидацию символов (нет запрещенных слов в адресе)
             chars_valid, chars_msg = validate_email_chars("test@mailinator.com")
             assert chars_valid
 
@@ -51,18 +50,15 @@ class TestFileStorage:
         safe_name = get_safe_filename("test file.pdf")
         assert safe_name == "test_file.pdf"
 
-        # Файл с опасными символами
         safe_name = get_safe_filename("test<file>.pdf")
         assert "<" not in safe_name
         assert ">" not in safe_name
 
     def test_file_operations(self, app):
         """Тест основных операций с файлами."""
-        # Проверяем что менеджер создается без ошибок
+
         assert FileStorageManager is not None
 
-        # Тест получения лимитов
-        # Эти методы требуют аутентифицированного пользователя
         user_limit = FileStorageManager.get_user_limit_message(None)
         assert isinstance(user_limit, str)
 
@@ -77,10 +73,9 @@ class TestTransliteration:
     def test_cyrillic_transliteration(self, app):
         """Тест транслитерации кириллицы."""
         filename = get_safe_filename("тестовый файл.txt")
-        assert (
-            "testovyj" in filename or "тестовый" not in filename
-        )  # Кириллица должна транслитерироваться
-        assert " " not in filename  # Должен заменить пробелы
+        assert "testovyj" in filename or "тестовый" not in filename
+
+        assert " " not in filename
 
     def test_special_chars_replacement(self, app):
         """Тест замены специальных символов."""
@@ -92,5 +87,6 @@ class TestTransliteration:
         assert "^" not in filename
         assert "&" not in filename
         assert "*" not in filename
-        assert "(" not in filename  # Все спецсимволы удаляются
+        assert "(" not in filename
+
         assert ")" not in filename

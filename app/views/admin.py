@@ -168,7 +168,7 @@ def admin_users():
             flash(message, "error")
     try:
         users = User.query.all()
-        # Подсчитываем количество submissions для каждого пользователя
+
         from sqlalchemy import func
 
         user_submission_counts = (
@@ -180,7 +180,6 @@ def admin_users():
             .all()
         )
 
-        # Создаем словарь user_id -> count
         submissions_count = {
             user_id: count for user_id, count in user_submission_counts
         }
@@ -455,7 +454,6 @@ def admin_subject_groups() -> Union[str, Response]:
         )
         groups = Group.query.filter_by(is_active=True).order_by(Group.name).all()
 
-        # Подсчитываем количество лекций и практик для каждого предмета
         subjects_materials_count = {}
         for subject in subjects:
             lectures_count = sum(

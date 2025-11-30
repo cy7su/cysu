@@ -1,4 +1,3 @@
-# flake8: noqa E501
 import os
 import shutil
 from datetime import datetime
@@ -151,7 +150,6 @@ class FileStorageManager:
                         f"Размеры не совпадают! Ожидалось: {file_size}, получено: {saved_size}"
                     )
 
-                # Автоматическая оптимизация файла после сохранения
                 if FileOptimizer.should_optimize_file(file_name):
                     current_app.logger.info(f"Запуск оптимизации файла: {file_name}")
                     try:
@@ -160,7 +158,7 @@ class FileStorageManager:
                         )
                         if success:
                             if new_filename:
-                                # Файл был переименован оптимизатором
+
                                 final_path = os.path.join(
                                     os.path.dirname(safe_full_path), new_filename
                                 )
@@ -168,7 +166,7 @@ class FileStorageManager:
                                     f"Файл оптимизирован и переименован: {final_path}"
                                 )
                             else:
-                                # Файл оптимизирован на месте
+
                                 final_size = os.path.getsize(safe_full_path)
                                 current_app.logger.info(
                                     f"Файл оптимизирован: {saved_size} -> {final_size} байт"
@@ -179,7 +177,7 @@ class FileStorageManager:
                             )
                     except Exception as e:
                         current_app.logger.error(
-                            f"Исключение при оптимизации файла {file_name}: {e}"  # pyright: ignore
+                            f"Исключение при оптимизации файла {file_name}: {e}"
                         )
             else:
                 current_app.logger.error(

@@ -29,9 +29,8 @@ class TestFileStorageManager:
             assert FileStorageManager.get_file_type("photo.jpg") == "image"
             assert FileStorageManager.get_file_type("document.pdf") == "document"
             assert FileStorageManager.get_file_type("archive.zip") == "archive"
-            assert (
-                FileStorageManager.get_file_type("file.txt") == "document"
-            )  # txt файлы - это документы
+            assert FileStorageManager.get_file_type("file.txt") == "document"
+
             assert FileStorageManager.get_file_type("") == "unknown"
 
     def test_is_allowed_file(self, app):
@@ -56,7 +55,7 @@ class TestFileStorageManager:
     def test_get_user_max_file_size_normal_user(self, app):
         """Тест размера файла для обычного пользователя."""
         with app.app_context():
-            # Mock обычный пользователь
+
             user = Mock()
             user.id = 999
             user.username = "normal_user"
@@ -70,10 +69,11 @@ class TestFileStorageManager:
     def test_get_user_max_file_size_special_user(self, app):
         """Тест размера файла для специального пользователя."""
         with app.app_context():
-            # Mock специальный пользователь
+
             user = Mock()
-            user.id = 1  # ID из SPECIAL_USER_IDS
-            user.username = "stormez"  # Имя из SPECIAL_USERNAMES
+            user.id = 1
+
+            user.username = "stormez"
 
             assert FileStorageManager.is_special_user(user)
 
@@ -101,14 +101,13 @@ class TestFileStorageManager:
         with app.app_context():
             with tempfile.TemporaryDirectory() as temp_dir:
                 with patch.dict(app.config, {"UPLOAD_FOLDER": temp_dir}):
-                    # Тестируем путь для материалов предмета
+
                     full_path, rel_path = FileStorageManager.get_material_upload_path(
                         1, "test.pdf"
                     )
                     assert "1" in full_path
                     assert rel_path == "1/test.pdf"
 
-                    # Тестируем путь для решений пользователя
                     full_path, rel_path = FileStorageManager.get_subject_upload_path(
                         1, 123, "solution.txt"
                     )
@@ -116,7 +115,6 @@ class TestFileStorageManager:
                     assert "123" in full_path
                     assert rel_path == "1/users/123/solution.txt"
 
-                    # Тестируем путь для чата
                     full_path, rel_path = FileStorageManager.get_chat_file_path(
                         456, "chat.pdf"
                     )
@@ -138,16 +136,16 @@ class TestYooKassaService:
         with app.app_context():
             service = YooKassaService()
 
-            # Проверяем правильные суммы подписок
-            assert service._get_subscription_days(89.0) == 30  # 1 месяц
-            assert service._get_subscription_days(199.0) == 90  # 3 месяца
-            assert service._get_subscription_days(349.0) == 180  # 6 месяцев
-            assert service._get_subscription_days(469.0) == 365  # 12 месяцев
+            assert service._get_subscription_days(89.0) == 30
 
-            # Проверяем что неизвестные суммы возвращают 30 дней
+            assert service._get_subscription_days(199.0) == 90
+
+            assert service._get_subscription_days(349.0) == 180
+
+            assert service._get_subscription_days(469.0) == 365
+
             assert service._get_subscription_days(999.0) == 30
 
-            # Проверяем градацию: каждая следующая подписка дает больше дней
             assert service._get_subscription_days(
                 199.0
             ) > service._get_subscription_days(89.0)
@@ -163,9 +161,9 @@ class TestYooKassaService:
         """Тест создания платежа в режиме симуляции."""
         with app.app_context():
             service = YooKassaService()
-            # Принудительно включаем симуляцию для теста
+
             if not service.simulation_mode:
-                return  # пропускаем если не симуляция
+                return
 
             user = Mock()
             user.id = 123
@@ -179,6 +177,5 @@ class TestYooKassaService:
         with app.app_context():
             service = YooKassaService()
 
-            # Тестируем базовую логику (может вернуть False в симуляции)
             result = service.process_successful_payment("fake_payment_id")
             assert isinstance(result, bool)

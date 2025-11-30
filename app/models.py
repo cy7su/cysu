@@ -201,7 +201,8 @@ class Subject(db.Model):
     description = db.Column(db.Text)
     pattern_type = db.Column(db.String(50), default="dots")
     pattern_svg = db.Column(db.Text)
-    mode = db.Column(db.Integer, default=1)  # 1 - full, 2 - practices only
+    mode = db.Column(db.Integer, default=1)
+
     created_by = db.Column(db.Integer, db.ForeignKey("user.id"))
     materials = db.relationship(
         "Material", backref="subject", lazy=True, cascade="all, delete-orphan"
@@ -239,14 +240,13 @@ class Material(db.Model):
         """Генерирует или возвращает короткую ссылку для поделения материалом"""
         from flask import url_for
 
-        # Ищем существующую короткую ссылку
         original_url = url_for(
             "main.material_detail", material_id=self.id, _external=True
         )
         short_link = ShortLink.query.filter_by(original_url=original_url).first()
 
         if not short_link:
-            # Создаем новую короткую ссылку
+
             short_link = ShortLink.create_unique(original_url)
             rule = ShortLinkRule(
                 short_link_id=short_link.id,

@@ -47,7 +47,7 @@ ALLOWED_EMAIL_DOMAINS = {
 EMAIL_LOCAL_PART_PATTERN = re.compile(r"^[A-Za-z0-9._+-]+$")
 EMAIL_DOMAIN_PATTERN = re.compile(r"^[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
-# Запрещенные слова в email
+
 FORBIDDEN_EMAIL_PATTERNS = [
     r"admin",
     r"administrator",
@@ -88,20 +88,20 @@ def validate_email_chars(email: str) -> Tuple[bool, str]:
     if not email:
         return False, "Email не может быть пустым"
 
-    if len(email) > 254:  # RFC 2821 limit
+    if len(email) > 254:
+
         return False, "Email слишком длинный"
 
-    # Проверяем основной формат
     if "@" not in email:
         return False, "Некорректный формат email"
 
     local_part, domain = email.split("@", 1)
 
-    # Проверяем локальную часть
     if not local_part:
         return False, "Отсутствует локальная часть email"
 
-    if len(local_part) > 64:  # RFC 2821 limit
+    if len(local_part) > 64:
+
         return False, "Локальная часть email слишком длинная"
 
     if not local_part[0].isalnum() or not local_part[-1].isalnum():
@@ -119,7 +119,6 @@ def validate_email_chars(email: str) -> Tuple[bool, str]:
     if not EMAIL_LOCAL_PART_PATTERN.fullmatch(local_part):
         return False, "Локальная часть содержит недопустимые символы"
 
-    # Проверяем домен
     if not domain:
         return False, "Отсутствует домен email"
 
@@ -129,7 +128,6 @@ def validate_email_chars(email: str) -> Tuple[bool, str]:
     if not EMAIL_DOMAIN_PATTERN.fullmatch(domain):
         return False, "Некорректный формат домена"
 
-    # Проверяем подозрительные паттерны
     for forbidden in FORBIDDEN_EMAIL_PATTERNS:
         if re.search(forbidden, local_part, re.IGNORECASE):
             return False, "Email содержит запрещенные слова"
@@ -141,7 +139,6 @@ def is_allowed_email_domain(email: str) -> bool:
     if not email or "@" not in email:
         return False
 
-    # Сначала проверим символы
     is_valid, error_msg = validate_email_chars(email)
     if not is_valid:
         return False
@@ -150,7 +147,6 @@ def is_allowed_email_domain(email: str) -> bool:
     local_part = local_part.strip()
     domain = domain.lower().strip()
 
-    # Проверяем домен в списке разрешенных
     if domain not in ALLOWED_EMAIL_DOMAINS:
         return False
 

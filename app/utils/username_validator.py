@@ -58,10 +58,10 @@ FORBIDDEN_WORDS = [
     "isis",
     "alqaeda",
     "terrorist",
-    "mumford",  # examples for leetspeak
+    "mumford",
     "mothafucka",
     "nigga",
-    "lobster",  # examples of common bypass attempts
+    "lobster",
     "lobzta",
     "kike",
     "coon",
@@ -131,7 +131,7 @@ USERNAME_ALLOWED_PATTERN = re.compile(r"^[A-Za-zА-Яа-яЁё0-9_]+$")
 def has_allowed_characters(username: str) -> bool:
     if not username:
         return False
-    # Проверяем паттерн, минимальную и максимальную длину
+
     if len(username) < 2 or len(username) > 14:
         return False
     return bool(USERNAME_ALLOWED_PATTERN.fullmatch(username))

@@ -16,22 +16,18 @@ class ExportService:
         if not name:
             return "Без_названия"
 
-        # Убираем пробелы в начале и конце
         name = name.strip()
 
         invalid_chars = ["/", "\\", ":", "*", "?", '"', "<", ">", "|", "\n", "\r", "\t"]
         for char in invalid_chars:
             name = name.replace(char, "_")
 
-        # Сжимаем множественные подчеркивания
         while "__" in name:
             name = name.replace("__", "_")
 
-        # Обрабатываем пробелы
         if " " in name:
             name = "_".join(name.split())
 
-        # Финальная очистка
         name = name.strip("_")
 
         if not name or len(name) > 100:

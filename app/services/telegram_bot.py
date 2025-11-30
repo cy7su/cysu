@@ -1,4 +1,3 @@
-# type: ignore
 import logging
 from typing import Optional, Dict, Any, List
 from flask import current_app
