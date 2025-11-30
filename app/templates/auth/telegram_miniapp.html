@@ -11,14 +11,12 @@
 
             <!-- Telegram Login Widget -->
             <div id="telegram-widget-container">
-                <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="authcysubot"
-                    data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+                <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="authcysubot" data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
             </div>
 
             <!-- Альтернативная кнопка, если виджет не загрузился -->
             <div id="fallback-button" style="display: none; margin-top: 15px">
-                <a href="https://oauth.telegram.org/auth?bot_id=8102415932&origin={{ request.url_root }}&embed=1&request_access=write&return_to={{ request.url }}"
-                    class="btn btn-primary btn-lg" style="
+                <a href="https://oauth.telegram.org/auth?bot_id=8102415932&origin={{ request.url_root }}&embed=1&request_access=write&return_to={{ request.url }}" class="btn btn-primary btn-lg" style="
                         padding: 12px 24px;
                         font-size: 1rem;
                         border-radius: 8px;
@@ -49,7 +47,7 @@
 
 <script>
     // Глобальная функция для обработки авторизации через Telegram Widget
-    window.onTelegramAuth = function (user) {
+    window.onTelegramAuth = function(user) {
         const loading = document.getElementById('loading')
         const errorMessage = document.getElementById('error-message')
         const errorText = document.getElementById('error-text')
@@ -59,21 +57,21 @@
 
             // Отправляем данные на сервер
             fetch('{{ url_for("telegram_auth.telegram_login") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({
-                    id: user.id,
-                    first_name: user.first_name || '',
-                    last_name: user.last_name || '',
-                    username: user.username || '',
-                    photo_url: user.photo_url || '',
-                    auth_date: Math.floor(Date.now() / 1000),
-                    hash: 'telegram_widget_auth',
-                }),
-            })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({
+                        id: user.id,
+                        first_name: user.first_name || '',
+                        last_name: user.last_name || '',
+                        username: user.username || '',
+                        photo_url: user.photo_url || '',
+                        auth_date: Math.floor(Date.now() / 1000),
+                        hash: 'telegram_widget_auth',
+                    }),
+                })
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
@@ -107,9 +105,9 @@
     }
 
     // Проверяем, есть ли параметры OAuth в URL (возврат из OAuth)
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         // Проверяем, загрузился ли виджет
-        setTimeout(function () {
+        setTimeout(function() {
             const widgetContainer = document.getElementById('telegram-widget-container')
             const fallbackButton = document.getElementById('fallback-button')
 
@@ -136,13 +134,13 @@
             }
 
             fetch('{{ url_for("telegram_auth.telegram_login") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify(authData),
-            })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify(authData),
+                })
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`)

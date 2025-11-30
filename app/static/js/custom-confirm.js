@@ -45,7 +45,7 @@ function customConfirm(message, onConfirm, onCancel = null) {
     const modal = new bootstrap.Modal(modalElement)
 
     // Обработчик подтверждения
-    document.getElementById(`${modalId}-confirm`).addEventListener('click', function () {
+    document.getElementById(`${modalId}-confirm`).addEventListener('click', function() {
         modal.hide()
         if (onConfirm && typeof onConfirm === 'function') {
             onConfirm()
@@ -53,7 +53,7 @@ function customConfirm(message, onConfirm, onCancel = null) {
     })
 
     // Обработчик отмены
-    document.getElementById(`${modalId}-cancel`).addEventListener('click', function () {
+    document.getElementById(`${modalId}-cancel`).addEventListener('click', function() {
         modal.hide()
         if (onCancel && typeof onCancel === 'function') {
             onCancel()
@@ -61,7 +61,7 @@ function customConfirm(message, onConfirm, onCancel = null) {
     })
 
     // Удаляем модальное окно после закрытия
-    modalElement.addEventListener('hidden.bs.modal', function () {
+    modalElement.addEventListener('hidden.bs.modal', function() {
         this.remove()
     })
 
@@ -72,8 +72,8 @@ function customConfirm(message, onConfirm, onCancel = null) {
 window.customConfirm = customConfirm
 
 // Переопределяем стандартный confirm для совместимости
-window.confirmDelete = function (message, formId) {
-    customConfirm(message, function () {
+window.confirmDelete = function(message, formId) {
+    customConfirm(message, function() {
         if (formId) {
             document.getElementById(formId).submit()
         }

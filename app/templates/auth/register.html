@@ -5,8 +5,7 @@
             <div class="registration-card{% if telegram_only %} registration-card-wide{% endif %}">
                 <div class="registration-header">
                     <div class="registration-logo">
-                        <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Логотип сайта"
-                            style="width: 48px; height: 48px" />
+                        <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Логотип сайта" style="width: 48px; height: 48px" />
                     </div>
                     <h1 class="registration-title">Регистрация</h1>
                 </div>
@@ -148,7 +147,7 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('.registration-form')
         const submitBtn = document.getElementById('submitBtn')
         const checkbox = document.querySelector('input[type="checkbox"]')
@@ -173,7 +172,7 @@
         }
 
         if (form && submitBtn) {
-            form.addEventListener('submit', function (e) {
+            form.addEventListener('submit', function(e) {
                 // Проверяем валидность формы перед отправкой
                 if (!form.checkValidity()) {
                     e.preventDefault()
@@ -193,7 +192,7 @@
                 submitBtn.disabled = true
 
                 // Устанавливаем таймаут для восстановления кнопки
-                setTimeout(function () {
+                setTimeout(function() {
                     if (submitBtn.disabled) {
                         submitBtn.innerHTML = 'Создать аккаунт'
                         updateButtonState()

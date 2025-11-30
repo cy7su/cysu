@@ -719,6 +719,7 @@ body {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -941,7 +942,8 @@ body {
 }
 
 .admin-subject-groups table td:nth-child(1) {
-    text-align: center; /* чекбокс по центру */
+    text-align: center;
+    /* чекбокс по центру */
 }
 
 .admin-subject-groups .d-flex.gap-1 {

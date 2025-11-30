@@ -9,8 +9,7 @@
         <div class="col-12">
             <div class="card shadow-sm border-0" style="background: none">
                 <div class="card-body p-0">
-                    <div class="d-flex justify-content-between align-items-center mb-3 p-3"
-                        style="background: var(--dp-01); border-radius: 8px">
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-3" style="background: var(--dp-01); border-radius: 8px">
                         <div class="d-flex align-items-center gap-3">
                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllUsers()">
                                 <i class="fas fa-check-square me-1"></i>Выбрать все
@@ -21,24 +20,20 @@
                             <span class="text-muted" id="selected-count">Выбрано: 0</span>
                         </div>
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-sm btn-success" onclick="showMassGroupModal()" disabled
-                                id="mass-group-btn">
+                            <button type="button" class="btn btn-sm btn-success" onclick="showMassGroupModal()" disabled id="mass-group-btn">
                                 <i class="fas fa-users me-1"></i>Назначить группу
                             </button>
-                            <button type="button" class="btn btn-sm btn-warning" onclick="showMassStatusModal()"
-                                disabled id="mass-status-btn">
+                            <button type="button" class="btn btn-sm btn-warning" onclick="showMassStatusModal()" disabled id="mass-status-btn">
                                 <i class="fas fa-crown me-1"></i>Изменить статус
                             </button>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteSelectedUsers()" disabled
-                                id="mass-delete-btn">
+                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteSelectedUsers()" disabled id="mass-delete-btn">
                                 <i class="fas fa-trash me-1"></i>Удалить
                             </button>
                         </div>
                     </div>
 
                     <div class="table-responsive" style="border-radius: 14px">
-                        <table class="table mb-0"
-                            style="background: var(--dp-02); color: var(--text-primary); font-size: 0.9em">
+                        <table class="table mb-0" style="background: var(--dp-02); color: var(--text-primary); font-size: 0.9em">
                             <thead style="background: var(--dp-03)">
                                 <tr>
                                     <th class="border-0" style="
@@ -49,47 +44,35 @@
                                         ">
                                         <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()" />
                                     </th>
-                                    <th class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
-                                        <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('id')"
-                                            style="color: var(--text-primary)">
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
+                                        <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('id')" style="color: var(--text-primary)">
                                             ID <i class="fas fa-sort ms-1"></i>
                                         </button>
                                     </th>
-                                    <th class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
                                         Пользователь
                                     </th>
-                                    <th class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
-                                        <button class="btn btn-link p-0 text-decoration-none"
-                                            onclick="sortTable('contact')" style="color: var(--text-primary)">
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
+                                        <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('contact')" style="color: var(--text-primary)">
                                             Контакт <i class="fas fa-sort ms-1"></i>
                                         </button>
                                     </th>
-                                    <th class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
-                                        <button class="btn btn-link p-0 text-decoration-none"
-                                            onclick="sortTable('group')" style="color: var(--text-primary)">
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
+                                        <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('group')" style="color: var(--text-primary)">
                                             Группа <i class="fas fa-sort ms-1"></i>
                                         </button>
                                     </th>
-                                    <th class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
-                                        <button class="btn btn-link p-0 text-decoration-none"
-                                            onclick="sortTable('status')" style="color: var(--text-primary)">
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
+                                        <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('status')" style="color: var(--text-primary)">
                                             Статус <i class="fas fa-sort ms-1"></i>
                                         </button>
                                     </th>
-                                    <th class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
-                                        <button class="btn btn-link p-0 text-decoration-none"
-                                            onclick="sortTable('subscription')" style="color: var(--text-primary)">
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
+                                        <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('subscription')" style="color: var(--text-primary)">
                                             Подписка <i class="fas fa-sort ms-1"></i>
                                         </button>
                                     </th>
-                                    <th class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
                                         Действия
                                     </th>
                                 </tr>
@@ -102,12 +85,10 @@
                                         color: var(--text-primary);
                                     " data-user-id="{{ user.id }}">
                                     {% if password_map.get(user.id) %}
-                                    <span style="display: none" data-password-for="{{ user.id }}"
-                                        data-password="{{ password_map[user.id] }}"></span>
+                                    <span style="display: none" data-password-for="{{ user.id }}" data-password="{{ password_map[user.id] }}"></span>
                                     {% endif %}
                                     <td style="color: var(--text-primary)">
-                                        <input type="checkbox" class="user-checkbox" value="{{ user.id }}"
-                                            onchange="updateSelectedCount()" />
+                                        <input type="checkbox" class="user-checkbox" value="{{ user.id }}" onchange="updateSelectedCount()" />
                                     </td>
                                     <td style="color: var(--text-primary)">
                                         <span class="badge bg-secondary">{{ user.id }}</span>
@@ -120,17 +101,14 @@
                                                 <span class="badge bg-warning" style="font-size: 0.6rem">Вы</span>
                                                 {% endif %}
                                             </div>
-                                            <small class="text-muted">{{ submissions_count.get(user.id, 0) }}
-                                                заданий</small>
+                                            <small class="text-muted">{{ submissions_count.get(user.id, 0) }} заданий</small>
                                         </div>
                                     </td>
                                     <td style="color: var(--text-primary)">
                                         <div class="d-flex align-items-center gap-2">
                                             {% if user.email %} {% if user.email.endswith('@telegram.org') %} {% set
                                             telegram_id = user.email.split('@')[0] %}
-                                            <button type="button" class="btn btn-sm btn-outline-info"
-                                                onclick="openTelegram('{{ telegram_id }}')" title="Открыть в Telegram"
-                                                style="
+                                            <button type="button" class="btn btn-sm btn-outline-info" onclick="openTelegram('{{ telegram_id }}')" title="Открыть в Telegram" style="
                                                     width: 24px;
                                                     height: 24px;
                                                     padding: 0;
@@ -141,9 +119,7 @@
                                                 <i class="fab fa-telegram" style="font-size: 0.6rem"></i>
                                             </button>
                                             {% else %}
-                                            <button type="button" class="btn btn-sm btn-outline-primary"
-                                                onclick="copyToClipboard('{{ user.email }}')" title="Копировать email"
-                                                style="
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('{{ user.email }}')" title="Копировать email" style="
                                                     width: 24px;
                                                     height: 24px;
                                                     padding: 0;
@@ -187,46 +163,23 @@
                                     </td>
                                     <td style="color: var(--text-primary)">
                                         <div class="d-flex gap-1">
-                                            <button type="button" class="btn btn-warning btn-sm reset-password-btn"
-                                                data-user-id="{{ user.id }}" data-username="{{ user.username|e }}"
-                                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem"
-                                                title="Сбросить пароль">
+                                            <button type="button" class="btn btn-warning btn-sm reset-password-btn" data-user-id="{{ user.id }}" data-username="{{ user.username|e }}" style="font-size: 0.7rem; padding: 0.25rem 0.5rem" title="Сбросить пароль">
                                                 <i class="fas fa-key"></i>
                                             </button>
-                                            <button type="button" class="btn btn-info btn-sm change-group-btn"
-                                                data-user-id="{{ user.id }}"
-                                                data-current-group="{{ (user.group.name if user.group else '')|e }}"
-                                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem"
-                                                title="Изменить группу">
+                                            <button type="button" class="btn btn-info btn-sm change-group-btn" data-user-id="{{ user.id }}" data-current-group="{{ (user.group.name if user.group else '')|e }}" style="font-size: 0.7rem; padding: 0.25rem 0.5rem" title="Изменить группу">
                                                 <i class="fas fa-user-friends"></i>
                                             </button>
-                                            <button type="button" class="btn btn-success btn-sm change-status-btn"
-                                                data-user-id="{{ user.id }}"
-                                                data-current-status="{{ ('admin' if user.is_admin else 'moderator' if user.is_moderator else 'user')|e }}"
-                                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem"
-                                                title="Изменить статус">
+                                            <button type="button" class="btn btn-success btn-sm change-status-btn" data-user-id="{{ user.id }}" data-current-status="{{ ('admin' if user.is_admin else 'moderator' if user.is_moderator else 'user')|e }}" style="font-size: 0.7rem; padding: 0.25rem 0.5rem" title="Изменить статус">
                                                 <i class="fas fa-crown"></i>
                                             </button>
-                                            <button type="button" class="btn btn-primary btn-sm toggle-subscription-btn"
-                                                data-user-id="{{ user.id }}" data-username="{{ user.username|e }}"
-                                                data-has-subscription="{{ user.has_active_subscription()|lower }}"
-                                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem"
-                                                title="{% if user.has_active_subscription() %}Отозвать подписку{% else %}Выдать подписку{% endif %}">
-                                                <i
-                                                    class="fas {% if user.has_active_subscription() %}fa-times{% else %}fa-check{% endif %}"></i>
+                                            <button type="button" class="btn btn-primary btn-sm toggle-subscription-btn" data-user-id="{{ user.id }}" data-username="{{ user.username|e }}" data-has-subscription="{{ user.has_active_subscription()|lower }}" style="font-size: 0.7rem; padding: 0.25rem 0.5rem" title="{% if user.has_active_subscription() %}Отозвать подписку{% else %}Выдать подписку{% endif %}">
+                                                <i class="fas {% if user.has_active_subscription() %}fa-times{% else %}fa-check{% endif %}"></i>
                                             </button>
-                                            <button type="button" class="btn btn-secondary btn-sm edit-user-btn"
-                                                data-user-id="{{ user.id }}" data-username="{{ user.username|e }}"
-                                                data-email="{{ user.email|e }}"
-                                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem"
-                                                title="Редактировать данные">
+                                            <button type="button" class="btn btn-secondary btn-sm edit-user-btn" data-user-id="{{ user.id }}" data-username="{{ user.username|e }}" data-email="{{ user.email|e }}" style="font-size: 0.7rem; padding: 0.25rem 0.5rem" title="Редактировать данные">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             {% if user.id != current_user.id %}
-                                            <button type="button" class="btn btn-danger btn-sm delete-user-btn"
-                                                data-user-id="{{ user.id }}" data-username="{{ user.username|e }}"
-                                                style="font-size: 0.7rem; padding: 0.25rem 0.5rem"
-                                                title="Удалить пользователя">
+                                            <button type="button" class="btn btn-danger btn-sm delete-user-btn" data-user-id="{{ user.id }}" data-username="{{ user.username|e }}" style="font-size: 0.7rem; padding: 0.25rem 0.5rem" title="Удалить пользователя">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                             {% endif %}
@@ -235,8 +188,7 @@
                                 </tr>
                                 {% endfor %} {% else %}
                                 <tr style="background: var(--dp-02); color: var(--text-primary)">
-                                    <td colspan="8" class="text-center text-muted py-4"
-                                        style="color: var(--text-primary)">
+                                    <td colspan="8" class="text-center text-muted py-4" style="color: var(--text-primary)">
                                         <i class="fas fa-users fa-2x mb-3"></i>
                                         <p>Нет пользователей</p>
                                     </td>
@@ -257,8 +209,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="massGroupModalLabel">Назначить группу пользователям</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" id="mass-group-form">
                 <div class="modal-body">
@@ -296,8 +247,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="massStatusModalLabel">Изменить статус пользователей</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" id="mass-status-form">
                 <div class="modal-body">
@@ -309,22 +259,19 @@
                         <label class="form-label">Выберите статус</label>
                         <div class="d-flex gap-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" value="admin"
-                                    id="status_admin" />
+                                <input class="form-check-input" type="radio" name="status" value="admin" id="status_admin" />
                                 <label class="form-check-label" for="status_admin">
                                     <span class="badge bg-danger">Администратор</span>
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" value="moderator"
-                                    id="status_moderator" />
+                                <input class="form-check-input" type="radio" name="status" value="moderator" id="status_moderator" />
                                 <label class="form-check-label" for="status_moderator">
                                     <span class="badge bg-warning">Модератор</span>
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" value="user" id="status_user"
-                                    checked />
+                                <input class="form-check-input" type="radio" name="status" value="user" id="status_user" checked />
                                 <label class="form-check-label" for="status_user">
                                     <span class="badge bg-secondary">Пользователь</span>
                                 </label>
@@ -347,8 +294,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="changeGroupModalLabel">Изменить группу</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" id="change-group-form">
                 <div class="modal-body">
@@ -379,14 +325,12 @@
 </div>
 
 <!-- Модальное окно для изменения статуса отдельного пользователя -->
-<div class="modal fade" id="changeStatusModal" tabindex="-1" aria-labelledby="changeStatusModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="changeStatusModal" tabindex="-1" aria-labelledby="changeStatusModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="changeStatusModalLabel">Изменить статус</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" id="change-status-form">
                 <div class="modal-body">
@@ -396,22 +340,19 @@
                         <label class="form-label">Выберите статус</label>
                         <div class="d-flex gap-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="new_role" value="admin"
-                                    id="new_role_admin" />
+                                <input class="form-check-input" type="radio" name="new_role" value="admin" id="new_role_admin" />
                                 <label class="form-check-label" for="new_role_admin">
                                     <span class="badge bg-danger">Администратор</span>
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="new_role" value="moderator"
-                                    id="new_role_moderator" />
+                                <input class="form-check-input" type="radio" name="new_role" value="moderator" id="new_role_moderator" />
                                 <label class="form-check-label" for="new_role_moderator">
                                     <span class="badge bg-warning">Модератор</span>
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="new_role" value="user"
-                                    id="new_role_user" checked />
+                                <input class="form-check-input" type="radio" name="new_role" value="user" id="new_role_user" checked />
                                 <label class="form-check-label" for="new_role_user">
                                     <span class="badge bg-secondary">Пользователь</span>
                                 </label>
@@ -434,8 +375,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editUserModalLabel">Редактировать данные пользователя</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" id="edit-user-form">
                 <div class="modal-body">
@@ -493,7 +433,7 @@
     let currentSortColumn = null
     let currentSortDirection = 'asc'
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         // Улучшение работы с select элементами
         const selects = document.querySelectorAll('select')
 
@@ -505,7 +445,7 @@
         // Улучшение UX для модальных окон
         const modals = document.querySelectorAll('.modal')
         modals.forEach((modal) => {
-            modal.addEventListener('shown.bs.modal', function () {
+            modal.addEventListener('shown.bs.modal', function() {
                 const firstInput = this.querySelector('input, select')
                 if (firstInput) {
                     firstInput.focus()
@@ -514,7 +454,7 @@
         })
 
         // Обработчики для кнопок действий
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             if (e.target.closest('.reset-password-btn')) {
                 const btn = e.target.closest('.reset-password-btn')
                 const userId = btn.dataset.userId
@@ -658,7 +598,7 @@
             return
         }
 
-        customConfirm(`Удалить ${selectedCheckboxes.length} пользователей? Это действие нельзя отменить!`, function () {
+        customConfirm(`Удалить ${selectedCheckboxes.length} пользователей? Это действие нельзя отменить!`, function() {
             // Подтверждение - продолжаем удаление
             const form = document.createElement('form')
             form.method = 'post'
@@ -723,7 +663,7 @@
 
     // Функции для отдельных пользователей
     function resetPassword(userId, username) {
-        customConfirm(`Сбросить пароль для пользователя ${username}?`, function () {
+        customConfirm(`Сбросить пароль для пользователя ${username}?`, function() {
             // Подтверждение - продолжаем сброс пароля
 
             const formData = new FormData()
@@ -731,9 +671,9 @@
             formData.append('reset_user_id', userId)
 
             fetch(window.location.href, {
-                method: 'POST',
-                body: formData,
-            })
+                    method: 'POST',
+                    body: formData,
+                })
                 .then((response) => response.text())
                 .then((html) => {
                     // Парсим HTML ответ для поиска нового пароля
@@ -854,7 +794,7 @@
         const action = hasSubscription ? 'отозвать' : 'выдать'
         const actionCapitalized = action.charAt(0).toUpperCase() + action.slice(1)
 
-        customConfirm(`${actionCapitalized} подписку пользователю ${username}?`, function () {
+        customConfirm(`${actionCapitalized} подписку пользователю ${username}?`, function() {
             // Подтверждение - продолжаем
 
             const form = document.createElement('form')
@@ -889,7 +829,7 @@
     }
 
     function deleteUser(userId, username) {
-        customConfirm(`Удалить пользователя ${username}? Это действие нельзя отменить!`, function () {
+        customConfirm(`Удалить пользователя ${username}? Это действие нельзя отменить!`, function() {
             // Подтверждение - продолжаем удаление
             const form = document.createElement('form')
             form.method = 'post'
@@ -953,7 +893,11 @@
                 case 'status':
                     const aStatus = a.querySelector('td:nth-child(6) .badge').textContent.toLowerCase()
                     const bStatus = b.querySelector('td:nth-child(6) .badge').textContent.toLowerCase()
-                    const statusOrder = { админ: 0, модератор: 1, пользователь: 2 }
+                    const statusOrder = {
+                        админ: 0,
+                        модератор: 1,
+                        пользователь: 2
+                    }
                     aValue = statusOrder[aStatus] || 3
                     bValue = statusOrder[bStatus] || 3
                     break
@@ -999,10 +943,10 @@
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard
                 .writeText(text)
-                .then(function () {
+                .then(function() {
                     showNotification('Скопировано: ' + text, 'success')
                 })
-                .catch(function (err) {
+                .catch(function(err) {
                     console.error('Ошибка копирования через Clipboard API:', err)
                     fallbackCopyToClipboard(text)
                 })
@@ -1038,8 +982,9 @@
 
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div')
-        notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'
-            } alert-dismissible fade show`
+        notification.className = `alert alert-${
+            type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'
+        } alert-dismissible fade show`
         notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;'
         notification.innerHTML = `
     ${message}

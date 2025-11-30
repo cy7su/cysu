@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 
 <head>
     {% if request.endpoint in ['main.shorten_page', 'main.resolve_shortlink', 'main.shortlink_expired',
-    'main.not_found'] %}
+        'main.not_found'] %}
     <meta name="robots" content="noindex,nofollow" />
     {% endif %}
     <meta charset="UTF-8" />
@@ -24,16 +24,13 @@
     <meta name="msapplication-starturl" content="/" />
     <meta name="msapplication-tap-highlight" content="no" />
 
-    <meta name="description"
-        content="{% block meta_description %}cysu - современная образовательная платформа для изучения программирования и IT. Лекции, практические задания, материалы по информационным технологиям.{% endblock %}" />
-    <meta name="keywords"
-        content="{% block meta_keywords %}образовательная платформа, программирование, обучение, лекции, практика, IT, разработка, Python, JavaScript, Java, C++, веб-разработка, базы данных, алгоритмы, информационные технологии, электронное обучение, дистанционное образование, cysu{% endblock %}" />
+    <meta name="description" content="{% block meta_description %}cysu - современная образовательная платформа для изучения программирования и IT. Лекции, практические задания, материалы по информационным технологиям.{% endblock %}" />
+    <meta name="keywords" content="{% block meta_keywords %}образовательная платформа, программирование, обучение, лекции, практика, IT, разработка, Python, JavaScript, Java, C++, веб-разработка, базы данных, алгоритмы, информационные технологии, электронное обучение, дистанционное образование, cysu{% endblock %}" />
     <meta name="author" content="cysu" />
     <meta name="robots" content="index, follow" />
 
     <meta property="og:title" content="{% block og_title %}cysu - Образовательная платформа{% endblock %}" />
-    <meta property="og:description"
-        content="{% block og_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}" />
+    <meta property="og:description" content="{% block og_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ request.url }}" />
     <meta property="og:site_name" content="cysu" />
@@ -46,73 +43,67 @@
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="{% block twitter_title %}cysu - Образовательная платформа{% endblock %}" />
-    <meta name="twitter:description"
-        content="{% block twitter_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}" />
+    <meta name="twitter:description" content="{% block twitter_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}" />
     <meta name="twitter:image" content="{{ request.url_root }}static/icons/og/og-image-1200x630.png" />
     <meta name="twitter:image:alt" content="cysu - Образовательная платформа" />
 
-    <meta property="linkedin:title"
-        content="{% block linkedin_title %}cysu - Образовательная платформа{% endblock %}" />
-    <meta property="linkedin:description"
-        content="{% block linkedin_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}" />
+    <meta property="linkedin:title" content="{% block linkedin_title %}cysu - Образовательная платформа{% endblock %}" />
+    <meta property="linkedin:description" content="{% block linkedin_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}" />
     <meta property="linkedin:image" content="{{ request.url_root }}static/icons/og/og-image-1200x630.png" />
 
     <meta property="vk:title" content="{% block vk_title %}cysu - Образовательная платформа{% endblock %}" />
-    <meta property="vk:description"
-        content="{% block vk_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}" />
+    <meta property="vk:description" content="{% block vk_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}" />
     <meta property="vk:image" content="{{ request.url_root }}static/icons/og/og-image-1200x630.png" />
 
     <meta property="vk:image" content="{{ request.url_root }}static/icons/og/og-image-1200x630.png" />
 
     <!-- Telegram -->
-    <meta property="telegram:title"
-        content="{% block telegram_title %}cysu - Образовательная платформа{% endblock %}" />
-    <meta property="telegram:description"
-        content="{% block telegram_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}" />
+    <meta property="telegram:title" content="{% block telegram_title %}cysu - Образовательная платформа{% endblock %}" />
+    <meta property="telegram:description" content="{% block telegram_description %}cysu - современная образовательная платформа для изучения программирования и IT.{% endblock %}" />
     <meta property="telegram:image" content="{{ request.url_root }}static/icons/og/og-image-1200x630.png" />
 
     <script type="application/ld+json">
-            {
-                "@context": "https://schema.org",
+        {
+            "@context": "https://schema.org",
+            "@type": "EducationalOrganization",
+            "name": "cysu - Образовательная платформа",
+            "alternateName": ["cysu", "cysu.ru", "образовательная платформа"],
+            "description": "cysu - современная образовательная платформа для изучения программирования и IT.",
+            "url": "{{ request.url_root }}",
+            "logo": "{{ request.url_root }}static/icons/android-chrome-192x192.png",
+            "sameAs": ["https://www.sstu.ru"],
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Саратов",
+                "addressCountry": "RU"
+            },
+            "parentOrganization": {
                 "@type": "EducationalOrganization",
+                "name": "Саратовский государственный технический университет имени Гагарина Ю.А."
+            },
+            "offers": {
+                "@type": "Offer",
+                "description": "Образовательные курсы по программированию и информационным технологиям",
+                "category": "Образование"
+            },
+            "keywords": "программирование, обучение, лекции, практика, IT, разработка, Python, JavaScript, Java, C++, веб-разработка, базы данных, алгоритмы, электронное обучение, дистанционное образование, cysu",
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": "{{ request.url_root }}search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+            },
+            "mainEntity": {
+                "@type": "WebSite",
                 "name": "cysu - Образовательная платформа",
-                "alternateName": ["cysu", "cysu.ru", "образовательная платформа"],
-                "description": "cysu - современная образовательная платформа для изучения программирования и IT.",
                 "url": "{{ request.url_root }}",
-                "logo": "{{ request.url_root }}static/icons/android-chrome-192x192.png",
-                "sameAs": ["https://www.sstu.ru"],
-                "address": {
-                    "@type": "PostalAddress",
-                    "addressLocality": "Саратов",
-                    "addressCountry": "RU"
-                },
-                "parentOrganization": {
-                    "@type": "EducationalOrganization",
-                    "name": "Саратовский государственный технический университет имени Гагарина Ю.А."
-                },
-                "offers": {
-                    "@type": "Offer",
-                    "description": "Образовательные курсы по программированию и информационным технологиям",
-                    "category": "Образование"
-                },
-                "keywords": "программирование, обучение, лекции, практика, IT, разработка, Python, JavaScript, Java, C++, веб-разработка, базы данных, алгоритмы, электронное обучение, дистанционное образование, cysu",
                 "potentialAction": {
                     "@type": "SearchAction",
                     "target": "{{ request.url_root }}search?q={search_term_string}",
                     "query-input": "required name=search_term_string"
-                },
-                "mainEntity": {
-                    "@type": "WebSite",
-                    "name": "cysu - Образовательная платформа",
-                    "url": "{{ request.url_root }}",
-                    "potentialAction": {
-                        "@type": "SearchAction",
-                        "target": "{{ request.url_root }}search?q={search_term_string}",
-                        "query-input": "required name=search_term_string"
-                    }
                 }
             }
-        </script>
+        }
+    </script>
 
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -121,23 +112,25 @@
 
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript">
-        ; (function (m, e, t, r, i, k, a) {
+        ;
+        (function(m, e, t, r, i, k, a) {
             m[i] =
                 m[i] ||
-                function () {
-                    ; (m[i].a = m[i].a || []).push(arguments)
+                function() {
+                    ;
+                    (m[i].a = m[i].a || []).push(arguments)
                 }
             m[i].l = 1 * new Date()
             for (var j = 0; j < document.scripts.length; j++) {
                 if (document.scripts[j].src === r) {
                     return
                 }
-            }
-            ; (k = e.createElement(t)),
+            };
+            ((k = e.createElement(t)),
                 (a = e.getElementsByTagName(t)[0]),
                 (k.async = 1),
                 (k.src = r),
-                a.parentNode.insertBefore(k, a)
+                a.parentNode.insertBefore(k, a))
         })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=105449117', 'ym')
 
         ym(105449117, 'init', {
@@ -158,12 +151,9 @@
 
     <!-- Favicon - только основные -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico', v=timestamp) }}" />
-    <link rel="icon" type="image/png" sizes="32x32"
-        href="{{ url_for('static', filename='icons/favicon-32x32.png', v=timestamp) }}" />
-    <link rel="icon" type="image/png" sizes="16x16"
-        href="{{ url_for('static', filename='icons/favicon-16x16.png', v=timestamp) }}" />
-    <link rel="apple-touch-icon" sizes="180x180"
-        href="{{ url_for('static', filename='icons/apple-touch-icon.png', v=timestamp) }}" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/favicon-32x32.png', v=timestamp) }}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='icons/favicon-16x16.png', v=timestamp) }}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/apple-touch-icon.png', v=timestamp) }}" />
     <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest', v='3') }}" />
     <meta name="msapplication-TileColor" content="#121212" />
 
@@ -194,8 +184,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css?v={{ timestamp }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css?v={{ timestamp }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=timestamp) }}" type="text/css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css', v=timestamp) }}" type="text/css" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
@@ -1580,7 +1569,9 @@
 
         /* Ховер эффект для карточек предметов */
         .subject-card {
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transition:
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
             border: 1px solid transparent;
         }
 
@@ -1711,7 +1702,7 @@
 
 <body>
     {% if maintenance_mode and not has_temp_access and (not current_user.is_authenticated or not
-    current_user.is_admin) %}
+        current_user.is_admin) %}
     <div class="maintenance-overlay">
         <div class="maintenance-overlay-content">
             <div class="maintenance-overlay-icon">
@@ -1734,16 +1725,11 @@
     <nav class="navbar navbar-expand-lg navbar-dark mb-2">
         <div class="container">
             <div class="navbar-brand d-flex align-items-center">
-                <img src="{{ url_for('static', filename='icons/favicon-48x48.png', v=timestamp) }}" alt="cysu"
-                    class="me-2" style="width: 32px; height: 32px; margin-right: 0rem !important" />
-                <a href="{{ url_for('main.index') }}" class="text-decoration-none text-white fw-bold"
-                    style="transition: color 0.3s; margin-bottom: 0.16rem"
-                    onmouseover="this.style.color='var(--primary-color) !important'"
-                    onmouseout="this.style.color='white'">cysu</a>
+                <img src="{{ url_for('static', filename='icons/favicon-48x48.png', v=timestamp) }}" alt="cysu" class="me-2" style="width: 32px; height: 32px; margin-right: 0rem !important" />
+                <a href="{{ url_for('main.index') }}" class="text-decoration-none text-white fw-bold" style="transition: color 0.3s; margin-bottom: 0.16rem" onmouseover="this.style.color = 'var(--primary-color) !important'" onmouseout="this.style.color = 'white'">cysu</a>
             </div>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
@@ -1751,15 +1737,13 @@
                 <ul class="navbar-nav ms-auto" role="menubar">
                     {% if current_user.is_authenticated %}
                     <li class="nav-item" role="none">
-                        <a class="nav-link" href="{{ url_for('main.profile') }}" role="menuitem"
-                            aria-label="Перейти к профилю">
+                        <a class="nav-link" href="{{ url_for('main.profile') }}" role="menuitem" aria-label="Перейти к профилю">
                             <i class="fas fa-user d-lg-none me-2" aria-hidden="true"></i>Профиль
                         </a>
                     </li>
                     {% if support_enabled %}
                     <li class="nav-item" role="none">
-                        <a class="nav-link" href="{{ url_for('tickets.tickets') }}" role="menuitem"
-                            aria-label="Перейти к тикетам">
+                        <a class="nav-link" href="{{ url_for('tickets.tickets') }}" role="menuitem" aria-label="Перейти к тикетам">
                             <i class="fas fa-ticket-alt d-lg-none me-2" aria-hidden="true"></i>Поддержка
                         </a>
                     </li>
@@ -1787,22 +1771,18 @@
                     </li>
 
                     <li class="nav-item dropdown d-none d-lg-block">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="adminDropdown"
-                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Админка
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown"
-                            style="min-width: 200px">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown" style="min-width: 200px">
                             <li>
-                                <a class="dropdown-item d-flex align-items-center"
-                                    href="{{ url_for('admin.admin_users') }}">
+                                <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin.admin_users') }}">
                                     <i class="fas fa-users me-3"></i>
                                     <span>Пользователи</span>
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center"
-                                    href="{{ url_for('admin.admin_subject_groups') }}">
+                                <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin.admin_subject_groups') }}">
                                     <i class="fas fa-link me-3"></i>
                                     <span>Предметы по группам</span>
                                 </a>
@@ -1811,8 +1791,7 @@
                                 <hr class="dropdown-divider my-2" />
                             </li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center"
-                                    href="{{ url_for('admin.admin_settings') }}">
+                                <a class="dropdown-item d-flex align-items-center" href="{{ url_for('admin.admin_settings') }}">
                                     <i class="fas fa-cogs me-3"></i>
                                     <span>Настройки</span>
                                 </a>
@@ -1843,31 +1822,24 @@
         </div>
     </nav>
 
-    <main class="container flex-grow-1 py-4" style="min-height: calc(100vh - 140px)" role="main"
-        aria-label="Основное содержимое">
+    <main class="container flex-grow-1 py-4" style="min-height: calc(100vh - 140px)" role="main" aria-label="Основное содержимое">
         {% if current_user.is_authenticated %} {% endif %} {% block breadcrumbs %}{% endblock %} {% block content
-        %}{% endblock %}
+            %}{% endblock %}
     </main>
 
     {% if not maintenance_mode %}
-    <div id="notifications-container"
-        style="position: fixed; top: 80px; right: 20px; z-index: 9999; pointer-events: none"></div>
+    <div id="notifications-container" style="position: fixed; top: 80px; right: 20px; z-index: 9999; pointer-events: none"></div>
     {% endif %}
 
     <footer class="footer" style="margin-top: auto">
         <div class="container">
-            <div class="row align-items-center mb-3"
-                style="border-bottom: 1px solid var(--border-secondary); padding-bottom: 1rem">
+            <div class="row align-items-center mb-3" style="border-bottom: 1px solid var(--border-secondary); padding-bottom: 1rem">
                 <div class="col-6 col-md-6 mb-3 mb-md-0">
                     <div class="d-flex align-items-center gap-2">
                         {% if current_user.is_authenticated and current_user.is_admin %}
-                        <form method="post" action="{{ url_for('main.toggle_admin_mode') }}" id="adminToggleForm"
-                            style="display: inline">
+                        <form method="post" action="{{ url_for('main.toggle_admin_mode') }}" id="adminToggleForm" style="display: inline">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Toggle Admin"
-                                onclick="toggleAdminMode()" id="adminToggleIcon"
-                                style="width: 32px;height: 32px;cursor: pointer;opacity: 1 !important; {% if current_user.admin_mode_enabled %}opacity: 1;{% else %}opacity: 0.2;{% endif %}"
-                                title="{% if current_user.admin_mode_enabled %}Режим администратора включен{% else %}Режим администратора выключен{% endif %}" />
+                            <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Toggle Admin" onclick="toggleAdminMode()" id="adminToggleIcon" style="width: 32px;height: 32px;cursor: pointer;opacity: 1 !important; {% if current_user.admin_mode_enabled %}opacity: 1;{% else %}opacity: 0.2;{% endif %}" title="{% if current_user.admin_mode_enabled %}Режим администратора включен{% else %}Режим администратора выключен{% endif %}" />
                         </form>
                         {% endif %}
                         <span class="text-primary fw-bold fs-5">cysu</span>
@@ -1876,20 +1848,14 @@
                 <div class="col-6 col-md-6">
                     <div class="d-flex justify-content-end gap-2">
                         {% if current_user.is_authenticated and support_enabled %}
-                        <button type="button"
-                            class="btn btn-primary rounded d-flex align-items-center justify-content-center text-decoration-none"
-                            style="width: 32px; height: 32px" onclick="openTicketModal()" title="Создать тикет">
+                        <button type="button" class="btn btn-primary rounded d-flex align-items-center justify-content-center text-decoration-none" style="width: 32px; height: 32px" onclick="openTicketModal()" title="Создать тикет">
                             <i class="fas fa-ticket-alt"></i>
                         </button>
                         {% endif %}
-                        <a href="https://vk.com/qsource" target="_blank"
-                            class="bg-primary rounded d-flex align-items-center justify-content-center text-white text-decoration-none"
-                            style="width: 32px; height: 32px">
+                        <a href="https://vk.com/qsource" target="_blank" class="bg-primary rounded d-flex align-items-center justify-content-center text-white text-decoration-none" style="width: 32px; height: 32px">
                             <i class="fab fa-vk"></i>
                         </a>
-                        <a href="https://t.me/cy7su" target="_blank"
-                            class="bg-primary rounded d-flex align-items-center justify-content-center text-white text-decoration-none"
-                            style="width: 32px; height: 32px">
+                        <a href="https://t.me/cy7su" target="_blank" class="bg-primary rounded d-flex align-items-center justify-content-center text-white text-decoration-none" style="width: 32px; height: 32px">
                             <i class="fab fa-telegram-plane"></i>
                         </a>
                     </div>
@@ -1900,21 +1866,17 @@
                 {% if support_enabled %}
                 <div class="col-12 col-md-6 mb-3 mb-md-0">
                     <h6 class="text-primary mb-2 text-center text-md-start">КОНТАКТЫ</h6>
-                    <div
-                        class="d-flex flex-column align-items-center align-items-md-start gap-2 text-center text-md-start">
+                    <div class="d-flex flex-column align-items-center align-items-md-start gap-2 text-center text-md-start">
                         <a href="mailto:support@cysu.ru" class="text-muted text-decoration-none">support@cysu.ru</a>
-                        <a href="https://t.me/cy7su" target="_blank" class="text-muted text-decoration-none">Поддержка в
-                            Telegram</a>
+                        <a href="https://t.me/cy7su" target="_blank" class="text-muted text-decoration-none">Поддержка в Telegram</a>
                     </div>
                 </div>
                 {% endif %}
                 <div class="col-12 {% if support_enabled %}col-md-6{% else %}{% endif %}">
-                    <h6 class="text-primary mb-2 text-center {% if support_enabled %}text-md-end{% else %}{% endif %}"
-                        style="text-align: end !important">
+                    <h6 class="text-primary mb-2 text-center {% if support_enabled %}text-md-end{% else %}{% endif %}" style="text-align: end !important">
                         ИНФОРМАЦИЯ
                     </h6>
-                    <div class="d-flex justify-content-center {% if support_enabled %}justify-content-md-end{% else %}{% endif %}"
-                        style="justify-content: end !important">
+                    <div class="d-flex justify-content-center {% if support_enabled %}justify-content-md-end{% else %}{% endif %}" style="justify-content: end !important">
                         <a href="{{ url_for('main.wiki') }}" class="text-muted text-decoration-none">База знаний</a>
                     </div>
                 </div>
@@ -1930,14 +1892,11 @@
                 </div>
                 <div class="col-12 col-md-6">
                     <small class="text-muted text-center text-md-end d-block">
-                        <a href="{{ url_for('main.privacy') }}" class="text-muted text-decoration-none">Политика
-                            конфиденциальности</a>
+                        <a href="{{ url_for('main.privacy') }}" class="text-muted text-decoration-none">Политика конфиденциальности</a>
                         |
-                        <a href="{{ url_for('main.terms') }}" class="text-muted text-decoration-none">Условия
-                            предоставления услуг</a>
+                        <a href="{{ url_for('main.terms') }}" class="text-muted text-decoration-none">Условия предоставления услуг</a>
                         |
-                        <a href="{{ url_for('main.security_policy') }}" class="text-muted text-decoration-none">Политика
-                            безопасности</a>
+                        <a href="{{ url_for('main.security_policy') }}" class="text-muted text-decoration-none">Политика безопасности</a>
                     </small>
                 </div>
             </div>
@@ -1949,7 +1908,7 @@
     <script>
         // Глобальные функции для всего приложения
         // Функция для переключения режима админа с анимацией
-        window.toggleAdminMode = function () {
+        window.toggleAdminMode = function() {
             const icon = document.getElementById('adminToggleIcon')
             if (icon) {
                 // Добавляем класс анимации
@@ -1968,10 +1927,10 @@
         }
 
         // Принудительное обновление иконок при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Обновляем все иконки с новым параметром версии
             const icons = document.querySelectorAll('link[rel*="icon"], link[rel="apple-touch-icon"]')
-            icons.forEach(function (icon) {
+            icons.forEach(function(icon) {
                 const href = icon.getAttribute('href')
                 if (href && href.includes('v=')) {
                     icon.setAttribute('href', href.replace(/v=\d+/, 'v=' + Date.now()))
@@ -1982,17 +1941,17 @@
 
     <script>
         // Предотвращение зума на iOS при фокусе на input
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const inputs = document.querySelectorAll(
-                'input[type="text"], input[type="email"], input[type="password"], textarea'
+                'input[type="text"], input[type="email"], input[type="password"], textarea',
             )
             inputs.forEach((input) => {
-                input.addEventListener('focus', function () {
+                input.addEventListener('focus', function() {
                     // Устанавливаем font-size 16px для предотвращения зума на iOS
                     this.style.fontSize = '16px'
                 })
 
-                input.addEventListener('blur', function () {
+                input.addEventListener('blur', function() {
                     // Возвращаем исходный размер шрифта
                     this.style.fontSize = ''
                 })
@@ -2020,12 +1979,12 @@
             // Улучшение для модальных окон на мобильных
             const modals = document.querySelectorAll('.modal')
             modals.forEach((modal) => {
-                modal.addEventListener('shown.bs.modal', function () {
+                modal.addEventListener('shown.bs.modal', function() {
                     // Предотвращаем скролл body на мобильных
                     document.body.style.overflow = 'hidden'
                 })
 
-                modal.addEventListener('hidden.bs.modal', function () {
+                modal.addEventListener('hidden.bs.modal', function() {
                     // Восстанавливаем скролл
                     document.body.style.overflow = ''
                 })
@@ -2067,7 +2026,7 @@
         }
 
         // Добавляем классы к body для специфичных стилей
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             if (isMobile()) {
                 document.body.classList.add('mobile-device')
             }
@@ -2120,7 +2079,7 @@
                 android: 'devicon-android-plain colored',
                 snow: 'fas fa-snowflake',
                 terminal: 'fas fa-terminal',
-                are : 'fas fa-asterisk',
+                are: 'fas fa-asterisk',
             }
 
             // Находим все элементы с классами text-muted mb-1 и text-muted mb-0
@@ -2153,9 +2112,9 @@
                                 iconClass.startsWith('fas ') ||
                                 iconClass.startsWith('far ') ||
                                 iconClass.startsWith('fab ')
-                            const iconStyle = isFontAwesome
-                                ? 'font-size: 1.2em; margin: 0 2px; color: var(--primary-color);'
-                                : 'font-size: 1.2em; margin: 0 2px;'
+                            const iconStyle = isFontAwesome ?
+                                'font-size: 1.2em; margin: 0 2px; color: var(--primary-color);' :
+                                'font-size: 1.2em; margin: 0 2px;'
 
                             const iconHtml = `<i class="${iconClass}" title="${language}" style="${iconStyle}"></i>`
                             text = text.replace(regex, iconHtml)
@@ -2255,15 +2214,15 @@
                 const title = this.getTitleByType(type);
 
                 notification.innerHTML = `
-                    <div class="notification-header">
-                        <div class="notification-title">${title}</div>
-                        <button class="notification-close" onclick="window.notificationManager.close('${id}')">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="notification-content">${message}</div>
-                    <div class="notification-timer"></div>
-                `;
+                        <div class="notification-header">
+                            <div class="notification-title">${title}</div>
+                            <button class="notification-close" onclick="window.notificationManager.close('${id}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="notification-content">${message}</div>
+                        <div class="notification-timer"></div>
+                    `;
 
                 // Обработчики для приостановки таймера при наведении
                 notification.addEventListener('mouseenter', () => this.pauseTimer(id));
@@ -2295,7 +2254,10 @@
                 const notification = this.notifications.get(id);
                 if (!notification) return;
 
-                const { element, duration } = notification;
+                const {
+                    element,
+                    duration
+                } = notification;
                 const timerElement = element.querySelector('.notification-timer');
 
                 notification.startTime = Date.now();
@@ -2323,7 +2285,11 @@
                 const notification = this.notifications.get(id);
                 if (!notification || notification.isPaused) return;
 
-                const { element, startTime, duration } = notification;
+                const {
+                    element,
+                    startTime,
+                    duration
+                } = notification;
                 const timerElement = element.querySelector('.notification-timer');
 
                 // Для бесконечных уведомлений не обновляем прогресс
@@ -2396,7 +2362,11 @@
                 const notification = this.notifications.get(id);
                 if (!notification) return;
 
-                const { element, timer, progressTimer } = notification;
+                const {
+                    element,
+                    timer,
+                    progressTimer
+                } = notification;
 
                 // Очищаем таймеры
                 if (timer) clearTimeout(timer);
@@ -2427,32 +2397,32 @@
         window.notificationManager = new NotificationManager();
 
         // Глобальная функция для показа уведомлений (можно вызывать из других скриптов)
-        window.showNotification = function (message, type = 'info', duration = 8000) {
+        window.showNotification = function(message, type = 'info', duration = 8000) {
             return window.notificationManager.show(message, type, duration);
         }
 
         // Функции для удобного вызова разных типов уведомлений
-        window.showSuccess = function (message, duration = 5000) {
+        window.showSuccess = function(message, duration = 5000) {
             return window.notificationManager.show(message, 'success', duration);
         }
 
-        window.showError = function (message, duration = 5000) {
+        window.showError = function(message, duration = 5000) {
             return window.notificationManager.show(message, 'error', duration);
         }
 
-        window.showWarning = function (message, duration = 3000) {
+        window.showWarning = function(message, duration = 3000) {
             return window.notificationManager.show(message, 'warning', duration);
         }
 
-        window.showInfo = function (message, duration = 3000) {
+        window.showInfo = function(message, duration = 3000) {
             return window.notificationManager.show(message, 'info', duration);
         }
 
         // Глобальная обработка ошибок AJAX
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Перехватываем ошибки fetch запросов
             const originalFetch = window.fetch;
-            window.fetch = function (...args) {
+            window.fetch = function(...args) {
                 return originalFetch.apply(this, args)
                     .then(response => {
                         if (!response.ok) {
@@ -2468,37 +2438,60 @@
 
             // Перехватываем ошибки XMLHttpRequest
             const originalXHROpen = XMLHttpRequest.prototype.open;
-            XMLHttpRequest.prototype.open = function (...args) {
-                this.addEventListener('error', function () {
+            XMLHttpRequest.prototype.open = function(...args) {
+                this.addEventListener('error', function() {
                     showError('Ошибка при выполнении запроса', 5000);
                 });
-                this.addEventListener('timeout', function () {
+                this.addEventListener('timeout', function() {
                     showError('Превышено время ожидания запроса', 5000);
                 });
                 return originalXHROpen.apply(this, args);
             };
 
             // Постоянные уведомления для пользователей
-            {% if not current_user.is_authenticated %}
+            {
+                %
+                if not current_user.is_authenticated %
+            }
             // Для неавторизованных пользователей только на главной странице
-            {% if request.endpoint == 'main.index' %}
+            {
+                %
+                if request.endpoint == 'main.index' %
+            }
             window.notificationManager.show('Для просмотра материалов необходимо авторизоваться', 'auth-notification', 17000); // 17 секунд
-            {% endif %}
-            {% elif not is_subscribed %}
+            {
+                % endif %
+            } {
+                % elif not is_subscribed %
+            }
             // Для авторизованных пользователей без подписки (только на главной странице)
-            {% if request.endpoint == 'main.index' %}
+            {
+                %
+                if request.endpoint == 'main.index' %
+            }
             window.notificationManager.show('Для доступа к предметам необходима активная подписка. <a href="{{ url_for("payment.subscription") }}" style="color: #ff6b35 !important; text-decoration: none; font-weight: bold;">Оформить подписку</a>', 'persistent', 0); // 0 = бесконечно
-            {% endif %}
-            {% endif %}
+            {
+                % endif %
+            } {
+                % endif %
+            }
 
             // Уведомление о пробной подписке (показывается на всех страницах)
-            {% if current_user.is_authenticated and subscription_info and subscription_info.is_trial %}
-            {% if request.endpoint == 'main.index' %}
-            setTimeout(function () {
+            {
+                %
+                if current_user.is_authenticated and subscription_info and subscription_info.is_trial %
+            } {
+                %
+                if request.endpoint == 'main.index' %
+            }
+            setTimeout(function() {
                 window.notificationManager.show('Пробная подписка активна!', 'info', 1000); // 2 секунды
             }, 100); // Показываем через 1 секунду после загрузки страницы
-            {% endif %}
-            {% endif %}
+            {
+                % endif %
+            } {
+                % endif %
+            }
 
 
         });
@@ -2523,9 +2516,9 @@
             submitBtn.disabled = true;
 
             fetch('/api/ticket/create', {
-                method: 'POST',
-                body: formData
-            })
+                    method: 'POST',
+                    body: formData
+                })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -2579,19 +2572,19 @@
                 fileItem.style.cssText = 'background-color: #2a2a2a; border: 1px solid #3a3a3a;';
 
                 fileItem.innerHTML = `
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-file me-2 text-primary"></i>
-                        <span class="text-white">${file.name}</span>
-                    </div>
-                    <span class="text-muted small">${fileSize} МБ</span>
-                `;
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-file me-2 text-primary"></i>
+                            <span class="text-white">${file.name}</span>
+                        </div>
+                        <span class="text-muted small">${fileSize} МБ</span>
+                    `;
 
                 fileList.appendChild(fileItem);
             }
         }
 
         // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Обработчик изменения файлов в форме тикета
             const fileInput = document.getElementById('ticketFiles');
             if (fileInput) {
@@ -2605,7 +2598,10 @@
             }
 
             // Загружаем уведомления для авторизованных пользователей
-            {% if current_user.is_authenticated %}
+            {
+                %
+                if current_user.is_authenticated %
+            }
             loadNotifications();
 
             // Проверяем уведомления только когда страница видима
@@ -2628,7 +2624,7 @@
             startNotificationCheck();
 
             // Останавливаем/запускаем при изменении видимости страницы
-            document.addEventListener('visibilitychange', function () {
+            document.addEventListener('visibilitychange', function() {
                 if (document.visibilityState === 'visible') {
                     loadNotifications(); // Сразу проверяем при возвращении на страницу
                     startNotificationCheck();
@@ -2636,7 +2632,9 @@
                     stopNotificationCheck();
                 }
             });
-            {% endif %}
+            {
+                % endif %
+            }
         });
 
         // Функция для отправки ответа пользователя на тикет
@@ -2651,12 +2649,12 @@
             submitBtn.disabled = true;
 
             fetch('/api/ticket/user_response', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
-                }
-            })
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                    }
+                })
                 .then(response => {
                     if (!response.ok) {
                         if (response.status === 413) {
@@ -2704,7 +2702,7 @@
         }
 
         // Прокручиваем чат вниз при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             scrollChatToBottom();
         });
 
@@ -2745,12 +2743,12 @@
             lastNotificationCheck = now;
 
             fetch('/api/notifications', {
-                method: 'GET',
-                headers: {
-                    'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache'
-                }
-            })
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.notifications.length > 0) {
@@ -2775,19 +2773,19 @@
 
             // Создаем HTML для уведомления с кнопкой
             const notificationHtml = `
-                <div class="d-flex align-items-center justify-content-between">
-                    <div class="flex-grow-1">
-                        <div class="mb-2">
-                            Администратор ответил на ваш тикет
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <button type="button" class="btn btn-sm btn-outline-success" onclick="goToTicket('${notification.link}', ${notification.id})" style="font-size: 0.75rem; padding: 2px 8px;">
-                                Перейти
-                            </button>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="flex-grow-1">
+                            <div class="mb-2">
+                                Администратор ответил на ваш тикет
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-outline-success" onclick="goToTicket('${notification.link}', ${notification.id})" style="font-size: 0.75rem; padding: 2px 8px;">
+                                    Перейти
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
 
             // Показываем уведомление через NotificationManager (7 минут = 420000 мс)
             const notificationId = window.notificationManager.show(notificationHtml, 'answer', 420000);
@@ -2807,7 +2805,7 @@
                 if (notificationElement) {
                     const closeButton = notificationElement.querySelector('.notification-close');
                     if (closeButton) {
-                        closeButton.onclick = function () {
+                        closeButton.onclick = function() {
                             markTicketNotificationRead(notification.id, notificationId);
                         };
                     }
@@ -2844,11 +2842,11 @@
 
             // Отправляем запрос на сервер
             fetch(`/api/notifications/${notificationId}/read`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
-                }
-            })
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                    }
+                })
                 .catch(error => {
                     console.error('Ошибка отметки уведомления как прочитанного:', error);
                 });
@@ -2861,7 +2859,7 @@
     <!-- Service Worker для кэширования -->
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function () {
+            window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/static/js/sw.js')
             })
         }
@@ -2883,15 +2881,14 @@
 
     <script>
         // Инициализация dropdown меню админки (только для десктопных устройств)
-        document.addEventListener('DOMContentLoaded', function () {
-
+        document.addEventListener('DOMContentLoaded', function() {
             // Ждем загрузки Bootstrap
-            let attempts = 0;
-            const maxAttempts = 50; // 5 секунд максимум
+            let attempts = 0
+            const maxAttempts = 50 // 5 секунд максимум
 
             function initDropdown() {
                 if (typeof bootstrap !== 'undefined') {
-                    const adminDropdown = document.getElementById('adminDropdown');
+                    const adminDropdown = document.getElementById('adminDropdown')
 
                     if (adminDropdown && adminDropdown !== null) {
                         try {
@@ -2899,29 +2896,29 @@
                             const dropdown = new bootstrap.Dropdown(adminDropdown, {
                                 autoClose: true,
                                 boundary: 'viewport',
-                            });
+                            })
                         } catch (error) {
-                            attempts++;
+                            attempts++
                             if (attempts < maxAttempts) {
-                                setTimeout(initDropdown, 100);
+                                setTimeout(initDropdown, 100)
                             }
                         }
                     } else {
-                        attempts++;
+                        attempts++
                         if (attempts < maxAttempts) {
-                            setTimeout(initDropdown, 100);
+                            setTimeout(initDropdown, 100)
                         }
                     }
                 } else {
-                    attempts++;
+                    attempts++
                     if (attempts < maxAttempts) {
-                        setTimeout(initDropdown, 100);
+                        setTimeout(initDropdown, 100)
                     }
                 }
 
-                initDropdown();
+                initDropdown()
             }
-        });
+        })
         // Функция для переключения режима админа с анимацией - дубликат удален
     </script>
 
@@ -2934,27 +2931,25 @@
                         <i class="fas fa-ticket-alt text-primary me-2"></i>
                         Создать тикет поддержки
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="ticketForm" onsubmit="event.preventDefault(); createTicket();">
+                    <form id="ticketForm" onsubmit="
+                                event.preventDefault()
+                                createTicket()
+                            ">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <div class="mb-3">
                             <label for="ticketSubject" class="form-label text-white">Тема *</label>
-                            <input type="text" class="form-control" id="ticketSubject" name="subject" required
-                                placeholder="Кратко опишите проблему" minlength="5" maxlength="255" />
+                            <input type="text" class="form-control" id="ticketSubject" name="subject" required placeholder="Кратко опишите проблему" minlength="5" maxlength="255" />
                         </div>
                         <div class="mb-3">
                             <label for="ticketMessage" class="form-label text-white">Сообщение *</label>
-                            <textarea class="form-control" id="ticketMessage" name="message" rows="5" required
-                                placeholder="Подробно опишите вашу проблему или вопрос" minlength="10"></textarea>
+                            <textarea class="form-control" id="ticketMessage" name="message" rows="5" required placeholder="Подробно опишите вашу проблему или вопрос" minlength="10"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="ticketFiles" class="form-label text-white">Прикрепить файлы (до 1 ГБ
-                                каждый)</label>
-                            <input type="file" class="form-control" id="ticketFiles" name="files" multiple
-                                accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar" />
+                            <label for="ticketFiles" class="form-label text-white">Прикрепить файлы (до 1 ГБ каждый)</label>
+                            <input type="file" class="form-control" id="ticketFiles" name="files" multiple accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar" />
                             <div class="form-text text-muted">
                                 Поддерживаемые форматы: изображения, PDF, документы, архивы
                             </div>
@@ -2975,7 +2970,7 @@
 
     <!-- Плашка согласия на куки (только на главной странице) -->
     {% if request.endpoint == 'main.index' %} {% include 'macros/cookie_consent.html'%} {% endif %} {% block scripts
-    %}{% endblock %} {% endif %}
+        %}{% endblock %} {% endif %}
 </body>
 
 </html>

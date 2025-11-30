@@ -564,16 +564,16 @@
     font-size: 8px !important;
 }
 
-.footer .mode-toggle input:checked + .mode-slider:before {
+.footer .mode-toggle input:checked+.mode-slider:before {
     transform: translateX(16px) !important;
 }
 
-.mode-toggle input:checked + .mode-slider {
+.mode-toggle input:checked+.mode-slider {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
 
-.mode-toggle input:checked + .mode-slider:before {
+.mode-toggle input:checked+.mode-slider:before {
     transform: translateX(22px);
 }
 
@@ -587,7 +587,7 @@
     justify-content: center;
 }
 
-.mode-toggle input:checked + .mode-slider:before {
+.mode-toggle input:checked+.mode-slider:before {
     content: 'А';
 }
 
@@ -1643,7 +1643,8 @@ a:hover {
     }
 }
 
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
     .btn {
         border-width: 0.5px;
     }
@@ -1686,6 +1687,7 @@ a:hover {
 }
 
 @supports (-webkit-touch-callout: none) {
+
     .form-control,
     .form-select {
         font-size: 16px;
@@ -1707,6 +1709,7 @@ a:hover {
 }
 
 @supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+
     .form-control,
     .form-select {
         -webkit-appearance: none;
@@ -2254,7 +2257,7 @@ body.modal-open {
     color: var(--text-secondary);
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
+.breadcrumb-item+.breadcrumb-item::before {
     content: '›';
     color: var(--text-disabled);
     font-weight: bold;
@@ -2290,7 +2293,7 @@ body.modal-open {
         border-radius: 12px;
     }
 
-    .breadcrumb-item + .breadcrumb-item::before {
+    .breadcrumb-item+.breadcrumb-item::before {
         margin: 0 0.25rem;
     }
 
@@ -2427,6 +2430,7 @@ body.modal-open {
 }
 
 @keyframes shake {
+
     0%,
     100% {
         transform: translateX(0);
@@ -2798,12 +2802,12 @@ body.modal-open {
     margin-top: 2px;
 }
 
-.checkbox-label input[type='checkbox']:checked + .checkmark {
+.checkbox-label input[type='checkbox']:checked+.checkmark {
     background: var(--primary-color);
     border-color: var(--primary-color);
 }
 
-.checkbox-label input[type='checkbox']:checked + .checkmark::after {
+.checkbox-label input[type='checkbox']:checked+.checkmark::after {
     content: '';
     position: absolute;
     left: 5px;

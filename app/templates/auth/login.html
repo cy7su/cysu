@@ -5,8 +5,7 @@
             <div class="registration-card">
                 <div class="registration-header">
                     <div class="registration-logo">
-                        <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Логотип сайта"
-                            style="width: 48px; height: 48px" />
+                        <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Логотип сайта" style="width: 48px; height: 48px" />
                     </div>
                     <h1 class="registration-title">Войдите в свой аккаунт</h1>
                 </div>
@@ -40,15 +39,13 @@
                         {% endif %}
                     </div>
 
-                    <div class="checkbox-group"
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
+                    <div class="checkbox-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
                         <label class="checkbox-label" style="margin-bottom: 0">
                             <input type="checkbox" name="remember_me" checked />
                             <span class="checkmark"></span>
                             Запомнить меня
                         </label>
-                        <a href="{{ url_for('auth.password_reset_request') }}" class="resend-link"
-                            style="font-size: 14px">Забыли пароль?</a>
+                        <a href="{{ url_for('auth.password_reset_request') }}" class="resend-link" style="font-size: 14px">Забыли пароль?</a>
                     </div>
 
                     <div class="button-group">

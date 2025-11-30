@@ -1297,7 +1297,10 @@ class SVGPatternGenerator {
         for (let i = 0; i < numColors; i++) {
             const randomColor = selectedPalette[Math.floor(Math.random() * selectedPalette.length)]
             const randomOpacity = this.random(0.3, 0.8)
-            paletteColors.push({ color: randomColor, opacity: randomOpacity })
+            paletteColors.push({
+                color: randomColor,
+                opacity: randomOpacity
+            })
         }
 
         return paletteColors
@@ -2957,5 +2960,10 @@ if (typeof window !== 'undefined') {
     window.setPatternColors = setPatternColors
     window.generateNewPatternForCard = generateNewPatternForCard
 } else if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { SVGPatternGenerator, getRandomPattern, getAllPatterns, setPatternColors }
+    module.exports = {
+        SVGPatternGenerator,
+        getRandomPattern,
+        getAllPatterns,
+        setPatternColors
+    }
 }

@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, session, url_for
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_minify import Minify
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
@@ -165,6 +166,8 @@ def create_app():
     login_manager.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
+    minify = Minify()
+    minify.init_app(app)
     from .views.telegram_auth import telegram_login
 
     csrf.exempt(telegram_login)

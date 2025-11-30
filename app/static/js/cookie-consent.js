@@ -129,7 +129,7 @@ class CookieConsentManager {
 }
 
 // Инициализируем при загрузке DOM
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     new CookieConsentManager()
 })
 

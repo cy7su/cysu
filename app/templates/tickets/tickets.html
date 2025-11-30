@@ -13,8 +13,7 @@ fa-life-ring"}, {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-al
                         <i class="fas fa-trash me-2"></i>Удалить все закрытые
                     </button>
                     {% endif %}
-                    <button class="btn btn-primary btn-tickets" data-bs-toggle="modal"
-                        data-bs-target="#createTicketModal">
+                    <button class="btn btn-primary btn-tickets" data-bs-toggle="modal" data-bs-target="#createTicketModal">
                         <i class="fas fa-plus me-2"></i>Создать тикет
                     </button>
                 </div>
@@ -47,10 +46,8 @@ fa-life-ring"}, {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-al
 
                                     <!-- Status Badge with enhanced styling -->
                                     <div class="d-flex align-items-center gap-2">
-                                        <span
-                                            class="badge fs-7 px-3 py-1 rounded-pill {% if ticket.status == 'open' %}bg-warning text-dark shadow-sm {% elif ticket.status == 'accepted' %}bg-info text-white shadow-sm {% elif ticket.status == 'closed' %}bg-success text-white shadow-sm {% else %}bg-secondary text-white{% endif %}">
-                                            <i
-                                                class="fas {% if ticket.status == 'open' %}fa-clock {% elif ticket.status == 'accepted' %}fa-check-circle {% elif ticket.status == 'closed' %}fa-lock {% else %}fa-question-circle{% endif %} me-1"></i>
+                                        <span class="badge fs-7 px-3 py-1 rounded-pill {% if ticket.status == 'open' %}bg-warning text-dark shadow-sm {% elif ticket.status == 'accepted' %}bg-info text-white shadow-sm {% elif ticket.status == 'closed' %}bg-success text-white shadow-sm {% else %}bg-secondary text-white{% endif %}">
+                                            <i class="fas {% if ticket.status == 'open' %}fa-clock {% elif ticket.status == 'accepted' %}fa-check-circle {% elif ticket.status == 'closed' %}fa-lock {% else %}fa-question-circle{% endif %} me-1"></i>
                                             {% if ticket.status == 'open' %}Открыт {% elif ticket.status == 'accepted'
                                             %}В работе {% elif ticket.status == 'closed' %}Закрыт {% else %}{{
                                             ticket.status }}{% endif %}
@@ -67,8 +64,7 @@ fa-life-ring"}, {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-al
 
                                 <!-- View button -->
                                 <div class="ms-3">
-                                    <a href="{{ url_for('tickets.ticket_detail', ticket_id=ticket.id) }}"
-                                        class="btn btn-primary btn-tickets rounded-pill px-4 py-2 shadow-sm" style="
+                                    <a href="{{ url_for('tickets.ticket_detail', ticket_id=ticket.id) }}" class="btn btn-primary btn-tickets rounded-pill px-4 py-2 shadow-sm" style="
                                             border: none;
                                             background: linear-gradient(135deg, #007bff, #0056b3);
                                             transition: all 0.3s ease;
@@ -81,10 +77,8 @@ fa-life-ring"}, {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-al
                             </div>
 
                             <!-- Message preview with better styling -->
-                            <div class="bg-light rounded-3 p-3 mb-3"
-                                style="background: var(--dp-01) !important; border: 1px solid var(--border-secondary)">
-                                <p class="card-text mb-2"
-                                    style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5">
+                            <div class="bg-light rounded-3 p-3 mb-3" style="background: var(--dp-01) !important; border: 1px solid var(--border-secondary)">
+                                <p class="card-text mb-2" style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5">
                                     <i class="fas fa-quote-left text-muted me-2" style="font-size: 0.8rem"></i>
                                     {{ ticket.message[:150] }}{% if ticket.message|length > 150 %}...{% endif %}
                                 </p>
@@ -154,8 +148,7 @@ fa-life-ring"}, {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-al
     </div>
 </div>
 
-<div class="modal fade" id="createTicketModal" tabindex="-1" aria-labelledby="createTicketModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="createTicketModal" tabindex="-1" aria-labelledby="createTicketModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -167,18 +160,15 @@ fa-life-ring"}, {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-al
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="ticketSubject" class="form-label">Тема</label>
-                        <input type="text" class="form-control" id="ticketSubject" name="subject" required
-                            placeholder="Введите тему тикета" />
+                        <input type="text" class="form-control" id="ticketSubject" name="subject" required placeholder="Введите тему тикета" />
                     </div>
                     <div class="mb-3">
                         <label for="ticketMessage" class="form-label">Сообщение</label>
-                        <textarea class="form-control" id="ticketMessage" name="message" rows="4" required
-                            placeholder="Опишите вашу проблему или вопрос"></textarea>
+                        <textarea class="form-control" id="ticketMessage" name="message" rows="4" required placeholder="Опишите вашу проблему или вопрос"></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="ticketFiles" class="form-label">Прикрепить файлы (до 1 ГБ каждый)</label>
-                        <input type="file" class="form-control" id="ticketFiles" name="files" multiple
-                            accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar" />
+                        <input type="file" class="form-control" id="ticketFiles" name="files" multiple accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar" />
                         <div class="form-text text-muted">
                             Поддерживаемые форматы: изображения, PDF, документы, архивы
                         </div>
@@ -198,7 +188,7 @@ fa-life-ring"}, {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-al
 
 <script>
     // Обработчик изменения файлов
-    document.getElementById('ticketFiles').addEventListener('change', function (e) {
+    document.getElementById('ticketFiles').addEventListener('change', function(e) {
         const fileList = document.getElementById('fileList')
         fileList.innerHTML = ''
 
@@ -237,12 +227,12 @@ fa-life-ring"}, {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-al
 
         // Отправляем запрос
         fetch('/api/ticket/create', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value,
-            },
-        })
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value,
+                },
+            })
             .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`)
@@ -297,12 +287,12 @@ fa-life-ring"}, {"title": "Тикеты", "url": None, "icon": "fas fa-ticket-al
         button.disabled = true
 
         fetch('/api/delete_all_closed_tickets', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content'),
-            },
-        })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content'),
+                },
+            })
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {

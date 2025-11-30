@@ -17,13 +17,13 @@ const STATIC_RESOURCES = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches
-            .open(STATIC_CACHE)
-            .then((cache) => {
-                return cache.addAll(STATIC_RESOURCES)
-            })
-            .then(() => {
-                return self.skipWaiting()
-            }),
+        .open(STATIC_CACHE)
+        .then((cache) => {
+            return cache.addAll(STATIC_RESOURCES)
+        })
+        .then(() => {
+            return self.skipWaiting()
+        }),
     )
 })
 
@@ -31,19 +31,19 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches
-            .keys()
-            .then((cacheNames) => {
-                return Promise.all(
-                    cacheNames.map((cacheName) => {
-                        if (cacheName !== STATIC_CACHE && cacheName !== CACHE_NAME) {
-                            return caches.delete(cacheName)
-                        }
-                    }),
-                )
-            })
-            .then(() => {
-                return self.clients.claim()
-            }),
+        .keys()
+        .then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== STATIC_CACHE && cacheName !== CACHE_NAME) {
+                        return caches.delete(cacheName)
+                    }
+                }),
+            )
+        })
+        .then(() => {
+            return self.clients.claim()
+        }),
     )
 })
 

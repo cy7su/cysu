@@ -159,7 +159,7 @@ class FeaturesCarousel {
 }
 
 // Инициализация при загрузке DOM
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     // Инициализируем карусель только на главной странице
     if (window.location.pathname === '/' || window.location.pathname === '') {
         new FeaturesCarousel()

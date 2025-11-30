@@ -15,8 +15,7 @@ user.username }}{% endblock %} {% block breadcrumbs %} {{ profile_breadcrumb() }
                     <div class="row">
                         <div class="col-md-4 col-12 text-center mb-4 mb-md-0">
                             <div class="mb-3">
-                                <div class="bg-dark rounded-circle d-inline-flex align-items-center justify-content-center"
-                                    style="
+                                <div class="bg-dark rounded-circle d-inline-flex align-items-center justify-content-center" style="
                                         width: 80px;
                                         height: 80px;
                                         border: 2px solid var(--border-secondary);
@@ -27,11 +26,9 @@ user.username }}{% endblock %} {% block breadcrumbs %} {{ profile_breadcrumb() }
                             </div>
                             <h5 class="text-white mb-2">{{ user.username }}</h5>
                             {% if user.is_admin %}
-                            <span class="badge bg-danger mb-3"
-                                style="background: var(--error) !important">Администратор</span>
+                            <span class="badge bg-danger mb-3" style="background: var(--error) !important">Администратор</span>
                             {% else %}
-                            <span class="badge bg-secondary mb-3"
-                                style="background: var(--dp-08) !important">Пользователь</span>
+                            <span class="badge bg-secondary mb-3" style="background: var(--dp-08) !important">Пользователь</span>
                             {% endif %}
                         </div>
 
@@ -47,8 +44,7 @@ user.username }}{% endblock %} {% block breadcrumbs %} {{ profile_breadcrumb() }
                                             {% set contact = user | format_user_contact %}
                                             <i class="{{ contact.icon }} me-3 text-primary" style="width: 20px"></i>
                                             <div class="flex-grow-1">
-                                                <small class="text-muted d-block">{{ 'Telegram' if contact.type ==
-                                                    'telegram' else 'Email' }}</small>
+                                                <small class="text-muted d-block">{{ 'Telegram' if contact.type == 'telegram' else 'Email' }}</small>
                                                 <span class="text-primary">{{ contact.display }}</span>
                                             </div>
                                         </div>
@@ -81,8 +77,7 @@ user.username }}{% endblock %} {% block breadcrumbs %} {{ profile_breadcrumb() }
                                             <i class="fas fa-calendar me-3 text-primary" style="width: 20px"></i>
                                             <div class="flex-grow-1">
                                                 <small class="text-muted d-block">Дата регистрации</small>
-                                                <span class="text-primary">{{ user.created_at.strftime('%d.%m.%Y') if
-                                                    user.created_at else 'Не
+                                                <span class="text-primary">{{ user.created_at.strftime('%d.%m.%Y') if user.created_at else 'Не
                                                     указано' }}</span>
                                             </div>
                                         </div>
@@ -123,25 +118,21 @@ user.username }}{% endblock %} {% block breadcrumbs %} {{ profile_breadcrumb() }
                                                 <small class="text-muted d-block">Статус подписки</small>
                                                 {% if subscription_type == "trial" %}
                                                 <span class="text-info">Пробная</span>
-                                                <br /><small class="text-muted">Действует до: {{
-                                                    subscription_expires.strftime('%d.%m.%Y') if
+                                                <br /><small class="text-muted">Действует до: {{ subscription_expires.strftime('%d.%m.%Y') if
                                                     subscription_expires else 'Не указано' }}</small>
                                                 {% elif subscription_type == "active" %}
                                                 <span class="text-success">Активна</span>
-                                                <br /><small class="text-muted">Действует до: {{
-                                                    subscription_expires.strftime('%d.%m.%Y') if
+                                                <br /><small class="text-muted">Действует до: {{ subscription_expires.strftime('%d.%m.%Y') if
                                                     subscription_expires else 'Не указано' }}</small>
                                                 {% else %}
                                                 <span class="text-warning">Неактивна</span>
-                                                <br /><small class="text-muted">Для доступа ко всем материалам
-                                                    необходима активная подписка</small>
+                                                <br /><small class="text-muted">Для доступа ко всем материалам необходима активная подписка</small>
                                                 {% endif %}
                                             </div>
                                         </div>
                                         {% if not is_subscribed %}
                                         <div class="mt-3">
-                                            <a href="{{ url_for('payment.subscription') }}"
-                                                class="btn btn-primary btn-sm">
+                                            <a href="{{ url_for('payment.subscription') }}" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-crown me-1"></i>Оформить подписку
                                             </a>
                                         </div>
@@ -160,12 +151,10 @@ user.username }}{% endblock %} {% block breadcrumbs %} {{ profile_breadcrumb() }
                                                 <i class="fas fa-download me-3 text-primary" style="width: 20px"></i>
                                                 <div>
                                                     <small class="text-muted d-block">Экспорт решений</small>
-                                                    <span class="text-primary" style="min-width: max-content">Скачать
-                                                        все загруженные практики</span>
+                                                    <span class="text-primary" style="min-width: max-content">Скачать все загруженные практики</span>
                                                 </div>
                                             </div>
-                                            <a href="{{ url_for('main.export_user_solutions') }}?t={{ moment().timestamp() }}"
-                                                class="btn btn-outline-primary btn-sm" style="
+                                            <a href="{{ url_for('main.export_user_solutions') }}?t={{ moment().timestamp() }}" class="btn btn-outline-primary btn-sm" style="
                                                     justify-content: flex-end;
                                                     align-items: center;
                                                     width: fit-content !important;

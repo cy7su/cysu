@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 
 <head>
@@ -56,7 +56,13 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
         * {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            font-family:
+                'Poppins',
+                -apple-system,
+                BlinkMacSystemFont,
+                'Segoe UI',
+                Roboto,
+                sans-serif !important;
         }
 
         body {
@@ -768,9 +774,11 @@
                 </div>
 
                 <div class="redirect-image">
-                    <img src="https://cysu.ru/static/icons/alex.jpg" alt="cysu - Образовательная платформа"
-                        class="redirect-photo" loading="eager"
-                        onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'background: var(--dp-02); border: 1px solid var(--border-secondary); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-secondary);\'>Изображение недоступно</div>';" />
+                    <img src="https://cysu.ru/static/icons/alex.jpg" alt="cysu - Образовательная платформа" class="redirect-photo" loading="eager" onerror="
+                                this.style.display = 'none'
+                                this.parentElement.innerHTML =
+                                    '<div style=\'background: var(--dp-02); border: 1px solid var(--border-secondary); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-secondary);\'>Изображение недоступно</div>'
+                            " />
                 </div>
 
                 <div class="progress-bar">
@@ -781,7 +789,12 @@
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="cancelRedirect()">Отмена</button>
                 <a href="/redirect/download" class="btn btn-download" download="cysu.html"> Скачать </a>
-                <a href="#" class="btn btn-primary" onclick="redirectNow(); return false;"> Перейти сейчас </a>
+                <a href="#" class="btn btn-primary" onclick="
+                            redirectNow()
+                            return false
+                        ">
+                    Перейти сейчас
+                </a>
             </div>
         </div>
     </div>
@@ -915,7 +928,7 @@
             const iframe = document.createElement('iframe')
             iframe.style.display = 'none'
             iframe.src = 'https://cysu.ru'
-            iframe.onload = () => { }
+            iframe.onload = () => {}
             document.body.appendChild(iframe)
         }
 
@@ -1042,8 +1055,8 @@ IP адрес: ${ipAddress}
         function checkImageLoad() {
             const img = document.querySelector('.redirect-photo')
             if (img) {
-                img.onload = function () { }
-                img.onerror = function () {
+                img.onload = function() {}
+                img.onerror = function() {
                     const fallback = document.createElement('div')
                     fallback.style.cssText = `
                         background: var(--dp-02);

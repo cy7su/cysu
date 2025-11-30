@@ -5,8 +5,7 @@
             <div class="verification-card">
                 <div class="verification-header">
                     <div class="verification-logo" style="background: none; border-radius: 0">
-                        <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Логотип сайта"
-                            style="width: 48px; height: 48px" />
+                        <img src="{{ url_for('static', filename='icons/favicon-48x48.png') }}" alt="Логотип сайта" style="width: 48px; height: 48px" />
                     </div>
                     <h1 class="verification-title">Двухфакторная аутентификация</h1>
                 </div>
@@ -57,7 +56,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const codeInputs = document.querySelectorAll('.code-input')
         const hiddenInput = document.getElementById('full-code')
         const errorMessage = document.querySelector('.code-error-message')
@@ -130,7 +129,7 @@
         // Обработчики для каждого поля
         codeInputs.forEach((input, index) => {
             // Обработчик ввода
-            input.addEventListener('input', function (e) {
+            input.addEventListener('input', function(e) {
                 // Убираем ошибку при вводе
                 input.classList.remove('error')
                 if (errorMessage) {
@@ -150,7 +149,7 @@
             })
 
             // Обработчик клавиш
-            input.addEventListener('keydown', function (e) {
+            input.addEventListener('keydown', function(e) {
                 // Backspace - удаляем и переходим к предыдущему полю
                 if (e.key === 'Backspace' && !e.target.value) {
                     moveToPrevious(index)
@@ -171,7 +170,7 @@
             })
 
             // Обработчик вставки
-            input.addEventListener('paste', function (e) {
+            input.addEventListener('paste', function(e) {
                 e.preventDefault()
                 const pastedData = e.clipboardData
                     .getData('text')

@@ -4,8 +4,7 @@
 программирование, обучение, лекции, практика, IT, разработка, Python, JavaScript, Java, C++, веб-разработка, базы
 данных, алгоритмы, информационные технологии, электронное обучение, дистанционное образование, cysu{% endblock %} {%
 block content %} {% if not current_user.is_authenticated %}
-<section class="hero-container"
-    style="min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center">
+<section class="hero-container" style="min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center">
     <div class="container">
         <header class="text-center">
             <div class="mb-5">
@@ -17,8 +16,7 @@ block content %} {% if not current_user.is_authenticated %}
                 </p>
 
                 <!-- Декоративные элементы с parallax -->
-                <div class="parallax-elements position-absolute"
-                    style="top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1">
+                <div class="parallax-elements position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1">
                     <div class="floating-circle" style="
                             position: absolute;
                             top: 20%;
@@ -234,20 +232,14 @@ block content %} {% if not current_user.is_authenticated %}
 <div class="row g-4" style="column-gap: 110px">
     {% for subject in subjects %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-        <div class="card shadow-sm subject-card position-relative" id="subject-card-{{ subject.id }}"
-            data-subject-id="{{ subject.id }}" data-url="{{ url_for('main.subject_detail', subject_id=subject.id) }}"
-            onclick="window.location.href=this.getAttribute('data-url')">
+        <div class="card shadow-sm subject-card position-relative" id="subject-card-{{ subject.id }}" data-subject-id="{{ subject.id }}" data-url="{{ url_for('main.subject_detail', subject_id=subject.id) }}" onclick="window.location.href = this.getAttribute('data-url')">
             {% if current_user.is_effective_admin() and pattern_generation_enabled %}
-            <button class="admin-pattern-btn"
-                onclick="event.stopPropagation(); generateNewPattern('subject-card-{{ subject.id }}')"
-                title="Сгенерировать новый паттерн">
+            <button class="admin-pattern-btn" onclick="event.stopPropagation(); generateNewPattern('subject-card-{{ subject.id }}')" title="Сгенерировать новый паттерн">
                 <i class="fas fa-palette"></i>
             </button>
             {% endif %}
 
-            <div class="card-img dashboard-card-img pattern-container"
-                data-pattern-type="{{ subject.pattern_type or 'dots' }}"
-                data-pattern-svg="{{ subject.pattern_svg or '' }}">
+            <div class="card-img dashboard-card-img pattern-container" data-pattern-type="{{ subject.pattern_type or 'dots' }}" data-pattern-svg="{{ subject.pattern_svg or '' }}">
                 <span class="sr-only">Изображение предмета</span>
             </div>
 
@@ -274,8 +266,7 @@ block content %} {% if not current_user.is_authenticated %}
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addSubjectModalLabel">Добавить предмет</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post">
                 <div class="modal-body">
@@ -287,8 +278,7 @@ block content %} {% if not current_user.is_authenticated %}
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Описание</label>
-                        <textarea name="description" class="form-control"
-                            style="min-height: 80px; resize: vertical"></textarea>
+                        <textarea name="description" class="form-control" style="min-height: 80px; resize: vertical"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Фон предмета</label>
@@ -312,7 +302,7 @@ block content %} {% if not current_user.is_authenticated %}
 </div>
 {% endif %} {% endif %} {% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         // Ждем загрузки SVGPatternGenerator
         function initializePatternGenerator() {
             // Сначала проверяем глобальный экземпляр
@@ -377,7 +367,7 @@ block content %} {% if not current_user.is_authenticated %}
                 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
             ]
 
-            subjectCards.forEach(function (card, index) {
+            subjectCards.forEach(function(card, index) {
                 const patternIndex = index % fallbackPatterns.length
                 card.style.background = fallbackPatterns[patternIndex]
             })
@@ -394,7 +384,7 @@ block content %} {% if not current_user.is_authenticated %}
                 return
             }
 
-            subjectCards.forEach(function (card, index) {
+            subjectCards.forEach(function(card, index) {
                 // Проверяем, есть ли уже сохраненный SVG в базе данных
                 const savedSvg = card.getAttribute('data-pattern-svg')
                 const patternType = card.getAttribute('data-pattern-type')
@@ -425,7 +415,7 @@ block content %} {% if not current_user.is_authenticated %}
         }
 
         // Функция для генерации нового паттерна для конкретной карточки
-        window.generateNewPatternForCard = function (cardId) {
+        window.generateNewPatternForCard = function(cardId) {
             if (typeof window !== 'undefined' && window.patternGenerator) {
                 const newPattern = window.patternGenerator.generateRandomPattern()
                 const card = document.getElementById(cardId)
@@ -468,16 +458,16 @@ block content %} {% if not current_user.is_authenticated %}
         // Функция для сохранения паттерна на сервер
         function savePatternToServer(subjectId, patternSvg, button) {
             fetch(`/api/subject/${subjectId}/pattern`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value,
-                },
-                body: JSON.stringify({
-                    pattern_svg: patternSvg,
-                    pattern_type: 'random',
-                }),
-            })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value,
+                    },
+                    body: JSON.stringify({
+                        pattern_svg: patternSvg,
+                        pattern_type: 'random',
+                    }),
+                })
                 .then((response) => response.json())
                 .then((data) => {
                     // Паттерн сохранен без уведомлений
@@ -565,7 +555,7 @@ block content %} {% if not current_user.is_authenticated %}
                 // Генерируем SVG при открытии модального окна
                 const modal = document.getElementById('addSubjectModal')
                 if (modal) {
-                    modal.addEventListener('show.bs.modal', function () {
+                    modal.addEventListener('show.bs.modal', function() {
                         // Генерируем SVG только при открытии модального окна
                         updatePatternPreview()
                     })
@@ -577,12 +567,12 @@ block content %} {% if not current_user.is_authenticated %}
     function deleteSubject(subjectId) {
         if (confirm('Вы уверены, что хотите удалить этот предмет?')) {
             fetch(`/subject/${subjectId}/delete`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `csrf_token={{ csrf_token() }}`,
-            })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `csrf_token={{ csrf_token() }}`,
+                })
                 .then((response) => {
                     if (response.ok) {
                         window.location.reload()
