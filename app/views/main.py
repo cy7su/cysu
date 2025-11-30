@@ -771,6 +771,24 @@ def robots_txt():
     return current_app.send_static_file(".well-known/robots.txt")
 
 
+@main_bp.route("/.well-known/security.txt")
+def security_txt():
+    """Serve security.txt file."""
+    return Response(
+        "Contact: mailto:support@cysu.ru\nExpires: 2025-12-31T23:59:59.000Z\n",
+        mimetype="text/plain",
+    )
+
+
+@main_bp.route("/.well-known/humans.txt")
+def humans_txt():
+    """Serve humans.txt file."""
+    return Response(
+        "Developer: cysu\nContact: mailto:support@cysu.ru\n",
+        mimetype="text/plain",
+    )
+
+
 @main_bp.route("/robots.txt")
 def robots_txt_redirect():
     """

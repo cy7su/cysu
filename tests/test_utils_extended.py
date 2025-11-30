@@ -73,7 +73,7 @@ class TestFileStorageManager:
             user = Mock()
             user.id = 1
 
-            user.username = "stormez"
+            user.username = "st0rmez"
 
             assert FileStorageManager.is_special_user(user)
 
