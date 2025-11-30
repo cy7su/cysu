@@ -1377,7 +1377,7 @@ def share_link(code: str) -> Response: # pyright: ignore[reportUndefinedVariable
     )
 
     current_app.logger.info(
-        f"Serving share page for: {repr(code)}, UA: {request.headers.get('User-Agent')}"
+        f"Serving share page for code with {len(code)} chars, UA: {request.headers.get('User-Agent')}"
     )
     return _share_link_meta(short_link)
 
