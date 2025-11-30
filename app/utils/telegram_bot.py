@@ -1,6 +1,7 @@
 import os
 from datetime import datetime, timedelta
 
+import httpx
 from telegram import (
     BotCommand,
     InlineKeyboardButton,
@@ -1472,31 +1473,29 @@ class TelegramBotManager:
         atexit.register(cleanup_pid_file)
         signal.signal(signal.SIGTERM, signal_handler)
         signal.signal(signal.SIGINT, signal_handler)
-        application = Application.builder().token(BOT_TOKEN).build()
+        from telegram.request import HTTPXRequest
+
+        # Workaround: some combinations of python-telegram-bot + httpx produce
+        # _client_kwargs containing 'proxy' which httpx.AsyncClient.__init__
+        # does not accept in this httpx version -> strip it out.
+        _orig_asyncclient_init = httpx.AsyncClient.__init__
+
+        def _patched_asyncclient_init(self, *args, **kwargs):
+            kwargs.pop("proxy", None)
+            return _orig_asyncclient_init(self, *args, **kwargs)
+
+        httpx.AsyncClient.__init__ = _patched_asyncclient_init
+
+        application = Application.builder().token(BOT_TOKEN).request(HTTPXRequest()).build()
+
         application.add_handler(CommandHandler("start", self.start_command))
         application.add_handler(CommandHandler("help", self.help_command))
         application.add_handler(CommandHandler("users", self.users_command))
         application.add_handler(CommandHandler("groups", self.groups_command))
-        application.add_handler(CallbackQueryHandler(self.handle_callback_query))
-        application.add_handler(
-            MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message)
-        )
+        # Обработчик входящих текстовых сообщений (для пошаговых действий: создание/редактирование и т.п.)
+        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
+        # Регистрируем общий обработчик ошибок, чтобы видеть исключения
         application.add_error_handler(self.error_handler)
-        commands = [
-            BotCommand("start", "Запустить бота"),
-            BotCommand("help", "Справка по командам"),
-            BotCommand("users", "Управление пользователями (только для админов)"),
-            BotCommand("groups", "Управление группами (только для админов)"),
-        ]
+        application.add_handler(CallbackQueryHandler(self.handle_callback_query))
 
-        async def post_init(application):
-            await application.bot.set_my_commands(commands)
-
-        application.post_init = post_init
-        logger.info("Запуск Telegram бота...")
         application.run_polling()
-
-
-if __name__ == "__main__":
-    bot_manager = TelegramBotManager()
-    bot_manager.run_bot()

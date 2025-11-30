@@ -42,7 +42,7 @@ material.title) }} {% endblock %} {% block content %}
                         </div>
                     </div>
                     {% endif %}
-
+                    
                     <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
                         {% if material.file %}
                         <a href="{{ url_for('main.serve_file', subject_id=material.subject_id, filename=material.file | extract_filename) }}"
