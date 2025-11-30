@@ -401,16 +401,8 @@ subject.description or 'Изучайте программирование и и�
             let isFileUploading = false;
             let isSolutionUploading = false;
 
-            const uploadMaxSizeBytes = {
-                {
-                    upload_max_size_bytes | int
-                }
-            };
-            const uploadLimitMessage = {
-                {
-                    upload_limit_message | tojson
-                }
-            };
+            const uploadMaxSizeBytes = {{ upload_max_size_bytes | int }};
+            const uploadLimitMessage = {{ upload_limit_message | tojson }};
 
             function handleFileUpload() {
                 const fileInput = document.getElementById('materialFile');

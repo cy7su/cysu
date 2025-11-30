@@ -1313,8 +1313,7 @@ def export_user_solutions() -> Response:
 
 
 @main_bp.route("/s/<code>")
-def share_link(code: str) -> Response:
-    """Обработка коротких ссылок на файлы материалов"""
+def share_link(code: str) -> Response: # pyright: ignore[reportUndefinedVariable]
     from ..models import ShortLink, Material, db
     from flask import request
 
@@ -1378,7 +1377,7 @@ def share_link(code: str) -> Response:
     )
 
     current_app.logger.info(
-        f"Serving share page for: {code}, UA: {request.headers.get('User-Agent')}"
+        f"Serving share page for: {repr(code)}, UA: {request.headers.get('User-Agent')}"
     )
     return _share_link_meta(short_link)
 
