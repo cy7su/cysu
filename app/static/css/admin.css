@@ -719,6 +719,7 @@ body {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -858,20 +859,29 @@ body {
     background: var(--primary);
 }
 
+/* Стили для управления пользователями */
+.admin-users .btn {
+    max-width: max-content !important;
+}
+
+/* Кнопки массовых операций справа */
+.admin-users .d-flex.justify-content-between .d-flex.gap-2 {
+    justify-content: flex-end !important;
+}
+
+/* Специфические правила для кнопок в таблице пользователей */
+.admin-users .admin-table-actions .btn,
+.admin-users .table .d-flex.gap-1 .btn,
+.admin-users td .btn {
+    max-width: max-content !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+}
+
 /* Выделение текста */
 ::selection {
     background: rgba(181, 149, 255, 0.2);
     color: var(--text-primary);
-}
-
-/* Фокус */
-*:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
-
-/* Скролл-бар */
-::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
@@ -899,4 +909,67 @@ body {
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--dp-12) var(--dp-01);
+}
+
+/* Стили для таблицы пользователей */
+.admin-users #users-table-body {
+    text-align-last: center;
+}
+
+.admin-users .d-flex.gap-1 {
+    justify-content: end;
+    width: fit-content;
+}
+
+/* Стили для предметов по группам */
+.admin-subject-groups .btn {
+    max-width: max-content !important;
+}
+
+/* Кнопки массовых операций справа */
+.admin-subject-groups .d-flex.justify-content-between .d-flex.gap-2 {
+    justify-content: flex-end !important;
+}
+
+/* Стили для таблицы предметов */
+.admin-subject-groups #subjects-table-body {
+    text-align-last: left;
+}
+
+/* Выравнивание колонок под заголовками */
+.admin-subject-groups table td {
+    text-align: left;
+}
+
+.admin-subject-groups table td:nth-child(1) {
+    text-align: center;
+    /* чекбокс по центру */
+}
+
+.admin-subject-groups .d-flex.gap-1 {
+    justify-content: end;
+    width: fit-content;
+}
+
+/* Фиксированная ширина колонки Действия */
+.admin-users table th:last-child,
+.admin-users table td:last-child,
+.admin-subject-groups table th:last-child,
+.admin-subject-groups table td:last-child {
+    width: 220px;
+    min-width: 220px;
+    max-width: 220px;
+}
+
+/* Закрепление колонки "Предмет" */
+.admin-subject-groups table th:nth-child(2),
+.admin-subject-groups table td:nth-child(2) {
+    position: sticky;
+    left: 40px;
+    background: var(--dp-03);
+    z-index: 10;
+}
+
+.admin-subject-groups table td:nth-child(2) {
+    background: var(--dp-02);
 }

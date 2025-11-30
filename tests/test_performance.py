@@ -14,7 +14,7 @@ class TestPerformance:
         from app.models import User, Subject, Material
 
         with app.app_context():
-            # Создаем тестовые данные
+
             users = []
             for i in range(10):
                 user = User(
@@ -34,9 +34,8 @@ class TestPerformance:
                 subjects.append(subject)
                 db.session.add(subject)
 
-            db.session.commit()  # Важно сохранить предметы сначала
+            db.session.commit()
 
-            # Создаем материалы связанные с предметами
             for subject in subjects:
                 for j in range(3):
                     material = Material(
@@ -49,7 +48,6 @@ class TestPerformance:
 
             db.session.commit()
 
-            # Тест производительности запросов
             start_time = time.time()
             for _ in range(100):
                 users_result = User.query.all()
@@ -74,13 +72,13 @@ class TestPerformance:
         with app.app_context():
             import os
 
-            # Проверяем robots.txt
             start_time = time.time()
             response = client.get("/robots.txt")
             end_time = time.time()
 
             response_time = end_time - start_time
-            assert response.status_code in [200, 301]  # Может быть redirect
+            assert response.status_code in [200, 301]
+
             assert (
                 response_time < 1.0
             ), f"Static file serving too slow: {response_time:.2f}s"
@@ -101,7 +99,6 @@ class TestLoad:
         with ThreadPoolExecutor(max_workers=5) as executor:
             results = list(executor.map(make_request, urls))
 
-        # Проверяем что все запросы успешны
         successful_requests = sum(1 for status in results if status == 200)
         assert successful_requests == len(
             urls
@@ -114,8 +111,7 @@ class TestIntegration:
     def test_full_user_workflow(self, app, client, db):
         """Тест полного рабочего процесса пользователя."""
         with app.app_context():
-            # Этот тест требует полной настройки аутентификации
-            # Пока пропустим для избежания сложности
+
             assert True, "Integration test placeholder"
 
     def test_subject_material_workflow(self, app, client, db):
@@ -123,21 +119,19 @@ class TestIntegration:
         from app.models import Subject, Material
 
         with app.app_context():
-            # Создаем предмет
+
             subject = Subject(
                 title="Integration Test Subject", description="Test description"
             )
             db.session.add(subject)
             db.session.commit()
 
-            # Создаем материал
             material = Material(
                 title="Integration Test Material", type="lecture", subject_id=subject.id
             )
             db.session.add(material)
             db.session.commit()
 
-            # Проверяем связь
             assert len(subject.materials) == 1
             assert subject.materials[0].title == "Integration Test Material"
             assert material.subject.title == "Integration Test Subject"
@@ -148,7 +142,7 @@ class TestCoverage:
 
     def test_import_coverage(self, app):
         """Тест покрытия импортов всех модулей."""
-        # Тестируем импорты основных модулей
+
         try:
             import app.models
             import app.services.subject_service
@@ -159,7 +153,6 @@ class TestCoverage:
             import app.utils.email_service
             import app.utils.payment_service
 
-            # Если все импорты успешны, тест проходит
             assert True, "All critical modules imported successfully"
         except ImportError as e:
             pytest.fail(f"Import failed: {e}")
@@ -173,7 +166,6 @@ class TestCoverage:
         with app.app_context():
             import tempfile
 
-            # Создаем предмет через сервис
             with tempfile.TemporaryDirectory() as temp_dir:
                 subject = SubjectService.create_subject(
                     title="Coverage Test Subject",
@@ -184,7 +176,6 @@ class TestCoverage:
                     upload_path=temp_dir,
                 )
 
-                # Создаем материал через сервис
                 material = MaterialService.create_material(
                     subject_id=subject.id,
                     title="Coverage Test Material",
@@ -192,7 +183,6 @@ class TestCoverage:
                     material_type="lecture",
                 )
 
-                # Проверяем что все сервисы работают вместе
                 assert subject.title == "Coverage Test Subject"
                 assert material.title == "Coverage Test Material"
                 assert material.subject_id == subject.id

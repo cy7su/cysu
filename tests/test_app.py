@@ -20,11 +20,11 @@ class TestApp:
     def test_database_connection(self, app, db):
         """Тест подключения к базе данных."""
         with app.app_context():
-            # Проверяем что можем создать таблицы
+
             from app.models import User
 
             db.create_all()
-            # Создаем тестового пользователя и проверяем работу
+
             unique_username = f"test_db_{uuid.uuid4()}"
             unique_email = f"test_db_{uuid.uuid4()}@gmail.com"
             user = User(username=unique_username, email=unique_email, password="test")
@@ -35,7 +35,7 @@ class TestApp:
 
     def test_blueprints_registration(self, app):
         """Тест регистрации blueprints."""
-        # Проверяем что основные blueprints зарегистрированы
+
         assert "main" in app.blueprints
         assert "auth" in app.blueprints
         assert "api" in app.blueprints

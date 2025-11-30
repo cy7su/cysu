@@ -32,19 +32,17 @@ class TestSubjectService:
                 assert subject.pattern_type == "dots"
                 assert subject.created_by == 1
 
-                # Проверяем что папка создана
                 subject_path = os.path.join(temp_dir, str(subject.id))
                 assert os.path.exists(subject_path)
 
     def test_update_subject(self, app):
         """Тест обновления предмета."""
         with app.app_context():
-            # Создаем предмет
+
             subject = Subject(title="Old Title", description="Old Description")
             db.session.add(subject)
             db.session.commit()
 
-            # Обновляем
             result = SubjectService.update_subject(
                 subject.id, "New Title", "New Description"
             )
@@ -61,11 +59,9 @@ class TestSubjectService:
             db.session.add(subject)
             db.session.commit()
 
-            # Пустой заголовок
             result = SubjectService.update_subject(subject.id, "", "Description")
             assert result is False
 
-            # Слишком длинный заголовок
             long_title = "A" * 300
             result = SubjectService.update_subject(
                 subject.id, long_title, "Description"
@@ -79,12 +75,11 @@ class TestSubjectService:
             db.session.add(subject)
             db.session.commit()
 
-            # Существующий предмет
             found_subject = SubjectService.get_subject_or_404(subject.id)
             assert found_subject.id == subject.id
 
-            # Несуществующий предмет должен вызвать 404
-            with pytest.raises(Exception):  # В тестах raises Exception для get_or_404
+            with pytest.raises(Exception):
+
                 SubjectService.get_subject_or_404(99999)
 
 
@@ -94,12 +89,11 @@ class TestMaterialService:
     def test_get_subject_materials(self, app):
         """Тест получения материалов предмета."""
         with app.app_context():
-            # Создаем предмет
+
             subject = Subject(title=f"Test Subject {uuid.uuid4()}")
             db.session.add(subject)
-            db.session.commit()  # Важно сохранить чтобы получить ID
+            db.session.commit()
 
-            # Создаем материалы
             lecture = Material(title="Лекция", type="lecture", subject_id=subject.id)
             assignment = Material(
                 title="Задание", type="assignment", subject_id=subject.id
@@ -119,7 +113,7 @@ class TestMaterialService:
     def test_create_material(self, app):
         """Тест создания материала."""
         with app.app_context():
-            # Создаем предмет
+
             subject = Subject(title="Test Subject")
             db.session.add(subject)
             db.session.commit()
@@ -142,10 +136,10 @@ class TestMaterialService:
     def test_update_material(self, app):
         """Тест обновления материала."""
         with app.app_context():
-            # Создаем предмет и материал
+
             subject = Subject(title="Subject")
             db.session.add(subject)
-            db.session.commit()  # Сохраняем предмет сначала
+            db.session.commit()
 
             material = Material(
                 title="Old Title",
@@ -156,7 +150,6 @@ class TestMaterialService:
             db.session.add(material)
             db.session.commit()
 
-            # Обновляем
             result = MaterialService.update_material(
                 material.id, "New Title", "New Description"
             )
@@ -171,18 +164,16 @@ class TestMaterialService:
         with app.app_context():
             subject = Subject(title="Subject")
             db.session.add(subject)
-            db.session.commit()  # Сохраняем предмет сначала
+            db.session.commit()
 
             material = Material(title="Test", type="lecture", subject_id=subject.id)
             db.session.add(material)
             db.session.commit()
 
-            # Слишком длинный заголовок
             long_title = "A" * 300
             result = MaterialService.update_material(material.id, long_title, "Desc")
             assert result is False
 
-            # Слишком длинное описание
             long_desc = "A" * 400
             result = MaterialService.update_material(material.id, "Title", long_desc)
             assert result is False
@@ -192,16 +183,12 @@ class TestMaterialService:
         with app.app_context():
             subject = Subject(title="Subject")
             db.session.add(subject)
-            db.session.commit()  # Сохраняем предмет сначала
+            db.session.commit()
 
-            # Создаем лекцию вместо задания
-            lecture = Material(
-                title="Lecture", type="lecture", subject_id=subject.id  # Не assignment
-            )
+            lecture = Material(title="Lecture", type="lecture", subject_id=subject.id)
             db.session.add(lecture)
             db.session.commit()
 
-            # Фиктивный объект файла для теста
             class MockFile:
                 filename = "test.pdf"
                 content_length = 1024
@@ -214,7 +201,7 @@ class TestMaterialService:
         with app.app_context():
             subject = Subject(title="Subject")
             db.session.add(subject)
-            db.session.commit()  # Сохраняем предмет сначала
+            db.session.commit()
 
             assignment = Material(
                 title="Assignment", type="assignment", subject_id=subject.id
@@ -231,33 +218,28 @@ class TestExportService:
 
     def test_clean_folder_name_valid(self, app):
         """Тест очистки названия папки с валидными именами."""
-        # Нормальное имя
+
         result = ExportService.clean_folder_name("Математика")
         assert result == "Математика"
 
-        # Пустое имя
         result = ExportService.clean_folder_name("")
         assert result == "Без_названия"
 
-        # Имя с пробелами
         result = ExportService.clean_folder_name("   Алгебра   ")
         assert result == "Алгебра"
 
     def test_clean_folder_name_with_invalid_chars(self, app):
         """Тест очистки названия папки с недопустимыми символами."""
-        # Замена спецсимволов (функция сжимает множественные подчеркивания)
-        result = ExportService.clean_folder_name("Мат/?*\\:<>|")
-        assert result == "Мат"  # Множественные "_" сжимаются до одного
 
-        # Тест с пробелами - они должны заменяться на "_"
+        result = ExportService.clean_folder_name("Мат/?*\\:<>|")
+        assert result == "Мат"
+
         result = ExportService.clean_folder_name("Мат Алгебра")
         assert result == "Мат_Алгебра"
 
-        # Удаление множественных подчеркиваний и концевых "_"
         result = ExportService.clean_folder_name("Файл\\:\\  :/?")
         assert result == "Файл"
 
-        # Слишком длинное имя
         long_name = "A" * 150
         result = ExportService.clean_folder_name(long_name)
         assert result == "Предмет"
@@ -271,28 +253,25 @@ class TestExportService:
     def test_export_user_solutions_with_submissions(self, app):
         """Тест экспорта решений для пользователя с решениями."""
         with app.app_context():
-            # Создаем тестовые данные
+
             subject = Subject(title="Математика")
             db.session.add(subject)
-            db.session.commit()  # Важно сохранить subject перед созданием material
+            db.session.commit()
 
             material = Material(
                 title="Упражнение 1", type="assignment", subject_id=subject.id
             )
             db.session.add(material)
-            db.session.commit()  # Сохраняем material
-
-            # Создаем фиктивное решение (мы не можем создать реальный файл)
-            # Тест проверяет логику без реальных файлов
+            db.session.commit()
 
             result = ExportService.export_user_solutions(1, "testuser")
-            # В данном случае нет решений, так что вернет None
+
             assert result is None
 
     def test_generate_readme_content(self, app):
         """Тест генерации содержимого README."""
         with app.app_context():
-            # Создаем mock данные
+
             subjects_dict = {
                 1: {
                     "subject": type("MockSubject", (), {"title": "Математика"})(),

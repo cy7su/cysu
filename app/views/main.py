@@ -1,4 +1,3 @@
-# flake8: noqa E501
 import os
 import shutil
 from typing import Union
@@ -47,6 +46,81 @@ main_bp.app_context_processor(inject_timestamp)
 main_bp.app_context_processor(inject_moment)
 main_bp.app_context_processor(inject_admin_users)
 main_bp.app_context_processor(inject_subscription_status)
+
+
+def get_user_solution_share_url(submission):
+    """
+    Генерирует или возвращает короткую ссылку для поделения пользовательского решения.
+    """
+    if not submission or not submission.file:
+        return None
+
+    from ..models import ShortLink
+    from ..utils.template_filters import extract_filename
+
+    filename_to_share = extract_filename(submission.file)
+    original_url = url_for(
+        "main.serve_user_file",
+        subject_id=submission.material.subject_id,
+        user_id=submission.user_id,
+        filename=filename_to_share,
+        _external=True,
+    )
+
+    short_link = ShortLink.query.filter_by(original_url=original_url).first()
+
+    if not short_link:
+
+        import secrets
+
+        code = secrets.token_urlsafe(8)
+
+        short_link = ShortLink(
+            code=code,
+            original_url=original_url,
+            clicks=0,
+        )
+        db.session.add(short_link)
+        db.session.commit()
+
+    return url_for("main.share_link", code=short_link.code, _external=True)
+
+
+def get_share_url(material):
+    """
+    Генерирует или возвращает короткую ссылку для поделения материалом.
+    """
+    if not material or not material.solution_file:
+        return None
+
+    from ..models import ShortLink
+    from ..utils.template_filters import extract_filename
+
+    filename_to_share = extract_filename(material.solution_file)
+    original_url = url_for(
+        "main.serve_file",
+        subject_id=material.subject_id,
+        filename=filename_to_share,
+        _external=True,
+    )
+
+    short_link = ShortLink.query.filter_by(original_url=original_url).first()
+
+    if not short_link:
+
+        import secrets
+
+        code = secrets.token_urlsafe(8)
+
+        short_link = ShortLink(
+            code=code,
+            original_url=original_url,
+            clicks=0,
+        )
+        db.session.add(short_link)
+        db.session.commit()
+
+    return url_for("main.share_link", code=short_link.code, _external=True)
 
 
 @main_bp.route("/", methods=["GET", "POST"])
@@ -234,14 +308,17 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         form.subject_id.choices = [(subject.id, subject.title)]
         form.subject_id.data = subject.id
         if form and form.validate_on_submit():
+            material_type = form.type.data
+            if subject.mode == 2:
+                material_type = "assignment"
             material = MaterialService.create_material(
                 subject_id=subject_id,
                 title=form.title.data,
                 description=form.description.data,
-                material_type=form.type.data,
+                material_type=material_type,
                 file_data=form.file.data,
                 solution_file_data=(
-                    form.solution_file.data if form.type.data == "assignment" else None
+                    form.solution_file.data if material_type == "assignment" else None
                 ),
                 created_by=current_user.id,
             )
@@ -281,6 +358,7 @@ def subject_detail(subject_id: int) -> Union[str, Response]:
         assignments_completion_percent=assignments_completion_percent,
         upload_limit_message=upload_limit_message,
         upload_max_size_bytes=upload_max_size_bytes,
+        is_practice_only=subject.mode == 2,
     )
 
 
@@ -292,7 +370,8 @@ def edit_subject(subject_id: int) -> Response:
         return redirect(url_for("main.index"))
     new_title = request.form.get("title", "").strip()
     new_description = request.form.get("description", "").strip()
-    if SubjectService.update_subject(subject_id, new_title, new_description):
+    new_mode = int(request.form.get("mode", 1))
+    if SubjectService.update_subject(subject_id, new_title, new_description, new_mode):
         flash("Предмет успешно обновлён")
     else:
         flash("Ошибка при обновлении предмета", "error")
@@ -336,7 +415,6 @@ def material_detail(material_id: int) -> Union[str, Response]:
     if material.type == "assignment" and current_user.is_authenticated:
         from app.models import Submission
 
-        # Загружаем submission с joinedload для material, чтобы избежать lazy loading
         submission = (
             Submission.query.options(joinedload(Submission.material))
             .filter_by(user_id=current_user.id, material_id=material_id)
@@ -380,7 +458,6 @@ def material_detail(material_id: int) -> Union[str, Response]:
     if my_submission and my_submission.file:
         user_solution_share_url = get_user_solution_share_url(my_submission)
 
-    # Генерируем мета-описание для материалов
     if material.file:
         file_name = (
             material.file.split("/")[-1] if "/" in material.file else material.file
@@ -547,7 +624,7 @@ def submit_solution(material_id: int) -> Response:
                 f"Исключение при сохранении решения пользователя {current_user.id} {original_filename}: {str(e)}"
             )
             flash(f"Ошибка при сохранении файла: {str(e)}", "error")
-    return redirect(url_for("main.subject_detail", subject_id=material.subject_id))
+    return redirect(url_for("main.material_detail", material_id=material_id))
 
 
 @main_bp.route("/toggle-admin-mode", methods=["POST"])
@@ -580,7 +657,7 @@ def edit_material(material_id: int) -> Response:
 @login_required
 def replace_material_file(material_id: int) -> Response:
     if not UserManagementService.can_manage_materials(current_user):
-        flash("Доступ запрещён", "error")
+        flash("Доступ запрещён")
         return redirect(url_for("main.index"))
     material = Material.query.get_or_404(material_id)
     if current_user.is_moderator:
@@ -685,72 +762,20 @@ def security_policy() -> str:
     return render_template("static/security_policy.html")
 
 
-@main_bp.route("/.well-known/security.txt")
-def security_txt() -> Response:
-    """Возвращает файл security.txt для исследователей безопасности"""
-    return Response(
-        """Contact: mailto:support@cysu.ru
-            Expires: 2026-01-15T00:00:00.000Z
-            Preferred-Languages: ru, en
-            Canonical: https://cysu.ru/.well-known/security.txt
-            Policy: https://cysu.ru/security-policy""",
-        mimetype="text/plain",
-    )
-
-
-@main_bp.route("/.well-known/humans.txt")
-def humans_txt() -> Response:
-    """Возвращает файл humans.txt с информацией о команде разработки"""
-    return Response(
-        """Developer: cysu
-    Contact: cysu.ru
-    From: Russia
-    Font Awesome: https://fontawesome.com/
-    Bootstrap: https://getbootstrap.com/
-    Flask: https://flask.palletsprojects.com/
-    HTML5, CSS3, JavaScript
-    Python, Flask
-    Bootstrap 5
-    Font Awesome 6
-    SQLite
-    Linux, Nginx
-    Last update: 2025-09-13
-    Language: Russian
-    Doctype: HTML5
-    IDE: VS Code
-""",
-        mimetype="text/plain",
-    )
-
-
 @main_bp.route("/.well-known/robots.txt")
-def robots_txt() -> Response:
-    """Возвращает файл robots.txt для поисковых роботов"""
-    return Response(
-        """User-agent: *
-Allow: /
-Sitemap: https://cysu.ru/sitemap.xml
-Crawl-delay: 1
-Disallow: /admin/
-Disallow: /api/
-Disallow: /static/logs/
-Disallow: /static/temp/
-Allow: /
-Allow: /subjects/
-Allow: /materials/
-Allow: /profile/
-Allow: /about/
-Allow: /contact/
-Allow: /wiki/
-Allow: /privacy/
-Allow: /terms/""",
-        mimetype="text/plain",
-    )
+def robots_txt():
+    """
+    Serve robots.txt from the static folder so url_for("main.robots_txt") can be built.
+    """
+
+    return current_app.send_static_file(".well-known/robots.txt")
 
 
 @main_bp.route("/robots.txt")
-def robots_txt_redirect() -> Response:
-    """Редирект с /robots.txt на /.well-known/robots.txt"""
+def robots_txt_redirect():
+    """
+    Redirect /robots.txt to /.well-known/robots.txt
+    """
     return redirect(url_for("main.robots_txt"), code=301)
 
 
@@ -988,7 +1013,7 @@ def serve_file(subject_id: int, filename: str) -> Response:
     safe_filename = secure_filename(filename)
     possible_paths = []
     try:
-        # Safely construct paths using os.path.join and os.path.normpath
+
         path1 = os.path.normpath(os.path.join(upload_folder, safe_filename))
         if path1.startswith(os.path.normpath(upload_folder)):
             possible_paths.append(path1)
@@ -1013,6 +1038,15 @@ def serve_file(subject_id: int, filename: str) -> Response:
     except Exception:
         pass
     try:
+
+        path6 = os.path.normpath(
+            os.path.join(upload_folder, str(subject_id), "materials", safe_filename)
+        )
+        if path6.startswith(os.path.normpath(upload_folder)):
+            possible_paths.append(path6)
+    except Exception:
+        pass
+    try:
         users_dir = os.path.join(upload_folder, str(subject_id), "users")
         if os.path.isdir(users_dir):
             for user_folder in os.listdir(users_dir):
@@ -1020,15 +1054,6 @@ def serve_file(subject_id: int, filename: str) -> Response:
                     path4 = os.path.normpath(
                         os.path.join(users_dir, user_folder, safe_filename)
                     )
-                    if path4.startswith(os.path.normpath(upload_folder)):
-                        possible_paths.append(path4)
-    except (OSError, Exception):
-        pass
-    try:
-        users_dir = os.path.join(upload_folder, str(subject_id), "users")
-        if os.path.isdir(users_dir):
-            for user_folder in os.listdir(users_dir):
-                if os.path.isdir(os.path.join(users_dir, user_folder)):
                     path5 = os.path.normpath(
                         os.path.join(
                             users_dir, user_folder, os.path.basename(safe_filename)
@@ -1191,7 +1216,7 @@ def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
         )
     )
     if not file_path.startswith(os.path.normpath(upload_folder)):
-        # Path traversal attempt
+
         current_app.logger.error(f" Path traversal attempt: {file_path}")
         abort(404)
     if not os.path.exists(file_path):
@@ -1288,12 +1313,10 @@ def export_user_solutions() -> Response:
 
 
 @main_bp.route("/s/<code>")
-def share_link(code: str) -> Response:
-    """Обработка коротких ссылок на файлы материалов"""
+def share_link(code: str) -> Response: # pyright: ignore[reportUndefinedVariable]
     from ..models import ShortLink, Material, db
     from flask import request
 
-    # Логируем все запросы к коротким ссылкам
     current_app.logger.info(
         f"Share link accessed: /s/{code}, User-Agent: {request.headers.get('User-Agent', 'No UA')}, IP: {request.remote_addr}"
     )
@@ -1303,7 +1326,6 @@ def share_link(code: str) -> Response:
         current_app.logger.warning(f"Short link not found: {code}")
         return redirect(url_for("main.not_found"))
 
-    # Проверяем правила ссылки (если есть)
     if short_link.rule:
         from datetime import datetime
 
@@ -1324,9 +1346,8 @@ def share_link(code: str) -> Response:
         f"Processing share link: {code}, original_url: {short_link.original_url}"
     )
 
-    # Для ботов (например, Telegram) возвращаем публичные метаданные без редиректа
     user_agent = request.headers.get("User-Agent", "").lower()
-    # Расширенная detection ботов
+
     bot_indicators = [
         "telegrambot",
         "telegram",
@@ -1355,107 +1376,28 @@ def share_link(code: str) -> Response:
         or "crawler" in user_agent
     )
 
-    if is_bot:
-        current_app.logger.info(
-            f"Bot detected and serving meta: {code}, UA: {request.headers.get('User-Agent')}"
-        )
-        return _share_link_meta(short_link)
-
-    # Извлекаем ID материала из URL
-    original_url = short_link.original_url
-    if "/material/" in original_url:
-        try:
-            material_id = int(original_url.split("/material/")[-1])
-            material = Material.query.get(material_id)
-
-            if material and material.solution_file:
-                # Для поделения используем только файл решения
-                from ..utils.template_filters import extract_filename
-
-                filename_to_share = extract_filename(material.solution_file)
-
-                # Перенаправляем на файл
-                file_url = url_for(
-                    "main.serve_file",
-                    subject_id=material.subject_id,
-                    filename=filename_to_share,
-                )
-                return redirect(file_url)
-        except (ValueError, IndexError) as e:
-            current_app.logger.error(f"Error parsing material ID from share link: {e}")
-
-    # Увеличиваем счетчик кликов
-    short_link.clicks += 1
-    db.session.commit()
-
-    # Проверяем, является ли это пользовательским решением
-    if "/files/" in original_url and "/users/" in original_url:
-        try:
-            # Парсим URL для пользовательских решений: /files/{subject_id}/users/{user_id}/{filename}
-            url_parts = original_url.split("/")
-            subject_id = int(url_parts[-4])  # subject_id
-            user_id = int(url_parts[-2])  # user_id
-            filename = url_parts[-1]  # filename
-
-            # Перенаправляем на serve_user_file
-            file_url = url_for(
-                "main.serve_user_file",
-                subject_id=subject_id,
-                user_id=user_id,
-                filename=filename,
-            )
-            return redirect(file_url)
-        except (ValueError, IndexError) as e:
-            current_app.logger.error(f"Error parsing user solution share link: {e}")
-
-    # Fallback - перенаправляем на оригинальный URL
-    return redirect(short_link.original_url)
-
-
-# Debug routes removed for security reasons
-# @main_bp.route("/debug/share_links")
-# def debug_share_links():
-#     """Временный роут для диагностики коротких ссылок"""
-#     import json
-#     from ..models import ShortLink
-
-#     links = ShortLink.query.all()
-#     data = []
-#     for link in links:
-#         data.append({
-#             'code': link.code,
-#             'original_url': link.original_url,
-#             'clicks': link.clicks,
-#             'created_at': link.created_at.isoformat() if link.created_at else None
-#         })
-
-#     return Response(json.dumps(data, ensure_ascii=False, indent=2), mimetype='application/json')
-
-
-# @main_bp.route("/debug/meta/<code>")
-# def debug_meta(code: str):
-#     """Временный роут для тестирования мета-данных"""
-#     from ..models import ShortLink
-
-#     short_link = ShortLink.query.filter_by(code=code).first()
-#     if not short_link:
-#         return f"Short link {code} not found", 404
-
-#     return _share_link_meta(short_link)
+    current_app.logger.info(
+        f"Serving share page for code with {len(code)} chars, UA: {request.headers.get('User-Agent')}"
+    )
+    return _share_link_meta(short_link)
 
 
 def _share_link_meta(short_link: "ShortLink") -> Response:
-    """Возвращает HTML страницу с метаданными для ботов"""
+    """Возвращает HTML страницу с метаданными для ботов и страницу с JS-загрузкой для пользователей"""
     from ..models import Material, Submission
+    from ..utils.template_filters import extract_filename
+    from flask import request, url_for
 
     original_url = short_link.original_url
 
-    # Дефолтные метаданные
     title = "cysu - Образовательная платформа"
     description = "cysu - современная образовательная платформа для изучения программирования и IT."
     image = "https://cysu.ru/static/icons/og/og-image-1200x630.png"
 
-    # Для материалов генерируем индивидуальные метаданные
+    small_image = "https://cysu.ru/static/icons/og/og-icon-32x32.png"
+
+    file_url = None
+
     if "/material/" in original_url:
         try:
             material_id = int(original_url.split("/material/")[-1])
@@ -1474,19 +1416,26 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
                     description = (
                         f"Предмет: {material.subject.title} - Задание: {material.title}"
                     )
+
+                if getattr(material, "solution_file", None):
+                    filename_to_share = extract_filename(material.solution_file)
+                    file_url = url_for(
+                        "main.serve_file",
+                        subject_id=material.subject_id,
+                        filename=filename_to_share,
+                        _external=True,
+                    )
         except (ValueError, IndexError) as e:
             current_app.logger.error(f"Error generating meta for share link: {e}")
 
-    # Для пользовательских решений
     elif "/files/" in original_url and "/users/" in original_url:
         try:
-            # Парсим URL: .../files/{subject_id}/users/{user_id}/{filename}
+
             from urllib.parse import urlparse
 
             parsed_url = urlparse(original_url)
             path_parts = parsed_url.path.split("/")
 
-            # Находим индексы ключевых элементов пути
             files_index = -1
             users_index = -1
             for i, part in enumerate(path_parts):
@@ -1496,7 +1445,6 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
                     users_index = i
 
             if files_index >= 0 and users_index == files_index + 2:
-                # Правильная структура: /files/{subject_id}/users/{user_id}/{filename}
                 subject_id = int(path_parts[files_index + 1])
                 user_id = int(path_parts[users_index + 1])
                 filename = (
@@ -1505,7 +1453,6 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
                     else ""
                 )
 
-                # Находим все submissions пользователя для данного subject
                 submissions = (
                     Submission.query.join(Material)
                     .filter(
@@ -1514,33 +1461,20 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
                     .all()
                 )
 
-                # Ищем submission с соответствующим filename
-                from ..utils.template_filters import extract_filename
-
                 matching_submission = None
                 for sub in submissions:
                     if sub.file and extract_filename(sub.file) == filename:
                         matching_submission = sub
                         break
 
-                if not matching_submission:
-                    # Если точное совпадение filename не найдено, берем первую submission
-                    if submissions:
-                        matching_submission = submissions[0]
-                        current_app.logger.info(
-                            f"Using first submission for user {user_id}, subject {subject_id}"
-                        )
-                    else:
-                        current_app.logger.warning(
-                            f"No submissions found for user {user_id}, subject {subject_id}"
-                        )
+                if not matching_submission and submissions:
+                    matching_submission = submissions[0]
 
                 if matching_submission and matching_submission.material:
                     material = matching_submission.material
                     title = f"{material.subject.title} - {material.title} (Решение)"
                     description = f"Пользовательское решение для: {material.subject.title} - {material.title}"
 
-                    # Извлекаем имя пользователя для отображения
                     from ..models import User
 
                     user = User.query.get(user_id)
@@ -1548,9 +1482,18 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
                         title = f"{user.username} - Решение: {material.subject.title} - {material.title}"
                         description = f"Решение от {user.username} для: {material.subject.title} - {material.title}"
 
-                    # Добавляем информацию о файле если доступна
                     if filename:
                         description += f" - Файл: {filename}"
+
+                    image = "https://cysu.ru/static/icons/og/telegram-400x400.png"
+
+                    file_url = url_for(
+                        "main.serve_user_file",
+                        subject_id=subject_id,
+                        user_id=user_id,
+                        filename=filename,
+                        _external=True,
+                    )
 
                     current_app.logger.info(
                         f"Generated meta for user solution: {title}"
@@ -1560,96 +1503,141 @@ def _share_link_meta(short_link: "ShortLink") -> Response:
                 f"Error generating meta for user solution share link: {e}"
             )
 
-    # Возвращаем HTML с Open Graph метками
+    if not file_url:
+        file_url = original_url if original_url else request.url
+
+    import json as _json
+
+    _js_title = _json.dumps(title)
+    _js_description = _json.dumps(description)
+    _js_file_url = _json.dumps(file_url)
+
     html = f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{escape(title)}</title>
     <meta name="description" content="{escape(description)}">
 
     <!-- Open Graph -->
     <meta property="og:title" content="{escape(title)}">
     <meta property="og:description" content="{escape(description)}">
-    <meta property="og:image" content="{escape(image)}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{escape(str(request.url))}">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{escape(title)}">
-    <meta name="twitter:description" content="{escape(description)}">
+    <!-- Force small preview (32x32) for Telegram by using the 32x32 image as og:image -->
+    <meta property="og:image" content="{escape(small_image)}">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="32">
+    <meta property="og:image:height" content="32">
+    <!-- Preserve large image for Twitter / cards if desired -->
     <meta name="twitter:image" content="{escape(image)}">
+    <meta name="twitter:image:type" content="image/png">
 
     <!-- Telegram -->
     <meta property="telegram:title" content="{escape(title)}">
     <meta property="telegram:description" content="{escape(description)}">
-    <meta property="telegram:image" content="{escape(image)}">
+    <meta property="telegram:image" content="{escape(small_image)}">
+    <meta property="telegram:image:width" content="32">
+    <meta property="telegram:image:height" content="32">
+    <meta property="telegram:image:type" content="image/png">
 
-    <!-- Redirect meta refresh для пользователей -->
-    <meta http-equiv="refresh" content="0; url={escape(short_link.original_url)}">
+    <link rel="icon" href="/static/favicon.ico">
+
+    <style>
+        /* Общие стили */
+        html, body {{
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Arial', sans-serif;
+            background: #121212;
+            color: #fff;
+        }}
+        .container {{
+            box-sizing: border-box;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }}
+        .logo {{
+            width: 120px;
+            height: 120px;
+            margin: 0 0 20px;
+            animation: spin 2s linear infinite;
+            object-fit: contain;
+        }}
+        @keyframes spin {{
+            from {{ transform: rotate(0deg); }}
+            to {{ transform: rotate(360deg); }}
+        }}
+        h1 {{
+            font-size: 1.8rem;
+            margin: 8px 0 12px;
+            line-height: 1.2;
+            word-break: break-word;
+        }}
+        p {{
+            font-size: 1rem;
+            margin: 0 0 18px;
+            opacity: 0.9;
+            word-break: break-word;
+        }}
+
+        /* Mobile adjustments */
+        @media (max-width: 600px) {{
+            .container {{
+                padding: 16px;
+            }}
+            .logo {{
+                width: 72px;
+                height: 72px;
+                margin-bottom: 12px;
+            }}
+            h1 {{
+                font-size: 1.2rem;
+            }}
+            p {{
+                font-size: 0.95rem;
+                margin-bottom: 12px;
+            }}
+        }}
+    </style>
 </head>
 <body>
-    <h1>{escape(title)}</h1>
-    <p>{escape(description)}</p>
-    <p>Перенаправление...</p>
+    <div class="container">
+        <img src="{escape(image)}" alt="cysu Logo" class="logo" decoding="async" loading="eager">
+        <h1>{escape(title)}</h1>
+        <p>{escape(description)}</p>
+    </div>
+
+    <link rel="icon" href="/static/favicon.ico">
+
     <script>
-        window.location.href = {json.dumps(short_link.original_url)};
+        (function() {{
+            var target = {_js_file_url};
+
+            // Авто-скачать через 1 секунду
+            try {{
+                setTimeout(function() {{
+                    var link = document.createElement('a');
+                    link.href = target;
+                    link.download = '';
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }}, 3000);
+            }} catch (e) {{
+                console && console.error("Auto-download failed:", e);
+            }}
+        }})();
     </script>
 </body>
-</html>"""
-
-    return Response(html, mimetype="text/html")
-
-
-def get_share_url(material) -> str:
-    """Получить короткую ссылку для решения материала с ленивой генерацией"""
-    from ..models import ShortLink, ShortLinkRule
-    from datetime import datetime, timedelta
-
-    original_url = url_for(
-        "main.material_detail", material_id=material.id, _external=True
-    )
-    short_link = ShortLink.query.filter_by(original_url=original_url).first()
-
-    if not short_link:
-        short_link = ShortLink.create_unique(original_url)
-        # Создаем правило с ограничением в 1 день
-        rule = ShortLinkRule()
-        rule.short_link_id = short_link.id
-        rule.expires_at = datetime.utcnow() + timedelta(days=1)
-        db.session.add(rule)
-        db.session.commit()
-
-    return url_for("main.share_link", code=short_link.code, _external=True)
-
-
-def get_user_solution_share_url(submission) -> str:
-    """Получить короткую ссылку для поделения пользовательским решением"""
-    from ..models import ShortLink, ShortLinkRule
-    from datetime import datetime, timedelta
-    from ..utils.template_filters import extract_filename
-
-    filename = extract_filename(submission.file)
-    original_url = url_for(
-        "main.serve_user_file",
-        subject_id=submission.material.subject_id,
-        user_id=submission.user_id,
-        filename=filename,
-        _external=True,
-    )
-    short_link = ShortLink.query.filter_by(original_url=original_url).first()
-
-    if not short_link:
-        short_link = ShortLink.create_unique(original_url)
-        # Создаем правило с ограничением в 1 день
-        rule = ShortLinkRule()
-        rule.short_link_id = short_link.id
-        rule.expires_at = datetime.utcnow() + timedelta(days=1)
-        db.session.add(rule)
-        db.session.commit()
-
-    return url_for("main.share_link", code=short_link.code, _external=True)
+</html>
+"""
+    return html

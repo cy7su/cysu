@@ -66,6 +66,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
+        file: config/Dockerfile
         push: true
         tags: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
         cache-from: type=gha

@@ -29,12 +29,12 @@ class FileOptimizer:
 
         filename = os.path.basename(file_path)
         if "." not in filename:
-            return True, None  # Файл без расширения не оптимизируем
+            return True, None
 
         extension = filename.rsplit(".", 1)[1].lower()
 
         if extension not in FileOptimizer.SUPPORTED_EXTENSIONS:
-            return True, None  # Неподдерживаемый тип файла
+            return True, None
 
         try:
             if extension == "pdf":
@@ -57,10 +57,8 @@ class FileOptimizer:
         try:
             import subprocess
 
-            # Создаем временный файл для оптимизированного PDF
             temp_path = file_path + ".optimized"
 
-            # Оптимизация с помощью Ghostscript (ebook preset для баланса качества/размера)
             cmd = [
                 "gs",
                 "-sDEVICE=pdfwrite",
@@ -80,14 +78,14 @@ class FileOptimizer:
                 opt_size = os.path.getsize(temp_path)
 
                 if opt_size < orig_size:
-                    # Заменяем оригинал оптимизированным
+
                     os.replace(temp_path, file_path)
                     current_app.logger.info(
                         f"PDF оптимизирован: {file_path} ({orig_size} -> {opt_size})"
                     )
                     return True, None
                 else:
-                    # Оптимизированный файл больше - удаляем его
+
                     os.unlink(temp_path)
                     return True, None
             else:
@@ -113,14 +111,11 @@ class FileOptimizer:
             with tempfile.TemporaryDirectory() as temp_dir:
                 temp_path_obj = Path(temp_dir)
 
-                # Распаковываем Office файл
                 with zipfile.ZipFile(file_path, "r") as zip_ref:
                     zip_ref.extractall(temp_path_obj)
 
-                # Удаляем ненужные метаданные
                 FileOptimizer._clean_office_metadata(temp_path_obj)
 
-                # Создаем оптимизированный файл с максимальным сжатием
                 with zipfile.ZipFile(
                     temp_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9
                 ) as zip_out:
@@ -173,11 +168,9 @@ class FileOptimizer:
             with open(file_path, "r", encoding="utf-8") as f:
                 nb = json.load(f)
 
-            # Очистка метаданных
             if "metadata" in nb:
                 nb["metadata"] = {}
 
-            # Очистка outputs и метаданных в ячейках
             for cell in nb.get("cells", []):
                 if "metadata" in cell:
                     cell["metadata"] = {}
@@ -186,7 +179,6 @@ class FileOptimizer:
                 if "execution_count" in cell:
                     cell["execution_count"] = None
 
-            # Сохраняем оптимизированный файл
             with open(file_path, "w", encoding="utf-8") as f:
                 json.dump(nb, f, indent=1, ensure_ascii=False)
 
@@ -200,8 +192,7 @@ class FileOptimizer:
     @staticmethod
     def _optimize_image(file_path: str) -> Tuple[bool, Optional[str]]:
         """Оптимизация изображений (пока только базовая поддержка)"""
-        # Для изображений можно добавить более сложную оптимизацию позже
-        # Пока просто возвращаем успех без изменений
+
         return True, None
 
     @staticmethod

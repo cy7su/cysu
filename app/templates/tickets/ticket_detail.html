@@ -7,10 +7,7 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
     <div class="container">
         <!-- Enhanced Header Section -->
         <div class="card shadow-lg border-0 mb-4" style="border-radius: 20px; background: white; overflow: hidden">
-            <div
-                class="card-header"
-                style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; padding: 2rem"
-            >
+            <div class="card-header" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; padding: 2rem">
                 <!-- Back button -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{{ url_for('tickets.tickets') }}" class="btn btn-light btn-sm rounded-pill shadow-sm">
@@ -20,31 +17,19 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
                     <!-- Status Badge -->
                     <div class="d-flex align-items-center gap-3">
                         {% if ticket.status == 'pending' %}
-                        <span
-                            class="badge fs-6 px-4 py-2 rounded-pill shadow-sm"
-                            style="background: rgba(255, 193, 7, 0.9); color: #000"
-                        >
+                        <span class="badge fs-6 px-4 py-2 rounded-pill shadow-sm" style="background: rgba(255, 193, 7, 0.9); color: #000">
                             <i class="fas fa-clock me-2"></i>Ожидает рассмотрения
                         </span>
                         {% elif ticket.status == 'accepted' %}
-                        <span
-                            class="badge fs-6 px-4 py-2 rounded-pill shadow-sm"
-                            style="background: rgba(25, 135, 84, 0.9); color: white"
-                        >
+                        <span class="badge fs-6 px-4 py-2 rounded-pill shadow-sm" style="background: rgba(25, 135, 84, 0.9); color: white">
                             <i class="fas fa-check-circle me-2"></i>В работе
                         </span>
                         {% elif ticket.status == 'rejected' %}
-                        <span
-                            class="badge fs-6 px-4 py-2 rounded-pill shadow-sm"
-                            style="background: rgba(220, 53, 69, 0.9); color: white"
-                        >
+                        <span class="badge fs-6 px-4 py-2 rounded-pill shadow-sm" style="background: rgba(220, 53, 69, 0.9); color: white">
                             <i class="fas fa-times-circle me-2"></i>Отклонен
                         </span>
                         {% elif ticket.status == 'closed' %}
-                        <span
-                            class="badge fs-6 px-4 py-2 rounded-pill shadow-sm"
-                            style="background: rgba(108, 117, 125, 0.9); color: white"
-                        >
+                        <span class="badge fs-6 px-4 py-2 rounded-pill shadow-sm" style="background: rgba(108, 117, 125, 0.9); color: white">
                             <i class="fas fa-lock me-2"></i>Закрыт
                         </span>
                         {% endif %}
@@ -70,17 +55,13 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
                             <div class="col-md-6">
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="fas fa-calendar-plus me-2" style="color: rgba(255, 255, 255, 0.7)"></i>
-                                    <span style="color: rgba(255, 255, 255, 0.9)"
-                                        >Создан:
-                                        <strong>{{ ticket.created_at.strftime('%d.%m.%Y в %H:%M') }}</strong></span
-                                    >
+                                    <span style="color: rgba(255, 255, 255, 0.9)">Создан:
+                                        <strong>{{ ticket.created_at.strftime('%d.%m.%Y в %H:%M') }}</strong></span>
                                 </div>
                                 {% if current_user.is_admin and current_user.admin_mode_enabled %}
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="fas fa-user me-2" style="color: rgba(255, 255, 255, 0.7)"></i>
-                                    <span style="color: rgba(255, 255, 255, 0.9)"
-                                        >Автор: <strong>{{ ticket.user.username }}</strong></span
-                                    >
+                                    <span style="color: rgba(255, 255, 255, 0.9)">Автор: <strong>{{ ticket.user.username }}</strong></span>
                                 </div>
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-envelope me-2" style="color: rgba(255, 255, 255, 0.7)"></i>
@@ -92,24 +73,18 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
                                 {% if ticket.updated_at != ticket.created_at %}
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="fas fa-calendar-check me-2" style="color: rgba(255, 255, 255, 0.7)"></i>
-                                    <span style="color: rgba(255, 255, 255, 0.9)"
-                                        >Обновлен:
-                                        <strong>{{ ticket.updated_at.strftime('%d.%m.%Y в %H:%M') }}</strong></span
-                                    >
+                                    <span style="color: rgba(255, 255, 255, 0.9)">Обновлен:
+                                        <strong>{{ ticket.updated_at.strftime('%d.%m.%Y в %H:%M') }}</strong></span>
                                 </div>
                                 {% endif %}
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="fas fa-comments me-2" style="color: rgba(255, 255, 255, 0.7)"></i>
-                                    <span style="color: rgba(255, 255, 255, 0.9)"
-                                        >Сообщений: <strong>{{ ticket.messages|length + 1 }}</strong></span
-                                    >
+                                    <span style="color: rgba(255, 255, 255, 0.9)">Сообщений: <strong>{{ ticket.messages|length + 1 }}</strong></span>
                                 </div>
                                 {% if ticket.files %}
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-paperclip me-2" style="color: rgba(255, 255, 255, 0.7)"></i>
-                                    <span style="color: rgba(255, 255, 255, 0.9)"
-                                        >Файлов: <strong>{{ ticket.files|length }}</strong></span
-                                    >
+                                    <span style="color: rgba(255, 255, 255, 0.9)">Файлов: <strong>{{ ticket.files|length }}</strong></span>
                                 </div>
                                 {% endif %}
                             </div>
@@ -129,24 +104,15 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
             </div>
             <div class="card-body p-0">
                 <!-- Initial Message -->
-                <div
-                    class="p-4 border-bottom"
-                    style="background: var(--dp-01); border-bottom: 1px solid #262626 !important"
-                >
+                <div class="p-4 border-bottom" style="background: var(--dp-01); border-bottom: 1px solid #262626 !important">
                     <div class="d-flex align-items-start gap-3">
                         <div class="flex-shrink-0">
                             {% if ticket.user_id == current_user.id %}
-                            <div
-                                class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                                style="width: 50px; height: 50px; font-size: 1.2rem"
-                            >
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.2rem">
                                 <i class="fas fa-user"></i>
                             </div>
                             {% else %}
-                            <div
-                                class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center"
-                                style="width: 50px; height: 50px; font-size: 1.2rem"
-                            >
+                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.2rem">
                                 <i class="fas fa-headset"></i>
                             </div>
                             {% endif %}
@@ -155,27 +121,18 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div class="d-flex align-items-center gap-2">
                                     {% if ticket.user_id == current_user.id %}
-                                    <span
-                                        class="badge bg-light text-primary px-3 py-1"
-                                        style="border: 1px solid var(--border-primary)"
-                                    >
+                                    <span class="badge bg-light text-primary px-3 py-1" style="border: 1px solid var(--border-primary)">
                                         <i class="fas fa-question-circle me-1"></i>Ваше сообщение
                                     </span>
                                     {% else %}
-                                    <span
-                                        class="badge bg-light text-secondary px-3 py-1"
-                                        style="border: 1px solid var(--border-primary)"
-                                    >
+                                    <span class="badge bg-light text-secondary px-3 py-1" style="border: 1px solid var(--border-primary)">
                                         <i class="fas fa-ticket-alt me-1"></i>Запрос
                                     </span>
                                     {% endif %}
                                 </div>
                                 <small class="text-muted">{{ ticket.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
                             </div>
-                            <div
-                                class="message-bubble p-4 rounded-4 shadow-sm"
-                                style="background: #262626; border: 1px solid var(--border-secondary)"
-                            >
+                            <div class="message-bubble p-4 rounded-4 shadow-sm" style="background: #262626; border: 1px solid var(--border-secondary)">
                                 {{ ticket.message }}
                             </div>
                         </div>
@@ -184,24 +141,15 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
 
                 <!-- Messages -->
                 {% for message in ticket.messages %}
-                <div
-                    class="p-4 {% if not loop.last %}border-bottom{% endif %}"
-                    style="background: {% if loop.index % 2 == 0 %}var(--dp-01){% else %}var(--dp-01){% endif %};  border-bottom: 1px solid #262626 !important;"
-                >
+                <div class="p-4 {% if not loop.last %}border-bottom{% endif %}" style="background: {% if loop.index % 2 == 0 %}var(--dp-01){% else %}var(--dp-01){% endif %};  border-bottom: 1px solid #262626 !important;">
                     <div class="d-flex align-items-start gap-3">
                         <div class="flex-shrink-0">
                             {% if message.is_admin %}
-                            <div
-                                class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
-                                style="width: 50px; height: 50px; font-size: 1.2rem"
-                            >
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.2rem">
                                 <i class="fas fa-crown"></i>
                             </div>
                             {% else %}
-                            <div
-                                class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                                style="width: 50px; height: 50px; font-size: 1.2rem"
-                            >
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.2rem">
                                 <i class="fas fa-user"></i>
                             </div>
                             {% endif %}
@@ -225,10 +173,7 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
                                 </div>
                                 <small class="text-muted">{{ message.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
                             </div>
-                            <div
-                                class="message-bubble p-4 rounded-4 shadow-sm"
-                                style="background: #262626; border: 1px solid var(--border-secondary)"
-                            >
+                            <div class="message-bubble p-4 rounded-4 shadow-sm" style="background: #262626; border: 1px solid var(--border-secondary)">
                                 {{ message.message }}
                             </div>
                         </div>
@@ -249,28 +194,13 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
                     <input type="hidden" name="ticket_id" value="{{ ticket.id }}" />
                     <div class="mb-3">
                         <label for="message" class="form-label">Сообщение</label>
-                        <textarea
-                            class="form-control"
-                            id="message"
-                            name="message"
-                            rows="4"
-                            required
-                            placeholder="Введите ваш ответ..."
-                        ></textarea>
+                        <textarea class="form-control" id="message" name="message" rows="4" required placeholder="Введите ваш ответ..."></textarea>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <a
-                            href="{{ url_for('tickets.tickets') }}"
-                            class="btn btn-secondary"
-                            style="width: 150px !important; height: 40px !important"
-                        >
+                        <a href="{{ url_for('tickets.tickets') }}" class="btn btn-secondary" style="width: 150px !important; height: 40px !important">
                             <i class="fas fa-arrow-left me-2"></i>Назад
                         </a>
-                        <button
-                            type="submit"
-                            class="btn btn-primary"
-                            style="width: 150px !important; height: 40px !important"
-                        >
+                        <button type="submit" class="btn btn-primary" style="width: 150px !important; height: 40px !important">
                             <i class="fas fa-paper-plane me-2"></i>Отправить
                         </button>
                     </div>
@@ -285,28 +215,16 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
             <div class="card-body">
                 <div class="d-flex gap-2 flex-wrap">
                     {% if ticket.status == 'pending' %}
-                    <form
-                        method="POST"
-                        action="{{ url_for('tickets.accept_ticket', ticket_id=ticket.id) }}"
-                        class="d-inline"
-                    >
+                    <form method="POST" action="{{ url_for('tickets.accept_ticket', ticket_id=ticket.id) }}" class="d-inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button type="submit" class="btn btn-success" style="width: 150px !important">Принять</button>
                     </form>
-                    <form
-                        method="POST"
-                        action="{{ url_for('tickets.reject_ticket', ticket_id=ticket.id) }}"
-                        class="d-inline"
-                    >
+                    <form method="POST" action="{{ url_for('tickets.reject_ticket', ticket_id=ticket.id) }}" class="d-inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button type="submit" class="btn btn-danger" style="width: 150px !important">Отклонить</button>
                     </form>
                     {% endif %}
-                    <form
-                        method="POST"
-                        action="{{ url_for('tickets.close_ticket', ticket_id=ticket.id) }}"
-                        class="d-inline"
-                    >
+                    <form method="POST" action="{{ url_for('tickets.close_ticket', ticket_id=ticket.id) }}" class="d-inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button type="submit" class="btn btn-secondary" style="width: 150px !important">Закрыть</button>
                     </form>
@@ -317,7 +235,7 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
     </div>
 
     <script>
-        document.getElementById('responseForm').addEventListener('submit', function (e) {
+        document.getElementById('responseForm').addEventListener('submit', function(e) {
             e.preventDefault()
 
             const formData = new FormData(this)
@@ -328,12 +246,12 @@ fa-life-ring"}, {"title": "Тикеты", "url": url_for('tickets.tickets'), "ic
             submitBtn.disabled = true
 
             fetch('{{ url_for("tickets.ticket_response") }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value,
-                },
-            })
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value,
+                    },
+                })
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`)

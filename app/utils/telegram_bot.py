@@ -1,6 +1,7 @@
 import os
 from datetime import datetime, timedelta
 
+import httpx
 from telegram import (
     BotCommand,
     InlineKeyboardButton,
@@ -48,7 +49,6 @@ class TelegramBotManager:
         """Обработчик команды /help - справка по командам бота"""
         help_text = "❓ <b>Справка: Бот управления cysu.ru</b>\n\n"
 
-        # Админпанель
         if update.effective_user.id == ADMIN_TELEGRAM_ID:
             help_text += "<blockquote>Команды администратора:\n"
             help_text += "/start - Перезапуск бота\n"
@@ -1422,7 +1422,6 @@ class TelegramBotManager:
             logger.error("TG_ID не найден в переменных окружения")
             return
 
-        # Prevent multiple bot instances
         import atexit
         import os
         import signal
@@ -1440,13 +1439,11 @@ class TelegramBotManager:
             cleanup_pid_file()
             exit(0)
 
-        # Check if bot is already running
         if os.path.exists(pid_file):
             try:
                 with open(pid_file, "r") as f:
                     old_pid = int(f.read().strip())
 
-                # Check if process is still running
                 os.kill(old_pid, 0)
                 logger.error(
                     "Telegram bot is already running (PID: {}). Please stop the other instance first.".format(
@@ -1455,12 +1452,11 @@ class TelegramBotManager:
                 )
                 return
             except (OSError, ValueError):
-                # Process not running, cleanup and continue
+
                 cleanup_pid_file()
             except Exception as e:
                 logger.warning(f"Error checking PID file: {e}")
 
-        # Write current PID
         try:
             with open(pid_file, "w") as f:
                 f.write(str(os.getpid()))
@@ -1468,35 +1464,33 @@ class TelegramBotManager:
             logger.error(f"Failed to write PID file: {e}")
             return
 
-        # Register cleanup handlers
         atexit.register(cleanup_pid_file)
         signal.signal(signal.SIGTERM, signal_handler)
         signal.signal(signal.SIGINT, signal_handler)
-        application = Application.builder().token(BOT_TOKEN).build()
+        from telegram.request import HTTPXRequest
+
+        _orig_asyncclient_init = httpx.AsyncClient.__init__
+
+        def _patched_asyncclient_init(self, *args, **kwargs):
+            kwargs.pop("proxy", None)
+            return _orig_asyncclient_init(self, *args, **kwargs)
+
+        httpx.AsyncClient.__init__ = _patched_asyncclient_init
+
+        application = (
+            Application.builder().token(BOT_TOKEN).request(HTTPXRequest()).build()
+        )
+
         application.add_handler(CommandHandler("start", self.start_command))
         application.add_handler(CommandHandler("help", self.help_command))
         application.add_handler(CommandHandler("users", self.users_command))
         application.add_handler(CommandHandler("groups", self.groups_command))
-        application.add_handler(CallbackQueryHandler(self.handle_callback_query))
+
         application.add_handler(
             MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message)
         )
+
         application.add_error_handler(self.error_handler)
-        commands = [
-            BotCommand("start", "Запустить бота"),
-            BotCommand("help", "Справка по командам"),
-            BotCommand("users", "Управление пользователями (только для админов)"),
-            BotCommand("groups", "Управление группами (только для админов)"),
-        ]
+        application.add_handler(CallbackQueryHandler(self.handle_callback_query))
 
-        async def post_init(application):
-            await application.bot.set_my_commands(commands)
-
-        application.post_init = post_init
-        logger.info("Запуск Telegram бота...")
         application.run_polling()
-
-
-if __name__ == "__main__":
-    bot_manager = TelegramBotManager()
-    bot_manager.run_bot()

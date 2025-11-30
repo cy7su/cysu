@@ -69,7 +69,7 @@ class TestUser:
     def test_user_admin_methods(self, app):
         """Тест методов администрирования пользователя."""
         with app.app_context():
-            # Обычный пользователь
+
             unique_username = f"regular{uuid.uuid4()}"
             unique_email = f"regular{uuid.uuid4()}@gmail.com"
             user = User(
@@ -83,7 +83,6 @@ class TestUser:
             assert not user.can_manage_materials()
             assert not user.can_see_all_subjects()
 
-            # Администратор с включенным режимом
             admin_username = f"admin{uuid.uuid4()}"
             admin_email = f"admin{uuid.uuid4()}@gmail.com"
             admin = User(
@@ -97,7 +96,6 @@ class TestUser:
             assert admin.can_manage_materials()
             assert admin.can_see_all_subjects()
 
-            # Модератор
             mod_username = f"mod{uuid.uuid4()}"
             mod_email = f"mod{uuid.uuid4()}@gmail.com"
             mod = User(
@@ -284,7 +282,8 @@ class TestEmailVerification:
             assert verification.user_id == 1
             assert verification.email == unique_email
             assert len(verification.code) == 6
-            assert not verification.is_used  # Используем отрицание для проверки False
+            assert not verification.is_used
+
             assert verification.expires_at > datetime.utcnow()
 
 
@@ -316,15 +315,13 @@ class TestSiteSettings:
         """Тест операций с настройками."""
         with app.app_context():
             unique_key = f"test_key_{uuid.uuid4()}"
-            # Установка настройки
+
             setting = SiteSettings.set_setting(unique_key, "test_value", "Test setting")
             assert setting.key == unique_key
             assert setting.value == "test_value"
 
-            # Получение настройки
             value = SiteSettings.get_setting(unique_key)
             assert value == "test_value"
 
-            # Не существующая настройка
             default_value = SiteSettings.get_setting("nonexistent", "default")
             assert default_value == "default"

@@ -1,5 +1,5 @@
 // Индикатор прокрутки - заполняет полосу прокрутки фиолетовым цветом
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     // Создаем стили для скролл-бара с прогрессом
     const style = document.createElement('style')
     style.id = 'scroll-indicator-styles'
@@ -15,10 +15,18 @@ document.addEventListener('DOMContentLoaded', function () {
         let targetColor
         if (document.body.classList.contains('peach-theme-active')) {
             // Персиковая тема
-            targetColor = { r: 255, g: 140, b: 105 } // #FF8C69
+            targetColor = {
+                r: 255,
+                g: 140,
+                b: 105
+            } // #FF8C69
         } else {
             // Фиолетовая тема (стандартная)
-            targetColor = { r: 181, g: 149, b: 255 } // #B595FF
+            targetColor = {
+                r: 181,
+                g: 149,
+                b: 255
+            } // #B595FF
         }
 
         // Вычисляем цвет на основе прогресса прокрутки
@@ -82,8 +90,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Обработчики событий
-    window.addEventListener('scroll', updateScrollIndicator, { passive: true })
-    window.addEventListener('resize', updateScrollIndicator, { passive: true })
+    window.addEventListener('scroll', updateScrollIndicator, {
+        passive: true
+    })
+    window.addEventListener('resize', updateScrollIndicator, {
+        passive: true
+    })
 
     // Инициализация
     updateScrollIndicator()

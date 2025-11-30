@@ -9,141 +9,76 @@
         <div class="col-12">
             <div class="card shadow-sm border-0" style="background: none">
                 <div class="card-body p-0">
-                    <div
-                        class="d-flex justify-content-between align-items-center mb-3 p-3"
-                        style="background: var(--dp-01); border-radius: 8px"
-                    >
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-3" style="background: var(--dp-01); border-radius: 8px">
                         <div class="d-flex align-items-center gap-3">
                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllSubjects()">
                                 <i class="fas fa-check-square me-1"></i>Выбрать все
                             </button>
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-outline-secondary"
-                                onclick="deselectAllSubjects()"
-                            >
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAllSubjects()">
                                 <i class="fas fa-square me-1"></i>Снять выбор
                             </button>
                             <span class="text-muted" id="selected-count">Выбрано: 0</span>
                         </div>
                         <div class="d-flex gap-2">
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-success"
-                                onclick="showMassAssignModal()"
-                                disabled
-                                id="mass-assign-btn"
-                            >
+                            <button type="button" class="btn btn-sm btn-success" onclick="showMassAssignModal()" disabled id="mass-assign-btn">
                                 <i class="fas fa-link me-1"></i>Назначить группам
                             </button>
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-warning"
-                                onclick="removeAllFromGroups()"
-                                disabled
-                                id="mass-remove-btn"
-                            >
+                            <button type="button" class="btn btn-sm btn-warning" onclick="removeAllFromGroups()" disabled id="mass-remove-btn">
                                 <i class="fas fa-unlink me-1"></i>Убрать из групп
                             </button>
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-danger"
-                                onclick="deleteSelectedSubjects()"
-                                disabled
-                                id="mass-delete-btn"
-                            >
+                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteSelectedSubjects()" disabled id="mass-delete-btn">
                                 <i class="fas fa-trash me-1"></i>Удалить выбранные
                             </button>
                         </div>
                     </div>
 
                     <div class="table-responsive" style="border-radius: 14px">
-                        <table
-                            class="table mb-0"
-                            style="background: var(--dp-02); color: var(--text-primary); font-size: 0.9em"
-                        >
+                        <table class="table mb-0" style="background: var(--dp-02); color: var(--text-primary); font-size: 0.9em">
                             <thead style="background: var(--dp-03)">
                                 <tr>
-                                    <th
-                                        class="border-0"
-                                        style="
+                                    <th class="border-0" style="
                                             color: var(--text-primary);
                                             font-size: 0.9em;
                                             padding: 0.5rem;
                                             width: 40px;
-                                        "
-                                    >
+                                        ">
                                         <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()" />
                                     </th>
-                                    <th
-                                        class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem"
-                                    >
-                                        <button
-                                            class="btn btn-link p-0 text-decoration-none"
-                                            onclick="sortTable('title')"
-                                            style="color: var(--text-primary)"
-                                        >
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
+                                        <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('title')" style="color: var(--text-primary)">
                                             Предмет <i class="fas fa-sort ms-1"></i>
                                         </button>
                                     </th>
-                                    <th
-                                        class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem"
-                                    >
-                                        <button
-                                            class="btn btn-link p-0 text-decoration-none"
-                                            onclick="sortTable('groups')"
-                                            style="color: var(--text-primary)"
-                                        >
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
+                                        <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('groups')" style="color: var(--text-primary)">
                                             Группы <i class="fas fa-sort ms-1"></i>
                                         </button>
                                     </th>
-                                    <th
-                                        class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem"
-                                    >
-                                        <button
-                                            class="btn btn-link p-0 text-decoration-none"
-                                            onclick="sortTable('materials')"
-                                            style="color: var(--text-primary)"
-                                        >
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
+                                        <button class="btn btn-link p-0 text-decoration-none" onclick="sortTable('materials')" style="color: var(--text-primary)">
                                             Материалов <i class="fas fa-sort ms-1"></i>
                                         </button>
                                     </th>
-                                    <th
-                                        class="border-0"
-                                        style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem"
-                                    >
+                                    <th class="border-0" style="color: var(--text-primary); font-size: 0.9em; padding: 0.5rem">
                                         Действия
                                     </th>
                                 </tr>
                             </thead>
                             <tbody style="background: var(--dp-02)" id="subjects-table-body">
                                 {% if subjects %} {% for subject in subjects %}
-                                <tr
-                                    style="
+                                <tr style="
                                         border-color: var(--border-secondary);
                                         background: var(--dp-02);
                                         color: var(--text-primary);
-                                    "
-                                    data-subject-id="{{ subject.id }}"
-                                >
+                                    " data-subject-id="{{ subject.id }}">
                                     <td style="color: var(--text-primary)">
-                                        <input
-                                            type="checkbox"
-                                            class="subject-checkbox"
-                                            value="{{ subject.id }}"
-                                            onchange="updateSelectedCount()"
-                                        />
+                                        <input type="checkbox" class="subject-checkbox" value="{{ subject.id }}" onchange="updateSelectedCount()" />
                                     </td>
                                     <td style="color: var(--text-primary)">
                                         <strong>{{ subject.title }}</strong>
                                         {% if subject.description %}
-                                        <br /><small class="text-muted"
-                                            >{{ subject.description[:50] }}{% if subject.description|length > 50 %}...{%
-                                            endif %}</small
-                                        >
+                                        <br /><small class="text-muted">{{ subject.description[:50] }}{% if subject.description|length > 50 %}...{%
+                                            endif %}</small>
                                         {% endif %}
                                     </td>
                                     <td style="color: var(--text-primary)">
@@ -154,28 +89,23 @@
                                         {% endif %}
                                     </td>
                                     <td style="color: var(--text-primary)">
-                                        <span class="badge bg-info">{{ subject.materials|length }}</span>
+                                        {% set material_count = subjects_materials_count.get(subject.id, {'lectures': 0,
+                                        'practices': 0}) %} {% if material_count.lectures > 0 or
+                                        material_count.practices > 0 %} {% if material_count.lectures > 0 %}
+                                        <span class="badge bg-info">{{ material_count.lectures }} лекций</span>
+                                        {% endif %} {% if material_count.practices > 0 %}
+                                        <span class="badge bg-warning">{{ material_count.practices }} практик</span>
+                                        {% endif %} {% else %}
+                                        <span class="badge bg-secondary">Нет материалов</span>
+                                        {% endif %}
                                     </td>
                                     <td style="color: var(--text-primary)">
                                         <div class="d-flex gap-1">
                                             {% if subject.groups %}
-                                            <form
-                                                method="post"
-                                                style="display: inline"
-                                                id="removeAllGroupsForm{{ subject.id }}"
-                                            >
+                                            <form method="post" style="display: inline" id="removeAllGroupsForm{{ subject.id }}">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                                <input
-                                                    type="hidden"
-                                                    name="remove_all_groups"
-                                                    value="{{ subject.id }}"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-warning btn-sm"
-                                                    onclick="customConfirm('Убрать предмет {{ subject.title }} из всех групп?', function() { document.getElementById('removeAllGroupsForm{{ subject.id }}').submit(); })"
-                                                    style="font-size: 0.7rem; padding: 0.25rem 0.5rem"
-                                                >
+                                                <input type="hidden" name="remove_all_groups" value="{{ subject.id }}" />
+                                                <button type="button" class="btn btn-warning btn-sm" onclick="customConfirm('Убрать предмет {{ subject.title }} из всех групп?', function() { document.getElementById('removeAllGroupsForm{{ subject.id }}').submit(); })" style="font-size: 0.7rem; padding: 0.25rem 0.5rem">
                                                     <i class="fas fa-unlink"></i>
                                                 </button>
                                             </form>
@@ -185,11 +115,7 @@
                                 </tr>
                                 {% endfor %} {% else %}
                                 <tr style="background: var(--dp-02); color: var(--text-primary)">
-                                    <td
-                                        colspan="5"
-                                        class="text-center text-muted py-4"
-                                        style="color: var(--text-primary)"
-                                    >
+                                    <td colspan="5" class="text-center text-muted py-4" style="color: var(--text-primary)">
                                         <i class="fas fa-book fa-2x mb-3"></i>
                                         <p>Нет предметов</p>
                                     </td>
@@ -209,12 +135,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="massAssignModalLabel">Назначить предметы группам</h5>
-                <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                ></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" id="mass-assign-form">
                 <div class="modal-body">
@@ -224,20 +145,13 @@
 
                     <div class="mb-3">
                         <label class="form-label">Выберите группы</label>
-                        <select
-                            name="group_ids"
-                            class="form-control"
-                            multiple
-                            size="6"
-                            required
-                            style="
+                        <select name="group_ids" class="form-control" multiple size="6" required style="
                                 background: var(--dp-01);
                                 border: 1px solid var(--border-secondary);
                                 color: var(--text-primary);
                                 border-radius: 20px;
                                 min-height: 120px;
-                            "
-                        >
+                            ">
                             {% for group in groups %}
                             <option value="{{ group.id }}">{{ group.name }}</option>
                             {% endfor %}
@@ -264,7 +178,7 @@
     let currentSortColumn = null
     let currentSortDirection = 'asc'
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         // Улучшение работы с select элементами
         const multiSelects = document.querySelectorAll('select[multiple]')
 
@@ -326,7 +240,7 @@
             searchInput.style.cssText =
                 'background: var(--dp-01); border: 1px solid var(--border-secondary); color: var(--text-primary); border-radius: 10px;'
 
-            searchInput.addEventListener('input', function () {
+            searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase()
                 Array.from(select.options).forEach((option) => {
                     const text = option.text.toLowerCase()
@@ -347,14 +261,14 @@
         // Улучшение UX для модальных окон
         const modals = document.querySelectorAll('.modal')
         modals.forEach((modal) => {
-            modal.addEventListener('shown.bs.modal', function () {
+            modal.addEventListener('shown.bs.modal', function() {
                 const searchInput = this.querySelector('input[type="text"]')
                 if (searchInput) {
                     searchInput.focus()
                 }
             })
 
-            modal.addEventListener('hidden.bs.modal', function () {
+            modal.addEventListener('hidden.bs.modal', function() {
                 const searchInput = this.querySelector('input[type="text"]')
                 if (searchInput) {
                     searchInput.value = ''
@@ -447,7 +361,7 @@
             return
         }
 
-        customConfirm(`Убрать ${selectedCheckboxes.length} предметов из всех групп?`, function () {
+        customConfirm(`Убрать ${selectedCheckboxes.length} предметов из всех групп?`, function() {
             // Создаем форму для массового удаления
             const form = document.createElement('form')
             form.method = 'post'
@@ -488,7 +402,7 @@
             return
         }
 
-        customConfirm(`Удалить ${selectedCheckboxes.length} предметов? Это действие нельзя отменить!`, function () {
+        customConfirm(`Удалить ${selectedCheckboxes.length} предметов? Это действие нельзя отменить!`, function() {
             const form = document.createElement('form')
             form.method = 'post'
             form.style.display = 'none'

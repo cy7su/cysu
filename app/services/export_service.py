@@ -2,7 +2,7 @@ import os
 import tempfile
 import zipfile
 from datetime import datetime
-from typing import Dict
+from typing import Dict, Optional
 
 from flask import current_app
 from werkzeug.utils import secure_filename
@@ -16,22 +16,18 @@ class ExportService:
         if not name:
             return "Без_названия"
 
-        # Убираем пробелы в начале и конце
         name = name.strip()
 
         invalid_chars = ["/", "\\", ":", "*", "?", '"', "<", ">", "|", "\n", "\r", "\t"]
         for char in invalid_chars:
             name = name.replace(char, "_")
 
-        # Сжимаем множественные подчеркивания
         while "__" in name:
             name = name.replace("__", "_")
 
-        # Обрабатываем пробелы
         if " " in name:
             name = "_".join(name.split())
 
-        # Финальная очистка
         name = name.strip("_")
 
         if not name or len(name) > 100:
@@ -39,7 +35,7 @@ class ExportService:
         return name
 
     @staticmethod
-    def export_user_solutions(user_id: int, username: str) -> str:
+    def export_user_solutions(user_id: int, username: str) -> Optional[str]:
         submissions = Submission.query.filter_by(user_id=user_id).all()
         if not submissions:
             return None

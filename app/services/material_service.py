@@ -1,12 +1,12 @@
 import os
 from datetime import datetime
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from flask import current_app
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import selectinload
 
 from .. import db
-from ..models import Material, Submission
+from ..models import Material, Submission, Subject
 from ..utils.file_storage import FileStorageManager
 from ..utils.transliteration import get_safe_filename
 
@@ -16,7 +16,7 @@ class MaterialService:
     def get_subject_materials(subject_id: int) -> Tuple[List[Material], List[Material]]:
         lectures = Material.query.filter_by(subject_id=subject_id, type="lecture").all()
         assignments = (
-            Material.query.options(joinedload(Material.submissions))
+            Material.query.options(selectinload(Material.submissions))
             .filter_by(subject_id=subject_id, type="assignment")
             .all()
         )
@@ -30,7 +30,7 @@ class MaterialService:
         material_type: str,
         file_data=None,
         solution_file_data=None,
-        created_by: int = None,
+        created_by: Optional[int] = None,
     ) -> Material:
         filename = None
         solution_filename = None
@@ -60,14 +60,16 @@ class MaterialService:
         return material
 
     @staticmethod
-    def update_material(material_id: int, title: str, description: str) -> bool:
+    def update_material(
+        material_id: int, title: str, description: Optional[str]
+    ) -> bool:
         material = Material.query.get_or_404(material_id)
         if len(title) > 255:
             return False
         if description and len(description) > 300:
             return False
         material.title = title
-        material.description = description if description else None
+        material.description = description or None
         db.session.commit()
         return True
 
@@ -102,7 +104,7 @@ class MaterialService:
     def add_solution_file(material: Material, file_data) -> bool:
         if not file_data or not file_data.filename:
             return False
-        subject = material.subject
+        subject = Subject.query.get(material.subject_id)
         filename = get_safe_filename(file_data.filename)
         if hasattr(file_data, "content_length") and file_data.content_length:
             if file_data.content_length > current_app.config.get(

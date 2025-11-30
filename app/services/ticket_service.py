@@ -7,13 +7,11 @@ from ..utils.file_storage import FileStorageManager
 
 
 class TicketService:
-    """Сервис для управления тикетами поддержки"""
 
     @staticmethod
     def change_ticket_status(
         ticket_id: int, new_status: str, admin_id: int, create_notification: bool = True
     ) -> Tuple[bool, str]:
-        """Изменить статус тикета"""
         try:
             ticket = Ticket.query.get(ticket_id)
             if not ticket:
@@ -56,7 +54,7 @@ class TicketService:
     def create_ticket(
         user_id: int, subject: str, message: str, files=None
     ) -> Tuple[Optional[Ticket], str]:
-        """Создать новый тикет"""
+
         try:
             subject = subject.strip()
             message = message.strip()
@@ -117,7 +115,7 @@ class TicketService:
     def add_ticket_response(
         ticket_id: int, user_id: int, message: str, files=None
     ) -> Tuple[bool, str]:
-        """Добавить ответ на тикет"""
+
         try:
             message = message.strip()
             if not message:
@@ -183,7 +181,7 @@ class TicketService:
 
     @staticmethod
     def _upload_ticket_file(ticket_id: int, file) -> Tuple[bool, str]:
-        """Загрузить файл тикета"""
+
         try:
             if not file or not file.filename:
                 return False, "Файл не выбран"
@@ -213,7 +211,7 @@ class TicketService:
     def delete_ticket_file(
         ticket_id: int, file_id: int, user_id: int
     ) -> Tuple[bool, str]:
-        """Удалить файл тикета"""
+
         try:
             ticket = Ticket.query.get(ticket_id)
             if not ticket:
@@ -240,7 +238,7 @@ class TicketService:
 
     @staticmethod
     def delete_all_closed_tickets(admin_id: int) -> Tuple[bool, str]:
-        """Удалить все закрытые тикеты"""
+
         try:
             from ..models import User
 
@@ -274,7 +272,7 @@ class TicketService:
 
     @staticmethod
     def get_ticket_files_info(ticket_id: int) -> List[Dict]:
-        """Получить информацию о файлах тикета"""
+
         try:
             ticket = Ticket.query.get(ticket_id)
             if not ticket:
@@ -301,7 +299,7 @@ class TicketService:
 
     @staticmethod
     def set_ticket_priority(ticket_id: int, priority: str) -> bool:
-        """Установить приоритет тикета."""
+
         try:
             ticket = Ticket.query.get(ticket_id)
             if not ticket:
@@ -325,7 +323,7 @@ class TicketService:
 
     @staticmethod
     def mass_update_status(ticket_ids: List[int], new_status: str) -> int:
-        """Массово обновить статус тикетов."""
+
         try:
             valid_statuses = ["open", "closed", "pending", "in_progress"]
             if new_status not in valid_statuses:

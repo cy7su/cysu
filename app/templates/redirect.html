@@ -1,840 +1,841 @@
 <!doctype html>
 <html lang="ru">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Редирект на cysu</title>
-        <link rel="icon" href="https://cysu.ru/favicon.ico" type="image/x-icon" />
-        <link rel="shortcut icon" href="https://cysu.ru/favicon.ico" type="image/x-icon" />
-        <link rel="apple-touch-icon" href="https://cysu.ru/favicon.ico" />
-        <link rel="icon" type="image/png" sizes="32x32" href="https://cysu.ru/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="https://cysu.ru/favicon-16x16.png" />
-        <style>
-            :root {
-                --primary-color: var(--peach-color);
-                --primary-hover: var(--peach-hover);
 
-                /* Уровни возвышения Material Design */
-                --dp-00: #121212;
-                /* Базовый темный серый */
-                --dp-01: #1e1e1e;
-                /* Легко приподнятые элементы */
-                --dp-02: #222222;
-                /* Карточки или панели */
-                --dp-03: #242424;
-                /* Навигация */
-                --dp-04: #272727;
-                /* Кнопки в покое */
-                --dp-06: #2c2c2c;
-                /* Модальные окна */
-                --dp-08: #2e2e2e;
-                /* Попапы */
-                --dp-12: #333333;
-                /* Диалоги */
-                --dp-16: #343434;
-                /* Высокие элементы */
-                --dp-24: #383838;
-                /* Максимальное возвышение */
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Редирект на cysu</title>
+    <link rel="icon" href="https://cysu.ru/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="https://cysu.ru/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="https://cysu.ru/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cysu.ru/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://cysu.ru/favicon-16x16.png" />
+    <style>
+        :root {
+            --primary-color: var(--peach-color);
+            --primary-hover: var(--peach-hover);
 
-                /* Цвета текста */
-                --text-primary: #ffffff;
-                --text-secondary: #b3b3b3;
-                --text-disabled: #666666;
+            /* Уровни возвышения Material Design */
+            --dp-00: #121212;
+            /* Базовый темный серый */
+            --dp-01: #1e1e1e;
+            /* Легко приподнятые элементы */
+            --dp-02: #222222;
+            /* Карточки или панели */
+            --dp-03: #242424;
+            /* Навигация */
+            --dp-04: #272727;
+            /* Кнопки в покое */
+            --dp-06: #2c2c2c;
+            /* Модальные окна */
+            --dp-08: #2e2e2e;
+            /* Попапы */
+            --dp-12: #333333;
+            /* Диалоги */
+            --dp-16: #343434;
+            /* Высокие элементы */
+            --dp-24: #383838;
+            /* Максимальное возвышение */
 
-                /* Цвета границ */
-                --border-primary: #333333;
-                --border-secondary: #404040;
-            }
+            /* Цвета текста */
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-disabled: #666666;
 
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
+            /* Цвета границ */
+            --border-primary: #333333;
+            --border-secondary: #404040;
+        }
 
-            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            * {
-                font-family:
-                    'Poppins',
-                    -apple-system,
-                    BlinkMacSystemFont,
-                    'Segoe UI',
-                    Roboto,
-                    sans-serif !important;
-            }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
-            body {
-                background: var(--dp-00);
-                color: var(--text-primary);
-                height: 100vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                overflow: hidden;
-            }
+        * {
+            font-family:
+                'Poppins',
+                -apple-system,
+                BlinkMacSystemFont,
+                'Segoe UI',
+                Roboto,
+                sans-serif !important;
+        }
 
-            .modal-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: var(--dp-00);
-                backdrop-filter: blur(12px);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 1000;
-                animation: modalFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            }
+        body {
+            background: var(--dp-00);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dp-00);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: modalFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .modal {
+            background: var(--dp-06);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 720px;
+            width: 90%;
+            box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-primary);
+            animation: modalSlideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            transform: translateY(0);
+            backdrop-filter: blur(20px);
+        }
+
+        @media (max-width: 768px) {
             .modal {
-                background: var(--dp-06);
-                border-radius: 20px;
-                padding: 40px;
-                max-width: 720px;
-                width: 90%;
-                box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
-                border: 1px solid var(--border-primary);
-                animation: modalSlideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-                position: relative;
-                transform: translateY(0);
-                backdrop-filter: blur(20px);
-            }
-
-            @media (max-width: 768px) {
-                .modal {
-                    padding: 24px;
-                    width: 95%;
-                    margin: 20px;
-                    border-radius: 16px;
-                }
-            }
-
-            @media (max-width: 480px) {
-                .modal {
-                    padding: 20px;
-                    width: calc(100% - 20px);
-                    margin: 10px;
-                    border-radius: 12px;
-                    margin-bottom: 80px;
-                    /* Дополнительное пространство снизу для debug-info */
-                }
-            }
-
-            .modal-header {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-bottom: 24px;
-            }
-
-            .icon {
-                width: 56px;
-                height: 56px;
-                background: transparent;
+                padding: 24px;
+                width: 95%;
+                margin: 20px;
                 border-radius: 16px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-right: 20px;
-                font-size: 32px;
-                animation: iconPulse 2s ease-in-out infinite;
             }
+        }
 
+        @media (max-width: 480px) {
+            .modal {
+                padding: 20px;
+                width: calc(100% - 20px);
+                margin: 10px;
+                border-radius: 12px;
+                margin-bottom: 80px;
+                /* Дополнительное пространство снизу для debug-info */
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .icon {
+            width: 56px;
+            height: 56px;
+            background: transparent;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 32px;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
             .modal-title {
-                font-size: 24px;
-                font-weight: 900;
-                color: var(--text-primary);
-                margin: 0;
+                font-size: 20px;
             }
+        }
 
-            @media (max-width: 768px) {
-                .modal-title {
-                    font-size: 20px;
-                }
-            }
-
-            @media (max-width: 480px) {
-                .modal-title {
-                    font-size: 18px;
-                }
-            }
-
-            .modal-content {
-                margin-bottom: 32px;
-            }
-
-            .modal-text {
-                color: var(--text-primary);
-                line-height: 1.8;
-                margin-bottom: 20px;
+        @media (max-width: 480px) {
+            .modal-title {
                 font-size: 18px;
-                font-weight: 400;
-                text-align: center;
-                letter-spacing: 0.3px;
             }
+        }
 
-            .modal-text:first-child {
-                font-size: 16px;
-                font-weight: 500;
-                margin-bottom: 12px;
-                color: var(--text-primary);
-            }
+        .modal-content {
+            margin-bottom: 32px;
+        }
 
-            .modal-text:last-child {
-                font-size: 16px;
-                color: var(--text-secondary);
-                opacity: 0.9;
-            }
+        .modal-text {
+            color: var(--text-primary);
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 400;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
 
-            .description-text {
-                margin: 20px 0;
-                text-align: center;
-            }
+        .modal-text:first-child {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
 
+        .modal-text:last-child {
+            font-size: 16px;
+            color: var(--text-secondary);
+            opacity: 0.9;
+        }
+
+        .description-text {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .description-text p {
+            font-size: 16px;
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 12px;
+            font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
             .description-text p {
-                font-size: 16px;
-                color: var(--text-primary);
-                line-height: 1.6;
-                margin-bottom: 12px;
-                font-weight: 400;
+                font-size: 15px;
             }
+        }
 
-            @media (max-width: 768px) {
-                .description-text p {
-                    font-size: 15px;
-                }
-            }
-
-            @media (max-width: 480px) {
-                .description-text p {
-                    font-size: 14px;
-                    line-height: 1.5;
-                }
-            }
-
-            .highlight {
-                background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-                background-clip: text;
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                font-weight: 600;
-                position: relative;
-            }
-
-            .highlight::after {
-                content: '';
-                position: absolute;
-                bottom: -2px;
-                left: 0;
-                right: 0;
-                height: 2px;
-                background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-                border-radius: 1px;
-                opacity: 0.3;
-            }
-
-            .redirect-image {
-                margin: 20px 0;
-                display: flex;
-                justify-content: center;
-            }
-
-            .redirect-photo {
-                width: 640px;
-                height: 200px;
-                object-fit: fill;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-                display: block;
-                max-width: 100%;
-            }
-
-            @media (max-width: 768px) {
-                .redirect-photo {
-                    width: 100%;
-                    height: 160px;
-                    max-width: 100%;
-                    object-fit: fill;
-                }
-            }
-
-            @media (max-width: 480px) {
-                .redirect-photo {
-                    height: 140px;
-                    width: 100%;
-                    max-width: 100%;
-                    object-fit: fill;
-                }
-            }
-
-            .redirect-info {
-                background: var(--dp-02);
-                border: 1px solid var(--border-secondary);
-                border-radius: 8px;
-                padding: 16px;
-                margin: 16px 0;
-            }
-
-            .redirect-url {
-                color: var(--primary-color);
-                font-weight: 500;
-                word-break: break-all;
-            }
-
-            .modal-actions {
-                display: flex;
-                gap: 12px;
-                justify-content: flex-end;
-            }
-
-            @media (max-width: 480px) {
-                .modal-actions {
-                    flex-direction: column;
-                    gap: 8px;
-                }
-            }
-
-            .debug-info {
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                padding: 12px 20px;
-                background: var(--dp-00);
-                backdrop-filter: blur(10px);
-                border: 1px solid var(--border-primary);
-                border-radius: 12px;
-                font-size: 10px;
-                color: var(--text-disabled);
-                line-height: 1.2;
-                text-align: center;
-                z-index: 1001;
-                max-width: 90%;
-                opacity: 0.7;
-                transition: all 0.3s ease;
-                cursor: pointer;
-                user-select: none;
-            }
-
-            @media (max-width: 768px) {
-                .debug-info {
-                    bottom: 10px;
-                    padding: 8px 12px;
-                    font-size: 9px;
-                    max-width: 95%;
-                    opacity: 0.6;
-                }
-            }
-
-            @media (max-width: 480px) {
-                .debug-info {
-                    bottom: 5px;
-                    padding: 6px 10px;
-                    font-size: 8px;
-                    max-width: 98%;
-                    opacity: 0.5;
-                    line-height: 1.1;
-                }
-            }
-
-            .debug-info:hover {
-                opacity: 1;
-                transform: translateX(-50%) scale(1.02);
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            }
-
-            .debug-info:active {
-                transform: translateX(-50%) scale(0.98);
-            }
-
-            .copy-notification {
-                position: fixed;
-                bottom: 80px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: var(--primary-color);
-                color: var(--dp-00);
-                padding: 8px 16px;
-                border-radius: 8px;
-                font-size: 12px;
-                font-weight: 500;
-                z-index: 1002;
-                animation: copyFade 2s ease-out forwards;
-                pointer-events: none;
-            }
-
-            @keyframes copyFade {
-                0% {
-                    opacity: 0;
-                    transform: translateX(-50%) translateY(10px);
-                }
-
-                20% {
-                    opacity: 1;
-                    transform: translateX(-50%) translateY(0);
-                }
-
-                80% {
-                    opacity: 1;
-                    transform: translateX(-50%) translateY(0);
-                }
-
-                100% {
-                    opacity: 0;
-                    transform: translateX(-50%) translateY(-10px);
-                }
-            }
-
-            .debug-info h4 {
-                color: var(--text-secondary);
-                margin: 0 0 6px 0;
-                font-size: 11px;
-                font-weight: 500;
-                opacity: 0.8;
-            }
-
-            .debug-info div {
-                margin-bottom: 1px;
-                word-break: break-all;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .debug-info div:last-child {
-                margin-bottom: 0;
-            }
-
-            .btn {
-                padding: 12px 24px;
-                border: none;
-                border-radius: 8px;
+        @media (max-width: 480px) {
+            .description-text p {
                 font-size: 14px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
+                line-height: 1.5;
+            }
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            border-radius: 1px;
+            opacity: 0.3;
+        }
+
+        .redirect-image {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .redirect-photo {
+            width: 640px;
+            height: 200px;
+            object-fit: fill;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: block;
+            max-width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .redirect-photo {
+                width: 100%;
+                height: 160px;
+                max-width: 100%;
+                object-fit: fill;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .redirect-photo {
+                height: 140px;
+                width: 100%;
+                max-width: 100%;
+                object-fit: fill;
+            }
+        }
+
+        .redirect-info {
+            background: var(--dp-02);
+            border: 1px solid var(--border-secondary);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .redirect-url {
+            color: var(--primary-color);
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 480px) {
+            .modal-actions {
+                flex-direction: column;
                 gap: 8px;
             }
+        }
 
-            .btn-primary {
-                background: var(--primary-color);
-                color: var(--dp-00);
+        .debug-info {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            background: var(--dp-00);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            font-size: 10px;
+            color: var(--text-disabled);
+            line-height: 1.2;
+            text-align: center;
+            z-index: 1001;
+            max-width: 90%;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        @media (max-width: 768px) {
+            .debug-info {
+                bottom: 10px;
+                padding: 8px 12px;
+                font-size: 9px;
+                max-width: 95%;
+                opacity: 0.6;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .debug-info {
+                bottom: 5px;
+                padding: 6px 10px;
+                font-size: 8px;
+                max-width: 98%;
+                opacity: 0.5;
+                line-height: 1.1;
+            }
+        }
+
+        .debug-info:hover {
+            opacity: 1;
+            transform: translateX(-50%) scale(1.02);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .debug-info:active {
+            transform: translateX(-50%) scale(0.98);
+        }
+
+        .copy-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: var(--dp-00);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 1002;
+            animation: copyFade 2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes copyFade {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
             }
 
-            .btn-primary:hover {
-                background: var(--primary-hover);
-                transform: translateY(-1px);
+            20% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
             }
 
-            .btn-secondary {
-                background: var(--dp-04);
-                color: var(--text-primary);
-                border: 1px solid var(--border-primary);
+            80% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
             }
 
-            .btn-secondary:hover {
-                background: var(--dp-08);
-                border-color: var(--border-secondary);
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
             }
+        }
 
-            .btn-download {
-                background: linear-gradient(135deg, #4caf50, #45a049);
-                color: var(--dp-00);
-                border: none;
-            }
+        .debug-info h4 {
+            color: var(--text-secondary);
+            margin: 0 0 6px 0;
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.8;
+        }
 
-            .btn-download:hover {
-                background: linear-gradient(135deg, #45a049, #3d8b40);
-                transform: translateY(-1px);
-            }
+        .debug-info div {
+            margin-bottom: 1px;
+            word-break: break-all;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-            .progress-bar {
-                width: 100%;
-                height: 8px;
-                background: var(--dp-02);
-                border-radius: 10px;
-                overflow: hidden;
-                margin: 20px 0;
-                position: relative;
-                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-            }
+        .debug-info div:last-child {
+            margin-bottom: 0;
+        }
 
-            .progress-fill {
-                height: 100%;
-                background: linear-gradient(
-                    45deg,
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--dp-00);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--dp-04);
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--dp-08);
+            border-color: var(--border-secondary);
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: var(--dp-00);
+            border: none;
+        }
+
+        .btn-download:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            transform: translateY(-1px);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--dp-02);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg,
                     var(--primary-color) 0%,
                     var(--primary-hover) 25%,
                     #ff6b6b 50%,
                     var(--primary-hover) 75%,
-                    var(--primary-color) 100%
-                );
-                background-size: 200% 100%;
-                border-radius: 10px;
-                transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-                position: relative;
-                overflow: hidden;
-                box-shadow: 0 0 20px rgba(181, 149, 255, 0.4);
-                animation: progressGradient 3s ease-in-out infinite;
-            }
+                    var(--primary-color) 100%);
+            background-size: 200% 100%;
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(181, 149, 255, 0.4);
+            animation: progressGradient 3s ease-in-out infinite;
+        }
 
-            .progress-fill::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(
-                    90deg,
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg,
                     transparent 0%,
                     rgba(255, 255, 255, 0.4) 25%,
                     rgba(255, 255, 255, 0.8) 50%,
                     rgba(255, 255, 255, 0.4) 75%,
-                    transparent 100%
-                );
-                border-radius: 10px;
-                animation: progressShine 2s ease-in-out infinite;
-            }
+                    transparent 100%);
+            border-radius: 10px;
+            animation: progressShine 2s ease-in-out infinite;
+        }
 
-            .progress-fill::before {
-                content: '';
-                position: absolute;
-                top: -2px;
-                left: 0;
-                right: 0;
-                bottom: -2px;
-                background: linear-gradient(
-                    90deg,
+        .progress-fill::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            background: linear-gradient(90deg,
                     var(--primary-color) 0%,
                     rgba(255, 255, 255, 0.2) 25%,
                     var(--primary-color) 50%,
                     rgba(255, 255, 255, 0.2) 75%,
-                    var(--primary-color) 100%
-                );
-                border-radius: 12px;
+                    var(--primary-color) 100%);
+            border-radius: 12px;
+            filter: blur(1px);
+            animation: progressGlow 2.5s ease-in-out infinite;
+        }
+
+        @keyframes modalFadeIn {
+            0% {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
+
+            50% {
+                opacity: 0.7;
+                backdrop-filter: blur(6px);
+            }
+
+            100% {
+                opacity: 1;
+                backdrop-filter: blur(12px);
+            }
+        }
+
+        @keyframes modalSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.9);
+                filter: blur(4px);
+            }
+
+            60% {
+                opacity: 0.9;
+                transform: translateY(5px) scale(0.98);
                 filter: blur(1px);
-                animation: progressGlow 2.5s ease-in-out infinite;
             }
 
-            @keyframes modalFadeIn {
-                0% {
-                    opacity: 0;
-                    backdrop-filter: blur(0px);
-                }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0px);
+            }
+        }
 
-                50% {
-                    opacity: 0.7;
-                    backdrop-filter: blur(6px);
-                }
+        @keyframes iconPulse {
 
-                100% {
-                    opacity: 1;
-                    backdrop-filter: blur(12px);
-                }
+            0%,
+            100% {
+                transform: scale(1);
             }
 
-            @keyframes modalSlideUp {
-                0% {
-                    opacity: 0;
-                    transform: translateY(40px) scale(0.9);
-                    filter: blur(4px);
-                }
+            50% {
+                transform: scale(1.1);
+            }
+        }
 
-                60% {
-                    opacity: 0.9;
-                    transform: translateY(5px) scale(0.98);
-                    filter: blur(1px);
-                }
-
-                100% {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                    filter: blur(0px);
-                }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
             }
 
-            @keyframes iconPulse {
-                0%,
-                100% {
-                    transform: scale(1);
-                }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
-                50% {
-                    transform: scale(1.1);
-                }
+        @keyframes progressGradient {
+            0% {
+                background-position: 0% 50%;
             }
 
-            @keyframes spin {
-                0% {
-                    transform: rotate(0deg);
-                }
-
-                100% {
-                    transform: rotate(360deg);
-                }
+            50% {
+                background-position: 100% 50%;
             }
 
-            @keyframes progressGradient {
-                0% {
-                    background-position: 0% 50%;
-                }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
 
-                50% {
-                    background-position: 100% 50%;
-                }
-
-                100% {
-                    background-position: 0% 50%;
-                }
+        @keyframes progressShine {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
             }
 
-            @keyframes progressShine {
-                0% {
-                    transform: translateX(-100%);
-                    opacity: 0;
-                }
-
-                50% {
-                    opacity: 1;
-                }
-
-                100% {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
+            50% {
+                opacity: 1;
             }
 
-            @keyframes progressGlow {
-                0%,
-                100% {
-                    opacity: 0.3;
-                    transform: scale(1);
-                }
+            100% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
 
-                50% {
-                    opacity: 0.7;
-                    transform: scale(1.05);
-                }
+        @keyframes progressGlow {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
             }
 
-            @keyframes iconRotate {
-                0% {
-                    transform: rotate(0deg) scale(1);
-                }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
 
-                50% {
-                    transform: rotate(180deg) scale(1.1);
-                }
-
-                100% {
-                    transform: rotate(360deg) scale(1);
-                }
+        @keyframes iconRotate {
+            0% {
+                transform: rotate(0deg) scale(1);
             }
 
-            .fade-out {
-                animation: fadeOut 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            50% {
+                transform: rotate(180deg) scale(1.1);
             }
 
-            @keyframes fadeOut {
-                0% {
-                    opacity: 1;
-                    transform: scale(1) translateY(0);
-                    filter: blur(0px);
-                }
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
 
-                30% {
-                    opacity: 0.8;
-                    transform: scale(1.05) translateY(-10px);
-                    filter: blur(2px);
-                }
+        .fade-out {
+            animation: fadeOut 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
 
-                70% {
-                    opacity: 0.3;
-                    transform: scale(0.95) translateY(20px);
-                    filter: blur(8px);
-                }
-
-                100% {
-                    opacity: 0;
-                    transform: scale(0.8) translateY(40px);
-                    filter: blur(15px);
-                }
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+                filter: blur(0px);
             }
 
-            .redirect-transition {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: var(--dp-00);
-                z-index: 9998;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                animation: redirectFade 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            30% {
+                opacity: 0.8;
+                transform: scale(1.05) translateY(-10px);
+                filter: blur(2px);
             }
 
-            @keyframes redirectFade {
-                0% {
-                    opacity: 0;
-                    transform: scale(0.8) rotate(5deg);
-                    filter: blur(20px);
-                }
-
-                30% {
-                    opacity: 1;
-                    transform: scale(1.05) rotate(-2deg);
-                    filter: blur(5px);
-                }
-
-                70% {
-                    opacity: 1;
-                    transform: scale(1) rotate(0deg);
-                    filter: blur(0px);
-                }
-
-                100% {
-                    opacity: 0;
-                    transform: scale(1.2) rotate(-5deg);
-                    filter: blur(15px);
-                }
+            70% {
+                opacity: 0.3;
+                transform: scale(0.95) translateY(20px);
+                filter: blur(8px);
             }
 
-            .loading-dots {
-                display: flex;
-                gap: 8px;
-                margin-top: 20px;
+            100% {
+                opacity: 0;
+                transform: scale(0.8) translateY(40px);
+                filter: blur(15px);
+            }
+        }
+
+        .redirect-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dp-00);
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: redirectFade 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes redirectFade {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) rotate(5deg);
+                filter: blur(20px);
             }
 
-            .loading-dot {
-                width: 12px;
-                height: 12px;
-                background: var(--primary-color);
-                border-radius: 50%;
-                animation: dotBounce 1.4s ease-in-out infinite both;
+            30% {
+                opacity: 1;
+                transform: scale(1.05) rotate(-2deg);
+                filter: blur(5px);
             }
 
-            .loading-dot:nth-child(1) {
-                animation-delay: -0.32s;
+            70% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+                filter: blur(0px);
             }
 
-            .loading-dot:nth-child(2) {
-                animation-delay: -0.16s;
+            100% {
+                opacity: 0;
+                transform: scale(1.2) rotate(-5deg);
+                filter: blur(15px);
+            }
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .loading-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            animation: dotBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0s;
+        }
+
+        @keyframes dotBounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+                opacity: 0.5;
             }
 
-            .loading-dot:nth-child(3) {
-                animation-delay: 0s;
+            40% {
+                transform: scale(1);
+                opacity: 1;
             }
+        }
+    </style>
+</head>
 
-            @keyframes dotBounce {
-                0%,
-                80%,
-                100% {
-                    transform: scale(0);
-                    opacity: 0.5;
-                }
+<body>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h1 class="modal-title">Переход на cysu</h1>
+            </div>
 
-                40% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-        </style>
-    </head>
-
-    <body>
-        <div class="modal-overlay" id="modalOverlay">
-            <div class="modal">
-                <div class="modal-header">
-                    <h1 class="modal-title">Переход на cysu</h1>
+            <div class="modal-content">
+                <div class="description-text">
+                    <p>
+                        Это крч сайт где есть <span class="highlight">лекции</span>,
+                        <span class="highlight">практики</span>, там можно
+                        <span class="highlight">решения свои загружать</span>
+                    </p>
+                    <p>Группы которых нет <span class="highlight">добавляются админом</span></p>
                 </div>
 
-                <div class="modal-content">
-                    <div class="description-text">
-                        <p>
-                            Это крч сайт где есть <span class="highlight">лекции</span>,
-                            <span class="highlight">практики</span>, там можно
-                            <span class="highlight">решения свои загружать</span>
-                        </p>
-                        <p>Группы которых нет <span class="highlight">добавляются админом</span></p>
+                <div class="redirect-info">
+                    <div style="font-size: 14px; color: var(--text-disabled); margin-bottom: 8px">
+                        Целевой сайт:
                     </div>
-
-                    <div class="redirect-info">
-                        <div style="font-size: 14px; color: var(--text-disabled); margin-bottom: 8px">
-                            Целевой сайт:
-                        </div>
-                        <div class="redirect-url">https://cysu.ru</div>
-                    </div>
-
-                    <div class="redirect-image">
-                        <img
-                            src="https://cysu.ru/static/icons/alex.jpg"
-                            alt="cysu - Образовательная платформа"
-                            class="redirect-photo"
-                            loading="eager"
-                            onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'background: var(--dp-02); border: 1px solid var(--border-secondary); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-secondary);\'>Изображение недоступно</div>';"
-                        />
-                    </div>
-
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
+                    <div class="redirect-url">https://cysu.ru</div>
                 </div>
 
-                <div class="modal-actions">
-                    <button class="btn btn-secondary" onclick="cancelRedirect()">Отмена</button>
-                    <a href="/redirect/download" class="btn btn-download" download="cysu.html"> Скачать </a>
-                    <a href="#" class="btn btn-primary" onclick="redirectNow(); return false;"> Перейти сейчас </a>
+                <div class="redirect-image">
+                    <img src="https://cysu.ru/static/icons/alex.jpg" alt="cysu - Образовательная платформа" class="redirect-photo" loading="eager" onerror="
+                                this.style.display = 'none'
+                                this.parentElement.innerHTML =
+                                    '<div style=\'background: var(--dp-02); border: 1px solid var(--border-secondary); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-secondary);\'>Изображение недоступно</div>'
+                            " />
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
                 </div>
             </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="cancelRedirect()">Отмена</button>
+                <a href="/redirect/download" class="btn btn-download" download="cysu.html"> Скачать </a>
+                <a href="#" class="btn btn-primary" onclick="
+                            redirectNow()
+                            return false
+                        ">
+                    Перейти сейчас
+                </a>
+            </div>
         </div>
+    </div>
 
-        <div class="debug-info" onclick="copySessionInfo()">
-            <h4>Информация о сессии</h4>
-            <div><strong>User Agent:</strong> <span id="userAgent"></span></div>
-            <div><strong>IP адрес:</strong> <span id="ipAddress">Загрузка...</span></div>
-            <div><strong>Время:</strong> <span id="currentTime"></span></div>
-            <div><strong>Разрешение:</strong> <span id="screenResolution"></span></div>
-            <div><strong>Язык:</strong> <span id="language"></span></div>
-            <div><strong>Платформа:</strong> <span id="platform"></span></div>
-        </div>
+    <div class="debug-info" onclick="copySessionInfo()">
+        <h4>Информация о сессии</h4>
+        <div><strong>User Agent:</strong> <span id="userAgent"></span></div>
+        <div><strong>IP адрес:</strong> <span id="ipAddress">Загрузка...</span></div>
+        <div><strong>Время:</strong> <span id="currentTime"></span></div>
+        <div><strong>Разрешение:</strong> <span id="screenResolution"></span></div>
+        <div><strong>Язык:</strong> <span id="language"></span></div>
+        <div><strong>Платформа:</strong> <span id="platform"></span></div>
+    </div>
 
-        <script>
-            let countdown = 10
-            let progress = 0
-            let redirectTimer
-            let progressTimer
+    <script>
+        let countdown = 10
+        let progress = 0
+        let redirectTimer
+        let progressTimer
 
-            // Обновление прогресса
-            function updateProgress() {
-                if (countdown <= 0) {
-                    redirectNow()
-                    return
-                }
-
-                countdown--
+        // Обновление прогресса
+        function updateProgress() {
+            if (countdown <= 0) {
+                redirectNow()
+                return
             }
 
-            // Немедленный редирект
-            function redirectNow() {
-                clearInterval(redirectTimer)
-                clearInterval(progressTimer)
+            countdown--
+        }
 
-                // Создаем плавный переход
-                const transitionOverlay = document.createElement('div')
-                transitionOverlay.className = 'redirect-transition'
+        // Немедленный редирект
+        function redirectNow() {
+            clearInterval(redirectTimer)
+            clearInterval(progressTimer)
 
-                const transitionContent = document.createElement('div')
-                transitionContent.style.cssText = `
+            // Создаем плавный переход
+            const transitionOverlay = document.createElement('div')
+            transitionOverlay.className = 'redirect-transition'
+
+            const transitionContent = document.createElement('div')
+            transitionContent.style.cssText = `
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -842,8 +843,8 @@
                 text-align: center;
             `
 
-                const transitionIcon = document.createElement('div')
-                transitionIcon.style.cssText = `
+            const transitionIcon = document.createElement('div')
+            transitionIcon.style.cssText = `
                 width: 100px;
                 height: 100px;
                 background: linear-gradient(45deg, var(--primary-color), var(--primary-hover));
@@ -857,56 +858,56 @@
                 color: var(--dp-00);
                 font-weight: bold;
             `
-                transitionIcon.textContent = 'c'
+            transitionIcon.textContent = 'c'
 
-                const transitionText = document.createElement('div')
-                transitionText.style.cssText = `
+            const transitionText = document.createElement('div')
+            transitionText.style.cssText = `
                 color: var(--text-primary);
                 font-size: 24px;
                 font-weight: 700;
                 margin-bottom: 15px;
                 letter-spacing: 2px;
             `
-                transitionText.textContent = 'cysu.ru'
+            transitionText.textContent = 'cysu.ru'
 
-                const loadingDots = document.createElement('div')
-                loadingDots.className = 'loading-dots'
-                loadingDots.innerHTML =
-                    '<div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div>'
+            const loadingDots = document.createElement('div')
+            loadingDots.className = 'loading-dots'
+            loadingDots.innerHTML =
+                '<div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div>'
 
-                transitionContent.appendChild(transitionIcon)
-                transitionContent.appendChild(transitionText)
-                transitionContent.appendChild(loadingDots)
-                transitionOverlay.appendChild(transitionContent)
-                document.body.appendChild(transitionOverlay)
+            transitionContent.appendChild(transitionIcon)
+            transitionContent.appendChild(transitionText)
+            transitionContent.appendChild(loadingDots)
+            transitionOverlay.appendChild(transitionContent)
+            document.body.appendChild(transitionOverlay)
 
-                // Скрываем debug-info
-                const debugInfo = document.querySelector('.debug-info')
-                if (debugInfo) {
-                    debugInfo.style.display = 'none'
-                }
-
-                // Анимация исчезновения модального окна
-                const modal = document.querySelector('.modal-overlay')
-                modal.classList.add('fade-out')
-
-                // Переход на сайт
-                setTimeout(() => {
-                    window.location.href = 'https://cysu.ru'
-                }, 2000)
+            // Скрываем debug-info
+            const debugInfo = document.querySelector('.debug-info')
+            if (debugInfo) {
+                debugInfo.style.display = 'none'
             }
 
-            // Отмена редиректа
-            function cancelRedirect() {
-                clearInterval(redirectTimer)
-                clearInterval(progressTimer)
+            // Анимация исчезновения модального окна
+            const modal = document.querySelector('.modal-overlay')
+            modal.classList.add('fade-out')
 
-                const modal = document.querySelector('.modal-overlay')
-                modal.classList.add('fade-out')
+            // Переход на сайт
+            setTimeout(() => {
+                window.location.href = 'https://cysu.ru'
+            }, 2000)
+        }
 
-                setTimeout(() => {
-                    modal.style.display = 'none'
-                    document.body.innerHTML = `
+        // Отмена редиректа
+        function cancelRedirect() {
+            clearInterval(redirectTimer)
+            clearInterval(progressTimer)
+
+            const modal = document.querySelector('.modal-overlay')
+            modal.classList.add('fade-out')
+
+            setTimeout(() => {
+                modal.style.display = 'none'
+                document.body.innerHTML = `
                     <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--dp-00); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                         <div style="text-align: center;">
                             <h1 style="margin-bottom: 16px;">Редирект отменен</h1>
@@ -919,91 +920,89 @@
                         </div>
                     </div>
                 `
-                }, 300)
+            }, 300)
+        }
+
+        // Предзагрузка сайта
+        function preloadTargetSite() {
+            const iframe = document.createElement('iframe')
+            iframe.style.display = 'none'
+            iframe.src = 'https://cysu.ru'
+            iframe.onload = () => {}
+            document.body.appendChild(iframe)
+        }
+
+        // Запуск предзагрузки
+        preloadTargetSite()
+
+        // Плавное заполнение прогресс-бара
+        function smoothProgress() {
+            const progressElement = document.getElementById('progressFill')
+            const targetProgress = ((10 - countdown) / 10) * 100
+            const currentWidth = parseFloat(progressElement.style.width) || 0
+
+            // Если текущая ширина больше целевой (например, при обновлении), плавно уменьшаем
+            if (currentWidth > targetProgress) {
+                const decrement = 2 // 2% за 50мс
+                const newWidth = Math.max(currentWidth - decrement, targetProgress)
+                progressElement.style.width = newWidth + '%'
+            }
+            // Если текущая ширина меньше целевой, плавно увеличиваем
+            else if (currentWidth < targetProgress) {
+                const increment = 1 // 1% за 50мс
+                const newWidth = Math.min(currentWidth + increment, targetProgress)
+                progressElement.style.width = newWidth + '%'
             }
 
-            // Предзагрузка сайта
-            function preloadTargetSite() {
-                const iframe = document.createElement('iframe')
-                iframe.style.display = 'none'
-                iframe.src = 'https://cysu.ru'
-                iframe.onload = () => {
-                    console.log('Сайт cysu.ru предзагружен')
-                }
-                document.body.appendChild(iframe)
+            // Принудительно устанавливаем 100% когда countdown = 0
+            if (countdown === 0) {
+                progressElement.style.width = '100%'
             }
+        }
 
-            // Запуск предзагрузки
-            preloadTargetSite()
+        // Запуск таймеров
+        redirectTimer = setInterval(updateProgress, 1000)
+        progressTimer = setInterval(smoothProgress, 50)
 
-            // Плавное заполнение прогресс-бара
-            function smoothProgress() {
-                const progressElement = document.getElementById('progressFill')
-                const targetProgress = ((10 - countdown) / 10) * 100
-                const currentWidth = parseFloat(progressElement.style.width) || 0
+        // Заполнение информации о сессии
+        function fillSessionInfo() {
+            // User Agent
+            document.getElementById('userAgent').textContent = navigator.userAgent
 
-                // Если текущая ширина больше целевой (например, при обновлении), плавно уменьшаем
-                if (currentWidth > targetProgress) {
-                    const decrement = 2 // 2% за 50мс
-                    const newWidth = Math.max(currentWidth - decrement, targetProgress)
-                    progressElement.style.width = newWidth + '%'
-                }
-                // Если текущая ширина меньше целевой, плавно увеличиваем
-                else if (currentWidth < targetProgress) {
-                    const increment = 1 // 1% за 50мс
-                    const newWidth = Math.min(currentWidth + increment, targetProgress)
-                    progressElement.style.width = newWidth + '%'
-                }
+            // Текущее время
+            const now = new Date()
+            document.getElementById('currentTime').textContent = now.toLocaleString('ru-RU')
 
-                // Принудительно устанавливаем 100% когда countdown = 0
-                if (countdown === 0) {
-                    progressElement.style.width = '100%'
-                }
-            }
+            // Разрешение экрана
+            document.getElementById('screenResolution').textContent = `${screen.width}x${screen.height}`
 
-            // Запуск таймеров
-            redirectTimer = setInterval(updateProgress, 1000)
-            progressTimer = setInterval(smoothProgress, 50)
+            // Язык
+            document.getElementById('language').textContent = navigator.language || navigator.languages[0]
 
-            // Заполнение информации о сессии
-            function fillSessionInfo() {
-                // User Agent
-                document.getElementById('userAgent').textContent = navigator.userAgent
+            // Платформа
+            document.getElementById('platform').textContent = navigator.platform
 
-                // Текущее время
-                const now = new Date()
-                document.getElementById('currentTime').textContent = now.toLocaleString('ru-RU')
+            // Получение IP адреса
+            fetch('https://api.ipify.org?format=json')
+                .then((response) => response.json())
+                .then((data) => {
+                    document.getElementById('ipAddress').textContent = data.ip
+                })
+                .catch(() => {
+                    document.getElementById('ipAddress').textContent = 'Не удалось получить'
+                })
+        }
 
-                // Разрешение экрана
-                document.getElementById('screenResolution').textContent = `${screen.width}x${screen.height}`
+        // Функция копирования информации о сессии
+        function copySessionInfo() {
+            const userAgent = document.getElementById('userAgent').textContent
+            const ipAddress = document.getElementById('ipAddress').textContent
+            const currentTime = document.getElementById('currentTime').textContent
+            const screenResolution = document.getElementById('screenResolution').textContent
+            const language = document.getElementById('language').textContent
+            const platform = document.getElementById('platform').textContent
 
-                // Язык
-                document.getElementById('language').textContent = navigator.language || navigator.languages[0]
-
-                // Платформа
-                document.getElementById('platform').textContent = navigator.platform
-
-                // Получение IP адреса
-                fetch('https://api.ipify.org?format=json')
-                    .then((response) => response.json())
-                    .then((data) => {
-                        document.getElementById('ipAddress').textContent = data.ip
-                    })
-                    .catch(() => {
-                        document.getElementById('ipAddress').textContent = 'Не удалось получить'
-                    })
-            }
-
-            // Функция копирования информации о сессии
-            function copySessionInfo() {
-                const userAgent = document.getElementById('userAgent').textContent
-                const ipAddress = document.getElementById('ipAddress').textContent
-                const currentTime = document.getElementById('currentTime').textContent
-                const screenResolution = document.getElementById('screenResolution').textContent
-                const language = document.getElementById('language').textContent
-                const platform = document.getElementById('platform').textContent
-
-                const sessionInfo = `Информация о сессии:
+            const sessionInfo = `Информация о сессии:
 User Agent: ${userAgent}
 IP адрес: ${ipAddress}
 Время: ${currentTime}
@@ -1011,58 +1010,55 @@ IP адрес: ${ipAddress}
 Язык: ${language}
 Платформа: ${platform}`
 
-                navigator.clipboard
-                    .writeText(sessionInfo)
-                    .then(() => {
-                        showCopyNotification()
-                    })
-                    .catch(() => {
-                        // Fallback для старых браузеров
-                        const textArea = document.createElement('textarea')
-                        textArea.value = sessionInfo
-                        document.body.appendChild(textArea)
-                        textArea.select()
-                        document.executeCommand('copy')
-                        document.body.removeChild(textArea)
-                        showCopyNotification()
-                    })
-            }
+            navigator.clipboard
+                .writeText(sessionInfo)
+                .then(() => {
+                    showCopyNotification()
+                })
+                .catch(() => {
+                    // Fallback для старых браузеров
+                    const textArea = document.createElement('textarea')
+                    textArea.value = sessionInfo
+                    document.body.appendChild(textArea)
+                    textArea.select()
+                    document.executeCommand('copy')
+                    document.body.removeChild(textArea)
+                    showCopyNotification()
+                })
+        }
 
-            // Показать уведомление о копировании
-            function showCopyNotification() {
-                const notification = document.createElement('div')
-                notification.className = 'copy-notification'
-                notification.textContent = 'Информация скопирована в буфер обмена'
-                document.body.appendChild(notification)
+        // Показать уведомление о копировании
+        function showCopyNotification() {
+            const notification = document.createElement('div')
+            notification.className = 'copy-notification'
+            notification.textContent = 'Информация скопирована в буфер обмена'
+            document.body.appendChild(notification)
 
-                setTimeout(() => {
-                    document.body.removeChild(notification)
-                }, 2000)
-            }
+            setTimeout(() => {
+                document.body.removeChild(notification)
+            }, 2000)
+        }
 
-            // Инициализация прогресс-бара
-            function initProgress() {
-                const progressElement = document.getElementById('progressFill')
-                progressElement.style.width = '0%'
-            }
+        // Инициализация прогресс-бара
+        function initProgress() {
+            const progressElement = document.getElementById('progressFill')
+            progressElement.style.width = '0%'
+        }
 
-            // Запуск заполнения информации
-            fillSessionInfo()
+        // Запуск заполнения информации
+        fillSessionInfo()
 
-            // Инициализация прогресс-бара
-            initProgress()
+        // Инициализация прогресс-бара
+        initProgress()
 
-            // Проверка загрузки изображения
-            function checkImageLoad() {
-                const img = document.querySelector('.redirect-photo')
-                if (img) {
-                    img.onload = function () {
-                        console.log('Изображение успешно загружено')
-                    }
-                    img.onerror = function () {
-                        console.log('Ошибка загрузки изображения')
-                        const fallback = document.createElement('div')
-                        fallback.style.cssText = `
+        // Проверка загрузки изображения
+        function checkImageLoad() {
+            const img = document.querySelector('.redirect-photo')
+            if (img) {
+                img.onload = function() {}
+                img.onerror = function() {
+                    const fallback = document.createElement('div')
+                    fallback.style.cssText = `
                         background: var(--dp-02);
                         border: 1px solid var(--border-secondary);
                         border-radius: 12px;
@@ -1072,16 +1068,17 @@ IP адрес: ${ipAddress}
                         font-size: 16px;
                         margin: 20px 0;
                     `
-                        fallback.textContent = 'Изображение недоступно'
-                        img.parentNode.replaceChild(fallback, img)
-                    }
+                    fallback.textContent = 'Изображение недоступно'
+                    img.parentNode.replaceChild(fallback, img)
                 }
             }
+        }
 
-            // Проверяем загрузку изображения
-            checkImageLoad()
+        // Проверяем загрузку изображения
+        checkImageLoad()
 
-            // Мета-редирект уже отключен в HTML
-        </script>
-    </body>
+        // Мета-редирект уже отключен в HTML
+    </script>
+</body>
+
 </html>

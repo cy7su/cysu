@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, session, url_for
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_minify import Minify
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
@@ -27,12 +28,13 @@ def create_app():
         static_folder=static_folder_path,
         static_url_path="/static",
     )
-    # SECRET_KEY обязательно должен быть установлен через переменную окружения
+
     secret_key = os.getenv("SECRET_KEY")
     if not secret_key:
         raise ValueError("SECRET_KEY environment variable is required")
     app.config["SECRET_KEY"] = secret_key
     app.config["SERVER_NAME"] = os.getenv("SERVER_NAME", "cysu.ru")
+    app.config["PREFERRED_URL_SCHEME"] = "https"
     db_path = os.path.abspath(
         os.path.join(os.path.dirname(os.path.dirname(__file__)), "app.db")
     )
@@ -114,7 +116,7 @@ def create_app():
         "12": float(os.getenv("SUBSCRIPTION_PRICE_12", 469.00)),
     }
     app.config["SUBSCRIPTION_CURRENCY"] = os.getenv("SUBSCRIPTION_CURRENCY", "RUB")
-    # Простая настройка централизованного логирования
+
     from .utils.logger import setup_logging
 
     log_file = os.getenv("LOG_FILE", "/root/logs/cysu.log")
@@ -123,16 +125,14 @@ def create_app():
     setup_logging(
         log_level=log_level,
         log_file=log_file,
-        console_enabled=not app.testing,  # Отключаем console в тестах
+        console_enabled=not app.testing,
         file_enabled=True,
     )
 
-    # Получаем настроенный логгер для приложения
     from .utils.logger import get_logger
 
     app_logger = get_logger("app")
 
-    # Логируем важную информацию о конфигурации
     app_logger.info(f"UPLOAD_FOLDER: {upload_folder}")
     app_logger.info(f"TICKET_FILES_FOLDER: {ticket_folder}")
     app_logger.info(f"DATABASE_URI: {os.path.basename(db_path)}")
@@ -146,9 +146,6 @@ def create_app():
                 response.cache_control.max_age = 31536000
                 response.cache_control.public = True
         return response
-
-    # Удален мертвый код логирования файлов в static
-    # that would never execute after return statement
 
     db.init_app(app)
     try:
@@ -169,6 +166,8 @@ def create_app():
     login_manager.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
+    minify = Minify()
+    minify.init_app(app)
     from .views.telegram_auth import telegram_login
 
     csrf.exempt(telegram_login)

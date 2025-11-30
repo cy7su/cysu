@@ -28,7 +28,6 @@ class ParallaxController {
 
         if (isSlowConnection || isLowEnd || window.innerWidth < 768) {
             this.isEnabled = false
-            console.log('Parallax disabled for performance')
         }
     }
 
@@ -38,8 +37,9 @@ class ParallaxController {
             'scroll',
             () => {
                 this.requestTick()
+            }, {
+                passive: true
             },
-            { passive: true },
         )
 
         // Отслеживаем изменение размера окна
@@ -47,8 +47,9 @@ class ParallaxController {
             'resize',
             () => {
                 this.scanElements()
+            }, {
+                passive: true
             },
-            { passive: true },
         )
 
         // Отслеживаем изменение видимости
@@ -131,7 +132,10 @@ class ParallaxController {
         const windowHeight = window.innerHeight
         const documentHeight = document.documentElement.scrollHeight
 
-        this.elements.forEach(({ element, config }) => {
+        this.elements.forEach(({
+            element,
+            config
+        }) => {
             const rect = element.getBoundingClientRect()
             const elementTop = rect.top + scrollY
             const elementHeight = rect.height
@@ -234,7 +238,10 @@ class ParallaxController {
     // Метод для полного отключения
     disable() {
         this.isEnabled = false
-        this.elements.forEach(({ element, originalTransform }) => {
+        this.elements.forEach(({
+            element,
+            originalTransform
+        }) => {
             element.style.transform = originalTransform
             element.style.opacity = ''
             element.style.filter = ''

@@ -26,6 +26,7 @@ from ..models import (
     SiteSettings,
     Subject,
     SubjectGroup,
+    Submission,
     User,
 )
 from ..services import UserManagementService, UserService
@@ -167,9 +168,25 @@ def admin_users():
             flash(message, "error")
     try:
         users = User.query.all()
+
+        from sqlalchemy import func
+
+        user_submission_counts = (
+            db.session.query(
+                User.id, func.count(Submission.id).label("submission_count")
+            )
+            .outerjoin(Submission)
+            .group_by(User.id)
+            .all()
+        )
+
+        submissions_count = {
+            user_id: count for user_id, count in user_submission_counts
+        }
     except Exception as e:
         current_app.logger.error(f"Error loading users: {e}")
         users = []
+        submissions_count = {}
         message = "Ошибка загрузки пользователей"
     if message and request.method == "POST":
         return redirect_with_notification(
@@ -191,7 +208,13 @@ def admin_users():
         password_map=password_map,
         message=message,
         groups=Group.query.all(),
+        submissions_count=submissions_count,
     )
+
+
+@admin_bp.route("/admin/groups", methods=["GET", "POST"])
+@login_required
+def admin_groups():
     if not current_user.is_effective_admin():
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
@@ -430,10 +453,24 @@ def admin_subject_groups() -> Union[str, Response]:
             .all()
         )
         groups = Group.query.filter_by(is_active=True).order_by(Group.name).all()
+
+        subjects_materials_count = {}
+        for subject in subjects:
+            lectures_count = sum(
+                1
+                for material in subject.materials
+                if material.type and material.type.lower() == "lecture"
+            )
+            practices_count = len(subject.materials) - lectures_count
+            subjects_materials_count[subject.id] = {
+                "lectures": lectures_count,
+                "practices": practices_count,
+            }
     except Exception as e:
         current_app.logger.error(f"Error loading subjects or groups: {e}")
         subjects = []
         groups = []
+        subjects_materials_count = {}
         flash("Ошибка загрузки предметов или групп.", "error")
     form = SubjectGroupForm()
     form.populate_choices(subjects, groups)
@@ -562,6 +599,7 @@ def admin_subject_groups() -> Union[str, Response]:
         groups=groups,
         form=form,
         message=message,
+        subjects_materials_count=subjects_materials_count,
     )
 
 
