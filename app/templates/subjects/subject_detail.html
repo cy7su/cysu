@@ -207,10 +207,10 @@ subject.description or 'Изучайте программирование и и�
                     <div class="mb-3">
                         <label class="form-label">Режим предмета</label>
                         <select name="mode" class="form-select">
-                            <option value="1" {% if subject.mode="" ="1" %}selected{% endif %}>
+                            <option value="1" {% if subject.mode == "1" %}selected{% endif %}>
                                 Полный (лекции + практики)
                             </option>
-                            <option value="2" {% if subject.mode="" ="2" %}selected{% endif %}>Только практики</option>
+                            <option value="2" {% if subject.mode == "2" %}selected{% endif %}>Только практики</option>
                         </select>
                         <div class="form-text">В режиме "Только практики" не отображается блок лекций</div>
                     </div>
