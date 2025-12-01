@@ -1,7 +1,8 @@
 """Простые тесты для проверки запуска приложения."""
 
-import pytest
 import uuid
+
+import pytest
 
 
 class TestApp:

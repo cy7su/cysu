@@ -1,7 +1,6 @@
 import secrets
 from datetime import datetime, timedelta
 
-
 from flask_login import UserMixin
 
 from . import db
@@ -44,6 +43,7 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     is_moderator = db.Column(db.Boolean, default=False)
     admin_mode_enabled = db.Column(db.Boolean, default=False)
+    moderator_mode_enabled = db.Column(db.Boolean, default=True, nullable=False)
     is_subscribed = db.Column(db.Boolean, default=False)
     subscription_expires = db.Column(db.DateTime)
     is_manual_subscription = db.Column(db.Boolean, default=False)
@@ -95,7 +95,7 @@ class User(UserMixin, db.Model):
     def can_add_materials_to_subject(self, subject):
         if self.is_admin and self.admin_mode_enabled:
             return True
-        elif self.is_moderator and self.group_id:
+        elif self.is_moderator and self.moderator_mode_enabled and self.group_id:
             from .models import SubjectGroup
 
             return (

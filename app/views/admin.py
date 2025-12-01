@@ -15,20 +15,8 @@ from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
 
 from .. import db
-from ..forms import (
-    AdminUserForm,
-    GroupForm,
-    SiteSettingsForm,
-    SubjectGroupForm,
-)
-from ..models import (
-    Group,
-    SiteSettings,
-    Subject,
-    SubjectGroup,
-    Submission,
-    User,
-)
+from ..forms import AdminUserForm, GroupForm, SiteSettingsForm, SubjectGroupForm
+from ..models import Group, SiteSettings, Subject, SubjectGroup, Submission, User
 from ..services import UserManagementService, UserService
 from ..utils.notifications import redirect_with_notification
 

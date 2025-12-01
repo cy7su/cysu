@@ -2,12 +2,10 @@ import os
 from datetime import datetime, timedelta
 
 import httpx
-from telegram import (
-    BotCommand,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Update,
-)
+from app import create_app, db
+from app.models import TelegramUser, User
+from app.utils.logger import get_logger
+from telegram import BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -17,10 +15,6 @@ from telegram.ext import (
     filters,
 )
 from werkzeug.security import generate_password_hash
-
-from app import create_app, db
-from app.models import TelegramUser, User
-from app.utils.logger import get_logger
 
 logger = get_logger("telegram_bot")
 BOT_TOKEN = os.getenv("TG_TOKEN")

@@ -1,20 +1,33 @@
-{% extends "base.html" %} {% from 'macros/breadcrumbs.html' import material_breadcrumb %} {% block title %}{{
-material.title }}{% endblock %} {% block meta_description %} {{ material.description or 'Предмет: ' +
-material.subject.title + ' - Задание: ' + material.title }} {% endblock %} {% block og_title %}{{ material.subject.title
-}} - {{ material.title }}{% endblock %} {% block og_description %} {% if material.description %} {{ material.description
-}} {% else %} Предмет: {{ material.subject.title }} - Задание: {{ material.title }} {% endif %} {% endblock %} {% block
-twitter_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %} {% block twitter_description %} {% if
-material.description %} {{ material.description }} {% else %} Предмет: {{ material.subject.title }} - Задание: {{
-material.title }} {% endif %} {% endblock %} {% block linkedin_title %}{{ material.subject.title }} - {{ material.title
-}}{% endblock %} {% block linkedin_description %} {% if material.description %} {{ material.description }} {% else %}
-Предмет: {{ material.subject.title }} - Задание: {{ material.title }} {% endif %} {% endblock %} {% block vk_title %}{{
-material.subject.title }} - {{ material.title }}{% endblock %} {% block vk_description %} {% if material.description %}
-{{ material.description }} {% else %} Предмет: {{ material.subject.title }} - Задание: {{ material.title }} {% endif %}
-{% endblock %} {% block telegram_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %} {% block
-telegram_description %} {% if material.description %} {{ material.description }} {% else %} Предмет: {{
-material.subject.title }} - Задание: {{ material.title }} {% endif %} {% endblock %} {% block breadcrumbs %} {{
-material_breadcrumb(material.subject.title, url_for('main.subject_detail', subject_id=material.subject.id),
-material.title) }} {% endblock %} {% block content %}
+{% extends "base.html" %}
+{% from 'macros/breadcrumbs.html' import material_breadcrumb %}
+
+{% block title %}{{ material.title }}{% endblock %}
+
+{% block meta_description %}{{ material.description or 'Предмет: ' + material.subject.title + ' - Задание: ' + material.title }}{% endblock %}
+
+{% block og_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %}
+
+{% block og_description %}{% if material.description %}{{ material.description }}{% else %}Предмет: {{ material.subject.title }} - Задание: {{ material.title }}{% endif %}{% endblock %}
+
+{% block twitter_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %}
+
+{% block twitter_description %}{% if material.description %}{{ material.description }}{% else %}Предмет: {{ material.subject.title }} - Задание: {{ material.title }}{% endif %}{% endblock %}
+
+{% block linkedin_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %}
+
+{% block linkedin_description %}{% if material.description %}{{ material.description }}{% else %}Предмет: {{ material.subject.title }} - Задание: {{ material.title }}{% endif %}{% endblock %}
+
+{% block vk_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %}
+
+{% block vk_description %}{% if material.description %}{{ material.description }}{% else %}Предмет: {{ material.subject.title }} - Задание: {{ material.title }}{% endif %}{% endblock %}
+
+{% block telegram_title %}{{ material.subject.title }} - {{ material.title }}{% endblock %}
+
+{% block telegram_description %}{% if material.description %}{{ material.description }}{% else %}Предмет: {{ material.subject.title }} - Задание: {{ material.title }}{% endif %}{% endblock %}
+
+{% block breadcrumbs %}{{ material_breadcrumb(material.subject.title, url_for('main.subject_detail', subject_id=material.subject.id), material.title) }}{% endblock %}
+
+{% block content %}
 <div class="container py-4">
     <div class="row">
         <div class="col-lg-8 mb-4">
@@ -27,6 +40,11 @@ material.title) }} {% endblock %} {% block content %}
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <h2 class="mb-0" style="font-size: 1.5rem; color: var(--text-primary)">{{ material.title }}</h2>
                     </div>
+                    {% if can_manage_material %}
+                    <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" style="max-width: max-content !important">
+                        <i class="fas fa-edit me-1"></i>Редактировать
+                    </button>
+                    {% endif %}
                 </div>
                 <div class="card-body" style="padding: 1.5rem">
                     {% if material.description %}
@@ -48,7 +66,7 @@ material.title) }} {% endblock %} {% block content %}
                             <i class="fas fa-download"></i>
                             <span>Скачать материал</span>
                         </a>
-                        {% if current_user.is_authenticated and current_user.can_manage_materials() %}
+                        {% if can_manage_material %}
                         <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('replaceFileInput').click()" style="max-width: max-content !important">
                             <i class="fas fa-exchange-alt me-1"></i>Заменить файл
                         </button>
@@ -57,8 +75,7 @@ material.title) }} {% endblock %} {% block content %}
                             <i class="fas fa-check-circle"></i>
                             <span>Готовое решение</span>
                         </a>
-                        {% if current_user.is_authenticated and current_user.can_manage_materials() and material.type ==
-                        'assignment' %}
+                        {% if can_manage_material and material.type == 'assignment' %}
                         <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#replaceSolutionFileModal" style="max-width: max-content !important">
                             <i class="fas fa-exchange-alt me-1"></i>Заменить решение
                         </button>
@@ -214,7 +231,7 @@ material.title) }} {% endblock %} {% block content %}
     </div>
 </div>
 
-{% if current_user.is_authenticated and current_user.can_manage_materials() %}
+{% if can_manage_material %}
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -417,4 +434,3 @@ material.title) }} {% endblock %} {% block content %}
         }
     </script>
     {% endblock %}
-</div>

@@ -1,12 +1,12 @@
 import os
 from datetime import datetime
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 from flask import current_app
 from sqlalchemy.orm import selectinload
 
 from .. import db
-from ..models import Material, Submission, Subject
+from ..models import Material, Subject, Submission
 from ..utils.file_storage import FileStorageManager
 from ..utils.transliteration import get_safe_filename
 

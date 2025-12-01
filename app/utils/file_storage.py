@@ -5,8 +5,8 @@ from typing import Tuple
 
 from flask import current_app
 
-from .transliteration import get_safe_filename
 from .file_optimizer import FileOptimizer
+from .transliteration import get_safe_filename
 
 
 def safe_path_join(base_path: str, *path_parts: str) -> str:

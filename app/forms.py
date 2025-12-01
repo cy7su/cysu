@@ -21,14 +21,8 @@ from wtforms.validators import (
 )
 
 from .models import Group
-from .utils.email_validator import (
-    get_allowed_domains_display,
-    is_allowed_email_domain,
-)
-from .utils.username_validator import (
-    contains_forbidden_word,
-    has_allowed_characters,
-)
+from .utils.email_validator import get_allowed_domains_display, is_allowed_email_domain
+from .utils.username_validator import contains_forbidden_word, has_allowed_characters
 
 
 def validate_allowed_email_domain(form, field):

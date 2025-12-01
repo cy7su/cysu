@@ -1,9 +1,10 @@
 """Тесты производительности и нагрузки."""
 
-import pytest
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
+
+import pytest
 
 
 class TestPerformance:
@@ -11,7 +12,7 @@ class TestPerformance:
 
     def test_database_query_performance(self, app, db):
         """Тест производительности запросов к базе данных."""
-        from app.models import User, Subject, Material
+        from app.models import Material, Subject, User
 
         with app.app_context():
 
@@ -116,7 +117,7 @@ class TestIntegration:
 
     def test_subject_material_workflow(self, app, client, db):
         """Тест рабочего процесса предмет-материал."""
-        from app.models import Subject, Material
+        from app.models import Material, Subject
 
         with app.app_context():
 
@@ -145,13 +146,13 @@ class TestCoverage:
 
         try:
             import app.models
-            import app.services.subject_service
             import app.services.material_service
+            import app.services.subject_service
             import app.services.user_service
-            import app.views.main
-            import app.views.auth
             import app.utils.email_service
             import app.utils.payment_service
+            import app.views.auth
+            import app.views.main
 
             assert True, "All critical modules imported successfully"
         except ImportError as e:
@@ -159,9 +160,9 @@ class TestCoverage:
 
     def test_service_integration_coverage(self, app, db):
         """Тест интеграции сервисов."""
-        from app.services.subject_service import SubjectService
+        from app.models import Material, Subject
         from app.services.material_service import MaterialService
-        from app.models import Subject, Material
+        from app.services.subject_service import SubjectService
 
         with app.app_context():
             import tempfile

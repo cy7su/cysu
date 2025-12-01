@@ -1,21 +1,22 @@
 """Тесты для моделей базы данных."""
 
-import pytest
 import uuid
 from datetime import datetime, timedelta
+
+import pytest
 from app.models import (
-    User,
-    Group,
-    Subject,
-    Material,
-    Payment,
-    Ticket,
     EmailVerification,
-    PasswordReset,
-    ShortLink,
+    Group,
+    Material,
     Notification,
+    PasswordReset,
+    Payment,
+    ShortLink,
     SiteSettings,
+    Subject,
     TelegramUser,
+    Ticket,
+    User,
     db,
 )
 

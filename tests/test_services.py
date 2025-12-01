@@ -1,13 +1,14 @@
 """Тесты для сервисов."""
 
-import pytest
-import tempfile
 import os
+import tempfile
 import uuid
-from app.services.subject_service import SubjectService
-from app.services.material_service import MaterialService
+
+import pytest
+from app.models import Material, Subject, db
 from app.services.export_service import ExportService
-from app.models import Subject, Material, db
+from app.services.material_service import MaterialService
+from app.services.subject_service import SubjectService
 
 
 class TestSubjectService:

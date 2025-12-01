@@ -1,9 +1,10 @@
 """Расширенные тесты для утилит с низким покрытием."""
 
-import pytest
-import tempfile
 import os
+import tempfile
 from unittest.mock import Mock, patch
+
+import pytest
 from app.utils.file_storage import FileStorageManager, safe_path_join
 from app.utils.payment_service import YooKassaService
 

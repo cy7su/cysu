@@ -36,7 +36,7 @@ class UserManagementService:
     def can_add_materials_to_subject(user: User, subject: Subject) -> bool:
         if user.is_admin and user.admin_mode_enabled:
             return True
-        elif user.is_moderator and user.group_id:
+        elif user.is_moderator and user.moderator_mode_enabled and user.group_id:
             from ..models import SubjectGroup
 
             return (
@@ -91,6 +91,14 @@ class UserManagementService:
         user.admin_mode_enabled = not user.admin_mode_enabled
         db.session.commit()
         return user.admin_mode_enabled
+
+    @staticmethod
+    def toggle_moderator_mode(user: User) -> bool:
+        if not user.is_moderator:
+            return False
+        user.moderator_mode_enabled = not user.moderator_mode_enabled
+        db.session.commit()
+        return user.moderator_mode_enabled
 
     @staticmethod
     def grant_manual_subscription(user: User, days: int = 30) -> bool:

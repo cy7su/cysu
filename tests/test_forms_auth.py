@@ -1,12 +1,13 @@
 """Дополнительные тесты для форм, аутентификации и оплаты."""
 
-import pytest
-from app.models import User, Subject
 import uuid
 
+import pytest
+from app.models import Subject, User
 
 try:
-    from app.forms import LoginForm, RegistrationForm as RegisterForm, MaterialForm
+    from app.forms import LoginForm, MaterialForm
+    from app.forms import RegistrationForm as RegisterForm
 
     FORMS_AVAILABLE = True
 except ImportError:

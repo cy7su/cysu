@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from typing import Union
@@ -16,7 +17,6 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from markupsafe import escape
-import json
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 
@@ -468,6 +468,14 @@ def material_detail(material_id: int) -> Union[str, Response]:
             f"Предмет: {material.subject.title} - Задание: {material.title}"
         )
 
+    can_manage_material = (
+        UserManagementService.can_manage_subject_materials(
+            current_user, material.subject
+        )
+        if current_user.is_authenticated
+        else False
+    )
+
     return render_template(
         "subjects/material_detail.html",
         material=material,
@@ -478,6 +486,7 @@ def material_detail(material_id: int) -> Union[str, Response]:
         share_url=share_url,
         user_solution_share_url=user_solution_share_url,
         meta_description=meta_description,
+        can_manage_material=can_manage_material,
     )
 
 
@@ -634,6 +643,17 @@ def toggle_admin_mode() -> Response:
         flash("Доступ запрещён")
         return redirect(url_for("main.index"))
     mode = "админ" if current_user.admin_mode_enabled else "пользователь"
+    flash(f"Переключен в режим {mode}")
+    return redirect(request.referrer or url_for("main.index"))
+
+
+@main_bp.route("/toggle-moderator-mode", methods=["POST"])
+@login_required
+def toggle_moderator_mode() -> Response:
+    if not UserManagementService.toggle_moderator_mode(current_user):
+        flash("Доступ запрещён")
+        return redirect(url_for("main.index"))
+    mode = "модератор" if current_user.moderator_mode_enabled else "пользователь"
     flash(f"Переключен в режим {mode}")
     return redirect(request.referrer or url_for("main.index"))
 
@@ -1313,9 +1333,10 @@ def export_user_solutions() -> Response:
 
 
 @main_bp.route("/s/<code>")
-def share_link(code: str) -> Response: # pyright: ignore[reportUndefinedVariable]
-    from ..models import ShortLink, Material, db
+def share_link(code: str) -> Response:  # pyright: ignore[reportUndefinedVariable]
     from flask import request
+
+    from ..models import Material, ShortLink, db
 
     current_app.logger.info(
         f"Share link accessed: /s/{code}, User-Agent: {request.headers.get('User-Agent', 'No UA')}, IP: {request.remote_addr}"
@@ -1384,9 +1405,10 @@ def share_link(code: str) -> Response: # pyright: ignore[reportUndefinedVariable
 
 def _share_link_meta(short_link: "ShortLink") -> Response:
     """Возвращает HTML страницу с метаданными для ботов и страницу с JS-загрузкой для пользователей"""
+    from flask import request, url_for
+
     from ..models import Material, Submission
     from ..utils.template_filters import extract_filename
-    from flask import request, url_for
 
     original_url = short_link.original_url
 

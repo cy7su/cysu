@@ -1,7 +1,8 @@
 import logging
-from typing import Optional, Dict, Any, List
-from flask import current_app
+from typing import Any, Dict, List, Optional
+
 from app.models import User
+from flask import current_app
 
 logger = logging.getLogger(__name__)
 

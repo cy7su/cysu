@@ -1,9 +1,10 @@
 """Тесты для представлений (views)."""
 
-import pytest
 import uuid
+
+import pytest
+from app.models import Group, Material, Subject, User, db
 from flask import url_for
-from app.models import User, Group, Subject, Material, db
 
 
 class TestMainViews:

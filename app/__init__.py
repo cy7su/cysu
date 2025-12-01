@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, session, url_for
 from flask_login import LoginManager
 from flask_mail import Mail
-from flask_minify import Minify
 from flask_migrate import Migrate
+from flask_minify import Minify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 
@@ -175,14 +175,7 @@ def create_app():
     login_manager.login_message = (
         "Пожалуйста, войдите в систему для доступа к этой странице."
     )
-    from .views import (
-        admin_bp,
-        api_bp,
-        auth_bp,
-        main_bp,
-        payment_bp,
-        tickets_bp,
-    )
+    from .views import admin_bp, api_bp, auth_bp, main_bp, payment_bp, tickets_bp
     from .views.telegram_auth import telegram_auth_bp
 
     app.register_blueprint(main_bp)

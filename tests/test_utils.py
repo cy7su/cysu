@@ -1,9 +1,8 @@
 """Тесты для утилит."""
 
 import pytest
-from app.utils.transliteration import get_safe_filename
 from app.utils.file_storage import FileStorageManager
-
+from app.utils.transliteration import get_safe_filename
 
 try:
     from app.utils.email_validator import is_allowed_email_domain, validate_email_chars
