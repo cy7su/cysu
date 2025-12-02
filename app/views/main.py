@@ -49,9 +49,6 @@ main_bp.app_context_processor(inject_subscription_status)
 
 
 def get_user_solution_share_url(submission):
-    """
-    Генерирует или возвращает короткую ссылку для поделения пользовательского решения.
-    """
     if not submission or not submission.file:
         return None
 
@@ -87,9 +84,6 @@ def get_user_solution_share_url(submission):
 
 
 def get_share_url(material):
-    """
-    Генерирует или возвращает короткую ссылку для поделения материалом.
-    """
     if not material or not material.solution_file:
         return None
 
@@ -784,24 +778,16 @@ def security_policy() -> str:
 
 @main_bp.route("/.well-known/robots.txt")
 def robots_txt():
-    """
-    Serve robots.txt from the static folder so url_for("main.robots_txt") can be built.
-    """
-
     return current_app.send_static_file(".well-known/robots.txt")
 
 
 @main_bp.route("/robots.txt")
 def robots_txt_redirect():
-    """
-    Redirect /robots.txt to /.well-known/robots.txt
-    """
     return redirect(url_for("main.robots_txt"), code=301)
 
 
 @main_bp.route("/error/<int:error_code>")
 def error_page(error_code: int) -> tuple:
-    """Универсальная страница ошибок"""
     from datetime import datetime
 
     error_info = {
@@ -955,7 +941,6 @@ def grant_temp_access() -> Response:
 
 @main_bp.route("/static/<path:filename>")
 def static_files(filename: str) -> Response:
-    """Обработчик статических файлов с кэшированием"""
     import os
 
     from flask import make_response, send_from_directory
@@ -1222,7 +1207,6 @@ def _handle_range_request(
     methods=["GET", "HEAD"],
 )
 def serve_user_file(subject_id: int, user_id: int, filename: str) -> Response:
-    """Специальный маршрут для файлов решений пользователей"""
     import os
 
     from flask import Response, abort
@@ -1404,7 +1388,6 @@ def share_link(code: str) -> Response:  # pyright: ignore[reportUndefinedVariabl
 
 
 def _share_link_meta(short_link: "ShortLink") -> Response:
-    """Возвращает HTML страницу с метаданными для ботов и страницу с JS-загрузкой для пользователей"""
     from flask import request, url_for
 
     from ..models import Material, Submission

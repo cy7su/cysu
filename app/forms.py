@@ -26,18 +26,12 @@ from .utils.username_validator import contains_forbidden_word, has_allowed_chara
 
 
 def validate_allowed_email_domain(form, field):
-    """
-    Валидатор для проверки разрешенных email доменов
-    """
     if field.data:
         if not is_allowed_email_domain(field.data):
             raise ValidationError("Регистрация недоступна для этого почтового сервиса")
 
 
 def validate_username_characters(form, field):
-    """
-    Валидатор для проверки допустимых символов в username
-    """
     if not field.data:
         return
     if "@" in field.data:
@@ -49,9 +43,6 @@ def validate_username_characters(form, field):
 
 
 def validate_username_allowed(form, field):
-    """
-    Валидатор для проверки username на запрещенные слова
-    """
     if field.data:
         if contains_forbidden_word(field.data):
             raise ValidationError("Это имя пользователя недоступно")
